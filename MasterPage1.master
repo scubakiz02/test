@@ -1,0 +1,208 @@
+<%@ Master Language="VB" CodeFile="MasterPage1.master.vb" Inherits="MasterPage1" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc2" %>
+<%-- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">--%>
+<!DOCTYPE html>
+<%-- <html xmlns="http://www.w3.org/1999/xhtml" > --%>
+<html lang="en">
+
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SATI.Net</title>
+    <link href="MainMenuCSS.css" rel="stylesheet" type="text/css" />
+    <link href="SatiTheme.css" rel="stylesheet" type="text/css" />
+    <link href="SatiStyle.css" rel="stylesheet" type="text/css" />
+    <link href="WorkInstructionLayout.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="MasterMainBackground">
+    <div>
+        <form id="form1" runat="server" defaultfocus="ContentPlaceHolder1">
+            <br />
+            <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="true" AsyncPostBackTimeout="600"></asp:ScriptManager>
+            <asp:Panel ID="MasterPagePanel" runat="server" HorizontalAlign="Center" CssClass="MasterPagePanel">
+                <asp:Panel ID="MasterPagePanelTop" runat="server" HorizontalAlign="Left" BackColor="#CCCCCC" Height="120px" CssClass="MasterPagePanelSub, MasterTopBackground">
+                    <asp:Panel ID="HeaderText" runat="server" class="MasterPagePanelSub, MasterTopBackground" Height="85px">
+                        <table class="MasterPagePanelSub, MasterTopBackground">
+                            <tr>
+                                <td style="padding-left: 10px; padding-bottom: 70px" class="MasterPagePanelSub">
+                                    <asp:HyperLink ID="Label1" runat="server" Font-Bold="True" Font-Size="50"
+                                        ForeColor="Blue" Text="SATI.Net" NavigateUrl="~/Main1.aspx" Font-Underline="false">
+                                    </asp:HyperLink>
+                                    <br />
+
+                                </td>
+                                <td style="text-align: right; vertical-align: top; padding-left: 120px" class="MasterPagePanelSub">
+                                    <table style="text-align: right">
+                                        <tr>
+                                            <td style="text-align: left; padding-bottom: 80px" class="MasterPagePanelSub">
+                                                <asp:Label ID="ComboLabel" runat="server" Text="SDS Search:" Width="82px" BackColor="Yellow" ForeColor="Red"></asp:Label>
+                                                <br />
+                                                <%--<asp:Button ID="HiddenSearchButton" runat="server" Text="" Width="80px" style="display:none"/>--%>
+                                            </td>
+                                            <td style="padding-bottom: 10px" class="MasterPagePanelSub">
+                                                <asp:UpdatePanel ID="UpdatePaneSDS" runat="server" DefaultButton="MakeShiftX">
+                                                    <ContentTemplate>
+                                                        <asp:Panel ID="Panel2" runat="server" HorizontalAlign="Center" Height="16px">
+                                                            <cc2:ComboBox ID="ComboSearchBox" runat="server" AppendDataBoundItems="false" AutoCompleteMode="Append" AutoPostBack="True" BackColor="#B5C7DE" DataTextField="Name" DataValueField="FileName" Font-Bold="True" Height="15px" RenderMode="Block" Width="250px" DropDownStyle="DropDown">
+                                                            </cc2:ComboBox>
+                                                        </asp:Panel>
+                                                        <asp:Panel ID="Panel3" runat="server" Height="16px" HorizontalAlign="Left" Style="padding-top: 3px">
+                                                            <asp:CheckBox ID="Preference" runat="server" Style="align-content: baseline; padding-top: 1px" Font-Size="Smaller" AutoPostBack="true" BorderStyle="Double" BorderColor="Transparent" />
+                                                            <asp:Label ID="SearchPrefence" runat="server" Text="Change Search Preference" Font-Size="Smaller"></asp:Label>
+                                                            <%--<asp:Button ID="MakeShiftX" runat="server" Text="X" Style="background-color: transparent; border: none; position: relative; z-index: 10; left: 103px; top: -21px; height: 18px; color: gray;" OnClick="MakeShiftX_Click"/>--%>
+                                                        </asp:Panel>
+                                                    </ContentTemplate>
+                                                </asp:UpdatePanel>
+                                                <asp:Panel ID="Panel1" runat="server" Height="60px">
+                                                    <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutPageUrl="~/Main1.aspx" />
+                                                    <br />
+                                                    <asp:LoginName ID="LoginName1" runat="server" Font-Bold="True" Font-Size="Large" FormatString="Hello,  {0}" />
+                                                </asp:Panel>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </asp:Panel>
+                    <asp:Panel ID="CSSMainMenuPanel" runat="server" HorizontalAlign="Center" Height="40px" CssClass="MasterTopBackground">
+                    </asp:Panel>
+                </asp:Panel>
+                <cc2:RoundedCornersExtender ID="RoundedCornersPanel5" runat="server" TargetControlID="MasterPagePanelTop" Radius="10" Corners="Top" Color="#80befd" />
+                <asp:Panel ID="MasterPagePanelMidCenter" runat="server" HorizontalAlign="Center" CssClass="MasterPagePanelSub">
+                    <asp:Panel ID="MasterPagePanelMain" runat="server" HorizontalAlign="Left" BackColor="White" CssClass="MasterPageContentPanel">
+                        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
+                    </asp:Panel>
+                </asp:Panel>
+                <asp:Panel ID="MasterPagePanelBottom" runat="server" HorizontalAlign="Center" Height="160px" CssClass="MasterPagePanelSub, MasterBottomBackground">
+                    <table class="MasterPageContentPanel">
+                        <tr>
+                            <td>
+                                <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/MR/MRT.aspx" ForeColor="White">Maintenance Request</asp:HyperLink>
+                                &nbsp;<asp:LinkButton ID="LinkButton1" runat="server"
+                                    PostBackUrl="~/CheckSum.aspx" Visible="false">Look CheckSum</asp:LinkButton>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:HyperLink ID="Forms_Button" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Controlled Forms" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="065px" Text="Forms"></asp:HyperLink>&nbsp;|&nbsp;
+                                <asp:HyperLink ID="ProcedButton" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Controlled Procedures" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="Black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="105px" Text="Procedures"></asp:HyperLink>&nbsp;|&nbsp;
+                                <asp:HyperLink ID="WorkInButton" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Controlled Work Instructions" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="154px" Text="Work Instructions"></asp:HyperLink>&nbsp;|&nbsp; 
+                                <asp:HyperLink ID="Label_Button" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Labels" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="Black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="105px" Text="Misc Labels"></asp:HyperLink>&nbsp;|&nbsp;
+                                <asp:HyperLink ID="RecipeButton" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Controlled Recipes" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="Black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="065px" Text="Recipes"></asp:HyperLink>&nbsp;|&nbsp;
+                                <asp:HyperLink ID="ProLogButton" NavigateUrl="~/DirectoryNavigator.aspx?Nav=Pro-Logs" runat="server" CssClass="MasterTopBackground" BorderColor="#666666" ForeColor="Black" BorderStyle="Outset" BorderWidth="2px" Font-Names="Times New Roman" Font-Underline="true" Width="070px" Text="Pro Logs"></asp:HyperLink>&nbsp;|&nbsp;
+                                <asp:HyperLink ID="HyperLink1" runat="server"
+                                    NavigateUrl="~/Reports/SPxChart.aspx"
+                                    BackColor="#339933" ForeColor="White" BorderColor="#666666"
+                                    BorderStyle="Outset" BorderWidth="2px" Width="120px">SPx Quick View</asp:HyperLink>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <asp:HyperLink ID="HyperLink10" runat="server"
+                                    NavigateUrl="http://57.201.101.139:82/"
+                                    CssClass="MasterTopBackground" ForeColor="Black" BorderColor="#666666"
+                                    BorderStyle="Outset" BorderWidth="2px" Width="75px">Sati.Pulse</asp:HyperLink>
+                                &nbsp;|&nbsp;
+                                <asp:HyperLink ID="HyperLink11" runat="server"
+                                    NavigateUrl="http://57.201.101.139:83/"
+                                    CssClass="MasterTopBackground" ForeColor="Black" BorderColor="#666666"
+                                    BorderStyle="Outset" BorderWidth="2px" Width="120px">Pure Wafer Web</asp:HyperLink>
+                                &nbsp;|&nbsp;
+                                <asp:HyperLink ID="HyperLink12" runat="server"
+                                    NavigateUrl="~/ToolData/CleanroomClimate.aspx"
+                                    CssClass="MasterTopBackground" ForeColor="Black" BorderColor="#666666" BackColor="#FFFFCC"
+                                    BorderStyle="Outset" BorderWidth="2px" Width="150px"> Cleanroom Climate</asp:HyperLink>
+                            </td>
+                        </tr>
+                    </table>
+                    <asp:Panel ID="MainTranslatorPanel" runat="server" CssClass="MasterPagePanelSub">
+                        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                            <ContentTemplate>
+                                <asp:Panel ID="TranslatorCheckBoxPanel" runat="server" Class="MasterPagePanelSub">
+                                    <table class="MasterPagePanelSub">
+                                        <tr>
+                                            <td>
+                                                <asp:CheckBox ID="CheckBoxViewTranslator" runat="server" AutoPostBack="True" Text="View Translator" ForeColor="White" />
+                                                <asp:HyperLink ID="HyperLink9" runat="server" NavigateUrl="~/Test.aspx" Visible="false">T</asp:HyperLink>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <br />
+                                </asp:Panel>
+                                <asp:Panel ID="PanelTranslator" runat="server" HorizontalAlign="Center" Visible="False" CssClass="MasterPagePanel, MasterBottomBackground">
+                                    <asp:Panel ID="PanelTranslatorinside" runat="server" HorizontalAlign="Center" Width="450px" BorderStyle="Solid" BorderColor="DarkGray">
+                                        <table style="color: white">
+                                            <tr>
+                                                <td></td>
+                                                <td style="padding-right: 300px; width: 76px">Translator
+                                                </td>
+                                                <td>
+                                                    <asp:Button ID="ButtonCloseWindow" runat="server" Font-Size="Smaller" Text="Close" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <br />
+                                        <br />
+                                        <table style="color: white">
+                                            <tr>
+                                                <td style="padding-right: 75px"></td>
+                                                <td>WB
+                                                </td>
+                                                <td>
+                                                    <asp:TextBox ID="TextBoxWB_to_In" runat="server" Width="120px"></asp:TextBox>
+                                                </td>
+                                                <td>&nbsp;to Instance&nbsp;
+                                                </td>
+                                                <td>
+                                                    <asp:Button ID="ButtonFindInstance" runat="server" Text="Find" />
+                                                </td>
+                                                <td>&nbsp;<asp:Label ID="LabelIntance" runat="server" Font-Size="Larger" ForeColor="white"></asp:Label>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-right: 75px"></td>
+                                                <td>CB&nbsp;
+                                                </td>
+                                                <td>
+                                                    <asp:TextBox ID="TextBoxCB_to_WB" runat="server" Width="120px"></asp:TextBox>
+                                                </td>
+                                                <td>&nbsp;to WB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                </td>
+                                                <td>
+                                                    <asp:Button ID="ButtonFindWaferBox" runat="server" Text="Find" />
+                                                </td>
+                                                <td>&nbsp;<asp:Label ID="LabelWaferBox" runat="server" Font-Size="Larger" ForeColor="white"></asp:Label>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <br />
+                                    </asp:Panel>
+                                </asp:Panel>
+                                <cc2:AlwaysVisibleControlExtender ID="Ex" TargetControlID="PanelTranslator" runat="server" VerticalSide="Middle" HorizontalSide="Center" />
+                            </ContentTemplate>
+                        </asp:UpdatePanel>
+                    </asp:Panel>
+                    <br />
+                </asp:Panel>
+                <cc2:RoundedCornersExtender ID="RoundedCornersExtender1" runat="server" TargetControlID="MasterPagePanelBottom" Radius="10" Corners="Bottom" />
+            </asp:Panel>
+            <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" />
+            <asp:HiddenField ID="DirectoryNavigatorPath" runat="server" Value="Controlled Forms" />
+        </form>
+    </div>
+    <script src="/scripts/MainMenuLoader.js" type="text/javascript"></script>
+    <script src="/scripts/SatiUtilityClient.js" type="text/javascript"></script>
+</body>
+</html>

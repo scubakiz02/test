@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "SatiDotNet2(3)", ".", "{BBA3DB41-E6CA-4D8E-A846-4D43A048680D}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.7.2"
+		Debug.AspNetCompiler.VirtualPath = "/SatiDotNet2"
+		Debug.AspNetCompiler.PhysicalPath = "..\SatiDotNet2\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\SatiDotNet2\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/SatiDotNet2"
+		Release.AspNetCompiler.PhysicalPath = "..\SatiDotNet2\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\SatiDotNet2\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "10291"
+		SlnRelativePath = "..\SatiDotNet2\"
+		StartServerOnDebug = "true"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DeBug2|Any CPU = DeBug2|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBA3DB41-E6CA-4D8E-A846-4D43A048680D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBA3DB41-E6CA-4D8E-A846-4D43A048680D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBA3DB41-E6CA-4D8E-A846-4D43A048680D}.DeBug2|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBA3DB41-E6CA-4D8E-A846-4D43A048680D}.DeBug2|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {709948B8-023C-4679-9CDE-4B538DCAC96A}
+	EndGlobalSection
+EndGlobal
