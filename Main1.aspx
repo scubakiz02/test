@@ -12,6 +12,7 @@
         <asp:HyperLink ID="HyperLink04" runat="server" ForeColor="Blue" NavigateUrl="~/DBMaintenance/DBMaintenanceMain.aspx">DB Maintenance</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink05" runat="server" ForeColor="Blue" NavigateUrl="~/Sales/MainSales.aspx">Sales Maintenance</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink07" runat="server" ForeColor="Blue" NavigateUrl="~/MaintenanceDepartment/MD_Main.aspx">Maintenance Department</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLink12" runat="server" ForeColor="Blue" NavigateUrl="~/ITDepartment/MD_Main.aspx">IT Department</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink10" runat="server" ForeColor="Blue" NavigateUrl="~/SPC/SPC_Main.aspx">SPC</asp:HyperLink><br /> 
          
         <asp:HyperLink ID="HyperLink09" runat="server" ForeColor="Blue" Visible="False" NavigateUrl="~/InfoDirectory/InfoDirectoryMain.aspx">Info Directory</asp:HyperLink><br />

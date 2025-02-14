@@ -1,0 +1,152 @@
+﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="true" CodeFile="ITRT.aspx.vb" Inherits="MR_MRT" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+
+    <script type="text/javascript"> 
+        function countChars(obj) {
+            var maxLength = 1000;
+            var strLength = obj.value.length;
+            var charRemain = (maxLength - strLength);
+
+            if (charRemain < 1) {
+                document.getElementById("charNum").innerHTML = '<span style="color: red;">You have achieved the limit of ' + maxLength + '.</span>';
+                if (charRemain < 0) {
+                    obj.value = obj.value.substring(0, maxLength);
+                }
+            } else {
+                document.getElementById("charNum").innerHTML = 'Characters Remaining: ' + charRemain;
+            }
+        }
+    </script>
+
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+
+            <table style="margin-bottom: 0px">
+                <tr>
+                    <td colspan="3" style="height: 23px;">
+
+                        <table class="MasterPagePanelSub">
+                            <tr>
+                                <td>&nbsp;<asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Ticket Request for IT"></asp:Label></td>
+                                <td style="text-align: right">&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/TR/OpenTRQuickView.aspx" /></td>
+                            </tr>
+                        </table>
+
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <br />
+                        <div style="display: flex; align-items: center;">
+                            <div>
+                                Select Department&nbsp;
+                                <asp:DropDownList ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
+                                    DataSourceID="DepartmentSqlDataSource" DataTextField="Department" DataValueField="Department"
+                                    OnSelectedIndexChanged="departmentDropDownList_SelectedIndexChanged" Width="168px">
+                                    <asp:ListItem>Select One...</asp:ListItem>
+                                </asp:DropDownList>
+                            </div>
+
+                            <div style="padding: 0 30px;">
+                                Select Tool&nbsp;
+                                <asp:DropDownList ID="ToolDropDownList" runat="server" DataSourceID="ToolSqlDataSource"
+                                    DataTextField="Tool" DataValueField="Key" Width="168px" AutoPostBack="True">
+                                </asp:DropDownList>
+                            </div>
+
+                            <asp:Panel Visible="False" ID="WebpagePanel" runat="server">
+                                Select Webpage&nbsp;
+                                <asp:DropDownList ID="WebpageDropDownList" runat="server" DataSourceID="WebpageSqlDataSource"
+                                    DataTextField="Tool" DataValueField="Key" Width="168px" AutoPostBack="True">
+                                </asp:DropDownList>
+                            </asp:Panel>
+                        </div>
+                        <br />
+                        <div>
+                            Is the tool down &nbsp;
+                        <asp:DropDownList ID="DropDownListTicketType" runat="server">
+                            <asp:ListItem>Select...</asp:ListItem>
+                            <asp:ListItem Value="Standard">No</asp:ListItem>
+                            <asp:ListItem Value="Down">Yes</asp:ListItem>
+                        </asp:DropDownList>
+                        </div>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td style="display: none; border-style: solid; border-width: thin" valign="top">
+                        <table class="style1" bgcolor="#CCFFCC">
+                            <tr>
+                                <td colspan="2" style="width: 118px">Wafer Infomation:
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 118px">Lot Number?</td>
+                                <td>
+                                    <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 118px">Instance Number?</td>
+                                <td>
+                                    <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox></td>
+                            </tr>
+                        </table>
+
+                    </td>
+                    <td colspan="2" valign="top">
+                        <asp:Panel ID="PanelSGT" runat="server" BackColor="#66CCFF" Visible="False">
+                            Select problem areas.<br />
+                            <asp:CheckBoxList
+                                ID="CheckBoxList_SGL"
+                                runat="server"
+                                DataSourceID="SqlDataSource_SGN"
+                                DataTextField="SG_Name"
+                                DataValueField="SB_Tag" RepeatLayout="Flow">
+                            </asp:CheckBoxList>
+                        </asp:Panel>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="padding-top: 20px">&nbsp;Describe the Problem Below 
+                        <asp:Panel ID="Panel1" runat="server" Height="17px" Style="padding-left: 4px">
+                            <p id="charNum" style="color: blue">Characters Remaining: 1000 </p>
+                        </asp:Panel>
+                        <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" />
+                        <asp:UpdateProgress ID="UpdateProgress2" runat="server">
+                            <ProgressTemplate>
+                                &nbsp;<img src="../Color/Animated_LoadingBigger.gif" />Loading...
+                            </ProgressTemplate>
+                        </asp:UpdateProgress>
+                        <br />
+                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px"></asp:Label>
+                    </td>
+                </tr>
+
+            </table>
+            <asp:SqlDataSource ID="DepartmentSqlDataSource" runat="server"
+                ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>" SelectCommand="SELECT [Department] FROM [T_IT_Departments] ORDER BY [Department]"></asp:SqlDataSource>
+
+            <asp:SqlDataSource ID="ToolSqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                SelectCommand="SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '0')"></asp:SqlDataSource>
+
+            <asp:SqlDataSource ID="WebpageSqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                SelectCommand="SELECT Tool, [Key] FROM dbo.T_IT_Webpages WHERE (Department = '0')"></asp:SqlDataSource>
+
+            <asp:SqlDataSource ID="SqlDataSource_SGN" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                SelectCommand="SELECT T_Tool_SubGroup_Tag_Names.SG_Name, T_Tool_SubGroup_Tag_Names.SB_Tag FROM T_Tools INNER JOIN T_Tool_SubGroup_Tag_Names ON T_Tools.[Key] = T_Tool_SubGroup_Tag_Names.Tool_Key WHERE (T_Tools.Tool = 'CMP 1')"></asp:SqlDataSource>
+
+            <br />
+        </ContentTemplate>
+    </asp:UpdatePanel>
+</asp:Content>
+

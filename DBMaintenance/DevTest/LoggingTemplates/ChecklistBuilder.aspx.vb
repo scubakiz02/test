@@ -1,0 +1,1140 @@
+﻿Imports System.Text.Json
+
+
+Partial Class MR_OpenTicketStatusBoard
+    Inherits System.Web.UI.Page
+    Dim SatiCode As New Class1
+    Dim VisiblePanels As New List(Of Panel)
+    Dim ValidTextBoxes As New List(Of TextBox)
+    Dim VisibleCheckBoxes As New List(Of CheckBox)
+    Dim LabelInputMap As New Dictionary(Of String, String)
+    Dim LabelOutOfRangeMap As New Dictionary(Of String, Boolean?)
+    Dim TbxToRange As New Dictionary(Of String, String)
+    Dim RangeCheck As New Dictionary(Of String, Func(Of String, Boolean)) 'a function that takes a String and returns a Boolean
+    Dim AreaKeyFromDropDownList As String
+    Dim TimeForNewLog As Boolean
+    Dim LogDS As New Data.DataSet
+    Dim LogDR As Data.DataRow
+    Dim ReadOnlyMessage As String = "Read-Only Mode"
+    Dim WebpageUrl As String = "/DBMaintenance/DevTest/LoggingTemplates/ChecklistBuilder.aspx"
+    Dim StampSelectPage As String = "/DBMaintenance/DevTest/LoggingTemplates/StampSelect.aspx"
+    Dim MostRecentRec As String
+    Dim DS As Data.DataSet
+    Dim DR As Data.DataRow
+    Dim DRC As Data.DataRowCollection
+    Dim AreaFromQueryString As String
+    Dim LabelFromQueryString As String
+    Dim CommentFromQueryString As String
+    Dim EditPreviewPanel_ScrollPos As String
+    Dim FormViewInsert As FormView = Nothing
+    Dim Department As String
+
+    Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
+        MenuAuthenication.CheckPageAuthenication(Page, User, Server)
+        'MenuAuthenication.CheckGroupAuthenication("Office", Server)
+        Me.MaintainScrollPositionOnPostBack = True
+        AreaFromQueryString = Request.QueryString("Area")
+        LabelFromQueryString = Request.QueryString("Label")
+        CommentFromQueryString = Request.QueryString("Comment")
+        EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
+        Dim Unit As String
+
+        If Not IsPostBack Then
+            ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
+
+            If AreaFromQueryString IsNot Nothing Then
+                RefreshIframe()
+                DepartmentInterfacePanel.Enabled = True
+
+                AreaDropDownList.SelectedValue = AreaFromQueryString
+                AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
+
+                If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [SatiTest].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
+                    Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
+                    AreaDisableButton.Text = "Enable"
+                End If
+
+                'if here, area ddl has a selected value. Thus, remove static ListItem from AreaDropDownList
+                If AreaDropDownList.Items(0).Text = "Select Checklist..." Then
+                    AreaDropDownList.Items.RemoveAt(0)
+                End If
+
+                'label interface
+                If LabelFromQueryString Is Nothing Then
+                    LabelFromQueryString = SetLabelFromQueryString()
+                End If
+
+                LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString
+                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY LabelOrder"
+                LabelDropDownList.Items.Clear()
+                LabelDropDownList.DataBind()
+
+                If LabelFromQueryString IsNot Nothing Then
+                    'enable associated functionalities
+                    LabelDropDownList.Enabled = True
+                    LabelOrderInterfacePanel.Enabled = True
+                    CheckOnlyCheckBox.Enabled = True
+                    OffHandAutoCheckbox.Enabled = True
+                    RangeOrderInterfacePanel.Enabled = True
+                    UnitInterfacePanel.Enabled = True
+
+                    'prep functionalities that were enabled
+                    Unit = GetSingleDbField("SELECT U.[Key] FROM [SatiTest].[dbo].[T_LogLabel] L INNER JOIN [SatiTest].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=" & LabelFromQueryString, "Key")
+                    UnitDropDownList.SelectedValue = Unit
+
+                    LabelDropDownList.SelectedValue = LabelFromQueryString
+                    LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
+                    LabelFormView_SqlDataSource.DataBind()
+
+                    SetCheckBox()
+                    SetRangeOrder()
+                End If
+
+                'comment interface
+                CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString
+                CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY CommentOrder"
+                CommentDropDownList.Items.Clear()
+                CommentDropDownList.DataBind()
+
+                If CommentFromQueryString IsNot Nothing Then
+                    'enable associated functionalities
+                    CommentDropDownList.Enabled = True
+                    CommentOrderInterface.Enabled = True
+
+                    'prep functionalities that were enabled
+                    CommentDropDownList.SelectedValue = CommentFromQueryString
+                    CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [Key]=" & CommentFromQueryString
+                    CommentFormView_SqlDataSource.DataBind()
+                End If
+
+                'stamp interface
+                StampInterfacePanel.Enabled = True
+
+                'Department interface
+                Department = GetSingleDbField("SELECT D.[Key] FROM [SatiTest].[dbo].[T_LogArea] A INNER JOIN [SatiTest].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] WHERE A.[Key]=" & AreaFromQueryString, "Key")
+                DepartmentDropDownList.SelectedValue = Department
+
+                'remove static ListItem for DepartmentDropDownList once user has selected an Department
+                If Department IsNot Nothing Then
+                    DepartmentDropDownList.Items(0).Enabled = False
+                    IntervalInterfacePanel.Enabled = True
+                End If
+
+            Else 'if here, user has just opened the webpage
+                'delete topmost dead record (dead = no records In T_LogData, And has been more 30 days since creation Of record In T_LogArea And (has a NULL Interval, Department, Or no associated Labels))
+                Dim TopmostDeadRecordKey As String = GetSingleDbField("SELECT [Key] FROM [SatiTest].[dbo].[T_LogArea] A WHERE (SELECT COUNT([Key]) FROM [SatiTest].[dbo].[T_LogData] D WHERE A.[Key]= D.AreaKey) = 0  And ABS(DATEDIFF(Day, GETDATE(), A.DateCreated)) > 30 And (A.IntervalKey Is NULL Or A.DepartmentKey Is NULL Or (Select COUNT([Key]) FROM [SatiTest].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0)", "Key")
+                If TopmostDeadRecordKey IsNot Nothing Then
+                    ExecuteSqlQuery("DELETE FROM [SatiTest].[dbo].[T_LogArea] WHERE [Key]=" & TopmostDeadRecordKey)
+                End If
+            End If
+        End If
+    End Sub
+
+    Protected Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
+        Dim IntervalKey As String
+        Dim Interval As String
+        Dim IntervalDR As Data.DataRow
+        Dim ListItemStylesDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: red;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [SatiTest].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: lightgray; color: gray;' ELSE 'color: black;' END AS ListItemStyles FROM [SatiTest].[dbo].[T_LogArea] A")
+        Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
+        Dim ListItemStylesDR As Data.DataRow
+        Dim AreaListItem As ListItem
+
+        'interval interface
+        Try 'in case selected checklist does NOT have a set interval
+            IntervalDR = SatiCode.GetMyDataSet("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [SatiTest].[dbo].[T_LogArea] A INNER JOIN [SatiTest].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaFromQueryString).Tables(0).Rows(0)
+            IntervalKey = IntervalDR("Key")
+            Interval = IntervalDR("Interval")
+            IntervalDropDownList.SelectedValue = IntervalKey
+        Catch ex As Exception
+            IntervalKey = Nothing
+        End Try
+
+        'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
+        For I = 0 To ListItemStylesRC
+            ListItemStylesDR = ListItemStylesDS.Tables(0).Rows(I)
+            AreaListItem = AreaDropDownList.Items.FindByValue(ListItemStylesDR("Key"))
+
+            If AreaListItem IsNot Nothing Then
+                AreaListItem.Attributes.Add("style", ListItemStylesDR("ListItemStyles"))
+            End If
+        Next
+
+        'remove static ListItem for IntervalDropDownList once user has selected an interval
+        If IntervalKey IsNot Nothing Then
+            Dim DatepickText As String = If(IsDBNull(IntervalDR("OneTimeDate")), String.Empty, Date.Parse(IntervalDR("OneTimeDate")).Date)
+            Dim Assignee As String = If(IsDBNull(IntervalDR("Assignee")), Nothing, IntervalDR("Assignee"))
+
+            If IntervalDropDownList.Items(0).Text = "Select Interval..." Then
+                IntervalDropDownList.Items.RemoveAt(0)
+            End If
+
+            If Interval = "DAILY" Then 'doing this up here, b/c the next if statement needs these changes to already be made
+                UserAssigneeButton.Visible = False
+
+                'reconfigure ShiftDropDownList ListItem controls
+                For Each ListItem As ListItem In ShiftDropDownList.Items
+                    If ListItem.Text <> ShiftDropDownList.Items(0).Text Then
+                        ListItem.Enabled = False
+                    End If
+                Next
+
+                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Day Shift"}, {"Value", "Day Shift"}})
+                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Night Shift"}, {"Value", "Night Shift"}})
+                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Days (M-F)"}, {"Value", "Days (M-F)"}})
+            End If
+
+            If Interval = "ONE TIME ONLY" Then
+                OneTimeDatepickPanel.Visible = True
+                DatepickTextBox.Text = DatepickText
+
+                If String.IsNullOrEmpty(DatepickText) Then 'disable AssigneeInterfacePanel if a date is NOT set
+                    AssigneeInterfacePanel.Enabled = False
+                    Exit Sub
+                End If
+            ElseIf IntervalDR("DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be quarterly, bi-annual, 1 year, 2 year, etc.
+                AssigneeInterfacePanel.Visible = False
+            End If
+
+            If Assignee Is Nothing Then
+                GenericDropDownList.Visible = True
+            ElseIf ShiftDropDownList.Items.FindByText(Assignee) IsNot Nothing Then
+                ShiftDropDownList.SelectedValue = Assignee
+                AssignToMenu_onClick(ShiftAssigneeButton, EventArgs.Empty)
+            ElseIf GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [SatiTest].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString & " AND Assignee='" & Assignee & "'", "Assignee") = "1" Then
+                UsersDropDownList.DataBind()
+                UsersDropDownList.SelectedValue = Assignee
+                AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
+            End If
+            'if 1 or more associated records exist in T_LogData, disable interval ddl
+            If GetSingleDbField("SELECT COUNT([Key]) As NumOfLogs FROM [SatiTest].[dbo].[T_LogData] WHERE AreaKey=" & AreaFromQueryString, "NumOfLogs") > 1 Then
+                IntervalDropDownList.Enabled = False
+            End If
+        End If
+
+        'prevent default FormView behavior when 'Insert' linkbutton is clicked and associated TextBox is empty
+        If AreaFromQueryString IsNot Nothing Then
+            If FormViewInsert Is Nothing Then
+                Exit Sub
+            End If
+        End If
+
+        'if FormViewInsert has a value, that means that FormView control is in insert mode, and IT NEEDS TO STAY THERE
+        If FormViewInsert IsNot Nothing Then
+            FormViewInsert.ChangeMode(FormViewMode.Insert)
+        End If
+
+        FormViewInsert = Nothing
+    End Sub
+
+    Sub CreateListItem(Config As Dictionary(Of String, String))
+        Dim ListItem2 As New ListItem()
+        ListItem2.Text = Config("Text")
+        ListItem2.Value = Config("Value")
+        CType(EditPreviewPanel.FindControl(Config("Parent")), DropDownList).Items.Add(ListItem2)
+    End Sub
+
+    Protected Sub Stamp_OnClick(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("INSERT INTO [SatiTest].[dbo].[T_LogStamp] (StampKey, DataRecordKey, StampedBy, Date) VALUES (" & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
+        sender.Text = User.Identity.Name.ToString
+        sender.Enabled = False
+    End Sub
+
+    Protected Sub DynamicButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+    End Sub
+
+    Public Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
+        Dim Generator As System.Random = New System.Random()
+        Return Generator.Next(Min, Max)
+    End Function
+
+    Function CallSqlFunction(Query As String) As Boolean
+
+    End Function
+
+    Function StripString(ByVal input As String) As String
+        Return Regex.Replace(input, "[^a-zA-Z0-9]", "").ToLower()
+    End Function
+
+    Private Sub SetControlsEnabledProp(container As Control, EnabledValue As Boolean)
+        For Each ctrl As Control In container.Controls
+            If TypeOf ctrl Is WebControl Then
+                DirectCast(ctrl, WebControl).Enabled = EnabledValue
+            End If
+
+            If EnabledValue And TypeOf ctrl Is CheckBox Then 'uncheck CheckBox elements during hourly rollover
+                DirectCast(ctrl, CheckBox).Checked = False
+            End If
+
+            ' Recursively process child controls
+            If ctrl.HasControls() Then
+                SetControlsEnabledProp(ctrl, EnabledValue)
+            End If
+        Next
+    End Sub
+
+
+    Sub UploadToDataTable()
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=SatiTest;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.Open()
+
+        Dim My_DA As New Data.SqlClient.SqlDataAdapter
+        Dim My_DS As New Data.DataSet
+        Dim My_DR As Data.DataRow
+        '*****************************************************************
+        '************************Select***********************************
+        '*****************************************************************
+        Dim MySelectCmd As New System.Data.SqlClient.SqlCommand
+        With MySelectCmd
+            .CommandText = MostRecentRec
+            .Connection = Connection
+        End With
+        My_DA.SelectCommand = MySelectCmd
+
+        '*****************************************************************
+        '************************Insert***********************************
+        '*****************************************************************
+        Dim MyInsertCmd As New System.Data.SqlClient.SqlCommand
+        With MyInsertCmd
+            .CommandText = "INSERT INTO T_LogData (AreaKey, Inputs, OutOfRange, Date, Operator, Shift, CompleteLog, ManagerStamp1, ManagerStamp2, ManagerStamp3, ToolNumber, Active) VALUES (@AreaKey, @Inputs, @OutOfRange, @Date, @Operator, @Shift, @CompleteLog, NULL, NULL, NULL, NULL, 'False')"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@AreaKey", System.Data.SqlDbType.Int, 0, "AreaKey"), New System.Data.SqlClient.SqlParameter("@Inputs", System.Data.SqlDbType.VarChar, 0, "Inputs"), New System.Data.SqlClient.SqlParameter("@OutOfRange", System.Data.SqlDbType.VarChar, 0, "OutOfRange"), New System.Data.SqlClient.SqlParameter("@Date", System.Data.SqlDbType.SmallDateTime, 0, "Date"), New System.Data.SqlClient.SqlParameter("@Operator", System.Data.SqlDbType.VarChar, 0, "Operator"), New System.Data.SqlClient.SqlParameter("@Shift", System.Data.SqlDbType.VarChar, 0, "Shift"), New System.Data.SqlClient.SqlParameter("@CompleteLog", System.Data.SqlDbType.Bit, 0, "CompleteLog")})
+        End With
+        My_DA.InsertCommand = MyInsertCmd
+
+        '*****************************************************************
+        '************************Update***********************************
+        '*****************************************************************
+        Dim MyUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With MyUpdateCmd
+            .CommandText = "UPDATE T_LogData SET [Inputs] = @Inputs, [OutOfRange] = @OutOfRange, [Date] = @Date, [Operator] = @Operator, [CompleteLog] = @CompleteLog WHERE [Key]=@DataLogKey; SELECT TOP(1) * FROM T_LogData WHERE AreaKey=" & AreaKeyFromDropDownList & " ORDER BY Date DESC;"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Inputs", System.Data.SqlDbType.VarChar, 0, "Inputs"), New System.Data.SqlClient.SqlParameter("@OutOfRange", System.Data.SqlDbType.VarChar, 0, "OutOfRange"), New System.Data.SqlClient.SqlParameter("@Date", System.Data.SqlDbType.SmallDateTime, 0, "Date"), New System.Data.SqlClient.SqlParameter("@Operator", System.Data.SqlDbType.VarChar, 0, "Operator"), New System.Data.SqlClient.SqlParameter("@CompleteLog", System.Data.SqlDbType.Bit, 0, "CompleteLog"), New System.Data.SqlClient.SqlParameter("@DataLogKey", System.Data.SqlDbType.Int, 0, "Key")})
+        End With
+        My_DA.UpdateCommand = MyUpdateCmd
+
+        '*****************************************************************
+        '************************Delete***********************************
+        '*****************************************************************
+        'Dim MyDeleteCmd As New System.Data.SqlClient.SqlCommand
+        'With MyDeleteCmd
+        '    .CommandText = "DELETE FROM [aspnet_UsersInRoles] WHERE (([UserId] = @Original_UserId) AND ([RoleId] = @Original_RoleId))"
+        '    .Connection = Connection
+        '    .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Original_UserId", System.Data.SqlDbType.UniqueIdentifier, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "UserId", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_RoleId", System.Data.SqlDbType.UniqueIdentifier, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "RoleId", System.Data.DataRowVersion.Original, Nothing)})
+        'End With
+        'My_DA.DeleteCommand = MyDeleteCmd
+
+        '*****************************************************************
+        '************************Genral***********************************
+        '*****************************************************************
+        My_DA.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_LogData", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("AreaKey", "AreaKey"), New System.Data.Common.DataColumnMapping("Inputs", "Inputs"), New System.Data.Common.DataColumnMapping("OutOfRange", "OutOfRange"), New System.Data.Common.DataColumnMapping("Date", "Date"), New System.Data.Common.DataColumnMapping("Operator", "Operator"), New System.Data.Common.DataColumnMapping("Shift", "Shift"), New System.Data.Common.DataColumnMapping("CompleteLog", "CompleteLog")})}) 'the fields that are dynamically generated
+        My_DA.Fill(My_DS)
+
+        'in case of db upload failure, closing code below in a try catch block
+        Try
+            My_DR = My_DS.Tables(0).Rows(0)
+            My_DR.AcceptChanges()
+            My_DR.BeginEdit()
+
+            If Not IsDBNull(My_DR("Operator")) Then
+                If My_DR("Operator") <> User.Identity.Name.ToString Then
+                    Throw New Exception(ReadOnlyMessage)
+                End If
+            End If
+
+            My_DR("Operator") = User.Identity.Name.ToString
+            My_DR("CompleteLog") = False
+            My_DR("Inputs") = JsonSerializer.Serialize(LabelInputMap)
+            My_DR("OutOfRange") = JsonSerializer.Serialize(LabelOutOfRangeMap)
+            My_DR("Date") = System.DateTime.Now.ToShortTimeString
+            My_DR.EndEdit()
+            My_DA.Update(My_DS, "T_LogData")
+        Catch ex As Exception
+        End Try
+        Connection.Close()
+    End Sub
+
+    Function ValidateInput(Pnl As Panel) As Boolean
+        Dim Button As Button
+        Dim TextBox As TextBox
+        Dim UserInput As String
+        Dim UserInputDec As Decimal
+        Dim InRange As Boolean
+        Dim Range As String
+        Dim LowerBound As Decimal
+        Dim UpperBound As Decimal
+        Dim DelimitArr() As String
+        Dim Valid As Boolean = True
+        Dim CheckboxOverTextbox As Boolean?
+
+        'TO DO: incorporate this block of code into the next for loop, to avoid looping through panel controls twice.
+        'Note: When looping through parent Panel, the TextBox control is reached before the CheckBox control. This snippet was a quick workaround
+        Dim Cbx As CheckBox
+
+        For Each ctrl As Control In Pnl.Controls
+            If TypeOf ctrl Is CheckBox Then
+                Cbx = CType(ctrl, CheckBox)
+            End If
+        Next
+        'TO DO: incorporate this block of code into the next for loop, to avoid looping through panel controls twice.
+        'Note: When looping through parent Panel, the TextBox control is reached before the CheckBox control. This snippet was a quick workaround
+
+        For Each ctrl As Control In Pnl.Controls
+            If TypeOf ctrl Is Button Then
+                Button = CType(ctrl, Button)
+            End If
+
+            If TypeOf ctrl Is TextBox Then
+                TextBox = CType(ctrl, TextBox)
+                UserInput = TextBox.Text
+                CheckboxOverTextbox = If(IsDBNull(SatiCode.GetMyDataSet("SELECT CheckboxOverTextbox FROM [SatiTest].[dbo].[T_LogLabel] WHERE [Key]=" & TextBox.ID).Tables(0).Rows(0)("CheckboxOverTextbox")), Nothing, SatiCode.GetMyDataSet("SELECT CheckboxOverTextbox FROM [SatiTest].[dbo].[T_LogLabel] WHERE [Key]=" & TextBox.ID).Tables(0).Rows(0)("CheckboxOverTextbox"))
+
+                If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
+                    If CheckboxOverTextbox Then
+                        SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                    Else
+                        SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
+                    End If
+
+                    Valid = False
+                    Exit For
+                ElseIf TbxToRange.ContainsKey(TextBox.ID) Then 'check if a range exists
+                    InRange = True
+                    Range = TbxToRange(TextBox.ID)
+
+                    'decipher if it's a numerical OR Greater Than(>)/Less Than(<) range
+                    If Range.Contains("-") Then
+                        DelimitArr = Range.Split("-")
+                        UserInputDec = Decimal.Parse(UserInput)
+
+                        Decimal.TryParse(Trim(DelimitArr(0)), LowerBound)
+                        Decimal.TryParse(Trim(DelimitArr(1)), UpperBound)
+
+                        If UserInputDec < LowerBound Or UserInputDec > UpperBound Then
+                            InRange = False
+                        End If
+                    ElseIf Range.Contains("<") Then
+                        If UserInputDec >= Decimal.Parse(Trim(Range.Replace("<", ""))) Then
+                            InRange = False
+                        End If
+                    ElseIf Range.Contains(">") Then
+                        If UserInputDec <= Decimal.Parse(Trim(Range.Replace(">", ""))) Then
+                            InRange = False
+                        End If
+                    End If
+
+                    If Not InRange Then
+                        'check associated CheckboxOverTextbox field in DB
+                        If IsDBNull(CheckboxOverTextbox) Then
+                            SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF RANGE*", Pnl)
+                            Exit For
+                        End If
+                    End If
+                End If
+                'if here, value is valid and in range
+                SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#F5F5F5"), "", Pnl)
+            End If
+        Next
+        LabelInputMap(Button.Text) = UserInput
+
+        If Cbx.Visible Then
+            LabelOutOfRangeMap(Button.Text) = Cbx.Checked
+        Else
+            LabelOutOfRangeMap(Button.Text) = Nothing
+        End If
+
+        Return Valid
+    End Function
+
+    Sub ValidateInputsAndUploadToDataTable(Callback As Action(Of Panel))
+        For Each Pnl As Panel In VisiblePanels
+            Callback(Pnl)
+            ValidateInput(Pnl)
+        Next
+
+        UploadToDataTable()
+    End Sub
+
+    Function ValidateInputsAndUploadToDataTable() As Boolean
+        Dim All_InputsAreValid As Boolean = True
+
+        For Each Pnl As Panel In VisiblePanels
+            If Not ValidateInput(Pnl) Then 'if a singular input is NOT valid
+                All_InputsAreValid = False
+            End If
+        Next
+
+        UploadToDataTable()
+        Return All_InputsAreValid
+    End Function
+
+    Sub SetCheckBox()
+        Dim TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [SatiTest].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "TbxOverlay")
+
+        If TbxOverlay = "Checkbox" Then
+            CheckOnlyCheckBox.Checked = True
+        ElseIf TbxOverlay = "OffHandAuto" Then
+            OffHandAutoCheckbox.Checked = True
+        End If
+    End Sub
+
+    Function SetCommentFromQueryString() As String
+        Try
+            'in case no comments exist for the checklist (Sql will say "System.IndexOutOfRangeException: 'There is no row at position 0.'")
+            Return SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY CommentOrder").Tables(0).Rows(0)("Key")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Function SetLabelFromQueryString() As String
+        Try
+            'in case no comments exist for the checklist (Sql will say "System.IndexOutOfRangeException: 'There is no row at position 0.'")
+            Return SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY LabelOrder").Tables(0).Rows(0)("Key")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Protected Sub AreaDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        AreaFromQueryString = AreaDropDownList.SelectedValue
+        LabelFromQueryString = SetLabelFromQueryString()
+        CommentFromQueryString = SetCommentFromQueryString()
+
+        RefreshPreview()
+    End Sub
+
+    Protected Sub LabelDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        LabelFromQueryString = sender.SelectedValue
+        CommentFromQueryString = SetCommentFromQueryString()
+        RefreshPreview()
+    End Sub
+
+    Protected Sub CommentDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        CommentFromQueryString = CommentDropDownList.SelectedValue
+        RefreshPreview()
+    End Sub
+
+    Protected Sub IntervalDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim IntervalDdlValue As Integer = IntervalDropDownList.SelectedValue
+        Dim IntervalDdlText As String = IntervalDropDownList.SelectedItem.Text
+        Dim UpdateQuery As String = "UPDATE [SatiTest].[dbo].[T_LogArea] SET IntervalKey='" & IntervalDdlValue & "'"
+
+        If IntervalDdlText <> "ONE TIME ONLY" Then 'in case user is going from ONE TIME ONLY interval to another interval
+            UpdateQuery += ", OneTimeDate = NULL"
+        End If
+
+        If GetSingleDbField("SELECT DisplayOrder FROM [SatiTest].[dbo].[T_LogAreaInterval] WHERE [Key]=" & IntervalDdlValue, "DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be bi-annual, 1 year, 2 year, etc.
+            UpdateQuery += ", Assignee='" & IntervalDdlText & "'"
+        Else
+            UpdateQuery += ", Assignee = NULL"
+        End If
+
+        UpdateQuery += " WHERE [Key]=" & AreaFromQueryString
+
+        ExecuteSqlQuery(UpdateQuery)
+
+        'ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET IntervalKey='" & IntervalDdlValue & "'" & If(IntervalDdlText <> "ONE TIME ONLY", ", OneTimeDate = NULL", String.Empty) & If(GetSingleDbField("SELECT DisplayOrder FROM [SatiTest].[dbo].[T_LogAreaInterval] WHERE [Key]=" & IntervalDdlValue, "DisplayOrder") > 5, ", Assignee='" & IntervalDdlText & "'", String.Empty) & " WHERE [Key]=" & AreaFromQueryString) 'IntervalKey 5 is MONTHLY. Examples would be bi-annual, 1 year, 2 year, etc.
+        RefreshPreview()
+    End Sub
+
+    Protected Sub DepartmentDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET DepartmentKey='" & DepartmentDropDownList.SelectedValue & "' WHERE [Key]=" & AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub UnitDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogLabel] SET UnitKey=" & UnitDropDownList.SelectedValue & " WHERE [Key]=" & LabelFromQueryString)
+        RefreshPreview()
+    End Sub
+
+
+    Protected Sub EditStampsButton_OnClick(sender As Object, e As EventArgs)
+        'Response.Redirect(StampSelectPage & "?" & Request.RawUrl.Split("?")(1)) 'add querystrings from current url to webpage listed within StampSelectPage
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
+        PreviewPanel_iframe.Attributes.Add("src", StampSelectPage & "?" & Request.RawUrl.Split("?")(1))
+    End Sub
+
+    Sub RefreshPreview()
+        Response.Redirect(WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & "&Area=" & AreaFromQueryString & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing))
+    End Sub
+
+    Sub RefreshIframe()
+        PreviewPanel_iframe.Attributes.Add("src", "/DBMaintenance/DevTest/LoggingTemplates/Log.aspx?Area=" & AreaFromQueryString)
+    End Sub
+
+    Sub SetRangeOrder()
+        Dim DbRange As String
+        Dim DbRangeDelimited As String()
+
+        RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel)
+
+        DbRange = GetSingleDbField("SELECT Range From [SatiTest].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
+        If DbRange IsNot Nothing Then
+            If DbRange.Contains("-") Then
+                DbRangeDelimited = DbRange.Split("-")
+                LowerBoundTextbox.Text = DbRangeDelimited(0)
+                UpperBoundTextbox.Text = DbRangeDelimited(1)
+                RangeOrderMenu_onClick(RangePickButton, EventArgs.Empty)
+
+                'empty OTHER textbox controls
+                LessThanTextbox.Text = ""
+                GreaterThanTextbox.Text = ""
+            ElseIf DbRange.Contains("<") Then
+                DbRangeDelimited = DbRange.Split("<")
+                LessThanTextbox.Text = DbRangeDelimited(1)
+                RangeOrderMenu_onClick(LessThanPickButton, EventArgs.Empty)
+
+                'empty OTHER textbox controls
+                LowerBoundTextbox.Text = ""
+                UpperBoundTextbox.Text = ""
+                GreaterThanTextbox.Text = ""
+            ElseIf DbRange.Contains(">") Then
+                DbRangeDelimited = DbRange.Split(">")
+                GreaterThanTextbox.Text = DbRangeDelimited(1)
+                RangeOrderMenu_onClick(GreaterThanPickButton, EventArgs.Empty)
+
+                'empty OTHER textbox controls
+                LowerBoundTextbox.Text = ""
+                UpperBoundTextbox.Text = ""
+                LessThanTextbox.Text = ""
+            End If
+        End If
+    End Sub
+
+    Function GetSingleDbField(SqlQuery As String, Field As String) As String
+        Dim Res As String
+
+        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
+        Try
+            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
+        Catch ex As Exception
+            Res = Nothing
+        End Try
+
+        Return Res
+    End Function
+
+    Protected Sub VerifyValue_Check(sender As Object, e As EventArgs)
+        Dim Button As Button
+        Dim Cbx As CheckBox
+        Dim CheckedStatus As Boolean
+
+        For Each Pnl As Panel In VisiblePanels
+            If Pnl Is sender.Parent Then ' if Pnl holds the textbox that triggered this event
+                For Each ctrl As Control In Pnl.Controls
+                    If TypeOf ctrl Is Button Then
+                        Button = CType(ctrl, Button)
+                    ElseIf TypeOf ctrl Is CheckBox Then
+                        Cbx = CType(ctrl, CheckBox)
+                    End If
+                Next
+            End If
+        Next
+
+        CheckedStatus = Not sender.Checked 'because view state is reset after postback, the true Checked value is the opposite of the current one
+        LabelOutOfRangeMap(Button.Text) = CheckedStatus
+        Cbx.Checked = CheckedStatus
+        UploadToDataTable()
+    End Sub
+
+    Protected Sub ModifyTextBoxValue_onCheckedChanged(sender As Object, e As EventArgs)
+        'get sibling textbox control value
+        Dim currentControl As Control = DirectCast(sender, Control).Parent 'parent Panel control of the sender Checkbox
+        Dim parentContainer As Control = currentControl.Parent
+
+        ' iterate through the controls of lowest level parent Panel control to get TextBox control
+        For Each ctrl In parentContainer.Controls
+            If TypeOf ctrl Is TextBox Then
+                'modify value of TextBox, ensure TextBox event fires and DB is updated
+                Dim TextBox As TextBox = DirectCast(ctrl, TextBox)
+
+                If TextBox.Text = "1" Then
+                    TextBox.Text = ""
+                Else
+                    TextBox.Text = "1"
+                End If
+
+                TextBox_OnTextChanged(TextBox, EventArgs.Empty) ' Manually trigger TextChanged event
+            End If
+        Next
+    End Sub
+
+    Protected Sub SetPanelBackColor(Color As System.Drawing.Color, Message As String, Pnl As Panel)
+        Dim BackColor As System.Drawing.Color = Color
+        Dim MalleableCtrl As WebControl
+
+        Pnl.BackColor = BackColor
+        For Each Ctrl As Control In Pnl.Controls
+            If TypeOf Ctrl Is WebControl Then
+                MalleableCtrl = DirectCast(Ctrl, WebControl)
+                MalleableCtrl.BackColor = BackColor
+
+                If MalleableCtrl.Attributes("ColorBlindMessage") IsNot Nothing Then
+                    DirectCast(MalleableCtrl, ITextControl).Text = Message
+                End If
+
+                If TypeOf Ctrl Is CheckBox Then
+                    If Message.Contains("CAUTION") Then
+                        Ctrl.Visible = True
+                        VisibleCheckBoxes.Add(Ctrl)
+                    Else
+                        Ctrl.Visible = False
+                    End If
+                End If
+            End If
+
+        Next
+    End Sub
+
+    Protected Sub TextBox_OnTextChanged(sender As Object, e As EventArgs)
+        Update_All_InputsValid_Field()
+
+        UploadToDataTable()
+
+        Try
+            ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogData] Set KeyOfLastLabel=" & SatiCode.GetMyDataSet("Select TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogLabel] WHERE LabelOrder > (Select LabelOrder FROM [SatiTest].[dbo].[T_LogLabel] WHERE [Key]=" & sender.ID & ")").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
+        Catch ex As Exception
+        End Try
+
+        Response.Redirect(Request.Url.ToString(), False) 'trigger postback AFTER this code has ran
+    End Sub
+
+    Sub SetEnabledProps(ButtonID As String, EnabledValue As Boolean)
+        If ButtonID.Contains("Area") Then
+            AreaDropDownList.Enabled = EnabledValue
+            LabelInterfacePanel.Enabled = EnabledValue
+            StampInterfacePanel.Enabled = EnabledValue
+            CommentInterfacePanel.Enabled = EnabledValue
+        ElseIf ButtonID.Contains("Label") Then
+            LabelDropDownList.Enabled = EnabledValue
+            AreaInterfacePanel.Enabled = EnabledValue
+            StampInterfacePanel.Enabled = EnabledValue
+            CommentInterfacePanel.Enabled = EnabledValue
+            UnitInterfacePanel.Enabled = EnabledValue
+            RefreshIframe()
+        ElseIf ButtonID.Contains("Comment") Then
+            CommentDropDownList.Enabled = EnabledValue
+            AreaInterfacePanel.Enabled = EnabledValue
+            LabelInterfacePanel.Enabled = EnabledValue
+            StampInterfacePanel.Enabled = EnabledValue
+            RefreshIframe()
+        End If
+
+        CheckOnlyCheckBox.Enabled = EnabledValue
+        LabelOrderInterfacePanel.Enabled = EnabledValue
+        RangeOrderInterfacePanel.Enabled = EnabledValue
+        CommentOrderInterface.Enabled = EnabledValue
+        IntervalInterfacePanel.Enabled = EnabledValue
+        DepartmentInterfacePanel.Enabled = EnabledValue
+    End Sub
+
+    Protected Sub EditButton_OnClick(sender As Object, e As EventArgs)
+        RefreshIframe()
+
+        'disable all other controls
+        SetEnabledProps(sender.ID, False)
+
+        AreaKeyFromDropDownList = AreaDropDownList.SelectedValue
+        AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
+
+        If LabelFromQueryString IsNot Nothing Then
+            LabelFormView_SqlDataSource.SelectCommand = "Select [Key], Label From T_LogLabel WHERE [Key]=" & LabelFromQueryString
+            LabelFormView_SqlDataSource.DataBind()
+        End If
+
+        If CommentFromQueryString IsNot Nothing Then
+            CommentFormView_SqlDataSource.SelectCommand = "Select [Key], Comment From T_LogCommentList WHERE [Key]=" & CommentFromQueryString
+            CommentFormView_SqlDataSource.DataBind()
+        End If
+    End Sub
+
+    Protected Sub UpdateButton_onClick(sender As Object, e As EventArgs)
+        If sender.ID.Contains("Area") Then
+            AreaFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogArea] SET Area='" & SqlProofSingleQuotes(sender.Parent.FindControl("AreaTextBox").Text) & "' WHERE [Key]=" & AreaDropDownList.SelectedValue
+            AreaFormView_SqlDataSource.Update()
+        ElseIf sender.ID.Contains("Label") Then
+            LabelFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogLabel] SET Label='" & SqlProofSingleQuotes(sender.Parent.FindControl("LabelTextBox").Text) & "' WHERE [Key]=" & LabelDropDownList.SelectedValue
+            LabelFormView_SqlDataSource.Update()
+        ElseIf sender.ID.Contains("Comment") Then
+            CommentFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogCommentList] SET Comment='" & SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text) & "' WHERE [Key]=" & CommentDropDownList.SelectedValue
+            CommentFormView_SqlDataSource.Update()
+            'ElseIf sender.ID.Contains("Stamp") Then
+            '    StampFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogStampList] SET Title='" & sender.Parent.FindControl("StampTextBox").Text & "' WHERE [Key]=" & StampDropDownList.SelectedValue
+            '    StampFormView_SqlDataSource.Update()
+        End If
+
+        RefreshPreview()
+    End Sub
+
+    Protected Sub UpdateCancelButton_OnClick(sender As Object, e As EventArgs)
+        SetEnabledProps(sender.ID, True) 'enable currently disabled FormView and DropDownList controls
+        RefreshPreview()
+    End Sub
+
+    Function SqlProofSingleQuotes(Text As String) As String
+        Return Text.Replace("'", "''") 'escape single quotes (') by doubling them ('')
+    End Function
+
+    Protected Sub InsertButton_onClick(sender As Object, e As EventArgs)
+        Dim UserInput As String
+        Dim NewLabelOrder As Integer
+        Dim NewCommentOrder As Integer
+
+        If sender.ID.Contains("Area") Then
+            Dim DS As Data.DataSet = SatiCode.GetMyDataSet("SELECT [Key] FROM [SatiTest].[dbo].[T_LogStampTitle]")
+            Dim RC As Integer = DS.Tables(0).Rows.Count
+            Dim DR As Data.DataRow
+            Dim DuplicateDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT Area FROM [SatiTest].[dbo].[T_LogArea] A INNER JOIN [SatiTest].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE I.Interval <> 'ONE TIME ONLY'")
+            Dim DuplicateRC As Integer = DuplicateDS.Tables(0).Rows.Count
+            Dim DuplicateDR As Data.DataRow
+            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("AreaTextBox").Text)
+
+            If String.IsNullOrEmpty(UserInput) Then
+                FormViewInsert = AreaFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+                Exit Sub
+            End If
+
+            'ensure checklist name does NOT currently exist in T_LogArea
+            For J = 0 To DuplicateRC - 1
+                DuplicateDR = DuplicateDS.Tables(0).Rows(J)
+                Dim Area As String = DuplicateDR("Area")
+
+                If StripString(UserInput) = StripString(Area) Then
+                    FormViewInsert = AreaFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+                    AreaErrorLabel.Text = "Error: '" & UserInput & "' checklist exists"
+                    Exit Sub
+                End If
+            Next
+
+            AreaFormView_SqlDataSource.InsertCommand = "INSERT INTO [SatiTest].[dbo].[T_LogArea] (Area, DateCreated, Active) OUTPUT INSERTED.[Key] VALUES ('" & UserInput & "', '" & Today & "', 1);"
+            AreaFormView_SqlDataSource.Insert()
+            AreaFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogArea] WHERE IntervalKey IS NULL AND Area='" & UserInput & "' ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+
+            'add record to FROM [SatiTest].[dbo].[T_LogStampList] for each stamp that exists in [SatiTest].[dbo].[T_LogStampTitle]
+            For I = 0 To RC - 1
+                DR = DS.Tables(0).Rows(I)
+                ExecuteSqlQuery("INSERT INTO [SatiTest].[dbo].[T_LogStampList] (AreaKey, TitleKey, Active) VALUES (" & AreaFromQueryString & ", " & DR("Key") & ", 0);")
+            Next
+
+            'b/c a new checklist has been created, there are ZERO associated Labels, Comments, or Stamps
+            LabelFromQueryString = Nothing
+            CommentFromQueryString = Nothing
+
+            If AreaErrorLabel.Text <> "" Then
+                AreaErrorLabel.Text = ""
+            End If
+        ElseIf sender.ID.Contains("Label") Then
+            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("LabelTextBox").Text)
+            If String.IsNullOrEmpty(UserInput) Then
+                FormViewInsert = LabelFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+                Exit Sub
+            End If
+            NewLabelOrder = GetSingleDbField("SELECT TOP(1) LabelOrder FROM [SatiTest].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY [Key] DESC", "LabelOrder") + 1
+
+            LabelFormView_SqlDataSource.InsertCommand = "INSERT INTO [SatiTest].[dbo].[T_LogLabel] (AreaKey, Label, LabelOrder) VALUES (" & AreaFromQueryString & ", '" & UserInput & "', " & NewLabelOrder & ");"
+            LabelFormView_SqlDataSource.Insert()
+            LabelFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " And Label ='" & UserInput & "' And LabelOrder=" & NewLabelOrder & " ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+
+        ElseIf sender.ID.Contains("Comment") Then
+            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text)
+            If String.IsNullOrEmpty(UserInput) Then
+                FormViewInsert = CommentFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+                Exit Sub
+            End If
+            NewCommentOrder = GetSingleDbField("SELECT TOP(1) CommentOrder FROM [SatiTest].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY [Key] DESC", "CommentOrder") + 1
+
+            CommentFormView_SqlDataSource.InsertCommand = "INSERT INTO [SatiTest].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) VALUES (" & AreaFromQueryString & ", '" & UserInput & "', " & NewCommentOrder & ");"
+            CommentFormView_SqlDataSource.Insert()
+            CommentFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " And Comment ='" & UserInput & "' And CommentOrder=" & NewCommentOrder & " ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+
+            'ElseIf sender.ID.Contains("Stamp") Then
+            '    UserInput = sender.Parent.FindControl("StampTextBox").Text
+            '    If String.IsNullOrEmpty(UserInput) Then
+            '        FormViewInsert = StampFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+            '        BuildDynamicAsp()
+            '        Exit Sub
+            '    End If
+
+            '    StampFormView_SqlDataSource.InsertCommand = "INSERT INTO [SatiTest].[dbo].[T_LogStampList] (AreaKey, Title) VALUES (" & AreaFromQueryString & ", '" & UserInput & "');"
+            '    StampFormView_SqlDataSource.Insert()
+            '    StampFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [SatiTest].[dbo].[T_LogStampList] WHERE AreaKey=" & AreaFromQueryString & " AND Title='" & UserInput & "' ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+        End If
+
+        RefreshPreview()
+    End Sub
+
+    Protected Sub InsertCancelButton_onClick(sender As Object, e As EventArgs)
+        Response.Redirect(Request.Url.AbsoluteUri) 'redirect to current url w/querystrings 
+    End Sub
+
+    Protected Sub NewButton_onClick(sender As Object, e As EventArgs)
+        SetEnabledProps(sender.ID, False)
+    End Sub
+
+    Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET Active=" & If(sender.Text = "Disable", 0, 1) & " WHERE [Key]=" & AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub TbxOverlay_onCheckedChanged(sender As Object, e As EventArgs)
+        Dim TbxOverlay As String = sender.Attributes("TbxOverlay")
+
+        If TbxOverlay = "Checkbox" Then
+            OffHandAutoCheckbox.Checked = False
+        Else
+            CheckOnlyCheckBox.Checked = False
+        End If
+
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogLabel] Set TbxOverlay=" & If(sender.Checked, "'" & TbxOverlay & "'", "NULL") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub CommentOrderInterface_onClick(sender As Object, e As EventArgs)
+        Dim Action As String
+
+        Select Case sender.ID
+            Case "UpInOrderCommentButton"
+                Action = "up"
+            Case "DownInOrderCommentButton"
+                Action = "down"
+        End Select
+
+        ExecuteSqlQuery("EXEC [SatiTest].[dbo].[UpdateCommentOrder] @CommentKey=" & CommentFromQueryString & ", @Action='" & Action & "'")
+        RefreshPreview()
+    End Sub
+    Protected Sub LabelOrderInterface_onClick(sender As Object, e As EventArgs)
+        Dim Action As String
+
+        Select Case sender.ID
+            Case "UpInOrderLabelButton"
+                Action = "up"
+            Case "DownInOrderLabelButton"
+                Action = "down"
+        End Select
+
+        ExecuteSqlQuery("EXEC [SatiTest].[dbo].[UpdateLabelOrder] @LabelKey=" & LabelFromQueryString & ", @Action='" & Action & "'")
+        RefreshPreview()
+    End Sub
+
+    Protected Sub RangeOrderMenu_onClick(sender As Object, e As EventArgs)
+        'iterate through child controls within RangeOrderMenu, check if it's it the sender. If so, add. Otherwise, enable
+
+        'iterate through child controls within RangeOrderMenu, check if it's it the sender. If so, disable. Otherwise, enable
+        For Each Ctrl In RangeOrderMenu.Controls
+            If TypeOf Ctrl Is Button Then
+                If Ctrl.ID = sender.ID Then
+                    Ctrl.Enabled = False
+                Else
+                    Ctrl.Enabled = True
+                End If
+            End If
+        Next
+
+        'iterate through child controls within DynamicRangeBoxPanel, check if it's Panel with ID of sender control custom 'InterfacePanel' attribute. If so, make visible. Otherwise, make invisible
+        For Each Ctrl In DynamicRangeBoxPanel.Controls
+            If TypeOf Ctrl Is Panel Then
+                If Ctrl.ID = sender.Attributes("InterfacePanel") Then
+                    Ctrl.Visible = True
+                Else
+                    Ctrl.Visible = False
+                End If
+            End If
+        Next
+
+        SetRangeButton.Enabled = True
+        InvalidInputLabel.Visible = False 'hide error message from user
+    End Sub
+
+    Protected Sub AssignToMenu_onClick(sender As Object, e As EventArgs)
+        'iterate through child controls within RangeOrderMenu, check if it's it the sender. If so, disable. Otherwise, enable
+        For Each Ctrl In AssignToMenuPanel.Controls
+            If TypeOf Ctrl Is Button Then
+                If Ctrl.Text = sender.Text Then
+                    Ctrl.Enabled = False
+                Else
+                    Ctrl.Enabled = True
+                End If
+            End If
+        Next
+
+        'iterate through child controls within DynamicRangeBoxPanel, check if it's Panel with ID of sender control custom 'InterfacePanel' attribute. If so, make visible. Otherwise, make invisible
+        For Each Ctrl In AssigneeDdlPanel.Controls
+            If TypeOf Ctrl Is DropDownList Then
+                Dim DropDownList As DropDownList = CType(EditPreviewPanel.FindControl(Ctrl.ID), DropDownList)
+
+                If Ctrl.ID = sender.Attributes("Ddl") Then
+                    Ctrl.Visible = True
+
+                    If Not DropDownList.SelectedItem.Text.Contains("Assign") AndAlso DropDownList.Items(0).Text.Contains("Assign") Then
+                        DropDownList.Items(0).Enabled = False
+                    End If
+                Else
+                    Ctrl.Visible = False
+                End If
+            End If
+        Next
+    End Sub
+
+    'Protected Sub GeneralAssigneeButton_OnClick(sender As Object, e As EventArgs)
+    '    AssignToMenu_onClick(GeneralAssigneeButton, EventArgs.Empty)
+    '    Assignee_SelectedIndexChanged(GenericDropDownList, EventArgs.Empty)
+    'End Sub
+
+    Protected Sub Assignee_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim Assignee As String = sender.SelectedValue
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET Assignee=" & If(Assignee = "NULL", "NULL", "'" & Assignee & "'") & " WHERE [Key]=" & AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub SetRangeButton_onClick(sender As Object, e As EventArgs)
+        Dim UserInput As Double
+        Dim UserInput2 As Double
+        Dim DbRange As String
+
+        If RangePanel.Visible Then
+            If Double.TryParse(LowerBoundTextbox.Text, UserInput) And Double.TryParse(UpperBoundTextbox.Text, UserInput2) And UserInput < UserInput2 Then
+                DbRange = UserInput & "-" & UserInput2
+                InvalidInputLabel.Visible = False 'hide error message from user
+            Else
+                InvalidInputLabel.Visible = True
+                Exit Sub
+            End If
+
+        ElseIf LessThanPanel.Visible Then
+            If Double.TryParse(LessThanTextbox.Text, UserInput) Then
+                DbRange = "<" & UserInput
+                InvalidInputLabel.Visible = False 'hide error message from user
+            Else
+                InvalidInputLabel.Visible = True
+                Exit Sub
+            End If
+        ElseIf GreaterThanPanel.Visible Then
+            If Double.TryParse(GreaterThanTextbox.Text, UserInput) Then
+                DbRange = ">" & UserInput
+                InvalidInputLabel.Visible = False 'hide error message from user
+            Else
+                InvalidInputLabel.Visible = True
+                Exit Sub
+            End If
+        End If
+
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogLabel] SET Range='" & DbRange & "' WHERE [Key]=" & LabelFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Sub Update_All_InputsValid_Field()
+        Dim All_InputsValid As Boolean = True
+
+        For Each Pnl As Panel In VisiblePanels
+            If Not ValidateInput(Pnl) Then
+                All_InputsValid = False
+            End If
+        Next
+
+        Try 'in case There is no row at position 0
+            If Not All_InputsValid Then
+                ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogData] Set All_InputsValid=0 WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key"))
+            Else
+                ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogData] Set All_InputsValid=1 WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key"))
+            End If
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    'Protected Sub DoneButton_Click(sender As Object, e As EventArgs)
+    '    Dim All_InputsAreValid As Boolean = ValidateInputsAndUploadToDataTable()
+    '    Dim NumOfComments As Integer = SatiCode.GetMyDataSet("Select Count([Key]) As NumOfComments FROM [SatiTest].[dbo].[T_LogOperatorComments] WHERE CommentKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")).Tables(0).Rows(0)("NumOfComments")
+
+    '    'ensure all inputs are filled with valid data
+    '    For Each kvp As KeyValuePair(Of String, String) In LabelInputMap
+    '        Dim Value As String = kvp.Value
+
+    '        If NumOfComments = 0 Then
+    '            If Value = "" OrElse Not All_InputsAreValid Then
+    '                MessageUserLabel.Text = "Error: Incomplete or invalid logs. Add a comment to proceed."
+    '                Exit Sub
+    '            End If
+    '        ElseIf Not All_InputsAreValid Then
+    '            'display verify interface
+    '            DoneButton.Enabled = False
+    '            MarkAsDoneCheckBox.Visible = True
+    '            Return
+    '        End If
+    '    Next
+
+    'if here, all fields are valid, because 'Exit Sub' statement has NOT been run
+    '    MarkAsDone()
+    'End Sub
+
+    Sub MarkAsDone()
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogData] SET CompleteLog=1 WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key"))
+        Update_All_InputsValid_Field()
+        Response.Redirect(Request.Url.ToString(), False) 'trigger postback AFTER this code has ran, to make the form readonly and dynamically create stamps
+    End Sub
+
+    Sub ExecuteSqlQuery(SqlQuery As String)
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Dim MySQLCommand As New Data.SqlClient.SqlCommand
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+        With MySQLCommand
+            .CommandText = SqlQuery
+            .Connection = Connection
+        End With
+        MySQLCommand.ExecuteNonQuery()
+        Connection.Close()
+    End Sub
+
+    Protected Sub DatepickCalendar_OnSelectionChanged(sender As Object, e As EventArgs)
+        DatepickTextBox.Text = sender.SelectedDate.Date
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET OneTimeDate='" & DatepickTextBox.Text & "' WHERE [Key]=" & AreaFromQueryString & "; UPDATE [SatiTest].[dbo].[T_LogData] SET Date='" & DatepickTextBox.Text & "' WHERE AreaKey=" & AreaFromQueryString) 'update smalldatetime fields in T_LogArea & T_LogData
+        EditDatepickButton.Enabled = True
+        DatepickCalendar.Visible = False
+    End Sub
+
+    Protected Sub DatepickCalendar_OnDayRender(sender As Object, e As DayRenderEventArgs)
+        If e.Day.Date = Today.Date Then
+            e.Cell.BackColor = System.Drawing.Color.LightGray
+            e.Cell.ForeColor = System.Drawing.Color.DarkGray
+        End If
+    End Sub
+
+    Protected Sub EditDatepickButton_OnClick(sender As Object, e As EventArgs)
+        EditDatepickButton.Enabled = False
+        DatepickCalendar.Visible = True
+    End Sub
+
+    Protected Sub UsersDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("UPDATE [SatiTest].[dbo].[T_LogArea] SET Assignee='" & sender.SelectedValue & "' WHERE [Key]=" & AreaFromQueryString)
+    End Sub
+
+    'Protected Sub AddCommentButton_Click(sender As Object, e As EventArgs)
+    '    Dim TextBoxText As String = CommentTextBox.Text
+    '    If (TextBoxText = "") Then
+    '        'send message to user
+    '        Exit Sub
+    '    End If
+
+    '    ExecuteSqlQuery("INSERT INTO [SatiTest].[dbo].[T_LogOperatorComments] VALUES (" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & TextBoxText & "')")
+    '    CommentTextBox.Text = ""
+    '    CommentGridView.DataBind()
+    'End Sub
+
+    'Protected Sub MarkAsDoneCheckBox_OnCheckedChanged(sender As Object, e As EventArgs)
+    '    If sender.Checked Then
+    '        MarkAsDone()
+    '        MarkAsDoneCheckBox.Visible = False
+    '    End If
+    'End Sub
+
+    Sub hold()
+        '<asp:Button ID = "Button1" runat="server" Text="Auto Batch Stock (Polish)" Height="125px" Width="258px" LabelTip="Master drive fault: n4 outer pin ring, n2 lower plate, n3 inner pin ring. Audible grinding noise heard emanating from outer pin ring gearbox/motor assembly area. Grinding most audible in second half of brush cycle when spin direction changes. " BackColor="#33CC33" />
+        '<asp:Button ID = "Button2" runat="server" Text="Auto Batch Stock / 3500 (DSP)" Height="50px" Width="300px" BackColor="#FFFF66" />
+        '<asp:Button ID = "Button3" runat="server" Text="Button" Height="112px" Width="644px" BackColor="Red" />
+        '<asp:Button ID="Button4" runat="server" Text="Button" OnClick="myclick" CommandArgument="themrnumber" />
+    End Sub
+
+End Class
+

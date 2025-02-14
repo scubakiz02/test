@@ -1,55 +1,19 @@
 
 Imports System.Windows.Forms
+Imports System.Threading
 
 Partial Class MasterPage1
     Inherits System.Web.UI.MasterPage
     Dim ROOT_View As String
+    Dim SatiCode As New Class1
 
     Private Sub Page_Load(sender As Object, e As System.EventArgs)
         Me.Page.Form.DefaultFocus = MasterPagePanelMain.UniqueID
 
         If Not IsPostBack Then
             BuildDataSet()
-
-            'Get UserId of row with the oldest LastActivityDate (LastActivityDate has to at minimum be from a year ago)
-            'snippet is from Class1.GetMyDataSet()
-            Dim Connection As New Data.SqlClient.SqlConnection
-            Dim SQLString As String = "SELECT Top 1 UserId, LastActivityDate FROM [SatiUsers].[dbo].[aspnet_Users] WHERE LastActivityDate < DATEADD(YEAR,-1,CAST(GETDATE() AS DATE)) AND IsAnonymous = 0 ORDER BY LastActivityDate"
-            Connection.ConnectionString = Session("DBConnect")
-            Connection.Open()
-
-            Dim DA As New Data.SqlClient.SqlDataAdapter
-            Dim DS As New Data.DataSet
-
-            Dim SelectCmd As New System.Data.SqlClient.SqlCommand
-
-            With SelectCmd
-                .CommandText = SQLString
-                .Connection = Connection
-            End With
-            DA.SelectCommand = SelectCmd
-
-            DA.Fill(DS)
-            Connection.Close()
-            'Get UserId of row with the oldest LastActivityDate (LastActivityDate has to at minimum be from a year ago)
-            'snippet is from Class1.GetMyDataSet()
-
-            'Set IsAnonymous field of associated row to 1 (Class1.DeleteMyAltsRecords)
-            Dim MySQLCommand As New Data.SqlClient.SqlCommand
-            Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
-            Dim DeleteSQL As String = "UPDATE [SatiUsers].[dbo].[aspnet_Users] SET IsAnonymous=1 WHERE UserID='" & DR("UserID").ToString() & "'"
-            Connection.ConnectionString = Session("DBConnect")
-            Connection.Open()
-            With MySQLCommand
-                .CommandText = DeleteSQL
-                .Connection = Connection
-            End With
-            MySQLCommand.ExecuteNonQuery()
-            Connection.Close()
-            'Set IsAnonymous field of associated row to 1 (Class1.DeleteMyAltsRecords)
         End If
     End Sub
-
 
     Function WaferBoxTOInstanceNumber(ByVal WB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection

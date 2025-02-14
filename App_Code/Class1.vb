@@ -23872,8 +23872,113 @@ Public Class Class1
     End Function
 
 
+    Function ITRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer, ByVal Status As String) As String
+        ITRequestTicket = 0
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+
+        Dim DA_MRTicket As New Data.SqlClient.SqlDataAdapter
+        Dim DS_MRTicket As New Data.DataSet
+        Dim DR_MRTicket As Data.DataRow
+        '*****************************************************************
+        '************************Select***********************************
+        '*****************************************************************
+        Dim MRTicketSelectCmd As New System.Data.SqlClient.SqlCommand
+        With MRTicketSelectCmd
+            .CommandText = "SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_ITR_Tickets WHERE (MR_Key = '" & Ticket & "')"
+            .Connection = Connection
+        End With
+        DA_MRTicket.SelectCommand = MRTicketSelectCmd
+
+        '*****************************************************************
+        '************************Insert***********************************
+        '*****************************************************************
+        Dim MRTicketInsertCmd As New System.Data.SqlClient.SqlCommand
+        With MRTicketInsertCmd
+            .CommandText = "INSERT INTO [dbo].[T_ITR_Tickets] ([Tool], [Status], [IssueDate], [IssueUser], [CloseDate], [CloseUser]) VALUES (@Tool, @Status, @IssueDate, @IssueUser, @CloseDate, @CloseUser); SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM [dbo].[T_ITR_Tickets] WHERE (MR_Key = SCOPE_IDENTITY())"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@Status", System.Data.SqlDbType.VarChar, 0, "Status"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser")})
+        End With
+        DA_MRTicket.InsertCommand = MRTicketInsertCmd
+
+        '*****************************************************************
+        '************************Update***********************************
+        '*****************************************************************
+        Dim MRTicketUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With MRTicketUpdateCmd
+            .CommandText = "UPDATE [dbo].[T_ITR_Tickets] SET [Tool] = @Tool, [Status] = @Status, [IssueDate] = @IssueDate, [IssueUser] = @IssueUser, [CloseDate] = @CloseDate, [CloseUser] = @CloseUser WHERE (([MR_Key] = @Original_MR_Key) AND ((@IsNull_Tool = 1 AND [Tool] IS NULL) OR ([Tool] = @Original_Tool)) AND ((@IsNull_Status = 1 AND [Status] IS NULL) OR ([Status] = @Original_Status)) AND ((@IsNull_IssueDate = 1 AND [IssueDate] IS NULL) OR ([IssueDate] = @Original_IssueDate)) AND ((@IsNull_IssueUser = 1 AND [IssueUser] IS NULL) OR ([IssueUser] = @Original_IssueUser)) AND ((@IsNull_CloseDate = 1 AND [CloseDate] IS NULL) OR ([CloseDate] = @Original_CloseDate)) AND ((@IsNull_CloseUser = 1 AND [CloseUser] IS NULL) OR ([CloseUser] = @Original_CloseUser))); SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_ITR_Tickets WHERE (MR_Key = @MR_Key)"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@Status", System.Data.SqlDbType.VarChar, 0, "Status"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser"), New System.Data.SqlClient.SqlParameter("@Original_MR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "MR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Status", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Status", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Status", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Status", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 4, "MR_Key")})
+        End With
+        DA_MRTicket.UpdateCommand = MRTicketUpdateCmd
+
+        '*****************************************************************
+        '************************Genral***********************************
+        '*****************************************************************
+        DA_MRTicket.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_ITR_Tickets", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("MR_Key", "MR_Key"), New System.Data.Common.DataColumnMapping("Tool", "Tool"), New System.Data.Common.DataColumnMapping("Status", "Status"), New System.Data.Common.DataColumnMapping("IssueDate", "IssueDate"), New System.Data.Common.DataColumnMapping("IssueUser", "IssueUser"), New System.Data.Common.DataColumnMapping("CloseDate", "CloseDate"), New System.Data.Common.DataColumnMapping("CloseUser", "CloseUser")})})
+        DA_MRTicket.Fill(DS_MRTicket)
+
+        Select Case Action
+            Case "New"
+                DR_MRTicket = DS_MRTicket.Tables("T_ITR_Tickets").NewRow
+                DR_MRTicket("Tool") = Tool
+                DR_MRTicket("Status") = Status
+                DR_MRTicket("IssueDate") = System.DateTime.Now.ToShortTimeString
+                DR_MRTicket("IssueUser") = User.Identity.Name.ToString
+                DS_MRTicket.Tables("T_ITR_Tickets").Rows.Add(DR_MRTicket)
+                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
+                ITRequestTicket = DR_MRTicket("MR_Key")
+
+            Case "ModStatus"
+                DR_MRTicket = DS_MRTicket.Tables(0).Rows(0)
+                DR_MRTicket.AcceptChanges()
+                DR_MRTicket.BeginEdit()
+                DR_MRTicket("Status") = Status
+                DR_MRTicket.EndEdit()
+                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
 
 
+            Case "Close"
+                '*****************************************************************
+                '** check to make sure they did not spam the close button ********
+                '*****************************************************************
+                Dim ds As Data.DataSet
+                Dim DR As Data.DataRow
+                Dim nullcheck As Boolean
+
+                ds = GetMyDataSet("SELECT CloseDate FROM dbo.T_ITR_Tickets WHERE (MR_Key = " & Ticket & ")") 'SELECT CloseDate FROM dbo.T_ITR_Tickets WHERE (MR_Key = 53868)
+                DR = ds.Tables(0).Rows(0)
+                nullcheck = IsDBNull(DR("CloseDate"))
+                If nullcheck = False Then
+                    Exit Function
+                End If
+
+                '*****************************************************************
+                '*****************************************************************
+
+                DR_MRTicket = DS_MRTicket.Tables(0).Rows(0)
+                DR_MRTicket.AcceptChanges()
+                DR_MRTicket.BeginEdit()
+                DR_MRTicket("CloseDate") = System.DateTime.Now.ToShortTimeString
+                DR_MRTicket("CloseUser") = User.Identity.Name.ToString
+                DR_MRTicket.EndEdit()
+                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
+                ITRequestTicket = 0
+
+                '**********************************
+                '*Sent Mail with Closed Ticket Info
+                '**********************************
+                '**********************************
+
+                ITRequestCloseTest(Ticket)
+
+                '**********************************
+                '**********************************
+        End Select
+        Connection.Close()
+
+    End Function
 
     Function MaintenanceRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer, ByVal Status As String) As String
         MaintenanceRequestTicket = 0
@@ -24029,6 +24134,56 @@ Public Class Class1
         SendMail_HTML(SB.ToString, Subject, "AZ.SatiMaintenanceRequest@purewafer.com", "")
 
     End Sub
+
+    Sub ITRequestCloseTest(ByVal Ticket As String)
+
+        Dim DS As Data.DataSet
+        Dim DR As Data.DataRow
+        Dim Count As Integer
+        Dim SB As New StringBuilder
+        Dim I As Integer
+        Dim Subject As String
+
+        DS = GetMyDataSet("SELECT TOP (100) PERCENT dbo.T_ITR_Tickets.MR_Key, dbo.T_IT_Tools.Department, dbo.T_IT_Tools.Tool, dbo.T_ITR_Tickets.Status, dbo.T_ITR_Tickets.IssueDate, dbo.T_ITR_Tickets.IssueUser, dbo.T_ITR_Tickets.CloseDate, dbo.T_ITR_Tickets.CloseUser, dbo.T_ITR_TicketNotes.NoteType, dbo.T_ITR_TicketNotes.Note, dbo.T_ITR_TicketNotes.NoteDate, dbo.T_ITR_TicketNotes.SatiUser, dbo.T_ITR_TicketNotes.[Key] FROM dbo.T_ITR_Tickets INNER JOIN dbo.T_IT_Tools ON dbo.T_ITR_Tickets.Tool = dbo.T_IT_Tools.[Key] LEFT OUTER JOIN dbo.T_ITR_TicketNotes ON dbo.T_ITR_Tickets.MR_Key = dbo.T_ITR_TicketNotes.MR_Key GROUP BY dbo.T_ITR_Tickets.MR_Key, dbo.T_IT_Tools.Department, dbo.T_IT_Tools.Tool, dbo.T_ITR_Tickets.Status, dbo.T_ITR_Tickets.IssueDate, dbo.T_ITR_Tickets.IssueUser, dbo.T_ITR_Tickets.CloseDate, dbo.T_ITR_Tickets.CloseUser, dbo.T_ITR_TicketNotes.NoteType, dbo.T_ITR_TicketNotes.Note, dbo.T_ITR_TicketNotes.NoteDate, dbo.T_ITR_TicketNotes.SatiUser, dbo.T_ITR_TicketNotes.[Key] HAVING (dbo.T_ITR_Tickets.MR_Key = " & Ticket & ") ORDER BY dbo.T_ITR_TicketNotes.[Key]")
+        Count = DS.Tables(0).Rows.Count
+
+        If Count > 1 Then
+            SB.Append(<h1 style="color: #0000FF">IT Request Closed</h1>)
+            SB.Append(<br/>)
+            For I = 0 To Count - 1
+                DR = DS.Tables(0).Rows(I)
+
+                If DR("NoteType") = "Org" Then
+                    Subject = "Ticket " & DR("MR_Key").ToString & " for " & DR("Tool").ToString & " is Closed"
+                    SB.Append("<font size=5>Ticket: </font> &nbsp; <font size=5 color=red><b>" & DR("MR_Key").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>Tool: </font> &nbsp; <font size=5 color=red><b>" & DR("Tool").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>Start Time: </font> &nbsp; <font size=5 color=red><b>" & DR("IssueDate").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>From User " & DR("SatiUser").ToString & ": </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append(<br/>)
+                End If
+            Next
+            For I = 0 To Count - 1
+                DR = DS.Tables(0).Rows(I)
+                If DR("NoteType") = "Tech" Then
+                    SB.Append("<font size=5>Tech User: " & DR("SatiUser").ToString & " : </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append(<br/>)
+                End If
+            Next
+            SB.Append("<font size=5>Close Time: </font> &nbsp; <font size=5 color=red><b>" & DR("CloseDate").ToString & "</b></font>")
+            SB.Append(<br/>)
+
+        End If
+
+        SendMail_HTML(SB.ToString, Subject, "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
+
+    End Sub
+
+
     Sub MaintenanceRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -24087,6 +24242,66 @@ Public Class Class1
         Connection.Close()
 
     End Sub
+
+    Sub ITRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
+
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+
+        Dim DA_MRNote As New Data.SqlClient.SqlDataAdapter
+        Dim DS_MRNote As New Data.DataSet
+        Dim DR_MRNote As Data.DataRow
+        '*****************************************************************
+        '************************Select***********************************
+        '*****************************************************************
+        Dim MRNoteSelectCmd As New System.Data.SqlClient.SqlCommand
+        With MRNoteSelectCmd
+            '.CommandText = "SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE (MR_Key = '" & Ticket & "')"
+            .CommandText = "SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE (MR_Key = '0')"
+            .Connection = Connection
+        End With
+        DA_MRNote.SelectCommand = MRNoteSelectCmd
+
+        '*****************************************************************
+        '************************Insert***********************************
+        '*****************************************************************
+        Dim MRNoteInsertCmd As New System.Data.SqlClient.SqlCommand
+        With MRNoteInsertCmd
+            .CommandText = "INSERT INTO [dbo].[T_ITR_TicketNotes] ([MR_Key], [NoteType], [Note], [NoteDate], [SatiUser]) VALUES (@MR_Key, @NoteType, @Note, @NoteDate, @SatiUser); SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE ([Key] = SCOPE_IDENTITY())"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 0, "MR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser")})
+        End With
+        DA_MRNote.InsertCommand = MRNoteInsertCmd
+
+        '*****************************************************************
+        '************************Update***********************************
+        '*****************************************************************
+        Dim MRNoteUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With MRNoteUpdateCmd
+            .CommandText = "UPDATE [dbo].[T_ITR_TicketNotes] SET [MR_Key] = @MR_Key, [NoteType] = @NoteType, [Note] = @Note, [NoteDate] = @NoteDate, [SatiUser] = @SatiUser WHERE (([Key] = @Original_Key) AND ([MR_Key] = @Original_MR_Key) AND ([NoteType] = @Original_NoteType) AND ([Note] = @Original_Note) AND ((@IsNull_NoteDate = 1 AND [NoteDate] IS NULL) OR ([NoteDate] = @Original_NoteDate)) AND ([SatiUser] = @Original_SatiUser)); SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE ([Key] = @Key)"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 0, "MR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser"), New System.Data.SqlClient.SqlParameter("@Original_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_MR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "MR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_NoteType", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteType", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_Note", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Note", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_NoteDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_NoteDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_SatiUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "SatiUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Key", System.Data.SqlDbType.Int, 4, "Key")})
+        End With
+        DA_MRNote.UpdateCommand = MRNoteUpdateCmd
+
+        '*****************************************************************
+        '************************Genral***********************************
+        '*****************************************************************
+        DA_MRNote.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_ITR_TicketNotes", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("Key", "Key"), New System.Data.Common.DataColumnMapping("MR_Key", "MR_Key"), New System.Data.Common.DataColumnMapping("NoteType", "NoteType"), New System.Data.Common.DataColumnMapping("Note", "Note"), New System.Data.Common.DataColumnMapping("NoteDate", "NoteDate"), New System.Data.Common.DataColumnMapping("SatiUser", "SatiUser")})})
+        DA_MRNote.Fill(DS_MRNote)
+        DR_MRNote = DS_MRNote.Tables("T_ITR_TicketNotes").NewRow
+        DR_MRNote("MR_Key") = Ticket
+        DR_MRNote("NoteType") = NoteType
+        DR_MRNote("Note") = Note
+        DR_MRNote("NoteDate") = System.DateTime.Now.ToShortTimeString
+        DR_MRNote("SatiUser") = User.Identity.Name.ToString
+        DS_MRNote.Tables("T_ITR_TicketNotes").Rows.Add(DR_MRNote)
+        DA_MRNote.Update(DS_MRNote, "T_ITR_TicketNotes")
+        Connection.Close()
+
+    End Sub
+
 
     Function KillLot(ByVal LotNumber As String) As Boolean
 
