@@ -374,7 +374,7 @@
 
                             <%--first record in table is null, to supply users the option to reset the unit--%>
                             <asp:SqlDataSource ID="UnitDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                                SelectCommand="SELECT Unit, [Key] FROM [ALTS].[dbo].[T_LogUnit] WHERE Unit IS NOT NULL"></asp:SqlDataSource>
+                                SelectCommand="SELECT Unit, [Key] FROM [ALTS].[dbo].[T_LogUnit] WHERE Unit IS NOT NULL ORDER BY Unit"></asp:SqlDataSource>
                         </asp:Panel>
                     </div>
 
