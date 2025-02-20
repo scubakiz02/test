@@ -38,7 +38,7 @@ Partial Class MR_OpenTicketStatusBoard
         Else '60 second page refresh
             'TodaysDate = Date.Parse("02/20/2025 00:34:00") 'to test midnight rollover
 
-            If DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0 Then
+            If Session("WhereFromQueryString") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
                 Session("WhereFromQueryString") = TodaysDate.Date
             End If
 
@@ -61,6 +61,7 @@ Partial Class MR_OpenTicketStatusBoard
                 AdminPanel.Visible = True
             End If
         Else
+            Session("ViewFromQueryString") = "Focus"
             ViewMenu_onClick(FocusViewButton, EventArgs.Empty) 'maintenance by default
         End If
 
@@ -76,6 +77,7 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
             Next
         Else
+            Session("ViewFromQueryString") = "Maintenance"
             DepartmentMenu_onClick(AllButton, EventArgs.Empty) 'all by default
         End If
 
