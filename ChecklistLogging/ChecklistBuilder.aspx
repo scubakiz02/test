@@ -251,7 +251,7 @@
                             </asp:Panel>
 
                             <asp:Panel runat="server" Style="display: flex; gap: var(--UWhitespace); align-items: center;">
-                                <asp:Label Text="Off Hand Auto:" runat="server" />
+                                <asp:Label Text="HOA:" runat="server" />
                                 <asp:CheckBox TbxOverlay="OffHandAuto" ID="OffHandAutoCheckbox" Enabled="false" OnCheckedChanged="TbxOverlay_onCheckedChanged" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
                             </asp:Panel>
                         </div>

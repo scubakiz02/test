@@ -345,7 +345,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -370,7 +370,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -395,7 +395,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -420,7 +420,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -445,7 +445,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -470,7 +470,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -495,7 +495,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -520,7 +520,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -545,7 +545,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -570,7 +570,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -595,7 +595,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -620,7 +620,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -645,7 +645,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -670,7 +670,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -695,7 +695,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -720,7 +720,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -745,7 +745,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -770,7 +770,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -795,7 +795,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -820,7 +820,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -845,7 +845,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -870,7 +870,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -895,7 +895,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -920,7 +920,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -945,7 +945,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -970,7 +970,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -995,7 +995,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1020,7 +1020,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1045,7 +1045,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1070,7 +1070,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1095,7 +1095,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1120,7 +1120,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1145,7 +1145,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1170,7 +1170,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1195,7 +1195,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1220,7 +1220,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1245,7 +1245,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1270,7 +1270,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1295,7 +1295,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1320,7 +1320,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1345,7 +1345,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1370,7 +1370,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1395,7 +1395,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1420,7 +1420,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1445,7 +1445,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1470,7 +1470,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1495,7 +1495,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1520,7 +1520,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1544,7 +1544,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
@@ -1569,7 +1569,7 @@
 
                                 <asp:Panel Visible="False" OffHandAuto="False" runat="server">
                                     <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Select Pump..." />
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Off" Value="Off" />
                                         <asp:ListItem Text="Hand" Value="Hand" />
                                         <asp:ListItem Text="Auto" Value="Auto" />
