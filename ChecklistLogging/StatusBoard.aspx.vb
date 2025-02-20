@@ -4,9 +4,6 @@ Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
     Dim TimeForNewLog As Boolean
-    Dim WhereFromQueryString As String
-    Dim DepartmentFromQueryString As String
-    Dim ViewFromQueryString As String
     Dim LogStatus As String
     Dim StripeColor As String
     Dim CurrLogDate As String
@@ -23,25 +20,36 @@ Partial Class MR_OpenTicketStatusBoard
         Dim AreaDS As Data.DataSet
         Dim AreaRC As Integer
         Dim SqlFuncDR As Data.DataRow
-        Dim TodaysDate As String = System.DateTime.Now.ToString().Split(" ")(0)
+        Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
 
-        WhereFromQueryString = Request.QueryString("WHERE")
-        DepartmentFromQueryString = Request.QueryString("Department")
-        ViewFromQueryString = Request.QueryString("View")
+        'update session state variables if querystring values exist
+        If Request.QueryString.Count > 0 Then
+            'Session("WhereFromQueryString") = If(Request.QueryString("WHERE") IsNot Nothing, Request.QueryString("WHERE"), Session("WhereFromQueryString"))
+            If Request.QueryString("WHERE") IsNot Nothing Then
+                Session("WhereFromQueryString") = Request.QueryString("WHERE")
+            ElseIf Session("WhereFromQueryString") Is Nothing Then
+                Session("WhereFromQueryString") = TodaysDate.Date
+            End If
 
-        If Not String.IsNullOrEmpty(WhereFromQueryString) Then
-            TimeTravelLabel.Text = "Time Travel Date = " & WhereFromQueryString
-            TimeTravelCalendar.VisibleDate = WhereFromQueryString 'the month the calendar displays
-        Else
-            WhereFromQueryString = System.DateTime.Now.ToString().Split(" ")(0)
-            '    Response.Redirect(Request.FilePath.ToString & "?WHERE=" & WhereFromQueryString & "&Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View"))
+            Session("DepartmentFromQueryString") = If(Request.QueryString("Department") IsNot Nothing, Request.QueryString("Department"), Session("DepartmentFromQueryString"))
+            Session("ViewFromQueryString") = If(Request.QueryString("View") IsNot Nothing, Request.QueryString("View"), Session("ViewFromQueryString"))
+
+            Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
+        Else '60 second page refresh
+            'TodaysDate = Date.Parse("02/20/2025 00:34:00") 'to test midnight rollover
+
+            If DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0 Then
+                Session("WhereFromQueryString") = TodaysDate.Date
+            End If
+
+            WhereLabel.Text = Session("WhereFromQueryString")
         End If
 
-        If Not String.IsNullOrEmpty(ViewFromQueryString) Then
+        If Not String.IsNullOrEmpty(Session("ViewFromQueryString")) Then
             'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
             For Each Ctrl In ViewMenu.Controls
                 If TypeOf Ctrl Is Button Then
-                    If Ctrl.ID.Contains(ViewFromQueryString) Then
+                    If Ctrl.ID.Contains(Session("ViewFromQueryString")) Then
                         Ctrl.Enabled = False
                     Else
                         Ctrl.Enabled = True
@@ -49,18 +57,18 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
             Next
 
-            If ViewFromQueryString = "Full" Then
+            If Session("ViewFromQueryString") = "Full" Then
                 AdminPanel.Visible = True
             End If
         Else
             ViewMenu_onClick(FocusViewButton, EventArgs.Empty) 'maintenance by default
         End If
 
-        If Not String.IsNullOrEmpty(DepartmentFromQueryString) Then
+        If Not String.IsNullOrEmpty(Session("DepartmentFromQueryString")) Then
             'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
             For Each Ctrl In DepartmentMenu.Controls
                 If TypeOf Ctrl Is Button Then
-                    If Ctrl.ID.Contains(DepartmentFromQueryString) Then
+                    If Ctrl.ID.Contains(Session("DepartmentFromQueryString")) Then
                         Ctrl.Enabled = False
                     Else
                         Ctrl.Enabled = True
@@ -71,8 +79,8 @@ Partial Class MR_OpenTicketStatusBoard
             DepartmentMenu_onClick(AllButton, EventArgs.Empty) 'all by default
         End If
 
-        'AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(DepartmentFromQueryString <> "All", " D.Department='" & DepartmentFromQueryString & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND (I.Interval <> 'ONE TIME ONLY' OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL))) AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder")
-        AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(DepartmentFromQueryString <> "All", " D.Department='" & DepartmentFromQueryString & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder")
+        'build button controls for checklists that have a department, interval, assignee, & at least 1 input
+        AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department='" & Session("DepartmentFromQueryString") & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder")
         AreaRC = AreaDS.Tables(0).Rows.Count
 
         For I = 0 To AreaRC - 1
@@ -81,12 +89,12 @@ Partial Class MR_OpenTicketStatusBoard
             SqlFunc = SqlFuncDR("SqlFunc")
             Dim DailyOrWeeklyChecklist As Boolean = If(SqlFunc = "[ALTS].[dbo].[T_Log_DailyChecklistInfo]" OrElse SqlFunc = "[ALTS].[dbo].[T_Log_WeeklyChecklistInfo]", True, False)
 
-            'If Date.Parse(WhereFromQueryString).Date <> Today.Date AndAlso DailyOrWeeklyChecklist Then 'do NOT display daily or weekly checklists during time travel
+            'If Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date AndAlso DailyOrWeeklyChecklist Then 'do NOT display daily or weekly checklists during time travel
             '    TimeTravelMessageLabel.Visible = True
             '    Continue For
             'End If
 
-            LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & WhereFromQueryString & "')")
+            LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
             LogDR = LogDS.Tables(0).Rows(0)
             TimeForNewLog = LogDR("TimeForNewLog")
             CurrLogDate = LogDR("CurrLogDate")
@@ -257,7 +265,7 @@ Partial Class MR_OpenTicketStatusBoard
 
             Select Case DR("Interval")
                 Case "ONE TIME ONLY"
-                    If Date.Parse(WhereFromQueryString).Date = LogDR("CurrLogDate").Date Then 'check if date of One TIme Task matches date in querystring
+                    If Date.Parse(Session("WhereFromQueryString")).Date = LogDR("CurrLogDate").Date Then 'check if date of One TIme Task matches date in querystring
                         SubSectionId += "OneTime"
                     Else
                         Continue For
@@ -317,8 +325,8 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         'build controls for PastIssuesPanel dynamically
-        'DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Operator, A.Area, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE (D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) AND D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " ORDER BY DATE DESC) AND D.Date < '" & WhereFromQueryString & "' AND AreaKey=" & AreaKey & " ORDER BY Date ASC")
-        DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=" & AreaKey & " AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(D.Date As Date) < '" & CurrLogDate & "' ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND '" & WhereFromQueryString & "' > D.Date)) AND ((D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC")
+        'DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Operator, A.Area, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE (D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) AND D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " ORDER BY DATE DESC) AND D.Date < '" & Session("WhereFromQueryString") & "' AND AreaKey=" & AreaKey & " ORDER BY Date ASC")
+        DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=" & AreaKey & " AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(D.Date As Date) < '" & CurrLogDate & "' ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND '" & Session("WhereFromQueryString") & "' > D.Date)) AND ((D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC")
         RC = DS.Tables(0).Rows.Count
 
         For I = 0 To RC - 1
@@ -341,7 +349,7 @@ Partial Class MR_OpenTicketStatusBoard
     Sub SetButtonText(Button As Button, DR As Data.DataRow)
         If Not IsDBNull(DR("Assignee")) Then
             Button.Text = DR("Assignee") & " - " & DR("Area")
-            Button.ForeColor = System.Drawing.Color.DarkBlue
+            ' Button.ForeColor = System.Drawing.Color.DarkBlue
         Else
             Button.Text = DR("Area")
         End If
@@ -350,7 +358,7 @@ Partial Class MR_OpenTicketStatusBoard
 
 
     Protected Sub TimeTravelCalendar_OnSelectionChanged(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?WHERE=" & TimeTravelCalendar.SelectedDate & "&Department=" & DepartmentFromQueryString & "&View=" & Request.QueryString("View"))
+        Response.Redirect(Request.FilePath.ToString & "?WHERE=" & TimeTravelCalendar.SelectedDate & "&Department=" & Session("DepartmentFromQueryString") & "&View=" & Request.QueryString("View"))
     End Sub
 
     Protected Sub TimeTravelCalendar_OnDayRender(sender As Object, e As DayRenderEventArgs)
@@ -379,15 +387,16 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub RedirectToLogAspx(sender As Object, e As EventArgs)
-        Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID & If(Date.Parse(WhereFromQueryString).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE"), String.Empty) & "&Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View"))
+        'Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE"), String.Empty) & "&Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View"))
+        Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID)
     End Sub
 
     Protected Sub DepartmentMenu_onClick(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(WhereFromQueryString).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & sender.Text & "&View=" & Request.QueryString("View"))
+        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & sender.Text & "&View=" & Request.QueryString("View"))
     End Sub
 
     Protected Sub ViewMenu_onClick(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(WhereFromQueryString).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & Request.QueryString("Department") & "&View=" & sender.Text)
+        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & Request.QueryString("Department") & "&View=" & sender.Text)
     End Sub
 
 End Class

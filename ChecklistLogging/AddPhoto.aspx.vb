@@ -11,8 +11,9 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DS As New Data.DataSet
     Dim DR As Data.DataRow
     Dim RC As Integer
-    Dim fileName As String
     Dim uploadDirectory As String
+    Dim VirtualDirectory As String
+    Dim Directory As String
     Dim DataKeyFromQueryString As String
     Dim AcceptedFormats As String() = {"tif", "tiff", "jpg", "jpeg", "png", "gif", "bmp"}
     Dim FormatToContentType As New Dictionary(Of String, String) From
@@ -32,8 +33,9 @@ Partial Class MR_OpenTicketStatusBoard
         AreaFromQueryString = Request.QueryString("Area")
         DataKeyFromQueryString = Request.QueryString("DataKey")
         DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & DataKeyFromQueryString).Tables(0).Rows(0)
-        uploadDirectory = Path.Combine("\\pwi-40\IT$\DevCopy\ST\SatiPhotoLogs\" & Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
-        'uploadDirectory = "Q:DevCopy\ST\SatiPhotoLogs\" & DR("Area").Replace(" ", "_") & "\" & GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-").Replace(" ", "_")
+        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
+        uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
+        VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
 
         If Not IsPostBack Then
             'AreaLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
@@ -55,22 +57,22 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub UploadFile(sender As Object, e As EventArgs)
         Dim fileNameDelimited As String()
-        Dim CompleteImagePath As String
         Dim Format As String
         Dim TestFile As String
         Dim match As Match
         Dim FileFormat As String
+        Dim fileName As String
 
         If Not Uploader.HasFile Then
             '    ErrorMessage.Text = "CHOOSE A FILE BEFORE UPLOADING"
             Exit Sub
         End If
 
-        fileName = IO.Path.GetFileName(Uploader.FileName)
+        fileName = IO.Path.GetFileName(Uploader.FileName) 'using session state variable because global variables do NOT retain values assinged within this function
         TestFile = fileName
         fileNameDelimited = fileName.Split(".")
         Format = fileNameDelimited(fileNameDelimited.Count - 1)
-        match = Regex.Match(TestFile, "[% < > : / \ | ? *]")
+        match = Regex.Match(fileName, "[% < > : / \ | ? *]")
         FileFormat = fileName.Split(".")(1)
 
         'Check for format other than an image
@@ -86,22 +88,20 @@ Partial Class MR_OpenTicketStatusBoard
         Loop
         fileName = TestFile
 
-        If Not Directory.Exists(uploadDirectory) Then
-            Directory.CreateDirectory(uploadDirectory)
+        If Not System.IO.File.Exists(uploadDirectory) Then
+            System.IO.Directory.CreateDirectory(uploadDirectory)
         End If
 
-        CompleteImagePath = Path.Combine(uploadDirectory, fileName)
-        Uploader.PostedFile.SaveAs(CompleteImagePath)
+        ViewState("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
+        Uploader.PostedFile.SaveAs(ViewState("FileUploadDirectory"))
 
         'variables declared in UploadFile do NOT hold their value, so I tied them to the session
-        Session("CompleteImagePath") = CompleteImagePath
         Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
 
         UploadPanel.Visible = False
         CancelSetPanel.Visible = True
         SnapshotImageButton.Visible = True
-        'SnapshotImageButton.ImageUrl = "ImageHandler.ashx?FileName=" & fileName & "&DataKey=" & DataKeyFromQueryString & "&Format=" & Session("Format")
-        SnapshotImageButton.ImageUrl = "ImageHandler.ashx?PhotoFilePath=" & CompleteImagePath & "&ContentType=" & Session("ContentType")
+        SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, fileName)
     End Sub
 
     Function GetSingleDbField(SqlQuery As String, Field As String) As String
@@ -139,14 +139,14 @@ Partial Class MR_OpenTicketStatusBoard
     End Function
 
     Protected Sub CancelImage_OnClick(sender As Object, e As EventArgs)
+        System.IO.File.Delete(ViewState("FileUploadDirectory"))
         Response.Redirect(Request.Url.ToString())
     End Sub
 
     Protected Sub ExitIframeButton_onClick(sender As Object, e As EventArgs)
         'variables declared in UploadFile do NOT hold their value, so I tied them to the session
-        Dim CompleteImagePath As String = Session("CompleteImagePath")
         Dim UserInput = ImgNameTextBox.Text
-        Dim FileName As String
+        Dim NewFileName As String
         Dim DuplicateDS As Data.DataSet
         Dim DuplicateRC As Integer
         Dim DuplicateDR As Data.DataRow
@@ -161,7 +161,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Else
                     DuplicateDS = SatiCode.GetMyDataSet("SELECT PhotoTitle FROM [ALTS].[dbo].[T_LogDataPhotos] P WHERE DataKey=" & DataKeyFromQueryString)
                     DuplicateRC = DuplicateDS.Tables(0).Rows.Count
-                    FileName = UserInput.Replace(" ", "_") & "." & If(ContentTypeToFormat.ContainsKey(Session("ContentType")), ContentTypeToFormat(Session("ContentType")), Session("ContentType"))
+                    NewFileName = UserInput.Replace(" ", "_") & "." & If(ContentTypeToFormat.ContainsKey(Session("ContentType")), ContentTypeToFormat(Session("ContentType")), Session("ContentType"))
                     StrippedUserInput = StripString(UserInput)
 
                     'ensure checklist name does NOT currently exist in T_LogArea
@@ -173,13 +173,13 @@ Partial Class MR_OpenTicketStatusBoard
                         End If
                     Next
 
-                    'ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath) VALUES (" & DataKeyFromQueryString & ", '" & Title & "', '" & Path.Combine(uploadDirectory, FileName) & "')")
-                    My.Computer.FileSystem.RenameFile(CompleteImagePath, FileName)
-                    ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath, ContentType, FileName) VALUES (" & DataKeyFromQueryString & ", '" & SqlProofSingleQuotes(UserInput) & "', '" & Path.Combine(uploadDirectory, FileName) & "', '" & Session("ContentType") & "', '" & FileName & "')")
+                    'ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath) VALUES (" & DataKeyFromQueryString & ", '" & Title & "', '" & Path.Combine(uploadDirectory, NewFileName) & "')")
+                    System.IO.File.Move(ViewState("FileUploadDirectory"), Path.Combine(uploadDirectory, NewFileName))
+                    ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath, ContentType, FileName) VALUES (" & DataKeyFromQueryString & ", '" & SqlProofSingleQuotes(UserInput) & "', '" & Path.Combine(VirtualDirectory, NewFileName) & "', '" & Session("ContentType") & "', '" & NewFileName & "')")
                 End If
             Else 'Cancel
-                If CompleteImagePath IsNot Nothing Then
-                    System.IO.File.Delete(CompleteImagePath)
+                If uploadDirectory IsNot Nothing Then
+                    System.IO.File.Delete(ViewState("FileUploadDirectory"))
                 End If
             End If
         Catch ex As Exception

@@ -73,7 +73,8 @@
         Session.Add("WI", "\\57.201.101.139\WI$\")
         Session.Add("ReportFolder", "http://57.201.101.139:81/TempImageWebFiles/")
         Session.Add("CustomerData", "http://57.201.101.139:81/CustomerData/")
-
+        Session.Add("SUP_VD", "http://57.201.101.139:81/SUP/")
+        Session.Add("SUP_IO", "\\57.201.101.139\SATI_Upload_Pics$\")
 
         'Session("CustomerData")
 

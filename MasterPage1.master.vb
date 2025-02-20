@@ -1,11 +1,9 @@
 
 Imports System.Windows.Forms
-Imports System.Threading
 
 Partial Class MasterPage1
     Inherits System.Web.UI.MasterPage
     Dim ROOT_View As String
-    Dim SatiCode As New Class1
 
     Private Sub Page_Load(sender As Object, e As System.EventArgs)
         Me.Page.Form.DefaultFocus = MasterPagePanelMain.UniqueID
@@ -14,6 +12,7 @@ Partial Class MasterPage1
             BuildDataSet()
         End If
     End Sub
+
 
     Function WaferBoxTOInstanceNumber(ByVal WB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection

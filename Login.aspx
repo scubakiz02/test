@@ -20,7 +20,7 @@
                 Font-Names="Verdana" 
                 Font-Size="0.8em" 
                 ForeColor="#333333" 
-                VisibleWhenLoggedIn="False" FailureAction="RedirectToLoginPage" ClientIDMode="AutoID" OnAuthenticate="Login1_Authenticate" EnableViewState="True"
+                VisibleWhenLoggedIn="False" FailureAction="RedirectToLoginPage" ClientIDMode="AutoID" 
                 >
                     <TextBoxStyle Font-Size="Large" />
                     <LoginButtonStyle BackColor="#FFFBFF" BorderColor="#CCCCCC" BorderStyle="Solid" BorderWidth="1px"

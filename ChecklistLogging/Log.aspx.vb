@@ -120,7 +120,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Panel.Attributes.Add("style", "position: relative")
 
                 Image.Attributes.Add("style", "display: none; background: white; border: 2px solid black; border-radius: var(--UWhitespace); padding: var(--UWhitespace); max-width: 50vw; max-height: 50vh;")
-                ImageUrl = "ImageHandler.ashx?PhotoFilePath=" & PhotoDR("PhotoFilePath") & "&ContentType=" & PhotoDR("ContentType")
+                ImageUrl = PhotoDR("PhotoFilePath")
 
                 LinkButton.ID = FileName & "_LinkButton"
                 LinkButton.Text = PhotoDR("PhotoTitle")
@@ -829,7 +829,20 @@ Partial Class MR_OpenTicketStatusBoard
 
     End Sub
     Protected Sub BackToStatusBoard_OnClick(sender As Object, e As EventArgs)
-        Response.Redirect("/ChecklistLogging/StatusBoard.aspx?WHERE=" & Request.QueryString("WHERE") & "&Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View"))
+        Dim Where As String = Request.QueryString("WHERE")
+        Dim Department As String = Request.QueryString("Department")
+        Dim View As String = Request.QueryString("View")
+        Dim StatusBoardUrl As String = "/ChecklistLogging/StatusBoard.aspx"
+
+        If Department IsNot Nothing AndAlso View IsNot Nothing Then 'user accessed Log.aspx from StatusBoard.aspx
+            StatusBoardUrl += "?" & "Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View")
+
+            If Where IsNot Nothing Then 'user is viewing log not associated with today's date
+                StatusBoardUrl += "&WHERE=" & Where
+            End If
+        End If
+
+        Response.Redirect(StatusBoardUrl)
     End Sub
 
     Protected Sub AddPhotoButton_OnClick(sender As Object, e As EventArgs)

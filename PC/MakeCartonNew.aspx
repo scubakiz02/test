@@ -22,6 +22,7 @@
                                     <asp:ListItem>Zebra5</asp:ListItem>
                                     <asp:ListItem Selected="True">Zebra6</asp:ListItem>
                                     <asp:ListItem>Zebra7</asp:ListItem>
+                                    <asp:ListItem>Zebra8</asp:ListItem>
                                 </asp:DropDownList><br />
                                 <br />
                                 <br />

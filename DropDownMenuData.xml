@@ -1,815 +1,805 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 
-<!--TO ADD A NEW WEBPAGE-->
-<!--PUT THEM INTO THE OPTIONS LIST, WITH THE SAME FORMATTING AS THE OTHERS ARE IN-->
-<!--FORMATING IS AS FOLLOWS-->
-<!--<Option>-->
-<!--<Department>           THIS IS THE NAME OF THE MENU TAB FOR THE DROP DOWN                  </Department>-->
-<!--<ColumneTitle>         THIS IS THE NAME OF THE COLUMN HEADERS INSIDE THE DROP DOWN         </ColumnTitle>-->
-<!--<Enable-Disable>       THIS WILL TELL THE MENU TO SHOW IT OR NOT - ENABLE OR DISABLE       </Enable-Disable>-->
-<!--<AuthenticationGroup>  THIS IS WHERE YOU ADD THE WEBPAGE AUTHENTICATION GROUP (EX: Office) </AuthenticationGroup>-->
-<!--<WebsiteName>          THIS IS THE NAME OF THE WEBSITE AS IT APPREARS ON THE MENU          </WebsiteName>-->
-<!--<WebsiteRef>/           THIS IS THE WEBSITE URL                                             </WebsiteRef>-->
-<!--</Option>-->
+<!--TO ADD A NEW WEBPAGE--> 
+    <!--PUT THEM INTO THE OPTIONS LIST, WITH THE SAME FORMATTING AS THE OTHERS ARE IN-->
+        <!--FORMATING IS AS FOLLOWS-->
+            <!--<Option>-->
+              <!--<Department>           THIS IS THE NAME OF THE MENU TAB FOR THE DROP DOWN                  </Department>-->
+              <!--<ColumneTitle>         THIS IS THE NAME OF THE COLUMN HEADERS INSIDE THE DROP DOWN         </ColumnTitle>-->
+              <!--<Enable-Disable>       THIS WILL TELL THE MENU TO SHOW IT OR NOT - ENABLE OR DISABLE       </Enable-Disable>-->
+              <!--<AuthenticationGroup>  THIS IS WHERE YOU ADD THE WEBPAGE AUTHENTICATION GROUP (EX: Office) </AuthenticationGroup>-->
+              <!--<WebsiteName>          THIS IS THE NAME OF THE WEBSITE AS IT APPREARS ON THE MENU          </WebsiteName>-->
+              <!--<WebsiteRef>/           THIS IS THE WEBSITE URL                                             </WebsiteRef>-->
+            <!--</Option>-->
 
-<!--IF A WEBSITE DOES NOT HAVE A GROUP PLEASE WRIGHT IN THE WORD "None" (Capital 'N')-->
-<!--HOWEVER ENSURE THAT THE NEW WEBPAGE IS IN THE PROPER GROUP (IF IT ALREADY EXSISTS)-->
-<!--GROUPS ARE LABELED BELOW-->
-<!--OTHERWISE ADD IT TO THE TO THE BOTTOM OF (WITHIN MENU) OR WHERE A GROUP ENDS OR BEGINS-->
+    <!--IF A WEBSITE DOES NOT HAVE A GROUP PLEASE WRIGHT IN THE WORD "None" (Capital 'N')-->
+    <!--HOWEVER ENSURE THAT THE NEW WEBPAGE IS IN THE PROPER GROUP (IF IT ALREADY EXSISTS)-->
+    <!--GROUPS ARE LABELED BELOW-->
+    <!--OTHERWISE ADD IT TO THE TO THE BOTTOM OF (WITHIN MENU) OR WHERE A GROUP ENDS OR BEGINS-->
 
 <Menu>
-	<!--GROUP    : PRODUCTION-->
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Department</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>Process Wafers</WebsiteName>
-		<WebsiteRef>/Production/ProcessWafers.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Department</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>Make Labels</WebsiteName>
-		<WebsiteRef>/Production/MakeLabels.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Department</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>View T7 Boxes</WebsiteName>
-		<WebsiteRef>/Production/T7InstanceView.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Department</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>SPx T7 Dupe Compatibility Check</WebsiteName>
-		<WebsiteRef>/Production/SPxT7DupeCompatibilityCheck.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Department</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>View Geo Data</WebsiteName>
-		<WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Logs</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>Enter Production Log</WebsiteName>
-		<WebsiteRef>/Production/EnterProductionLog.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production</Department>
-		<ColumnTitle>Production Logs</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>View Production Log</WebsiteName>
-		<WebsiteRef>/Production/ViewProductionLogData.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: PRODUCTION-->
-	<!--GROUP    : PRODUCTION CONTROL-->
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Production Controller</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Receiving</AuthenticationGroup>
-		<WebsiteName>Receive Wafers</WebsiteName>
-		<WebsiteRef>/PC/ReceiveWafers.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Production Controller</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>Receiving Log</WebsiteName>
-		<WebsiteRef>/PC/WHReceivingHistory.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Non-Comforming</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>NC Packing</WebsiteName>
-		<WebsiteRef>/PC/NonConformingPacking.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Non-Comforming</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>NC Skid Builder</WebsiteName>
-		<WebsiteRef>/PC/NonConformingSkidBuilder.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Non-Comforming</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>NC Managment</WebsiteName>
-		<WebsiteRef>/PC/NonConformingManagment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Manage Lots</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Make First Pass Lot</WebsiteName>
-		<WebsiteRef>/PC/MakeFirstPassLot.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Manage Lots</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Make Rework Lot (OLD)</WebsiteName>
-		<WebsiteRef>/PC/MakeReworkLot.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Manage Lots</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Make Rework Lot (NEW)</WebsiteName>
-		<WebsiteRef>/PC/MakeReworkLots.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Manage Lots</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Merge Lots</WebsiteName>
-		<WebsiteRef>/PC/MergeLots.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View Warehouse Inv</WebsiteName>
-		<WebsiteRef>/PC/WHInventory.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>View Lots in Process</WebsiteName>
-		<WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View And Adjust Rework Inv</WebsiteName>
-		<WebsiteRef>/PC/ReworkInvAdj.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View Partial Inv</WebsiteName>
-		<WebsiteRef>/PC/Partial%20Inv.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View FGI And Check</WebsiteName>
-		<WebsiteRef>/DBMaintenance/FGICheck.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View FGI And Check (New)</WebsiteName>
-		<WebsiteRef>/DBMaintenance/FGI_View.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View Wafer Box or Carton Detail</WebsiteName>
-		<WebsiteRef>/PC/FGICartonDetail.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Make Pallet Holding</WebsiteName>
-		<WebsiteRef>/PC/Make_FGI_PalletHolding.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Scan Pallet Holding</WebsiteName>
-		<WebsiteRef>/PC/ScanPalletHolding.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Inventory</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>View Pallet Holding</WebsiteName>
-		<WebsiteRef>/PC/ViewPalletHolding.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>FGI Cartons</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>PC</AuthenticationGroup>
-		<WebsiteName>Make Carton</WebsiteName>
-		<WebsiteRef>/PC/MakeCartonNew.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Shippments</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Shipping</AuthenticationGroup>
-		<WebsiteName>Make Pick Ticket</WebsiteName>
-		<WebsiteRef>/PC/MakePickTicket.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Shippments</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Shipping</AuthenticationGroup>
-		<WebsiteName>Make Shipment</WebsiteName>
-		<WebsiteRef>/PC/MakeShipment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Shippments</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Shipping</AuthenticationGroup>
-		<WebsiteName>Remove Shipment</WebsiteName>
-		<WebsiteRef>/PC/RemoveShipment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Production Control</Department>
-		<ColumnTitle>Shippments</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>MasterDBAdmin</AuthenticationGroup>
-		<WebsiteName>Wafertory</WebsiteName>
-		<WebsiteRef>/PC/WafertoryMove.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: PRODUCTION CONTROL-->
-	<!--GROUP    : REPORTS-->
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>In Process Sum By Stage</WebsiteName>
-		<WebsiteRef>/Reports/ProcessInvReport.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>View Lots In Process</WebsiteName>
-		<WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>View Pending Shipments (OLD)</WebsiteName>
-		<WebsiteRef>/Reports/PendingShipments.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Pending Shipments Managment</WebsiteName>
-		<WebsiteRef>/PC/ShipPending/PendingManagment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Shipments Released</WebsiteName>
-		<WebsiteRef>/Reports/ShipmentReleaseView.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Inventory Summary (Excel)</WebsiteName>
-		<WebsiteRef>/Reports/ReportFiles/Inv%20Sati%20Summary.xls</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Inventory Summary (Web)</WebsiteName>
-		<WebsiteRef>/Reports/InventoryWebSummary.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Inventory Summary (SB Micro Print)</WebsiteName>
-		<WebsiteRef>/Reports/ReportFiles/Inv%20Sati%20SummaryMicroSB.xls</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Inventory Summary (SJ Flter Export)</WebsiteName>
-		<WebsiteRef>/Reports/InvFilterExport.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Returned Yield By ID By Date</WebsiteName>
-		<WebsiteRef>/Reports/ReportFiles/Returned%20Yield%20By%20ID.xls</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Sati Archive Report's</WebsiteName>
-		<WebsiteRef>/Reports/SAR/SAR_Main.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>History Inv Slice</WebsiteName>
-		<WebsiteRef>/Reports/DayArchive.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>SPx Current Bin Fall</WebsiteName>
-		<WebsiteRef>/Reports/SurfScan.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>T7 Detail Report</WebsiteName>
-		<WebsiteRef>/Reports/T7Detail.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>FGI Carton Detail</WebsiteName>
-		<WebsiteRef>/PC/FGICartonDetail.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>T7 Instance And Wafer Box View</WebsiteName>
-		<WebsiteRef>/Production/T7InstanceView.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>View Geo Data</WebsiteName>
-		<WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Make KPI</WebsiteName>
-		<WebsiteRef>/Reports/KPI.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>WipX Report</WebsiteName>
-		<WebsiteRef>/Reports/WipX_Report.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Defects by ID</WebsiteName>
-		<WebsiteRef>/Reports/Defects_ByIDs_ByDateRange.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Surf Scan Out's</WebsiteName>
-		<WebsiteRef>/Reports/Out.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Spec - Surf - CMP View</WebsiteName>
-		<WebsiteRef>/Reports/Spec-Surf-CMP.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Reports</Department>
-		<ColumnTitle>Reports Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>SDS Page</WebsiteName>
-		<WebsiteRef>/DBMaintenance/SATI_SDS.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: REPORTS-->
-	<!--GROUP    : CUSTOMER MAINTENANCE-->
-	<Option>
-		<Department>Customer Maintenance</Department>
-		<ColumnTitle>Main ID</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>CustomerEdit</AuthenticationGroup>
-		<WebsiteName>ID Transfers</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/IDSplits.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Customer Maintenance</Department>
-		<ColumnTitle>Main ID</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>CustomerEdit</AuthenticationGroup>
-		<WebsiteName>ID Defects</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/ID_DefectMaintenance.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Customer Maintenance</Department>
-		<ColumnTitle>Main ID</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>ID Test Label</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/TestLabel.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Customer Maintenance</Department>
-		<ColumnTitle>PO/SO</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Release SO</WebsiteName>
-		<WebsiteRef>/Sales/SO_Release.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: CUSTOMER MAINTENANCE-->
-	<!--GROUP    : DATABASE MAINTENANCE-->
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Users</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>MakeUser</AuthenticationGroup>
-		<WebsiteName>Make New User</WebsiteName>
-		<WebsiteRef>/NewUser.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Users</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>EditRoles</AuthenticationGroup>
-		<WebsiteName>Edit User Roles</WebsiteName>
-		<WebsiteRef>/DBMaintenance/EditRoles.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Test Area</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>MasterDBAdmin</AuthenticationGroup>
-		<WebsiteName>Development Test Area</WebsiteName>
-		<WebsiteRef>/DBMaintenance/DevTestArea.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Data Pack Maker</WebsiteName>
-		<WebsiteRef>/DBMaintenance/DataPackMaker.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Kill A Lot Page</WebsiteName>
-		<WebsiteRef>/PC/Kill_A_Lot.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Tool Ids</WebsiteName>
-		<WebsiteRef>/MR/Tools.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Department Names</WebsiteName>
-		<WebsiteRef>/DBMaintenance/DepartmentNames.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>MR Group Managment</WebsiteName>
-		<WebsiteRef>/MR/MR_Group_List_Managment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>MR Report</WebsiteName>
-		<WebsiteRef>/MR/Reports/MachineUptimeReport.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>MR Tool Sub Groups</WebsiteName>
-		<WebsiteRef>/DBMaintenance/MR_ToolSub_Group.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>MRT (NEW)</WebsiteName>
-		<WebsiteRef>/MR/MRT.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Utilities</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>MR Viewer (NEW)</WebsiteName>
-		<WebsiteRef>/MR/MR_Viewer.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Diameter View</WebsiteName>
-		<WebsiteRef>/DBMaintenance/DiameterView.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Special Case Page</WebsiteName>
-		<WebsiteRef>/DBMaintenance/SpecialCaseTool.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>PWI Report Defect Class</WebsiteName>
-		<WebsiteRef>/DBMaintenance/PWReportDefectClass.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>CustomerEdit</AuthenticationGroup>
-		<WebsiteName>Core Elements</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/CoreElementsMail.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Address Make Change</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/CustomerAddressEdit.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Fix Pre Data Record</WebsiteName>
-		<WebsiteRef>/DBMaintenance/FixCBPreDataRecord.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>SPx Dupe Checker</WebsiteName>
-		<WebsiteRef>/Production/SPxT7DupeCompatibilityCheck.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>T7 Detail</WebsiteName>
-		<WebsiteRef>/Reports/T7Detail.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Path Managment</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/PathManagment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Customer ID Spec Edit</WebsiteName>
-		<WebsiteRef>/CustomerMaintenance/CustomersIDsSpecs.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>New View Lots</WebsiteName>
-		<WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continue</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Geo Tool Search Viewer</WebsiteName>
-		<WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>WH Label Testing</WebsiteName>
-		<WebsiteRef>/DBMaintenance/WH_Labels_and_Test.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Rec notes</WebsiteName>
-		<WebsiteRef>/ReceivingNotes.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>New Shipping</WebsiteName>
-		<WebsiteRef>/PC/Ship.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>New Surf Labels</WebsiteName>
-		<WebsiteRef>/Production/MakeSurfScanWaferBoxLabel.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>DBMaintenance</AuthenticationGroup>
-		<WebsiteName>Manage Shipping Forcast Pick Ticket</WebsiteName>
-		<WebsiteRef>/PC/ManageShipForcastPickTickets.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Database Maintenance</Department>
-		<ColumnTitle>Tools In Development Continued</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>SDS Page</WebsiteName>
-		<WebsiteRef>/DBMaintenance/SATI_SDS.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: DATABASE MAINTENANCE-->
-	<!--GROUP    : SALES MAINTENANCE-->
-	<Option>
-		<Department>Sales Maintenance</Department>
-		<ColumnTitle>Sales Area</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Sales</AuthenticationGroup>
-		<WebsiteName>SO Managment</WebsiteName>
-		<WebsiteRef>/Sales/PO_SO_Managment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Sales Maintenance</Department>
-		<ColumnTitle>Sales Area</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Sales</AuthenticationGroup>
-		<WebsiteName>Future SO Managment</WebsiteName>
-		<WebsiteRef>/Sales/EnterFuturePO.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>Sales Maintenance</Department>
-		<ColumnTitle>Sales Area</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Office</AuthenticationGroup>
-		<WebsiteName>Release SO</WebsiteName>
-		<WebsiteRef>/Sales/SO_Release.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: SALES MAINTENANCE-->
-	<!--GROUP    : MAINTENANCE DEPARTMENT-->
-	<Option>
-		<Department>Maintenance Department</Department>
-		<ColumnTitle>Maintenance</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Maintenance</AuthenticationGroup>
-		<WebsiteName>Maintenance Requests</WebsiteName>
-		<WebsiteRef>/MR/MR_Viewer.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: MAINTENANCE DEPARTMENT-->
-	<!--GROUP    : MAINTENANCE DEPARTMENT-->
-	<Option>
-		<Department>IT Department</Department>
-		<ColumnTitle>IT</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>EditRoles</AuthenticationGroup>
-		<WebsiteName>IT Requests</WebsiteName>
-		<WebsiteRef>/TR/MR_Viewer.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: MAINTENANCE DEPARTMENT-->
-	<!--GROUP    : SPC-->
-	<Option>
-		<Department>SPC</Department>
-		<ColumnTitle>SATI.SPC</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>SPC Compile</WebsiteName>
-		<WebsiteRef>/SPC/SPC_Compile.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>SPC</Department>
-		<ColumnTitle>SATI.SPC</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>None</AuthenticationGroup>
-		<WebsiteName>SPC Viewer</WebsiteName>
-		<WebsiteRef>/SPC/SPC_View.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>SPC</Department>
-		<ColumnTitle>SATI.SPC</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Eng</AuthenticationGroup>
-		<WebsiteName>SPC Managment</WebsiteName>
-		<WebsiteRef>/SPC/SPC_Managment.aspx</WebsiteRef>
-	</Option>
-	<Option>
-		<Department>SPC</Department>
-		<ColumnTitle>SATI.SPC</ColumnTitle>
-		<Enable-Disable>Enable</Enable-Disable>
-		<AuthenticationGroup>Eng</AuthenticationGroup>
-		<WebsiteName>SPC Record Maintenance</WebsiteName>
-		<WebsiteRef>/SPC/SPC_Record_Maintenance.aspx</WebsiteRef>
-	</Option>
-	<!--GROUP END: SPC-->
+  <!--GROUP    : PRODUCTION-->
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Department</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>Process Wafers</WebsiteName>
+    <WebsiteRef>/Production/ProcessWafers.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Department</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>Make Labels</WebsiteName>
+    <WebsiteRef>/Production/MakeLabels.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Department</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>View T7 Boxes</WebsiteName>
+    <WebsiteRef>/Production/T7InstanceView.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Department</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>SPx T7 Dupe Compatibility Check</WebsiteName>
+    <WebsiteRef>/Production/SPxT7DupeCompatibilityCheck.aspx</WebsiteRef>
+  </Option>
+    <Option>
+        <Department>Production</Department>
+        <ColumnTitle>Production Department</ColumnTitle>
+        <Enable-Disable>Enable</Enable-Disable>
+        <AuthenticationGroup>None</AuthenticationGroup>
+        <WebsiteName>View Geo Data</WebsiteName>
+        <WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
+    </Option>
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Logs</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>Enter Production Log</WebsiteName>
+    <WebsiteRef>/Production/EnterProductionLog.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production</Department>
+    <ColumnTitle>Production Logs</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>View Production Log</WebsiteName>
+    <WebsiteRef>/Production/ViewProductionLogData.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: PRODUCTION-->
+  <!--GROUP    : PRODUCTION CONTROL-->      
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Production Controller</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Receiving</AuthenticationGroup>
+    <WebsiteName>Receive Wafers</WebsiteName>
+    <WebsiteRef>/PC/ReceiveWafers.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Production Controller</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>Receiving Log</WebsiteName>
+    <WebsiteRef>/PC/WHReceivingHistory.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Non-Comforming</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>NC Packing</WebsiteName>
+    <WebsiteRef>/PC/NonConformingPacking.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Non-Comforming</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>NC Skid Builder</WebsiteName>
+    <WebsiteRef>/PC/NonConformingSkidBuilder.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Non-Comforming</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>NC Managment</WebsiteName>
+    <WebsiteRef>/PC/NonConformingManagment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Manage Lots</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Make First Pass Lot</WebsiteName>
+    <WebsiteRef>/PC/MakeFirstPassLot.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Manage Lots</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Make Rework Lot (OLD)</WebsiteName>
+    <WebsiteRef>/PC/MakeReworkLot.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Manage Lots</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Make Rework Lot (NEW)</WebsiteName>
+    <WebsiteRef>/PC/MakeReworkLots.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Manage Lots</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Merge Lots</WebsiteName>
+    <WebsiteRef>/PC/MergeLots.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View Warehouse Inv</WebsiteName>
+    <WebsiteRef>/PC/WHInventory.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>View Lots in Process</WebsiteName>
+    <WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View And Adjust Rework Inv</WebsiteName>
+    <WebsiteRef>/PC/ReworkInvAdj.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View Partial Inv</WebsiteName>
+    <WebsiteRef>/PC/Partial%20Inv.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View FGI And Check</WebsiteName>
+    <WebsiteRef>/DBMaintenance/FGICheck.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View FGI And Check (New)</WebsiteName>
+    <WebsiteRef>/DBMaintenance/FGI_View.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View Wafer Box or Carton Detail</WebsiteName>
+    <WebsiteRef>/PC/FGICartonDetail.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Make Pallet Holding</WebsiteName>
+    <WebsiteRef>/PC/Make_FGI_PalletHolding.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Scan Pallet Holding</WebsiteName>
+    <WebsiteRef>/PC/ScanPalletHolding.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Inventory</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>View Pallet Holding</WebsiteName>
+    <WebsiteRef>/PC/ViewPalletHolding.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>FGI Cartons</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>PC</AuthenticationGroup>
+    <WebsiteName>Make Carton</WebsiteName>
+    <WebsiteRef>/PC/MakeCartonNew.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Shippments</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Shipping</AuthenticationGroup>
+    <WebsiteName>Make Pick Ticket</WebsiteName>
+    <WebsiteRef>/PC/MakePickTicket.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Shippments</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Shipping</AuthenticationGroup>
+    <WebsiteName>Make Shipment</WebsiteName>
+    <WebsiteRef>/PC/MakeShipment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Shippments</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Shipping</AuthenticationGroup>
+    <WebsiteName>Remove Shipment</WebsiteName>
+    <WebsiteRef>/PC/RemoveShipment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Production Control</Department>
+    <ColumnTitle>Shippments</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>MasterDBAdmin</AuthenticationGroup>
+    <WebsiteName>Wafertory</WebsiteName>
+    <WebsiteRef>/PC/WafertoryMove.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: PRODUCTION CONTROL-->
+  <!--GROUP    : REPORTS-->  
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>In Process Sum By Stage</WebsiteName>
+    <WebsiteRef>/Reports/ProcessInvReport.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>View Lots In Process</WebsiteName>
+    <WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>View Pending Shipments (OLD)</WebsiteName>
+    <WebsiteRef>/Reports/PendingShipments.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Pending Shipments Managment</WebsiteName>
+    <WebsiteRef>/PC/ShipPending/PendingManagment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Shipments Released</WebsiteName>
+    <WebsiteRef>/Reports/ShipmentReleaseView.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Inventory Summary (Excel)</WebsiteName>
+    <WebsiteRef>/Reports/ReportFiles/Inv%20Sati%20Summary.xls</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Inventory Summary (Web)</WebsiteName>
+    <WebsiteRef>/Reports/InventoryWebSummary.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Inventory Summary (SB Micro Print)</WebsiteName>
+    <WebsiteRef>/Reports/ReportFiles/Inv%20Sati%20SummaryMicroSB.xls</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Inventory Summary (SJ Flter Export)</WebsiteName>
+    <WebsiteRef>/Reports/InvFilterExport.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Returned Yield By ID By Date</WebsiteName>
+    <WebsiteRef>/Reports/ReportFiles/Returned%20Yield%20By%20ID.xls</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Sati Archive Report's</WebsiteName>
+    <WebsiteRef>/Reports/SAR/SAR_Main.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>History Inv Slice</WebsiteName>
+    <WebsiteRef>/Reports/DayArchive.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>SPx Current Bin Fall</WebsiteName>
+    <WebsiteRef>/Reports/SurfScan.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>T7 Detail Report</WebsiteName>
+    <WebsiteRef>/Reports/T7Detail.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>FGI Carton Detail</WebsiteName>
+    <WebsiteRef>/PC/FGICartonDetail.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>T7 Instance And Wafer Box View</WebsiteName>
+    <WebsiteRef>/Production/T7InstanceView.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>View Geo Data</WebsiteName>
+    <WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Make KPI</WebsiteName>
+    <WebsiteRef>/Reports/KPI.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>WipX Report</WebsiteName>
+    <WebsiteRef>/Reports/WipX_Report.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Defects by ID</WebsiteName>
+    <WebsiteRef>/Reports/Defects_ByIDs_ByDateRange.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Surf Scan Out's</WebsiteName>
+    <WebsiteRef>/Reports/Out.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Spec - Surf - CMP View</WebsiteName>
+    <WebsiteRef>/Reports/Spec-Surf-CMP.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Reports</Department>
+    <ColumnTitle>Reports Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>SDS Page</WebsiteName>
+    <WebsiteRef>/DBMaintenance/SATI_SDS.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: REPORTS-->
+  <!--GROUP    : CUSTOMER MAINTENANCE-->  
+  <Option>
+    <Department>Customer Maintenance</Department>
+    <ColumnTitle>Main ID</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>CustomerEdit</AuthenticationGroup>
+    <WebsiteName>ID Transfers</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/IDSplits.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Customer Maintenance</Department>
+    <ColumnTitle>Main ID</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>CustomerEdit</AuthenticationGroup>
+    <WebsiteName>ID Defects</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/ID_DefectMaintenance.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Customer Maintenance</Department>
+    <ColumnTitle>Main ID</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>ID Test Label</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/TestLabel.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Customer Maintenance</Department>
+    <ColumnTitle>PO/SO</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Release SO</WebsiteName>
+    <WebsiteRef>/Sales/SO_Release.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: CUSTOMER MAINTENANCE-->
+  <!--GROUP    : DATABASE MAINTENANCE-->  
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Users</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>MakeUser</AuthenticationGroup>
+    <WebsiteName>Make New User</WebsiteName>
+    <WebsiteRef>/NewUser.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Users</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>EditRoles</AuthenticationGroup>
+    <WebsiteName>Edit User Roles</WebsiteName>
+    <WebsiteRef>/DBMaintenance/EditRoles.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Test Area</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>MasterDBAdmin</AuthenticationGroup>
+    <WebsiteName>Development Test Area</WebsiteName>
+    <WebsiteRef>/DBMaintenance/DevTestArea.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Data Pack Maker</WebsiteName>
+    <WebsiteRef>/DBMaintenance/DataPackMaker.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Kill A Lot Page</WebsiteName>
+    <WebsiteRef>/PC/Kill_A_Lot.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Tool Ids</WebsiteName>
+    <WebsiteRef>/MR/Tools.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Department Names</WebsiteName>
+    <WebsiteRef>/DBMaintenance/DepartmentNames.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>MR Group Managment</WebsiteName>
+    <WebsiteRef>/MR/MR_Group_List_Managment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>MR Report</WebsiteName>
+    <WebsiteRef>/MR/Reports/MachineUptimeReport.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>MR Tool Sub Groups</WebsiteName>
+    <WebsiteRef>/DBMaintenance/MR_ToolSub_Group.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>MRT (NEW)</WebsiteName>
+    <WebsiteRef>/MR/MRT.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Utilities</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>MR Viewer (NEW)</WebsiteName>
+    <WebsiteRef>/MR/MR_Viewer.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Diameter View</WebsiteName>
+    <WebsiteRef>/DBMaintenance/DiameterView.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Special Case Page</WebsiteName>
+    <WebsiteRef>/DBMaintenance/SpecialCaseTool.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>PWI Report Defect Class</WebsiteName>
+    <WebsiteRef>/DBMaintenance/PWReportDefectClass.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>CustomerEdit</AuthenticationGroup>
+    <WebsiteName>Core Elements</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/CoreElementsMail.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Address Make Change</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/CustomerAddressEdit.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Fix Pre Data Record</WebsiteName>
+    <WebsiteRef>/DBMaintenance/FixCBPreDataRecord.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>SPx Dupe Checker</WebsiteName>
+    <WebsiteRef>/Production/SPxT7DupeCompatibilityCheck.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>T7 Detail</WebsiteName>
+    <WebsiteRef>/Reports/T7Detail.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Path Managment</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/PathManagment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Customer ID Spec Edit</WebsiteName>
+    <WebsiteRef>/CustomerMaintenance/CustomersIDsSpecs.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>New View Lots</WebsiteName>
+    <WebsiteRef>/PC/ViewLots2.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continue</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Geo Tool Search Viewer</WebsiteName>
+    <WebsiteRef>/Reports/GeoViewer.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>WH Label Testing</WebsiteName>
+    <WebsiteRef>/DBMaintenance/WH_Labels_and_Test.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Rec notes</WebsiteName>
+    <WebsiteRef>/ReceivingNotes.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>New Shipping</WebsiteName>
+    <WebsiteRef>/PC/Ship.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>New Surf Labels</WebsiteName>
+    <WebsiteRef>/Production/MakeSurfScanWaferBoxLabel.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>DBMaintenance</AuthenticationGroup>
+    <WebsiteName>Manage Shipping Forcast Pick Ticket</WebsiteName>
+    <WebsiteRef>/PC/ManageShipForcastPickTickets.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Database Maintenance</Department>
+    <ColumnTitle>Tools In Development Continued</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>SDS Page</WebsiteName>
+    <WebsiteRef>/DBMaintenance/SATI_SDS.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: DATABASE MAINTENANCE-->
+  <!--GROUP    : SALES MAINTENANCE-->  
+  <Option>
+    <Department>Sales Maintenance</Department>
+    <ColumnTitle>Sales Area</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Sales</AuthenticationGroup>
+    <WebsiteName>SO Managment</WebsiteName>
+    <WebsiteRef>/Sales/PO_SO_Managment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Sales Maintenance</Department>
+    <ColumnTitle>Sales Area</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Sales</AuthenticationGroup>
+    <WebsiteName>Future SO Managment</WebsiteName>
+    <WebsiteRef>/Sales/EnterFuturePO.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>Sales Maintenance</Department>
+    <ColumnTitle>Sales Area</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Office</AuthenticationGroup>
+    <WebsiteName>Release SO</WebsiteName>
+    <WebsiteRef>/Sales/SO_Release.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: SALES MAINTENANCE-->
+  <!--GROUP    : MAINTENANCE DEPARTMENT-->  
+  <Option>
+    <Department>Maintenance Department</Department>
+    <ColumnTitle>Maintenance</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Maintenance</AuthenticationGroup>
+    <WebsiteName>Maintenance Requests</WebsiteName>
+    <WebsiteRef>/MR/MR_Viewer.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: MAINTENANCE DEPARTMENT-->
+  <!--GROUP    : SPC-->  
+  <Option>
+    <Department>SPC</Department>
+    <ColumnTitle>SATI.SPC</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>SPC Compile</WebsiteName>
+    <WebsiteRef>/SPC/SPC_Compile.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>SPC</Department>
+    <ColumnTitle>SATI.SPC</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>None</AuthenticationGroup>
+    <WebsiteName>SPC Viewer</WebsiteName>
+    <WebsiteRef>/SPC/SPC_View.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>SPC</Department>
+    <ColumnTitle>SATI.SPC</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Eng</AuthenticationGroup>
+    <WebsiteName>SPC Managment</WebsiteName>
+    <WebsiteRef>/SPC/SPC_Managment.aspx</WebsiteRef>
+  </Option>
+  <Option>
+    <Department>SPC</Department>
+    <ColumnTitle>SATI.SPC</ColumnTitle>
+    <Enable-Disable>Enable</Enable-Disable>
+    <AuthenticationGroup>Eng</AuthenticationGroup>
+    <WebsiteName>SPC Record Maintenance</WebsiteName>
+    <WebsiteRef>/SPC/SPC_Record_Maintenance.aspx</WebsiteRef>
+  </Option>
+  <!--GROUP END: SPC-->
 </Menu>

@@ -71,9 +71,18 @@ Partial Public Class DBMaintenance_DataPackMaker
             End Try
         End If
 
-        If Me.RadioButtonOnSemi.Checked = True Then
+        If Me.RadioButtonOnSemi200mm.Checked = True Then
             Try
                 SatiCode.MakeOnSemiDataPack(Flex)
+                Me.FileNameTextBox0.Text = ("Check OnSemi Data Packs Folder For Your File")
+            Catch ex As Exception
+                Me.FileNameTextBox0.Text = ("Data Pack Fail Error")
+            End Try
+        End If
+
+        If Me.RadioButtonOnSemi300mm.Checked = True Then '******* The ON Semi took over the Global-NY plant "EFK". they still want to use the GF XML files.
+            Try
+                SatiCode.MakeGFDataPack(Flex)
                 Me.FileNameTextBox0.Text = ("Check OnSemi Data Packs Folder For Your File")
             Catch ex As Exception
                 Me.FileNameTextBox0.Text = ("Data Pack Fail Error")
@@ -253,8 +262,14 @@ Partial Public Class DBMaintenance_DataPackMaker
         End If
     End Sub
 
-    Protected Sub RadioButtonOnSemi_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles RadioButtonOnSemi.CheckedChanged
-        If RadioButtonOnSemi.Checked = True Then
+    Protected Sub RadioButtonOnSemi200mm_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles RadioButtonOnSemi200mm.CheckedChanged
+        If RadioButtonOnSemi200mm.Checked = True Then
+            Viewp2()
+        End If
+    End Sub
+
+    Protected Sub RadioButtonOnSemi300mm_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles RadioButtonOnSemi300mm.CheckedChanged
+        If RadioButtonOnSemi300mm.Checked = True Then
             Viewp2()
         End If
     End Sub

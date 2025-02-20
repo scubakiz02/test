@@ -5,6 +5,7 @@ Imports System.IO
 Imports System.Xml
 Imports System.Data
 
+
 Public Class Class1
     Inherits System.Web.UI.Page
 
@@ -965,8 +966,8 @@ Public Class Class1
 
     End Sub
 
-    Sub ModRecvingInv(ByVal Action As String, ByVal IDNote As String, ByVal NewWLNumber As String, ByVal PackingSlip As String,
-    ByVal Carrier As String, ByVal WaferQty As String, ByVal Containment As String,
+    Sub ModRecvingInv(ByVal Action As String, ByVal IDNote As String, ByVal NewWLNumber As String, ByVal PackingSlip As String, _
+    ByVal Carrier As String, ByVal WaferQty As String, ByVal Containment As String, _
     ByVal ContainmentQty As String, ByVal Notes As String, ByVal InvType As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -1077,6 +1078,32 @@ Public Class Class1
             GetCustomerName = DR("Customer_Name").ToString
         Else
             GetCustomerName = "Error"
+        End If
+
+        Connection.Close()
+
+    End Function
+
+    Function GetCustomerFAB(ByVal ID As String) As String
+
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+        Dim DA As New Data.SqlClient.SqlDataAdapter
+        Dim DS As New Data.DataSet
+        Dim DR As Data.DataRow
+        Dim SelectCmd As New System.Data.SqlClient.SqlCommand
+        With SelectCmd
+            .CommandText = "SELECT dbo.Customer.Customer_Name, dbo.Customer.CustomerID FROM dbo.MainID INNER JOIN dbo.Customer ON dbo.MainID.CustomerID = dbo.Customer.CustomerID WHERE (dbo.MainID.MainID = N'" & ID & "')"
+            .Connection = Connection
+        End With
+        DA.SelectCommand = SelectCmd
+        DA.Fill(DS)
+        If Not DS.Tables(0).Rows.Count = 0 Then
+            DR = DS.Tables(0).Rows(0)
+            GetCustomerFAB = DR("CustomerID").ToString
+        Else
+            GetCustomerFAB = "Error"
         End If
 
         Connection.Close()
@@ -1237,7 +1264,7 @@ Public Class Class1
         Dim DS_Metals As New Data.DataSet
         Dim MetalsSelectCmd As New System.Data.SqlClient.SqlCommand
         With MetalsSelectCmd
-            .CommandText = "SELECT Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K FROM dbo.fctn_SatiCofA200mmMetalsSample('" & Carton & "') AS fctn_SatiCofA200mmMetalsSample_1"
+            .CommandText = "SELECT Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K FROM dbo.fctn_SatiCofA200mmMetalsSample('" & Carton & "') AS fctn_SatiCofA200mmMetalsSample_1" 'added ", Co, Mn, Mo, W, Ti" to the select on 12/20/2024 for debugging a issue. error "Co" not found in the function "setMDL"  
             .Connection = Connection
         End With
         DA_Metals.SelectCommand = MetalsSelectCmd
@@ -1284,44 +1311,6 @@ Public Class Class1
 
     End Function
 
-    '10/31/24
-    'Function GetCarton300mmMetals(ByVal InstanceNumber As String) As Data.DataSet 'normal 300mm make CofA pulls here
-    '    Dim Connection As New Data.SqlClient.SqlConnection
-    '    Connection.ConnectionString = Session("DBConnect")
-    '    Connection.Open()
-    '    Dim LotNumber As String = ""
-    '    'Find LotNumber for the Instance Number
-    '    'Look to see if that Instance numbers lot number is in the metals database.
-    '    'if the lot number is in the data base then return the data
-    '    Dim DS_LotNumber As New Data.DataSet
-    '    DS_LotNumber = GetMyDataSet("SELECT dbo.T_FGI_Boxes.InstanceKey, dbo.LabelsMade.Lot FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey WHERE (dbo.T_FGI_Boxes.InstanceKey = " & InstanceNumber & ")")
-    '    If DS_LotNumber.Tables(0).Rows.Count > 0 Then
-    '        Dim DR_lotNumber As Data.DataRow
-
-    '        DR_lotNumber = DS_LotNumber.Tables(0).Rows(0)
-    '        LotNumber = DR_lotNumber("Lot")
-    '        Dim DS_MetalsTable As New Data.DataSet
-    '        DS_MetalsTable = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.[GFAAS Data] WHERE (Source = N'300mm' OR Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
-    '        If DS_MetalsTable.Tables(0).Rows.Count > 1 Then
-    '            'return data
-    '            GetCarton300mmMetals = DS_MetalsTable
-    '            Connection.Close()
-    '            Exit Function
-    '        End If
-    '    End If
-
-
-    '    'else, get some data then save as the lot number in the data dase for late 
-    '    'Get some data and save it
-    '    Dim DS_Get300mmMetalsData As New Data.DataSet
-    '    DS_Get300mmMetalsData = Get300Metals(InstanceNumber)
-
-    '    GetCarton300mmMetals = WriteMetals(DS_Get300mmMetalsData, LotNumber)
-
-    '    Connection.Close()
-    'End Function
-    '10/31/24
-
     Function GetCarton300mmMetals(ByVal InstanceNumber As String) As Data.DataSet 'normal 300mm make CofA pulls here
         Dim Connection As New Data.SqlClient.SqlConnection
         Connection.ConnectionString = Session("DBConnect")
@@ -1338,7 +1327,7 @@ Public Class Class1
             DR_lotNumber = DS_LotNumber.Tables(0).Rows(0)
             LotNumber = DR_lotNumber("Lot")
             Dim DS_MetalsTable As New Data.DataSet
-            DS_MetalsTable = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.[GFAAS Data] WHERE (Source = N'300mm' OR Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
+            DS_MetalsTable = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, V, Au, Ag FROM dbo.[GFAAS Data] WHERE (Source = N'300mm' OR Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
             If DS_MetalsTable.Tables(0).Rows.Count > 1 Then
                 'return data
                 GetCarton300mmMetals = DS_MetalsTable
@@ -1348,12 +1337,12 @@ Public Class Class1
         End If
 
 
-        'else, get some data then save as the lot number in the data dase for late 
+        'else, get some data then save as the lot number in the data dase for later 
         'Get some data and save it
         Dim DS_Get300mmMetalsData As New Data.DataSet
         DS_Get300mmMetalsData = Get300Metals(InstanceNumber)
 
-        Return WriteMetals(DS_Get300mmMetalsData, LotNumber)
+        GetCarton300mmMetals = WriteMetals(DS_Get300mmMetalsData, LotNumber)
 
         Connection.Close()
     End Function
@@ -1366,7 +1355,7 @@ Public Class Class1
         Dim DS_Metals As New Data.DataSet
         Dim MetalsSelectCmd As New System.Data.SqlClient.SqlCommand
         With MetalsSelectCmd
-            .CommandText = "SELECT Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.fctn_SatiCofA300MetalsSample('" & InstanceNumber & "') AS fctn_SatiCofA300MetalsSample_1"
+            .CommandText = "SELECT Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, V, Au, Ag FROM dbo.fctn_SatiCofA300MetalsSample('" & InstanceNumber & "') AS fctn_SatiCofA300MetalsSample_1"
             .Connection = Connection
         End With
         DA_Metals.SelectCommand = MetalsSelectCmd
@@ -1375,7 +1364,411 @@ Public Class Class1
     End Function
 
 
-    '10/31/24
+    Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
+
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+
+        Dim DA As New Data.SqlClient.SqlDataAdapter
+        Dim DS As New Data.DataSet
+        Dim DR As Data.DataRow
+        Dim DR_Metals As Data.DataRow
+
+
+        Dim MySelectCmd As New System.Data.SqlClient.SqlCommand
+        With MySelectCmd
+            .CommandText = "SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, Ag, Au, V FROM [GFAAS Data] WHERE ([Record Number] = 0)"
+            .Connection = Connection
+        End With
+        DA.SelectCommand = MySelectCmd
+
+        Dim MyInsertCmd As New System.Data.SqlClient.SqlCommand
+        With MyInsertCmd
+            .CommandText = "INSERT INTO [GFAAS Data] ([Date/Time], [Source], [Test Type], [Idenyification], [Location], [Ca], [Ma], [Ni], [Zn], [Al], [Fe], [Cr], [Cu], [Na], [K], [Co], [Mn], [Mo], [W], [Ti], [Ag], [Au], [V]) VALUES (@p1, @Source, @Test_Type, @Idenyification, @Location, @Ca, @Ma, @Ni, @Zn, @Al, @Fe, @Cr, @Cu, @Na, @K, @Co, @Mn, @Mo, @W, @Ti, @Ag, @Au, @V); SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, Ag, Au, V FROM [GFAAS Data] WHERE ([Record Number] = SCOPE_IDENTITY())"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@p1", System.Data.SqlDbType.SmallDateTime, 0, "Date/Time"), New System.Data.SqlClient.SqlParameter("@Source", System.Data.SqlDbType.NVarChar, 0, "Source"), New System.Data.SqlClient.SqlParameter("@Test_Type", System.Data.SqlDbType.NVarChar, 0, "Test Type"), New System.Data.SqlClient.SqlParameter("@Idenyification", System.Data.SqlDbType.NVarChar, 0, "Idenyification"), New System.Data.SqlClient.SqlParameter("@Location", System.Data.SqlDbType.NVarChar, 0, "Location"), New System.Data.SqlClient.SqlParameter("@Ca", System.Data.SqlDbType.Float, 0, "Ca"), New System.Data.SqlClient.SqlParameter("@Ma", System.Data.SqlDbType.Float, 0, "Ma"), New System.Data.SqlClient.SqlParameter("@Ni", System.Data.SqlDbType.Float, 0, "Ni"), New System.Data.SqlClient.SqlParameter("@Zn", System.Data.SqlDbType.Float, 0, "Zn"), New System.Data.SqlClient.SqlParameter("@Al", System.Data.SqlDbType.Float, 0, "Al"), New System.Data.SqlClient.SqlParameter("@Fe", System.Data.SqlDbType.Float, 0, "Fe"), New System.Data.SqlClient.SqlParameter("@Cr", System.Data.SqlDbType.Float, 0, "Cr"), New System.Data.SqlClient.SqlParameter("@Cu", System.Data.SqlDbType.Float, 0, "Cu"), New System.Data.SqlClient.SqlParameter("@Na", System.Data.SqlDbType.Float, 0, "Na"), New System.Data.SqlClient.SqlParameter("@K", System.Data.SqlDbType.Float, 0, "K"), New System.Data.SqlClient.SqlParameter("@Co", System.Data.SqlDbType.Float, 0, "Co"), New System.Data.SqlClient.SqlParameter("@Mn", System.Data.SqlDbType.Float, 0, "Mn"), New System.Data.SqlClient.SqlParameter("@Mo", System.Data.SqlDbType.Float, 0, "Mo"), New System.Data.SqlClient.SqlParameter("@W", System.Data.SqlDbType.Float, 0, "W"), New System.Data.SqlClient.SqlParameter("@Ti", System.Data.SqlDbType.Float, 0, "Ti"), New System.Data.SqlClient.SqlParameter("@Ag", System.Data.SqlDbType.Float, 0, "Ag"), New System.Data.SqlClient.SqlParameter("@Au", System.Data.SqlDbType.Float, 0, "Au"), New System.Data.SqlClient.SqlParameter("@V", System.Data.SqlDbType.Float, 0, "V")})
+        End With
+        DA.InsertCommand = MyInsertCmd
+
+        Dim MyUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With MyUpdateCmd
+            .CommandText = "UPDATE [GFAAS Data] SET [Date/Time] = @p1, [Source] = @Source, [Test Type] = @Test_Type, [Idenyification] = @Idenyification, [Location] = @Location, [Ca] = @Ca, [Ma] = @Ma, [Ni] = @Ni, [Zn] = @Zn, [Al] = @Al, [Fe] = @Fe, [Cr] = @Cr, [Cu] = @Cu, [Na] = @Na, [K] = @K, [Co] = @Co, [Mn] = @Mn, [Mo] = @Mo, [W] = @W, [Ti] = @Ti, [Ag] = @Ag, [Au] = @Au, [V] = @V WHERE (([Record Number] = @Original_Record_Number) AND ((@p3 = 1 AND [Date/Time] IS NULL) OR ([Date/Time] = @p2)) AND ((@IsNull_Source = 1 AND [Source] IS NULL) OR ([Source] = @Original_Source)) AND ((@IsNull_Test_Type = 1 AND [Test Type] IS NULL) OR ([Test Type] = @Original_Test_Type)) AND ((@IsNull_Idenyification = 1 AND [Idenyification] IS NULL) OR ([Idenyification] = @Original_Idenyification)) AND ((@IsNull_Location = 1 AND [Location] IS NULL) OR ([Location] = @Original_Location)) AND ((@IsNull_Ca = 1 AND [Ca] IS NULL) OR ([Ca] = @Original_Ca)) AND ((@IsNull_Ma = 1 AND [Ma] IS NULL) OR ([Ma] = @Original_Ma)) AND ((@IsNull_Ni = 1 AND [Ni] IS NULL) OR ([Ni] = @Original_Ni)) AND ((@IsNull_Zn = 1 AND [Zn] IS NULL) OR ([Zn] = @Original_Zn)) AND ((@IsNull_Al = 1 AND [Al] IS NULL) OR ([Al] = @Original_Al)) AND ((@IsNull_Fe = 1 AND [Fe] IS NULL) OR ([Fe] = @Original_Fe)) AND ((@IsNull_Cr = 1 AND [Cr] IS NULL) OR ([Cr] = @Original_Cr)) AND ((@IsNull_Cu = 1 AND [Cu] IS NULL) OR ([Cu] = @Original_Cu)) AND ((@IsNull_Na = 1 AND [Na] IS NULL) OR ([Na] = @Original_Na)) AND ((@IsNull_K = 1 AND [K] IS NULL) OR ([K] = @Original_K)) AND ((@IsNull_Co = 1 AND [Co] IS NULL) OR ([Co] = @Original_Co)) AND ((@IsNull_Mn = 1 AND [Mn] IS NULL) OR ([Mn] = @Original_Mn)) AND ((@IsNull_Mo = 1 AND [Mo] IS NULL) OR ([Mo] = @Original_Mo)) AND ((@IsNull_W = 1 AND [W] IS NULL) OR ([W] = @Original_W)) AND ((@IsNull_Ti = 1 AND [Ti] IS NULL) OR ([Ti] = @Original_Ti)) AND ((@IsNull_Ag = 1 AND [Ag] IS NULL) OR ([Ag] = @Original_Ag)) AND ((@IsNull_Au = 1 AND [Au] IS NULL) OR ([Au] = @Original_Au)) AND ((@IsNull_V = 1 AND [V] IS NULL) OR ([V] = @Original_V))); SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, Ag, Au, V FROM [GFAAS Data] WHERE ([Record Number] = @Record_Number)"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@p1", System.Data.SqlDbType.SmallDateTime, 0, "Date/Time"), New System.Data.SqlClient.SqlParameter("@Source", System.Data.SqlDbType.NVarChar, 0, "Source"), New System.Data.SqlClient.SqlParameter("@Test_Type", System.Data.SqlDbType.NVarChar, 0, "Test Type"), New System.Data.SqlClient.SqlParameter("@Idenyification", System.Data.SqlDbType.NVarChar, 0, "Idenyification"), New System.Data.SqlClient.SqlParameter("@Location", System.Data.SqlDbType.NVarChar, 0, "Location"), New System.Data.SqlClient.SqlParameter("@Ca", System.Data.SqlDbType.Float, 0, "Ca"), New System.Data.SqlClient.SqlParameter("@Ma", System.Data.SqlDbType.Float, 0, "Ma"), New System.Data.SqlClient.SqlParameter("@Ni", System.Data.SqlDbType.Float, 0, "Ni"), New System.Data.SqlClient.SqlParameter("@Zn", System.Data.SqlDbType.Float, 0, "Zn"), New System.Data.SqlClient.SqlParameter("@Al", System.Data.SqlDbType.Float, 0, "Al"), New System.Data.SqlClient.SqlParameter("@Fe", System.Data.SqlDbType.Float, 0, "Fe"), New System.Data.SqlClient.SqlParameter("@Cr", System.Data.SqlDbType.Float, 0, "Cr"), New System.Data.SqlClient.SqlParameter("@Cu", System.Data.SqlDbType.Float, 0, "Cu"), New System.Data.SqlClient.SqlParameter("@Na", System.Data.SqlDbType.Float, 0, "Na"), New System.Data.SqlClient.SqlParameter("@K", System.Data.SqlDbType.Float, 0, "K"), New System.Data.SqlClient.SqlParameter("@Co", System.Data.SqlDbType.Float, 0, "Co"), New System.Data.SqlClient.SqlParameter("@Mn", System.Data.SqlDbType.Float, 0, "Mn"), New System.Data.SqlClient.SqlParameter("@Mo", System.Data.SqlDbType.Float, 0, "Mo"), New System.Data.SqlClient.SqlParameter("@W", System.Data.SqlDbType.Float, 0, "W"), New System.Data.SqlClient.SqlParameter("@Ti", System.Data.SqlDbType.Float, 0, "Ti"), New System.Data.SqlClient.SqlParameter("@Ag", System.Data.SqlDbType.Float, 0, "Ag"), New System.Data.SqlClient.SqlParameter("@Au", System.Data.SqlDbType.Float, 0, "Au"), New System.Data.SqlClient.SqlParameter("@V", System.Data.SqlDbType.Float, 0, "V"), New System.Data.SqlClient.SqlParameter("@Original_Record_Number", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Record Number", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@p3", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Date/Time", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@p2", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Date/Time", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Source", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Source", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Source", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Source", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Test_Type", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Test Type", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Test_Type", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Test Type", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Idenyification", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Idenyification", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Idenyification", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Idenyification", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Location", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Location", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Location", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Location", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ca", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ca", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ca", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ca", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ma", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ma", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ma", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ma", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ni", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ni", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ni", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ni", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Zn", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Zn", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Zn", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Zn", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Al", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Al", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Al", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Al", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Fe", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Fe", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Fe", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Fe", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Cr", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Cr", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Cr", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Cr", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Cu", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Cu", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Cu", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Cu", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Na", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Na", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Na", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Na", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_K", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "K", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_K", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "K", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Co", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Co", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Co", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Co", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Mn", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Mn", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Mn", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Mn", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Mo", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Mo", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Mo", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Mo", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_W", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "W", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_W", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "W", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ti", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ti", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ti", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ti", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ag", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ag", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ag", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ag", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Au", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Au", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Au", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Au", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_V", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "V", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_V", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "V", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Record_Number", System.Data.SqlDbType.Int, 4, "Record Number")})
+        End With
+        DA.UpdateCommand = MyUpdateCmd
+
+        DA.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "GFAAS Data", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("Record Number", "Record Number"), New System.Data.Common.DataColumnMapping("Date/Time", "Date/Time"), New System.Data.Common.DataColumnMapping("Source", "Source"), New System.Data.Common.DataColumnMapping("Test Type", "Test Type"), New System.Data.Common.DataColumnMapping("Idenyification", "Idenyification"), New System.Data.Common.DataColumnMapping("Location", "Location"), New System.Data.Common.DataColumnMapping("Ca", "Ca"), New System.Data.Common.DataColumnMapping("Ma", "Ma"), New System.Data.Common.DataColumnMapping("Ni", "Ni"), New System.Data.Common.DataColumnMapping("Zn", "Zn"), New System.Data.Common.DataColumnMapping("Al", "Al"), New System.Data.Common.DataColumnMapping("Fe", "Fe"), New System.Data.Common.DataColumnMapping("Cr", "Cr"), New System.Data.Common.DataColumnMapping("Cu", "Cu"), New System.Data.Common.DataColumnMapping("Na", "Na"), New System.Data.Common.DataColumnMapping("K", "K"), New System.Data.Common.DataColumnMapping("Co", "Co"), New System.Data.Common.DataColumnMapping("Mn", "Mn"), New System.Data.Common.DataColumnMapping("Mo", "Mo"), New System.Data.Common.DataColumnMapping("W", "W"), New System.Data.Common.DataColumnMapping("Ti", "Ti"), New System.Data.Common.DataColumnMapping("Ag", "Ag"), New System.Data.Common.DataColumnMapping("Au", "Au"), New System.Data.Common.DataColumnMapping("V", "V")})})
+        DA.Fill(DS)
+
+        Dim R As Double = 0
+        Dim M As Int16 = 0
+        Dim MyNull As Object
+        MyNull = System.DBNull.Value
+
+        For i As Int16 = 0 To 1
+            DR_Metals = DS_Metals.Tables(0).Rows(i)
+            DR = DS.Tables("GFAAS Data").NewRow
+            DR("Date/Time") = DateTime.Now.ToShortDateString
+            DR("Source") = "SATI"
+            DR("Test Type") = "at/cm²"
+            DR("Idenyification") = LotNumber
+            DR("Location") = "Prescott"
+
+            'Ca ************************************
+            If Not DR_Metals("Ca") Is MyNull Then
+                If DR_Metals("Ca") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Ca") = DR_Metals("Ca") + R
+                    Else
+                        DR("Ca") = DR_Metals("Ca") - R
+                    End If
+                Else
+                    DR("Ca") = 0.01
+                End If
+            Else
+                DR("Ca") = 0.01
+            End If
+
+            'Ma ************************************
+            If Not DR_Metals("Ma") Is MyNull Then
+                If DR_Metals("Ma") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Ma") = DR_Metals("Ma") + R
+                    Else
+                        DR("Ma") = DR_Metals("Ma") - R
+                    End If
+                Else
+                    DR("Ma") = 0.01
+                End If
+            Else
+                DR("Ma") = 0.01
+            End If
+
+            'Ni ************************************
+            If Not DR_Metals("Ni") Is MyNull Then
+                If DR_Metals("Ni") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Ni") = DR_Metals("Ni") + R
+                    Else
+                        DR("Ni") = DR_Metals("Ni") - R
+                    End If
+                Else
+                    DR("Ni") = 0.01
+                End If
+            Else
+                DR("Ni") = 0.01
+            End If
+
+            'Zn ************************************
+            If Not DR_Metals("Zn") Is MyNull Then
+                If DR_Metals("Zn") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Zn") = DR_Metals("Zn") + R
+                    Else
+                        DR("Zn") = DR_Metals("Zn") - R
+                    End If
+                Else
+                    DR("Zn") = 0.01
+                End If
+            Else
+                DR("Zn") = 0.01
+            End If
+
+            'Al ************************************
+            If Not DR_Metals("Al") Is MyNull Then
+                If DR_Metals("Al") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Al") = DR_Metals("Al") + R
+                    Else
+                        DR("Al") = DR_Metals("Al") - R
+                    End If
+                Else
+                    DR("Al") = 0.01
+                End If
+            Else
+                DR("Al") = 0.01
+            End If
+
+            'Fe ************************************
+            If Not DR_Metals("Fe") Is MyNull Then
+                If DR_Metals("Fe") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Fe") = DR_Metals("Fe") + R
+                    Else
+                        DR("Fe") = DR_Metals("Fe") - R
+                    End If
+                Else
+                    DR("Fe") = 0.01
+                End If
+            Else
+                DR("Fe") = 0.01
+            End If
+
+            'Cr ************************************
+            If Not DR_Metals("Cr") Is MyNull Then
+                If DR_Metals("Cr") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Cr") = DR_Metals("Cr") + R
+                    Else
+                        DR("Cr") = DR_Metals("Cr") - R
+                    End If
+                Else
+                    DR("Cr") = 0.01
+                End If
+            Else
+                DR("Cr") = 0.01
+            End If
+
+            'Cu ************************************
+            If Not DR_Metals("Cu") Is MyNull Then
+                If DR_Metals("Cu") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Cu") = DR_Metals("Cu") + R
+                    Else
+                        DR("Cu") = DR_Metals("Cu") - R
+                    End If
+                Else
+                    DR("Cu") = 0.01
+                End If
+            Else
+                DR("Cu") = 0.01
+            End If
+
+            'Na ************************************
+            If Not DR_Metals("Na") Is MyNull Then
+                If DR_Metals("Na") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("Na") = DR_Metals("Na") + R
+                    Else
+                        DR("Na") = DR_Metals("Na") - R
+                    End If
+                Else
+                    DR("Na") = 0.01
+                End If
+            Else
+                DR("Na") = 0.01
+            End If
+
+            'K ************************************
+            If Not DR_Metals("K") Is MyNull Then
+                If DR_Metals("K") > 0.01 Then
+                    R = GetRandomNumber(9, 1) / 1000
+                    M = GetRandomNumber(3, 1)
+                    If M = 1 Then
+                        DR("K") = DR_Metals("K") + R
+                    Else
+                        DR("K") = DR_Metals("K") - R
+                    End If
+                Else
+                    DR("K") = 0.01
+                End If
+            Else
+                DR("K") = 0.01
+            End If
+
+            'Co ************************************
+            Try
+                If Not DR_Metals("Co") Is MyNull Then
+                    If DR_Metals("Co") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Co") = DR_Metals("Co") + R
+                        Else
+                            DR("Co") = DR_Metals("Co") - R
+                        End If
+                    Else
+                        DR("Co") = 0.01
+                    End If
+                Else
+                    DR("Co") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Co") = 0.01
+            End Try
+
+
+            'Mn ************************************
+            Try
+                If Not DR_Metals("Mn") Is MyNull Then
+                    If DR_Metals("Mn") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Mn") = DR_Metals("Mn") + R
+                        Else
+                            DR("Mn") = DR_Metals("Mn") - R
+                        End If
+                    Else
+                        DR("Mn") = 0.01
+                    End If
+                Else
+                    DR("Mn") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Mn") = 0.01
+            End Try
+
+
+            'Mo ************************************
+            Try
+                If Not DR_Metals("Mo") Is MyNull Then
+                    If DR_Metals("Mo") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Mo") = DR_Metals("Mo") + R
+                        Else
+                            DR("Mo") = DR_Metals("Mo") - R
+                        End If
+                    Else
+                        DR("Mo") = 0.01
+                    End If
+                Else
+                    DR("Mo") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Mo") = 0.01
+            End Try
+
+
+            'W ************************************
+            Try
+                If Not DR_Metals("W") Is MyNull Then
+                    If DR_Metals("W") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("W") = DR_Metals("W") + R
+                        Else
+                            DR("W") = DR_Metals("W") - R
+                        End If
+                    Else
+                        DR("W") = 0.01
+                    End If
+                Else
+                    DR("W") = 0.01
+                End If
+            Catch ex As Exception
+                DR("W") = 0.01
+            End Try
+
+
+            'Ti ************************************
+            Try
+                If Not DR_Metals("Ti") Is MyNull Then
+                    If DR_Metals("Ti") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Ti") = DR_Metals("Ti") + R
+                        Else
+                            DR("Ti") = DR_Metals("Ti") - R
+                        End If
+                    Else
+                        DR("Ti") = 0.01
+                    End If
+                Else
+                    DR("Ti") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Ti") = 0.01
+            End Try
+
+
+            'Au ************************************
+            Try
+                If Not DR_Metals("Au") Is MyNull Then
+                    If DR_Metals("Au") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Au") = DR_Metals("Au") + R
+                        Else
+                            DR("Au") = DR_Metals("Au") - R
+                        End If
+                    Else
+                        DR("Au") = 0.01
+                    End If
+                Else
+                    DR("Au") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Au") = 0.01
+            End Try
+
+            'Ag ************************************
+            Try
+                If Not DR_Metals("Ag") Is MyNull Then
+                    If DR_Metals("Ag") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("Ag") = DR_Metals("Ag") + R
+                        Else
+                            DR("Ag") = DR_Metals("Ag") - R
+                        End If
+                    Else
+                        DR("Ag") = 0.01
+                    End If
+                Else
+                    DR("Ag") = 0.01
+                End If
+            Catch ex As Exception
+                DR("Ag") = 0.01
+            End Try
+
+            'V ************************************
+            Try
+                If Not DR_Metals("V") Is MyNull Then
+                    If DR_Metals("V") > 0.01 Then
+                        R = GetRandomNumber(9, 1) / 1000
+                        M = GetRandomNumber(3, 1)
+                        If M = 1 Then
+                            DR("V") = DR_Metals("V") + R
+                        Else
+                            DR("V") = DR_Metals("V") - R
+                        End If
+                    Else
+                        DR("V") = 0.01
+                    End If
+                Else
+                    DR("V") = 0.01
+                End If
+            Catch ex As Exception
+                DR("V") = 0.01
+            End Try
+
+            DS.Tables("GFAAS Data").Rows.Add(DR)
+            DA.Update(DS, "GFAAS Data")
+        Next
+
+
+        Connection.Close()
+        WriteMetals = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, Ag, Au, V FROM dbo.[GFAAS Data] WHERE (Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
+
+    End Function
+
     'Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
 
     '    Dim Connection As New Data.SqlClient.SqlConnection
@@ -1418,294 +1811,61 @@ Public Class Class1
     '    Dim M As Int16 = 0
     '    Dim MyNull As Object
     '    MyNull = System.DBNull.Value
+    '    Dim liveMdlSet As Data.DataRow = GetMyDataSet("SELECT [Key], [MDL_User], [EnterDate], [ExpireDate], Li, Na, Mg, Al, K, Ca, Ti, V, Cr, Mn, Fe, Co, Ni, Cu, Zn, Ga, Ars, Sr, Mo, Ag, Ba, Ta, W, Au, Pb, Ma, Se, Zr, La, Ir, Pt, [Notes] FROM [T_Metals_MDL] WHERE ExpireDate IS NULL").Tables(0).Rows(0)
 
     '    For i As Int16 = 0 To 1
     '        DR_Metals = DS_Metals.Tables(0).Rows(i)
     '        DR = DS.Tables("GFAAS Data").NewRow
-    '        DR("Date/Time") = DateTime.Now.ToShortDateString
+    '        DR("Date/Time") = DateTime.Now.ToString
     '        DR("Source") = "SATI"
     '        DR("Test Type") = "at/cm²"
     '        DR("Idenyification") = LotNumber
     '        DR("Location") = "Prescott"
 
     '        'Ca ************************************
-    '        If Not DR_Metals("Ca") Is MyNull Then
-    '            If DR_Metals("Ca") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Ca") = DR_Metals("Ca") + R
-    '                Else
-    '                    DR("Ca") = DR_Metals("Ca") - R
-    '                End If
-    '            Else
-    '                DR("Ca") = 0.01
-    '            End If
-    '        Else
-    '            DR("Ca") = 0.01
-    '        End If
+    '        setMDL("Ca", liveMdlSet, DR, DR_Metals)
 
     '        'Ma ************************************
-    '        If Not DR_Metals("Ma") Is MyNull Then
-    '            If DR_Metals("Ma") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Ma") = DR_Metals("Ma") + R
-    '                Else
-    '                    DR("Ma") = DR_Metals("Ma") - R
-    '                End If
-    '            Else
-    '                DR("Ma") = 0.01
-    '            End If
-    '        Else
-    '            DR("Ma") = 0.01
-    '        End If
+    '        setMDL("Ma", liveMdlSet, DR, DR_Metals)
 
     '        'Ni ************************************
-    '        If Not DR_Metals("Ni") Is MyNull Then
-    '            If DR_Metals("Ni") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Ni") = DR_Metals("Ni") + R
-    '                Else
-    '                    DR("Ni") = DR_Metals("Ni") - R
-    '                End If
-    '            Else
-    '                DR("Ni") = 0.01
-    '            End If
-    '        Else
-    '            DR("Ni") = 0.01
-    '        End If
+    '        setMDL("Ni", liveMdlSet, DR, DR_Metals)
 
     '        'Zn ************************************
-    '        If Not DR_Metals("Zn") Is MyNull Then
-    '            If DR_Metals("Zn") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Zn") = DR_Metals("Zn") + R
-    '                Else
-    '                    DR("Zn") = DR_Metals("Zn") - R
-    '                End If
-    '            Else
-    '                DR("Zn") = 0.01
-    '            End If
-    '        Else
-    '            DR("Zn") = 0.01
-    '        End If
+    '        setMDL("Zn", liveMdlSet, DR, DR_Metals)
 
     '        'Al ************************************
-    '        If Not DR_Metals("Al") Is MyNull Then
-    '            If DR_Metals("Al") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Al") = DR_Metals("Al") + R
-    '                Else
-    '                    DR("Al") = DR_Metals("Al") - R
-    '                End If
-    '            Else
-    '                DR("Al") = 0.01
-    '            End If
-    '        Else
-    '            DR("Al") = 0.01
-    '        End If
+    '        setMDL("Al", liveMdlSet, DR, DR_Metals)
 
     '        'Fe ************************************
-    '        If Not DR_Metals("Fe") Is MyNull Then
-    '            If DR_Metals("Fe") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Fe") = DR_Metals("Fe") + R
-    '                Else
-    '                    DR("Fe") = DR_Metals("Fe") - R
-    '                End If
-    '            Else
-    '                DR("Fe") = 0.01
-    '            End If
-    '        Else
-    '            DR("Fe") = 0.01
-    '        End If
+    '        setMDL("Fe", liveMdlSet, DR, DR_Metals)
 
     '        'Cr ************************************
-    '        If Not DR_Metals("Cr") Is MyNull Then
-    '            If DR_Metals("Cr") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Cr") = DR_Metals("Cr") + R
-    '                Else
-    '                    DR("Cr") = DR_Metals("Cr") - R
-    '                End If
-    '            Else
-    '                DR("Cr") = 0.01
-    '            End If
-    '        Else
-    '            DR("Cr") = 0.01
-    '        End If
+    '        setMDL("Cr", liveMdlSet, DR, DR_Metals)
 
     '        'Cu ************************************
-    '        If Not DR_Metals("Cu") Is MyNull Then
-    '            If DR_Metals("Cu") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Cu") = DR_Metals("Cu") + R
-    '                Else
-    '                    DR("Cu") = DR_Metals("Cu") - R
-    '                End If
-    '            Else
-    '                DR("Cu") = 0.01
-    '            End If
-    '        Else
-    '            DR("Cu") = 0.01
-    '        End If
+    '        setMDL("Cu", liveMdlSet, DR, DR_Metals)
 
     '        'Na ************************************
-    '        If Not DR_Metals("Na") Is MyNull Then
-    '            If DR_Metals("Na") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("Na") = DR_Metals("Na") + R
-    '                Else
-    '                    DR("Na") = DR_Metals("Na") - R
-    '                End If
-    '            Else
-    '                DR("Na") = 0.01
-    '            End If
-    '        Else
-    '            DR("Na") = 0.01
-    '        End If
+    '        setMDL("Na", liveMdlSet, DR, DR_Metals)
 
     '        'K ************************************
-    '        If Not DR_Metals("K") Is MyNull Then
-    '            If DR_Metals("K") > 0.01 Then
-    '                R = GetRandomNumber(9, 1) / 1000
-    '                M = GetRandomNumber(3, 1)
-    '                If M = 1 Then
-    '                    DR("K") = DR_Metals("K") + R
-    '                Else
-    '                    DR("K") = DR_Metals("K") - R
-    '                End If
-    '            Else
-    '                DR("K") = 0.01
-    '            End If
-    '        Else
-    '            DR("K") = 0.01
-    '        End If
+    '        setMDL("K", liveMdlSet, DR, DR_Metals)
 
     '        'Co ************************************
-    '        Try
-    '            If Not DR_Metals("Co") Is MyNull Then
-    '                If DR_Metals("Co") > 0.01 Then
-    '                    R = GetRandomNumber(9, 1) / 1000
-    '                    M = GetRandomNumber(3, 1)
-    '                    If M = 1 Then
-    '                        DR("Co") = DR_Metals("Co") + R
-    '                    Else
-    '                        DR("Co") = DR_Metals("Co") - R
-    '                    End If
-    '                Else
-    '                    DR("Co") = 0.01
-    '                End If
-    '            Else
-    '                DR("Co") = 0.01
-    '            End If
-    '        Catch ex As Exception
-    '            DR("Co") = 0.01
-    '        End Try
-
+    '        setMDL("Co", liveMdlSet, DR, DR_Metals)
 
     '        'Mn ************************************
-    '        Try
-    '            If Not DR_Metals("Mn") Is MyNull Then
-    '                If DR_Metals("Mn") > 0.01 Then
-    '                    R = GetRandomNumber(9, 1) / 1000
-    '                    M = GetRandomNumber(3, 1)
-    '                    If M = 1 Then
-    '                        DR("Mn") = DR_Metals("Mn") + R
-    '                    Else
-    '                        DR("Mn") = DR_Metals("Mn") - R
-    '                    End If
-    '                Else
-    '                    DR("Mn") = 0.01
-    '                End If
-    '            Else
-    '                DR("Mn") = 0.01
-    '            End If
-    '        Catch ex As Exception
-    '            DR("Mn") = 0.01
-    '        End Try
-
+    '        setMDL("Mn", liveMdlSet, DR, DR_Metals)
 
     '        'Mo ************************************
-    '        Try
-    '            If Not DR_Metals("Mo") Is MyNull Then
-    '                If DR_Metals("Mo") > 0.01 Then
-    '                    R = GetRandomNumber(9, 1) / 1000
-    '                    M = GetRandomNumber(3, 1)
-    '                    If M = 1 Then
-    '                        DR("Mo") = DR_Metals("Mo") + R
-    '                    Else
-    '                        DR("Mo") = DR_Metals("Mo") - R
-    '                    End If
-    '                Else
-    '                    DR("Mo") = 0.01
-    '                End If
-    '            Else
-    '                DR("Mo") = 0.01
-    '            End If
-    '        Catch ex As Exception
-    '            DR("Mo") = 0.01
-    '        End Try
-
+    '        setMDL("Mo", liveMdlSet, DR, DR_Metals)
 
     '        'W ************************************
-    '        Try
-    '            If Not DR_Metals("W") Is MyNull Then
-    '                If DR_Metals("W") > 0.01 Then
-    '                    R = GetRandomNumber(9, 1) / 1000
-    '                    M = GetRandomNumber(3, 1)
-    '                    If M = 1 Then
-    '                        DR("W") = DR_Metals("W") + R
-    '                    Else
-    '                        DR("W") = DR_Metals("W") - R
-    '                    End If
-    '                Else
-    '                    DR("W") = 0.01
-    '                End If
-    '            Else
-    '                DR("W") = 0.01
-    '            End If
-    '        Catch ex As Exception
-    '            DR("W") = 0.01
-    '        End Try
-
+    '        setMDL("W", liveMdlSet, DR, DR_Metals)
 
     '        'Ti ************************************
-    '        Try
-    '            If Not DR_Metals("Ti") Is MyNull Then
-    '                If DR_Metals("Ti") > 0.01 Then
-    '                    R = GetRandomNumber(9, 1) / 1000
-    '                    M = GetRandomNumber(3, 1)
-    '                    If M = 1 Then
-    '                        DR("Ti") = DR_Metals("Ti") + R
-    '                    Else
-    '                        DR("Ti") = DR_Metals("Ti") - R
-    '                    End If
-    '                Else
-    '                    DR("Ti") = 0.01
-    '                End If
-    '            Else
-    '                DR("Ti") = 0.01
-    '            End If
-    '        Catch ex As Exception
-    '            DR("Ti") = 0.01
-    '        End Try
+    '        setMDL("Ti", liveMdlSet, DR, DR_Metals)
 
     '        DS.Tables("GFAAS Data").Rows.Add(DR)
     '        DA.Update(DS, "GFAAS Data")
@@ -1713,118 +1873,9 @@ Public Class Class1
 
 
     '    Connection.Close()
-    '    WriteMetals = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.[GFAAS Data] WHERE (Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
+    '    Return GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.[GFAAS Data] WHERE (Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
 
     'End Function
-    '10/31/24
-
-    Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
-
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-
-        Dim DA As New Data.SqlClient.SqlDataAdapter
-        Dim DS As New Data.DataSet
-        Dim DR As Data.DataRow
-        Dim DR_Metals As Data.DataRow
-
-
-        Dim MySelectCmd As New System.Data.SqlClient.SqlCommand
-        With MySelectCmd
-            .CommandText = "SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM [GFAAS Data] WHERE ([Record Number] = 0)"
-            .Connection = Connection
-        End With
-        DA.SelectCommand = MySelectCmd
-
-        Dim MyInsertCmd As New System.Data.SqlClient.SqlCommand
-        With MyInsertCmd
-            .CommandText = "INSERT INTO [GFAAS Data] ([Date/Time], [Source], [Test Type], [Idenyification], [Location], [Ca], [Ma], [Ni], [Zn], [Al], [Fe], [Cr], [Cu], [Na], [K], [Co], [Mn], [Mo], [W], [Ti]) VALUES (@p1, @Source, @Test_Type, @Idenyification, @Location, @Ca, @Ma, @Ni, @Zn, @Al, @Fe, @Cr, @Cu, @Na, @K, @Co, @Mn, @Mo, @W, @Ti);SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM [GFAAS Data] WHERE ([Record Number] = SCOPE_IDENTITY())"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@p1", System.Data.SqlDbType.SmallDateTime, 0, "Date/Time"), New System.Data.SqlClient.SqlParameter("@Source", System.Data.SqlDbType.NVarChar, 0, "Source"), New System.Data.SqlClient.SqlParameter("@Test_Type", System.Data.SqlDbType.NVarChar, 0, "Test Type"), New System.Data.SqlClient.SqlParameter("@Idenyification", System.Data.SqlDbType.NVarChar, 0, "Idenyification"), New System.Data.SqlClient.SqlParameter("@Location", System.Data.SqlDbType.NVarChar, 0, "Location"), New System.Data.SqlClient.SqlParameter("@Ca", System.Data.SqlDbType.Float, 0, "Ca"), New System.Data.SqlClient.SqlParameter("@Ma", System.Data.SqlDbType.Float, 0, "Ma"), New System.Data.SqlClient.SqlParameter("@Ni", System.Data.SqlDbType.Float, 0, "Ni"), New System.Data.SqlClient.SqlParameter("@Zn", System.Data.SqlDbType.Float, 0, "Zn"), New System.Data.SqlClient.SqlParameter("@Al", System.Data.SqlDbType.Float, 0, "Al"), New System.Data.SqlClient.SqlParameter("@Fe", System.Data.SqlDbType.Float, 0, "Fe"), New System.Data.SqlClient.SqlParameter("@Cr", System.Data.SqlDbType.Float, 0, "Cr"), New System.Data.SqlClient.SqlParameter("@Cu", System.Data.SqlDbType.Float, 0, "Cu"), New System.Data.SqlClient.SqlParameter("@Na", System.Data.SqlDbType.Float, 0, "Na"), New System.Data.SqlClient.SqlParameter("@K", System.Data.SqlDbType.Float, 0, "K"), New System.Data.SqlClient.SqlParameter("@Co", System.Data.SqlDbType.Float, 0, "Co"), New System.Data.SqlClient.SqlParameter("@Mn", System.Data.SqlDbType.Float, 0, "Mn"), New System.Data.SqlClient.SqlParameter("@Mo", System.Data.SqlDbType.Float, 0, "Mo"), New System.Data.SqlClient.SqlParameter("@W", System.Data.SqlDbType.Float, 0, "W"), New System.Data.SqlClient.SqlParameter("@Ti", System.Data.SqlDbType.Float, 0, "Ti")})
-        End With
-        DA.InsertCommand = MyInsertCmd
-
-        Dim MyUpdateCmd As New System.Data.SqlClient.SqlCommand
-        With MyUpdateCmd
-            .CommandText = "UPDATE [GFAAS Data] SET [Date/Time] = @p1, [Source] = @Source, [Test Type] = @Test_Type, [Idenyification] = @Idenyification, [Location] = @Location, [Ca] = @Ca, [Ma] = @Ma, [Ni] = @Ni, [Zn] = @Zn, [Al] = @Al, [Fe] = @Fe, [Cr] = @Cr, [Cu] = @Cu, [Na] = @Na, [K] = @K, [Co] = @Co, [Mn] = @Mn, [Mo] = @Mo, [W] = @W, [Ti] = @Ti WHERE (([Record Number] = @Original_Record_Number) AND ((@p3 = 1 AND [Date/Time] IS NULL) OR ([Date/Time] = @p2)) AND ((@IsNull_Source = 1 AND [Source] IS NULL) OR ([Source] = @Original_Source)) AND ((@IsNull_Test_Type = 1 AND [Test Type] IS NULL) OR ([Test Type] = @Original_Test_Type)) AND ((@IsNull_Idenyification = 1 AND [Idenyification] IS NULL) OR ([Idenyification] = @Original_Idenyification)) AND ((@IsNull_Location = 1 AND [Location] IS NULL) OR ([Location] = @Original_Location)) AND ((@IsNull_Ca = 1 AND [Ca] IS NULL) OR ([Ca] = @Original_Ca)) AND ((@IsNull_Ma = 1 AND [Ma] IS NULL) OR ([Ma] = @Original_Ma)) AND ((@IsNull_Ni = 1 AND [Ni] IS NULL) OR ([Ni] = @Original_Ni)) AND ((@IsNull_Zn = 1 AND [Zn] IS NULL) OR ([Zn] = @Original_Zn)) AND ((@IsNull_Al = 1 AND [Al] IS NULL) OR ([Al] = @Original_Al)) AND ((@IsNull_Fe = 1 AND [Fe] IS NULL) OR ([Fe] = @Original_Fe)) AND ((@IsNull_Cr = 1 AND [Cr] IS NULL) OR ([Cr] = @Original_Cr)) AND ((@IsNull_Cu = 1 AND [Cu] IS NULL) OR ([Cu] = @Original_Cu)) AND ((@IsNull_Na = 1 AND [Na] IS NULL) OR ([Na] = @Original_Na)) AND ((@IsNull_K = 1 AND [K] IS NULL) OR ([K] = @Original_K)) AND ((@IsNull_Co = 1 AND [Co] IS NULL) OR ([Co] = @Original_Co)) AND ((@IsNull_Mn = 1 AND [Mn] IS NULL) OR ([Mn] = @Original_Mn)) AND ((@IsNull_Mo = 1 AND [Mo] IS NULL) OR ([Mo] = @Original_Mo)) AND ((@IsNull_W = 1 AND [W] IS NULL) OR ([W] = @Original_W)) AND ((@IsNull_Ti = 1 AND [Ti] IS NULL) OR ([Ti] = @Original_Ti))); SELECT [Record Number], [Date/Time], Source, [Test Type], Idenyification, Location, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM [GFAAS Data] WHERE ([Record Number] = @Record_Number)"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@p1", System.Data.SqlDbType.SmallDateTime, 0, "Date/Time"), New System.Data.SqlClient.SqlParameter("@Source", System.Data.SqlDbType.NVarChar, 0, "Source"), New System.Data.SqlClient.SqlParameter("@Test_Type", System.Data.SqlDbType.NVarChar, 0, "Test Type"), New System.Data.SqlClient.SqlParameter("@Idenyification", System.Data.SqlDbType.NVarChar, 0, "Idenyification"), New System.Data.SqlClient.SqlParameter("@Location", System.Data.SqlDbType.NVarChar, 0, "Location"), New System.Data.SqlClient.SqlParameter("@Ca", System.Data.SqlDbType.Float, 0, "Ca"), New System.Data.SqlClient.SqlParameter("@Ma", System.Data.SqlDbType.Float, 0, "Ma"), New System.Data.SqlClient.SqlParameter("@Ni", System.Data.SqlDbType.Float, 0, "Ni"), New System.Data.SqlClient.SqlParameter("@Zn", System.Data.SqlDbType.Float, 0, "Zn"), New System.Data.SqlClient.SqlParameter("@Al", System.Data.SqlDbType.Float, 0, "Al"), New System.Data.SqlClient.SqlParameter("@Fe", System.Data.SqlDbType.Float, 0, "Fe"), New System.Data.SqlClient.SqlParameter("@Cr", System.Data.SqlDbType.Float, 0, "Cr"), New System.Data.SqlClient.SqlParameter("@Cu", System.Data.SqlDbType.Float, 0, "Cu"), New System.Data.SqlClient.SqlParameter("@Na", System.Data.SqlDbType.Float, 0, "Na"), New System.Data.SqlClient.SqlParameter("@K", System.Data.SqlDbType.Float, 0, "K"), New System.Data.SqlClient.SqlParameter("@Co", System.Data.SqlDbType.Float, 0, "Co"), New System.Data.SqlClient.SqlParameter("@Mn", System.Data.SqlDbType.Float, 0, "Mn"), New System.Data.SqlClient.SqlParameter("@Mo", System.Data.SqlDbType.Float, 0, "Mo"), New System.Data.SqlClient.SqlParameter("@W", System.Data.SqlDbType.Float, 0, "W"), New System.Data.SqlClient.SqlParameter("@Ti", System.Data.SqlDbType.Float, 0, "Ti"), New System.Data.SqlClient.SqlParameter("@Original_Record_Number", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Record Number", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@p3", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Date/Time", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@p2", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Date/Time", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Source", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Source", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Source", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Source", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Test_Type", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Test Type", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Test_Type", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Test Type", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Idenyification", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Idenyification", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Idenyification", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Idenyification", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Location", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Location", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Location", System.Data.SqlDbType.NVarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Location", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ca", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ca", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ca", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ca", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ma", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ma", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ma", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ma", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ni", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ni", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ni", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ni", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Zn", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Zn", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Zn", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Zn", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Al", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Al", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Al", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Al", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Fe", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Fe", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Fe", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Fe", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Cr", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Cr", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Cr", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Cr", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Cu", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Cu", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Cu", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Cu", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Na", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Na", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Na", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Na", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_K", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "K", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_K", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "K", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Co", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Co", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Co", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Co", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Mn", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Mn", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Mn", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Mn", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Mo", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Mo", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Mo", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Mo", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_W", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "W", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_W", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "W", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Ti", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Ti", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Ti", System.Data.SqlDbType.Float, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Ti", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Record_Number", System.Data.SqlDbType.Int, 4, "Record Number")})
-        End With
-        DA.UpdateCommand = MyUpdateCmd
-
-        DA.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "GFAAS Data", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("Record Number", "Record Number"), New System.Data.Common.DataColumnMapping("Date/Time", "Date/Time"), New System.Data.Common.DataColumnMapping("Source", "Source"), New System.Data.Common.DataColumnMapping("Test Type", "Test Type"), New System.Data.Common.DataColumnMapping("Idenyification", "Idenyification"), New System.Data.Common.DataColumnMapping("Location", "Location"), New System.Data.Common.DataColumnMapping("Ca", "Ca"), New System.Data.Common.DataColumnMapping("Ma", "Ma"), New System.Data.Common.DataColumnMapping("Ni", "Ni"), New System.Data.Common.DataColumnMapping("Zn", "Zn"), New System.Data.Common.DataColumnMapping("Al", "Al"), New System.Data.Common.DataColumnMapping("Fe", "Fe"), New System.Data.Common.DataColumnMapping("Cr", "Cr"), New System.Data.Common.DataColumnMapping("Cu", "Cu"), New System.Data.Common.DataColumnMapping("Na", "Na"), New System.Data.Common.DataColumnMapping("K", "K"), New System.Data.Common.DataColumnMapping("Co", "Co"), New System.Data.Common.DataColumnMapping("Mn", "Mn"), New System.Data.Common.DataColumnMapping("Mo", "Mo"), New System.Data.Common.DataColumnMapping("W", "W"), New System.Data.Common.DataColumnMapping("Ti", "Ti")})})
-        DA.Fill(DS)
-
-        Dim R As Double = 0
-        Dim M As Int16 = 0
-        Dim MyNull As Object
-        MyNull = System.DBNull.Value
-        Dim liveMdlSet As Data.DataRow = GetMyDataSet("SELECT [Key], [MDL_User], [EnterDate], [ExpireDate], Li, Na, Mg, Al, K, Ca, Ti, V, Cr, Mn, Fe, Co, Ni, Cu, Zn, Ga, Ars, Sr, Mo, Ag, Ba, Ta, W, Au, Pb, Ma, Se, Zr, La, Ir, Pt, [Notes] FROM [T_Metals_MDL] WHERE ExpireDate IS NULL").Tables(0).Rows(0)
-
-        For i As Int16 = 0 To 1
-            DR_Metals = DS_Metals.Tables(0).Rows(i)
-            DR = DS.Tables("GFAAS Data").NewRow
-            DR("Date/Time") = DateTime.Now.ToString
-            DR("Source") = "Bob"
-            DR("Test Type") = "Bob"
-            DR("Idenyification") = LotNumber
-            DR("Location") = "Bob"
-
-            'Ca ************************************
-            setMDL("Ca", liveMdlSet, DR, DR_Metals)
-
-            'Ma ************************************
-            setMDL("Ma", liveMdlSet, DR, DR_Metals)
-
-            'Ni ************************************
-            setMDL("Ni", liveMdlSet, DR, DR_Metals)
-
-            'Zn ************************************
-            setMDL("Zn", liveMdlSet, DR, DR_Metals)
-
-            'Al ************************************
-            setMDL("Al", liveMdlSet, DR, DR_Metals)
-
-            'Fe ************************************
-            setMDL("Fe", liveMdlSet, DR, DR_Metals)
-
-            'Cr ************************************
-            setMDL("Cr", liveMdlSet, DR, DR_Metals)
-
-            'Cu ************************************
-            setMDL("Cu", liveMdlSet, DR, DR_Metals)
-
-            'Na ************************************
-            setMDL("Na", liveMdlSet, DR, DR_Metals)
-
-            'K ************************************
-            setMDL("K", liveMdlSet, DR, DR_Metals)
-
-            'Co ************************************
-            setMDL("Co", liveMdlSet, DR, DR_Metals)
-
-            'Mn ************************************
-            setMDL("Mn", liveMdlSet, DR, DR_Metals)
-
-            'Mo ************************************
-            setMDL("Mo", liveMdlSet, DR, DR_Metals)
-
-            'W ************************************
-            setMDL("W", liveMdlSet, DR, DR_Metals)
-
-            'Ti ************************************
-            setMDL("Ti", liveMdlSet, DR, DR_Metals)
-
-            DS.Tables("GFAAS Data").Rows.Add(DR)
-            DA.Update(DS, "GFAAS Data")
-        Next
-
-
-        Connection.Close()
-        Return GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti FROM dbo.[GFAAS Data] WHERE (Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
-
-    End Function
 
     Sub setMDL(elem As String, liveMdlDR As Data.DataRow, DR As Data.DataRow, DR_Metals As Data.DataRow)
         Dim R As Double = 0
@@ -1851,6 +1902,8 @@ Public Class Class1
             DR(elem) = DR_Metals(elem)
         End If
     End Sub
+
+
 
     Function Data_Enlightenment_Camp(BoxType As String, Box As String, Info As String) As String
 
@@ -3577,6 +3630,36 @@ Public Class Class1
                     End If
                 End If
 
+                If GetCustomerFAB(MainID) = "ON-Semi-EFK" Then
+                    Flex.ActiveSheetByName = "On300"
+
+                    Flex.ConvertFormulasToValues(True)
+                    Flex.Recalc()
+                    Flex.PrintOptions = FlexCel.Core.TPrintOptions.None
+
+                    If Not Printer = "" Then
+                        Dim printlabelME As New FlexCel.Render.FlexCelPrintDocument(Flex)
+                        Try
+                            With printlabelME
+                                If TestLabel = False Then
+                                    .PrinterSettings.PrinterName = Printer
+                                    .PrinterSettings.Copies = WB_Label_Count(MainID)
+                                    .Print()
+                                    .Dispose()
+                                Else
+                                    .PrinterSettings.PrinterName = Printer
+                                    .PrinterSettings.Copies = 1
+                                    .Print()
+                                    .Dispose()
+                                End If
+
+                            End With
+                        Catch ex As Exception
+
+                        End Try
+
+                    End If
+                End If
 
             Case "CB" ' Cardboard Box Label
 
@@ -3900,7 +3983,7 @@ Public Class Class1
         Dim LabelRecordSelectCmd As New System.Data.SqlClient.SqlCommand
         With LabelRecordSelectCmd
             .CommandText = "Select LabelRecordNumber, Lot, LabelType, Wafers, Total_Qty, RecordNumber, SO_Key, Operator, EventTime, RFID, LotBoxNumber FROM dbo.LabelsMade WHERE (Lot = '0000-00000-0000')"
-            .Connection = Connection
+                    .Connection = Connection
         End With
         DA_LabelRecord.SelectCommand = LabelRecordSelectCmd
 
@@ -9157,9 +9240,9 @@ Public Class Class1
             'Flex.SetCellValue(ii + 10, 54, DR_CofAInfo("ClusterAreaCnt").ToString)
 
 
-            If DR_Spec("Customer_Name").ToString.Contains("IBM") Or DR_Spec("Customer_Name").ToString.Contains("GF") Or DR_Spec("Customer_Name").ToString.Contains("ON-Semi") Then 'SlotBySlotSheetName
+            If DR_Spec("Customer_Name").ToString.Contains("IBM") Or DR_Spec("Customer_Name").ToString.Contains("GF") Or DR_Spec("Customer_Name").ToString.Contains("ON Semiconductor") Then 'SlotBySlotSheetName
                 SlotBySlotSheetName = "Slot-by-Slot WRemoval"
-                'Flex.SetCellValue(ii + 3, 12, DR_CofAInfo("Removal"))
+                Flex.SetCellValue(ii + 3, 12, DR_CofAInfo("Removal")) ' (un remmed this out so On Semi will have removal on CofA. not sure why it was Remmed out. 2025-01-09)
                 SlotBySlotCm = 13
             Else
                 SlotBySlotSheetName = "Slot-by-Slot"
@@ -10494,11 +10577,16 @@ Public Class Class1
                 Flex.SetCellValue(mi + 60, 11, DR_Metals("Cu") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 12, DR_Metals("Na") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 13, DR_Metals("K") * 10) ' *10 to take E10 to E9
-                Flex.SetCellValue(mi + 60, 14, "0") 'DR_Metals("Ti"))
+                Flex.SetCellValue(mi + 60, 14, DR_Metals("Ti") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 15, DR_Metals("Co") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 16, DR_Metals("Mn") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 17, DR_Metals("Mo") * 10) ' *10 to take E10 to E9
                 Flex.SetCellValue(mi + 60, 18, DR_Metals("W") * 10) ' *10 to take E10 to E9
+
+                Flex.SetCellValue(mi + 60, 19, DR_Metals("Au") * 10) ' *10 to take E10 to E9
+                Flex.SetCellValue(mi + 60, 20, DR_Metals("Ag") * 10) ' *10 to take E10 to E9
+                Flex.SetCellValue(mi + 60, 21, DR_Metals("V") * 10) ' *10 to take E10 to E9
+
             Next
 
         End If
@@ -10541,7 +10629,7 @@ Public Class Class1
 
         End If
 
-        If DR_Spec("Customer_Name").ToString.Contains("IBM") Or DR_Spec("Customer_Name").ToString.Contains("GF") Then
+        If DR_Spec("Customer_Name").ToString.Contains("IBM") Or DR_Spec("Customer_Name").ToString.Contains("GF") Or DR_Spec("Customer_Name").ToString.Contains("ON Semiconductor") Then
             If Add_CheckSum_2CofA(Flex, True) = "Bad T7" Then
                 MakeCofA = "Error, Bad T7"
                 Exit Function
@@ -11798,7 +11886,7 @@ Public Class Class1
                 Flex.ActiveSheetByName = SlotBySlotSheetName
 
             Else
-
+                
                 Flex.ActiveSheetByName = SlotBySlotSheetName
 
             End If
@@ -13001,7 +13089,7 @@ Public Class Class1
                 sixCount = sixCount + 1
             End If
         Next
-
+       
         Flex.Recalc()
         'SlotBySlotSheetName = "Slot-by-Slot WRemoval"
 
@@ -14217,7 +14305,7 @@ Public Class Class1
         Using swPara As StreamWriter = File.CreateText(FILE_NAME)
             swPara.WriteLine("UNITID,UNITTYPE,PARTNUMBER,PARTDESC,PARTECLEVEL,SUPPLIER_NUM,DOX,PRODDATE,SUPPLIER_PLANTSITE,SUPPLIER_PLANT_LINE,SUBUNITID,SUBUNITTYPE,SUBUNIT_PRODDATE,TESTERID,TESTMETHOD,MEASUREMENT_TS,PARAMNAME,PARAMID,PARAMLISTID,PARAMTEXT,PARAMVALUE,PARAMUNIT,PARENTUNITID,PARENTUNITTYPE,PARAMSEMANTIC")
 
-            Dim StdLine As String = SHIPMENT_ID & ",SHIPMENT," & PartNumber & ",," & PartECLevel & "," & Supplier & ",," & ProDate & "," & PlantSite & "," & PLANTLINE & ",,,,,,,,"
+            Dim StdLine As String = SHIPMENT_ID & ",SHIPMENT," & PartNumber & ",," & PartECLevel & "," & Supplier & ",," & ProDate & "," & PlantSite & "," & PlantLine & ",,,,,,,,"
 
             'NUM_IN_UNIT
             swPara.WriteLine(StdLine & "NUM_IN_UNIT,,," & flex.GetCellValue(15, 2).ToString & ",#,,,S")
@@ -15770,7 +15858,7 @@ Public Class Class1
         Dim PLANTLINE As String = ""
 
         Select Case Fab
-            Case "Global-NY"
+            Case "ON-Semi-EFK"
                 PLANTLINE = "EFK"
                 Make_GF_300mm_XMLDataPack(flex, PLANTLINE)
             Case "Global-VT"
@@ -15780,47 +15868,70 @@ Public Class Class1
 
     End Function
 
+
+
+
+
     Function Find_GF_xsiNameSpace_By_ID(TheID As String) As String
 
         Select Case TheID
             Case "3087" '2ERWF-13047
                 Find_GF_xsiNameSpace_By_ID = "MS-002537_1_PureWafer.xsd"
+
             Case "3089" '2ERWF-13042
                 Find_GF_xsiNameSpace_By_ID = "MS-002525_1_PureWafer.xsd"
+
             Case "3090" '2ERWF-13046
                 Find_GF_xsiNameSpace_By_ID = "MS-002536_1_PureWafer.xsd"
+
             Case "3110" '2ERWF-13038
                 Find_GF_xsiNameSpace_By_ID = "MS-002529_1_PureWafer.xsd"
+
             Case "3111" '2ERWF-13039
                 Find_GF_xsiNameSpace_By_ID = ""
+
             Case "3112" '2ERWF-13044
                 'Find_GF_xsiNameSpace_By_ID = "MS-002531_1_PureWafer.xsd"
                 Find_GF_xsiNameSpace_By_ID = "B04-0831_5_PureWafer.xsd"
+
             Case "3113" '2ERWF-13044
                 'Find_GF_xsiNameSpace_By_ID = "MS-002531_1_PureWafer.xsd"
                 Find_GF_xsiNameSpace_By_ID = "B04-0831_5_PureWafer.xsd"
+
             Case "3212" '2ERWF-13043
                 Find_GF_xsiNameSpace_By_ID = "MS-002527_1_PureWafer.xsd"
+
             Case "3260" '2ERWF-13045
                 Find_GF_xsiNameSpace_By_ID = "MS-002534_1_PureWafer.xsd"
+
+            Case "3359" '2ERWF-33001
+                Find_GF_xsiNameSpace_By_ID = "MS-010031.xsd"
+
             Case "3360" '2ERWF-13042
                 Find_GF_xsiNameSpace_By_ID = "MS-002525_1_PureWafer.xsd"
+
             Case "3361" '2ERWF-13008
                 Find_GF_xsiNameSpace_By_ID = "MS-000805_5_PureWafer.xsd"
+
             Case "3362" '2ERWF-13009
                 Find_GF_xsiNameSpace_By_ID = "MS-001171_4_PureWafer.xsd"
+
             Case "3363" '2ERWF-13020
                 Find_GF_xsiNameSpace_By_ID = "MS-003487_1_PureWafer.xsd"
 
 
             Case "3400" '2ERWF-13048
                 Find_GF_xsiNameSpace_By_ID = "MS-002540_1_PureWafer.xsd"
+
             Case "3570" '2ERWF-13008
                 Find_GF_xsiNameSpace_By_ID = "MS-000805_5_PureWafer.xsd"
+
             Case "3571" '2ERWF-15533
                 Find_GF_xsiNameSpace_By_ID = "" 'Rev7
+
             Case "3572" '2ERWF-13009
                 Find_GF_xsiNameSpace_By_ID = "MS-001171_4_PureWafer.xsd"
+
             Case "3573" '2ERWF-15617
                 Find_GF_xsiNameSpace_By_ID = "" 'Rev7
 
@@ -15863,6 +15974,10 @@ Public Class Class1
     Function Find_GF_AD_25um(TheID As String) As Boolean
 
         Select Case TheID
+            'On Semi NY ID's
+            Case "3359"
+                Find_GF_AD_25um = True
+
             'GF ID's
             Case "3112"
                 Find_GF_AD_25um = True
@@ -15917,67 +16032,157 @@ Public Class Class1
 
     End Function
 
-    Function GF_Partical_Marker_ForXML(ByVal TheText As String) As String
-        Try
-            GF_Partical_Marker_ForXML = "None"
-
-            If TheText.Contains("37nm") Then
-                GF_Partical_Marker_ForXML = "LPD_LPD_N_37nm"
-            End If
-
-            If TheText.Contains("0.034") Then
-                GF_Partical_Marker_ForXML = "LPD_34nm"
-                Exit Function
-            End If
-
-            If TheText.Contains("0.050") Then
-                GF_Partical_Marker_ForXML = "LPD_50nm"
-                Exit Function
-            End If
-
-            If TheText.Contains("0.055") Then
-                GF_Partical_Marker_ForXML = "LPD_0.055um"
-                Exit Function
-            End If
-
-            If TheText.Contains("55nm") Then
-                GF_Partical_Marker_ForXML = "LPD_LPD_N_55nm"
-                Exit Function
-            End If
-
-            If TheText.Contains("50nm") Then
-                GF_Partical_Marker_ForXML = "LPD_LPD_N_50nm"
-                Exit Function
-            End If
-
-            If TheText.Contains("90nm") Then
-                GF_Partical_Marker_ForXML = "LPD_LPD_N_90nm"
-                Exit Function
-            End If
-
-            If TheText.Contains("0.065") Then
-                GF_Partical_Marker_ForXML = "LPD_0.065um"
-                Exit Function
-            End If
-
-            If TheText.Contains("0.08") Then
-                GF_Partical_Marker_ForXML = "LPD_0.08um"
-            End If
-
-            If TheText.Contains("0.12") Then
-                GF_Partical_Marker_ForXML = "LPD_0.12um"
-                Exit Function
-            End If
-
-            If TheText.Contains("0.16") Then
-                GF_Partical_Marker_ForXML = "LPD_0.16um"
-                Exit Function
-            End If
 
 
-        Catch ex As Exception
-            GF_Partical_Marker_ForXML = "None"
-        End Try
+    'Function GF_Partical_Marker_ForXML(ByVal TheText As String) As String
+    '    Try
+    '        GF_Partical_Marker_ForXML = "None"
+
+    '        If TheText.Contains("37nm") Then
+    '            GF_Partical_Marker_ForXML = "LPD_LPD_N_37nm"
+    '        End If
+
+    '        If TheText.Contains("0.034") Then
+    '            GF_Partical_Marker_ForXML = "LPD_34nm"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("0.050") Then
+    '            GF_Partical_Marker_ForXML = "LPD_50nm"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("0.055") Then
+    '            GF_Partical_Marker_ForXML = "LPD_0.055um"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("55nm") Then
+    '            GF_Partical_Marker_ForXML = "LPD_LPD_N_55nm"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("50nm") Then
+    '            GF_Partical_Marker_ForXML = "LPD_LPD_N_50nm"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("90nm") Then
+    '            GF_Partical_Marker_ForXML = "LPD_LPD_N_90nm"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("0.065") Then
+    '            GF_Partical_Marker_ForXML = "LPD_0.065um"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("0.08") Then
+    '            GF_Partical_Marker_ForXML = "LPD_0.08um"
+    '        End If
+
+    '        If TheText.Contains("0.12") Then
+    '            GF_Partical_Marker_ForXML = "LPD_0.12um"
+    '            Exit Function
+    '        End If
+
+    '        If TheText.Contains("0.16") Then
+    '            GF_Partical_Marker_ForXML = "LPD_0.16um"
+    '            Exit Function
+    '        End If
+
+
+    '    Catch ex As Exception
+    '        GF_Partical_Marker_ForXML = "None"
+    '    End Try
+
+
+
+    'End Function
+
+
+    Function GF_Partical_Marker_ForXML(ByVal TheText As String, TheType As String) As String
+
+        GF_Partical_Marker_ForXML = "None"
+
+        TheType = UCase(TheType)
+        Select Case TheType
+            Case "LPD"
+
+            Case "LPDN"
+                If TheText.Contains("55nm") Then
+                    GF_Partical_Marker_ForXML = "LPD_LPD_N_55nm"
+                    Exit Function
+                End If
+
+            Case "SOD"
+
+            Case Else
+                ' the  orig code here
+                Try
+                    GF_Partical_Marker_ForXML = "None"
+
+                    If TheText.Contains("37nm") Then
+                        GF_Partical_Marker_ForXML = "LPD_LPD_N_37nm"
+                    End If
+
+                    If TheText.Contains("0.034") Then
+                        GF_Partical_Marker_ForXML = "LPD_34nm"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("0.050") Then
+                        GF_Partical_Marker_ForXML = "LPD_50nm"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("0.055") Then
+                        GF_Partical_Marker_ForXML = "LPD_0.055um"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("55nm") Then
+                        GF_Partical_Marker_ForXML = "LPD_LPD_N_55nm"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("50nm") Then
+                        GF_Partical_Marker_ForXML = "LPD_LPD_N_50nm"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("90nm") Then
+                        GF_Partical_Marker_ForXML = "LPD_LPD_N_90nm"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("0.065") Then
+                        GF_Partical_Marker_ForXML = "LPD_0.065um"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("0.08") Then
+                        GF_Partical_Marker_ForXML = "LPD_0.08um"
+                    End If
+
+                    If TheText.Contains("0.12") Then
+                        GF_Partical_Marker_ForXML = "LPD_0.12um"
+                        Exit Function
+                    End If
+
+                    If TheText.Contains("0.16") Then
+                        GF_Partical_Marker_ForXML = "LPD_0.16um"
+                        Exit Function
+                    End If
+
+
+                Catch ex As Exception
+                    GF_Partical_Marker_ForXML = "None"
+                End Try
+
+        End Select
+
+
 
 
 
@@ -16045,22 +16250,22 @@ Public Class Class1
         End If
 
         Try
-            Partical1 = GF_Partical_Marker_ForXML(flex.GetCellValue(37, 3).ToString)
+            Partical1 = GF_Partical_Marker_ForXML(flex.GetCellValue(37, 3).ToString, "")
         Catch ex As Exception
             Partical1 = "None"
         End Try
         Try
-            Partical2 = GF_Partical_Marker_ForXML(flex.GetCellValue(38, 3).ToString)
+            Partical2 = GF_Partical_Marker_ForXML(flex.GetCellValue(38, 3).ToString, "")
         Catch ex As Exception
             Partical2 = "None"
         End Try
         Try
-            Partical3 = GF_Partical_Marker_ForXML(flex.GetCellValue(39, 3).ToString)
+            Partical3 = GF_Partical_Marker_ForXML(flex.GetCellValue(39, 3).ToString, "")
         Catch ex As Exception
             Partical3 = "None"
         End Try
         Try
-            Partical4 = GF_Partical_Marker_ForXML(flex.GetCellValue(40, 3).ToString)
+            Partical4 = GF_Partical_Marker_ForXML(flex.GetCellValue(40, 3).ToString, "")
         Catch ex As Exception
             Partical4 = "None"
         End Try
@@ -16446,6 +16651,9 @@ Public Class Class1
         Dim Na As Double = 0.001
         Dim Ni As Double = 0.001
         Dim Zn As Double = 0.001
+        Dim Ag As Double = 0.001
+        Dim Au As Double = 0.001
+        Dim V As Double = 0.001
         Dim Partical1 As String = ""
         Dim Partical2 As String = ""
         Dim Partical3 As String = ""
@@ -16457,9 +16665,10 @@ Public Class Class1
 
 
         'GF wants the data uploaded in E10. So, the CofA data is in E8 and need to shift to E10 by dividing by 100
-        flex.ActiveSheetByName = "Metals"
+        'flex.ActiveSheetByName = "Metals"
+        flex.ActiveSheetByName = "Cust Spec Data"
         Try
-            K = (flex.GetCellValue(15, 2).ToString / 100) '* 100000000
+            K = (flex.GetCellValue(32, 25).ToString / 10) '* 100000000
             If K = 0 Then
                 K = 0.001
             End If
@@ -16468,7 +16677,7 @@ Public Class Class1
         End Try
 
         Try
-            Al = (flex.GetCellValue(10, 2).ToString / 100) '* 100000000
+            Al = (flex.GetCellValue(27, 25).ToString / 10) '* 100000000
             If Al = 0 Then
                 Al = 0.001
             End If
@@ -16477,7 +16686,7 @@ Public Class Class1
         End Try
 
         Try
-            Ca = (flex.GetCellValue(6, 2).ToString / 100)
+            Ca = (flex.GetCellValue(23, 25).ToString / 10)
             If Ca = 0 Then
                 Ca = 0.001
             End If
@@ -16486,7 +16695,7 @@ Public Class Class1
         End Try
 
         Try
-            Cr = (flex.GetCellValue(12, 2).ToString / 100)
+            Cr = (flex.GetCellValue(29, 25).ToString / 10)
             If Cr = 0 Then
                 Cr = 0.001
             End If
@@ -16495,7 +16704,7 @@ Public Class Class1
         End Try
 
         Try
-            Cu = (flex.GetCellValue(13, 2).ToString / 100)
+            Cu = (flex.GetCellValue(30, 25).ToString / 10)
             If Cu = 0 Then
                 Cu = 0.001
             End If
@@ -16504,7 +16713,7 @@ Public Class Class1
         End Try
 
         Try
-            Fe = (flex.GetCellValue(11, 2).ToString / 100)
+            Fe = (flex.GetCellValue(28, 25).ToString / 10)
             If Fe = 0 Then
                 Fe = 0.001
             End If
@@ -16513,7 +16722,7 @@ Public Class Class1
         End Try
 
         Try
-            Na = (flex.GetCellValue(14, 2).ToString / 100)
+            Na = (flex.GetCellValue(31, 25).ToString / 10)
             If Na = 0 Then
                 Na = 0.001
             End If
@@ -16522,7 +16731,7 @@ Public Class Class1
         End Try
 
         Try
-            Ni = (flex.GetCellValue(8, 2).ToString / 100)
+            Ni = (flex.GetCellValue(25, 25).ToString / 10)
             If Ni = 0 Then
                 Ni = 0.001
             End If
@@ -16531,12 +16740,39 @@ Public Class Class1
         End Try
 
         Try
-            Zn = (flex.GetCellValue(9, 2).ToString / 100)
+            Zn = (flex.GetCellValue(26, 25).ToString / 10)
             If Zn = 0 Then
                 Zn = 0.001
             End If
         Catch ex As Exception
             Zn = 0.001
+        End Try
+
+        Try
+            Au = (flex.GetCellValue(39, 25).ToString / 10)
+            If Au = 0 Then
+                Au = 0.001
+            End If
+        Catch ex As Exception
+            Au = 0.001
+        End Try
+
+        Try
+            Ag = (flex.GetCellValue(38, 25).ToString / 10)
+            If Ag = 0 Then
+                Ag = 0.001
+            End If
+        Catch ex As Exception
+            Ag = 0.001
+        End Try
+
+        Try
+            V = (flex.GetCellValue(40, 25).ToString / 10)
+            If V = 0 Then
+                V = 0.001
+            End If
+        Catch ex As Exception
+            V = 0.001
         End Try
 
 
@@ -16556,22 +16792,22 @@ Public Class Class1
         'find what particals
         flex.ActiveSheetByName = "Slot-by-Slot WRemoval"
         Try
-            Partical1 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 13).ToString)
+            Partical1 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 13).ToString, flex.GetCellValue(1, 13).ToString)
         Catch ex As Exception
             Partical1 = "None"
         End Try
         Try
-            Partical2 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 14).ToString)
+            Partical2 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 14).ToString, flex.GetCellValue(1, 14).ToString)
         Catch ex As Exception
             Partical2 = "None"
         End Try
         Try
-            Partical3 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 15).ToString)
+            Partical3 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 15).ToString, flex.GetCellValue(1, 15).ToString)
         Catch ex As Exception
             Partical3 = "None"
         End Try
         Try
-            Partical4 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 16).ToString)
+            Partical4 = GF_Partical_Marker_ForXML(flex.GetCellValue(2, 16).ToString, flex.GetCellValue(1, 16).ToString)
         Catch ex As Exception
             Partical4 = "None"
         End Try
@@ -16584,7 +16820,14 @@ Public Class Class1
         'FInf out if we are doing Scratches and Clusters
         SC = Find_GF_Scratchs_And_Clusters(flex.GetCellValue(11, 2).ToString)
 
-        Dim XMLFileName As String = "\\PWI-40\software$\LabelTemplates\LabelArchive\GFDataPacks\"
+        Dim XMLFileName As String = "" ' "\\PWI-40\software$\LabelTemplates\LabelArchive\GFDataPacks\"
+
+        If PLANTLINE = "EFK" Then
+            XMLFileName = "\\PWI-40\software$\LabelTemplates\LabelArchive\OnSemiDataPacks\"
+        Else
+            XMLFileName = "\\PWI-40\software$\LabelTemplates\LabelArchive\GFDataPacks\"
+        End If
+
         XMLFileName = XMLFileName & flex.GetCellValue(7, 3).ToString & "_" ' PartNumber
         XMLFileName = XMLFileName & flex.GetCellValue(3, 8).ToString & ".XML" 'ship#
 
@@ -16660,23 +16903,23 @@ Public Class Class1
                     XWriter.WriteAttributeString("ExpireDate", DateString)
 
                     '----------------------------------------------------------------------------------
-                    XWriter.WriteStartElement("SYMBOLICS")
-                    '**
-                    If Not DopantValue = "" Then
-                        XWriter.WriteStartElement("Dopant")
-                        XWriter.WriteAttributeString("VALUE", DopantValue) 'Attributes
-                        XWriter.WriteEndElement()
-                    End If
-                    '**
-                    XWriter.WriteStartElement("Notch_orientation")
-                    XWriter.WriteAttributeString("VALUE", "110") 'Attributes
-                    XWriter.WriteEndElement()
-                    '**
-                    XWriter.WriteStartElement("Surface_orientation")
-                    XWriter.WriteAttributeString("VALUE", "100") 'Attributes
-                    XWriter.WriteEndElement()
-                    '**
-                    XWriter.WriteEndElement()
+                    'XWriter.WriteStartElement("SYMBOLICS")
+                    ''**
+                    'If Not DopantValue = "" Then
+                    '    XWriter.WriteStartElement("Dopant")
+                    '    XWriter.WriteAttributeString("VALUE", DopantValue) 'Attributes
+                    '    XWriter.WriteEndElement()
+                    'End If
+                    ''**
+                    'XWriter.WriteStartElement("Notch_orientation")
+                    'XWriter.WriteAttributeString("VALUE", "110") 'Attributes
+                    'XWriter.WriteEndElement()
+                    ''**
+                    'XWriter.WriteStartElement("Surface_orientation")
+                    'XWriter.WriteAttributeString("VALUE", "100") 'Attributes
+                    'XWriter.WriteEndElement()
+                    ''**
+                    'XWriter.WriteEndElement()
                     '------------------------------------------------------------------------------------
 
 
@@ -16840,6 +17083,36 @@ Public Class Class1
                         XWriter.WriteStartElement("RAW")
                         XWriter.WriteAttributeString("Sublot", flex.GetCellValue(I, 3).ToString) 'Attributes
                         XWriter.WriteAttributeString("VALUE", Zn) 'Attributes
+                        XWriter.WriteEndElement()
+                    Next
+                    XWriter.WriteEndElement()
+
+                    'Surf_Metal_Au
+                    XWriter.WriteStartElement("Surf_Metal_Au")
+                    For I = PointerStart To PointerEnd
+                        XWriter.WriteStartElement("RAW")
+                        XWriter.WriteAttributeString("Sublot", flex.GetCellValue(I, 3).ToString) 'Attributes
+                        XWriter.WriteAttributeString("VALUE", Au) 'Attributes
+                        XWriter.WriteEndElement()
+                    Next
+                    XWriter.WriteEndElement()
+
+                    'Surf_Metal_Ag
+                    XWriter.WriteStartElement("Surf_Metal_Ag")
+                    For I = PointerStart To PointerEnd
+                        XWriter.WriteStartElement("RAW")
+                        XWriter.WriteAttributeString("Sublot", flex.GetCellValue(I, 3).ToString) 'Attributes
+                        XWriter.WriteAttributeString("VALUE", Ag) 'Attributes
+                        XWriter.WriteEndElement()
+                    Next
+                    XWriter.WriteEndElement()
+
+                    'Surf_Metal_V
+                    XWriter.WriteStartElement("Surf_Metal_V")
+                    For I = PointerStart To PointerEnd
+                        XWriter.WriteStartElement("RAW")
+                        XWriter.WriteAttributeString("Sublot", flex.GetCellValue(I, 3).ToString) 'Attributes
+                        XWriter.WriteAttributeString("VALUE", V) 'Attributes
                         XWriter.WriteEndElement()
                     Next
                     XWriter.WriteEndElement()
@@ -18488,13 +18761,13 @@ Public Class Class1
                             Exit Do
                         End If
 
-                        Metalsloop = Metalsloop + 1
+                Metalsloop = Metalsloop + 1
 
-                        If Metalsloop = 200 Then
-                            Exit Do
-                        End If
+                If Metalsloop = 200 Then
+                    Exit Do
+                End If
 
-                    Loop
+            Loop
 
                 End If
                 flex.ActiveSheetByName = "AllData"
@@ -20680,21 +20953,21 @@ Public Class Class1
 
 
                 If Swan = True Then
-                    Select Case RemoveSheet
-                        Case Is = "Analysis"
-                            flex.RecalcAndVerify()
-                            flex.ConvertFormulasToValues(True)
-                            loopcounter = loopcounter + 1
+                        Select Case RemoveSheet
+                            Case Is = "Analysis"
+                                flex.RecalcAndVerify()
+                                flex.ConvertFormulasToValues(True)
+                                loopcounter = loopcounter + 1
 
-                        Case Is = "CofC"
-                            flex.RecalcAndVerify()
-                            flex.ConvertFormulasToValues(True)
-                            loopcounter = loopcounter + 1
-                        Case Else
-                            flex.DeleteSheet(1)
+                            Case Is = "CofC"
+                                flex.RecalcAndVerify()
+                                flex.ConvertFormulasToValues(True)
+                                loopcounter = loopcounter + 1
+                            Case Else
+                                flex.DeleteSheet(1)
 
-                    End Select
-                Else
+                        End Select
+                    Else
 
 
 
@@ -23795,7 +24068,7 @@ Public Class Class1
         Pick_Shipping_UnitTable = "Good"
     End Function
 
-    Function ReceivatoryWafers(ByVal StartWL_or_WaferLogComplete As String, ByVal ID As String, ByVal WL As String, ByVal Qty As String, ByVal PackingSlip As String,
+    Function ReceivatoryWafers(ByVal StartWL_or_WaferLogComplete As String, ByVal ID As String, ByVal WL As String, ByVal Qty As String, ByVal PackingSlip As String, _
     ByVal Carrier As String, ByVal Note As String, ByVal ContainmentUnit As String, ByVal ContainmentQty As String, ByVal SatiUser As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -23872,113 +24145,8 @@ Public Class Class1
     End Function
 
 
-    Function ITRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer, ByVal Status As String) As String
-        ITRequestTicket = 0
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-
-        Dim DA_MRTicket As New Data.SqlClient.SqlDataAdapter
-        Dim DS_MRTicket As New Data.DataSet
-        Dim DR_MRTicket As Data.DataRow
-        '*****************************************************************
-        '************************Select***********************************
-        '*****************************************************************
-        Dim MRTicketSelectCmd As New System.Data.SqlClient.SqlCommand
-        With MRTicketSelectCmd
-            .CommandText = "SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_ITR_Tickets WHERE (MR_Key = '" & Ticket & "')"
-            .Connection = Connection
-        End With
-        DA_MRTicket.SelectCommand = MRTicketSelectCmd
-
-        '*****************************************************************
-        '************************Insert***********************************
-        '*****************************************************************
-        Dim MRTicketInsertCmd As New System.Data.SqlClient.SqlCommand
-        With MRTicketInsertCmd
-            .CommandText = "INSERT INTO [dbo].[T_ITR_Tickets] ([Tool], [Status], [IssueDate], [IssueUser], [CloseDate], [CloseUser]) VALUES (@Tool, @Status, @IssueDate, @IssueUser, @CloseDate, @CloseUser); SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM [dbo].[T_ITR_Tickets] WHERE (MR_Key = SCOPE_IDENTITY())"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@Status", System.Data.SqlDbType.VarChar, 0, "Status"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser")})
-        End With
-        DA_MRTicket.InsertCommand = MRTicketInsertCmd
-
-        '*****************************************************************
-        '************************Update***********************************
-        '*****************************************************************
-        Dim MRTicketUpdateCmd As New System.Data.SqlClient.SqlCommand
-        With MRTicketUpdateCmd
-            .CommandText = "UPDATE [dbo].[T_ITR_Tickets] SET [Tool] = @Tool, [Status] = @Status, [IssueDate] = @IssueDate, [IssueUser] = @IssueUser, [CloseDate] = @CloseDate, [CloseUser] = @CloseUser WHERE (([MR_Key] = @Original_MR_Key) AND ((@IsNull_Tool = 1 AND [Tool] IS NULL) OR ([Tool] = @Original_Tool)) AND ((@IsNull_Status = 1 AND [Status] IS NULL) OR ([Status] = @Original_Status)) AND ((@IsNull_IssueDate = 1 AND [IssueDate] IS NULL) OR ([IssueDate] = @Original_IssueDate)) AND ((@IsNull_IssueUser = 1 AND [IssueUser] IS NULL) OR ([IssueUser] = @Original_IssueUser)) AND ((@IsNull_CloseDate = 1 AND [CloseDate] IS NULL) OR ([CloseDate] = @Original_CloseDate)) AND ((@IsNull_CloseUser = 1 AND [CloseUser] IS NULL) OR ([CloseUser] = @Original_CloseUser))); SELECT MR_Key, Tool, Status, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_ITR_Tickets WHERE (MR_Key = @MR_Key)"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@Status", System.Data.SqlDbType.VarChar, 0, "Status"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser"), New System.Data.SqlClient.SqlParameter("@Original_MR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "MR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Status", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Status", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Status", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Status", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 4, "MR_Key")})
-        End With
-        DA_MRTicket.UpdateCommand = MRTicketUpdateCmd
-
-        '*****************************************************************
-        '************************Genral***********************************
-        '*****************************************************************
-        DA_MRTicket.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_ITR_Tickets", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("MR_Key", "MR_Key"), New System.Data.Common.DataColumnMapping("Tool", "Tool"), New System.Data.Common.DataColumnMapping("Status", "Status"), New System.Data.Common.DataColumnMapping("IssueDate", "IssueDate"), New System.Data.Common.DataColumnMapping("IssueUser", "IssueUser"), New System.Data.Common.DataColumnMapping("CloseDate", "CloseDate"), New System.Data.Common.DataColumnMapping("CloseUser", "CloseUser")})})
-        DA_MRTicket.Fill(DS_MRTicket)
-
-        Select Case Action
-            Case "New"
-                DR_MRTicket = DS_MRTicket.Tables("T_ITR_Tickets").NewRow
-                DR_MRTicket("Tool") = Tool
-                DR_MRTicket("Status") = Status
-                DR_MRTicket("IssueDate") = System.DateTime.Now.ToShortTimeString
-                DR_MRTicket("IssueUser") = User.Identity.Name.ToString
-                DS_MRTicket.Tables("T_ITR_Tickets").Rows.Add(DR_MRTicket)
-                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
-                ITRequestTicket = DR_MRTicket("MR_Key")
-
-            Case "ModStatus"
-                DR_MRTicket = DS_MRTicket.Tables(0).Rows(0)
-                DR_MRTicket.AcceptChanges()
-                DR_MRTicket.BeginEdit()
-                DR_MRTicket("Status") = Status
-                DR_MRTicket.EndEdit()
-                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
 
 
-            Case "Close"
-                '*****************************************************************
-                '** check to make sure they did not spam the close button ********
-                '*****************************************************************
-                Dim ds As Data.DataSet
-                Dim DR As Data.DataRow
-                Dim nullcheck As Boolean
-
-                ds = GetMyDataSet("SELECT CloseDate FROM dbo.T_ITR_Tickets WHERE (MR_Key = " & Ticket & ")") 'SELECT CloseDate FROM dbo.T_ITR_Tickets WHERE (MR_Key = 53868)
-                DR = ds.Tables(0).Rows(0)
-                nullcheck = IsDBNull(DR("CloseDate"))
-                If nullcheck = False Then
-                    Exit Function
-                End If
-
-                '*****************************************************************
-                '*****************************************************************
-
-                DR_MRTicket = DS_MRTicket.Tables(0).Rows(0)
-                DR_MRTicket.AcceptChanges()
-                DR_MRTicket.BeginEdit()
-                DR_MRTicket("CloseDate") = System.DateTime.Now.ToShortTimeString
-                DR_MRTicket("CloseUser") = User.Identity.Name.ToString
-                DR_MRTicket.EndEdit()
-                DA_MRTicket.Update(DS_MRTicket, "T_ITR_Tickets")
-                ITRequestTicket = 0
-
-                '**********************************
-                '*Sent Mail with Closed Ticket Info
-                '**********************************
-                '**********************************
-
-                ITRequestCloseTest(Ticket)
-
-                '**********************************
-                '**********************************
-        End Select
-        Connection.Close()
-
-    End Function
 
     Function MaintenanceRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer, ByVal Status As String) As String
         MaintenanceRequestTicket = 0
@@ -24134,56 +24302,6 @@ Public Class Class1
         SendMail_HTML(SB.ToString, Subject, "AZ.SatiMaintenanceRequest@purewafer.com", "")
 
     End Sub
-
-    Sub ITRequestCloseTest(ByVal Ticket As String)
-
-        Dim DS As Data.DataSet
-        Dim DR As Data.DataRow
-        Dim Count As Integer
-        Dim SB As New StringBuilder
-        Dim I As Integer
-        Dim Subject As String
-
-        DS = GetMyDataSet("SELECT TOP (100) PERCENT dbo.T_ITR_Tickets.MR_Key, dbo.T_IT_Tools.Department, dbo.T_IT_Tools.Tool, dbo.T_ITR_Tickets.Status, dbo.T_ITR_Tickets.IssueDate, dbo.T_ITR_Tickets.IssueUser, dbo.T_ITR_Tickets.CloseDate, dbo.T_ITR_Tickets.CloseUser, dbo.T_ITR_TicketNotes.NoteType, dbo.T_ITR_TicketNotes.Note, dbo.T_ITR_TicketNotes.NoteDate, dbo.T_ITR_TicketNotes.SatiUser, dbo.T_ITR_TicketNotes.[Key] FROM dbo.T_ITR_Tickets INNER JOIN dbo.T_IT_Tools ON dbo.T_ITR_Tickets.Tool = dbo.T_IT_Tools.[Key] LEFT OUTER JOIN dbo.T_ITR_TicketNotes ON dbo.T_ITR_Tickets.MR_Key = dbo.T_ITR_TicketNotes.MR_Key GROUP BY dbo.T_ITR_Tickets.MR_Key, dbo.T_IT_Tools.Department, dbo.T_IT_Tools.Tool, dbo.T_ITR_Tickets.Status, dbo.T_ITR_Tickets.IssueDate, dbo.T_ITR_Tickets.IssueUser, dbo.T_ITR_Tickets.CloseDate, dbo.T_ITR_Tickets.CloseUser, dbo.T_ITR_TicketNotes.NoteType, dbo.T_ITR_TicketNotes.Note, dbo.T_ITR_TicketNotes.NoteDate, dbo.T_ITR_TicketNotes.SatiUser, dbo.T_ITR_TicketNotes.[Key] HAVING (dbo.T_ITR_Tickets.MR_Key = " & Ticket & ") ORDER BY dbo.T_ITR_TicketNotes.[Key]")
-        Count = DS.Tables(0).Rows.Count
-
-        If Count > 1 Then
-            SB.Append(<h1 style="color: #0000FF">IT Request Closed</h1>)
-            SB.Append(<br/>)
-            For I = 0 To Count - 1
-                DR = DS.Tables(0).Rows(I)
-
-                If DR("NoteType") = "Org" Then
-                    Subject = "Ticket " & DR("MR_Key").ToString & " for " & DR("Tool").ToString & " is Closed"
-                    SB.Append("<font size=5>Ticket: </font> &nbsp; <font size=5 color=red><b>" & DR("MR_Key").ToString & "</b></font>")
-                    SB.Append(<br/>)
-                    SB.Append("<font size=5>Tool: </font> &nbsp; <font size=5 color=red><b>" & DR("Tool").ToString & "</b></font>")
-                    SB.Append(<br/>)
-                    SB.Append("<font size=5>Start Time: </font> &nbsp; <font size=5 color=red><b>" & DR("IssueDate").ToString & "</b></font>")
-                    SB.Append(<br/>)
-                    SB.Append("<font size=5>From User " & DR("SatiUser").ToString & ": </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
-                    SB.Append(<br/>)
-                    SB.Append(<br/>)
-                End If
-            Next
-            For I = 0 To Count - 1
-                DR = DS.Tables(0).Rows(I)
-                If DR("NoteType") = "Tech" Then
-                    SB.Append("<font size=5>Tech User: " & DR("SatiUser").ToString & " : </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
-                    SB.Append(<br/>)
-                    SB.Append(<br/>)
-                End If
-            Next
-            SB.Append("<font size=5>Close Time: </font> &nbsp; <font size=5 color=red><b>" & DR("CloseDate").ToString & "</b></font>")
-            SB.Append(<br/>)
-
-        End If
-
-        SendMail_HTML(SB.ToString, Subject, "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
-
-    End Sub
-
-
     Sub MaintenanceRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -24242,66 +24360,6 @@ Public Class Class1
         Connection.Close()
 
     End Sub
-
-    Sub ITRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
-
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-
-        Dim DA_MRNote As New Data.SqlClient.SqlDataAdapter
-        Dim DS_MRNote As New Data.DataSet
-        Dim DR_MRNote As Data.DataRow
-        '*****************************************************************
-        '************************Select***********************************
-        '*****************************************************************
-        Dim MRNoteSelectCmd As New System.Data.SqlClient.SqlCommand
-        With MRNoteSelectCmd
-            '.CommandText = "SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE (MR_Key = '" & Ticket & "')"
-            .CommandText = "SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE (MR_Key = '0')"
-            .Connection = Connection
-        End With
-        DA_MRNote.SelectCommand = MRNoteSelectCmd
-
-        '*****************************************************************
-        '************************Insert***********************************
-        '*****************************************************************
-        Dim MRNoteInsertCmd As New System.Data.SqlClient.SqlCommand
-        With MRNoteInsertCmd
-            .CommandText = "INSERT INTO [dbo].[T_ITR_TicketNotes] ([MR_Key], [NoteType], [Note], [NoteDate], [SatiUser]) VALUES (@MR_Key, @NoteType, @Note, @NoteDate, @SatiUser); SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE ([Key] = SCOPE_IDENTITY())"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 0, "MR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser")})
-        End With
-        DA_MRNote.InsertCommand = MRNoteInsertCmd
-
-        '*****************************************************************
-        '************************Update***********************************
-        '*****************************************************************
-        Dim MRNoteUpdateCmd As New System.Data.SqlClient.SqlCommand
-        With MRNoteUpdateCmd
-            .CommandText = "UPDATE [dbo].[T_ITR_TicketNotes] SET [MR_Key] = @MR_Key, [NoteType] = @NoteType, [Note] = @Note, [NoteDate] = @NoteDate, [SatiUser] = @SatiUser WHERE (([Key] = @Original_Key) AND ([MR_Key] = @Original_MR_Key) AND ([NoteType] = @Original_NoteType) AND ([Note] = @Original_Note) AND ((@IsNull_NoteDate = 1 AND [NoteDate] IS NULL) OR ([NoteDate] = @Original_NoteDate)) AND ([SatiUser] = @Original_SatiUser)); SELECT [Key], MR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_ITR_TicketNotes WHERE ([Key] = @Key)"
-            .Connection = Connection
-            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@MR_Key", System.Data.SqlDbType.Int, 0, "MR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser"), New System.Data.SqlClient.SqlParameter("@Original_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_MR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "MR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_NoteType", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteType", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_Note", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Note", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_NoteDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_NoteDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_SatiUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "SatiUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Key", System.Data.SqlDbType.Int, 4, "Key")})
-        End With
-        DA_MRNote.UpdateCommand = MRNoteUpdateCmd
-
-        '*****************************************************************
-        '************************Genral***********************************
-        '*****************************************************************
-        DA_MRNote.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_ITR_TicketNotes", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("Key", "Key"), New System.Data.Common.DataColumnMapping("MR_Key", "MR_Key"), New System.Data.Common.DataColumnMapping("NoteType", "NoteType"), New System.Data.Common.DataColumnMapping("Note", "Note"), New System.Data.Common.DataColumnMapping("NoteDate", "NoteDate"), New System.Data.Common.DataColumnMapping("SatiUser", "SatiUser")})})
-        DA_MRNote.Fill(DS_MRNote)
-        DR_MRNote = DS_MRNote.Tables("T_ITR_TicketNotes").NewRow
-        DR_MRNote("MR_Key") = Ticket
-        DR_MRNote("NoteType") = NoteType
-        DR_MRNote("Note") = Note
-        DR_MRNote("NoteDate") = System.DateTime.Now.ToShortTimeString
-        DR_MRNote("SatiUser") = User.Identity.Name.ToString
-        DS_MRNote.Tables("T_ITR_TicketNotes").Rows.Add(DR_MRNote)
-        DA_MRNote.Update(DS_MRNote, "T_ITR_TicketNotes")
-        Connection.Close()
-
-    End Sub
-
 
     Function KillLot(ByVal LotNumber As String) As Boolean
 
@@ -25796,7 +25854,6 @@ Public Class Class1
         MySQLCommand.ExecuteNonQuery()
         Connection.Close()
     End Sub
-
 
     Function GetSchema(ByVal TableName As String) As Data.DataTable
         'include System.Data Namespace to any file that uses this function (Imports System.Data)
@@ -27944,7 +28001,7 @@ Public Class Class1
 
         Select Case Diameter
             Case 200
-                Select Case num
+                Select Case Num
                     Case 1 '199.85
                         DiameterRandom = 199.85
                         Exit Function
@@ -27969,7 +28026,7 @@ Public Class Class1
                 End Select
 
             Case 300
-                Select Case num
+                Select Case Num
                     Case 1
                         Return 299.85
                         Exit Function

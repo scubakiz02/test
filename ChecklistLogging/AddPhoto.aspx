@@ -114,7 +114,7 @@
 
                 <asp:Panel Visible="False" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server" ID="CancelSetPanel">
                     <div style="position: relative; width: fit-content;">
-                        <asp:ImageButton ID="SnapshotImageButton" ImageUrl="ImageHandler.ashx" runat="server" Style="max-width: 50vw; max-height: 50vh; object-fit: contain;" />
+                        <asp:ImageButton ID="SnapshotImageButton" runat="server" Style="max-width: 50vw; max-height: 50vh; object-fit: contain;" />
                         <asp:Button OnClick="CancelImage_OnClick" Style="position: absolute; top: 0; right: 0; background: black; color: white; opacity: .5; border-radius: 50%;" Text="&#x58;" runat="server" />
                     </div>
 

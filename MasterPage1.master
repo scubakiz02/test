@@ -80,7 +80,6 @@
                         <tr>
                             <td>
                                 <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/MR/MRT.aspx" ForeColor="White">Maintenance Request</asp:HyperLink>
-                                <asp:HyperLink ID="HyperLink3" runat="server" NavigateUrl="~/TR/ITRT.aspx" ForeColor="White">IT Request</asp:HyperLink>
                                 &nbsp;<asp:LinkButton ID="LinkButton1" runat="server"
                                     PostBackUrl="~/CheckSum.aspx" Visible="false">Look CheckSum</asp:LinkButton>
                             </td>

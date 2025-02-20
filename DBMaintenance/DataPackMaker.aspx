@@ -12,7 +12,8 @@
                 <asp:Panel ID="Panel1" runat="server">
                     <asp:RadioButton ID="RadioButtonIBM" runat="server" Text="IBM" AutoPostBack="true" GroupName="Cust" />
                     &nbsp;<asp:RadioButton ID="RadioButtonGF" runat="server" Text="GF (USA)" AutoPostBack="true" GroupName="Cust" />
-                    &nbsp;<asp:RadioButton ID="RadioButtonOnSemi" runat="server" Text="On Semi" AutoPostBack="true" GroupName="Cust" />
+                    &nbsp;<asp:RadioButton ID="RadioButtonOnSemi200mm" runat="server" Text="On Semi (200mm) " AutoPostBack="true" GroupName="Cust" />
+                    &nbsp;<asp:RadioButton ID="RadioButtonOnSemi300mm" runat="server" Text="On Semi (300mm)" AutoPostBack="true" GroupName="Cust" />
                     &nbsp;<asp:RadioButton ID="RadioButtonWafetTech" runat="server" Text="Wafer Tech" AutoPostBack="True" GroupName="Cust" />
                     &nbsp;<asp:RadioButton ID="RadioButtonMicron" runat="server" AutoPostBack="True" GroupName="Cust" Text="Micron" />
                     &nbsp;<asp:RadioButton ID="RadioButtonSamsung" runat="server" AutoPostBack="True" GroupName="Cust" Text="Samsung" />

@@ -38,6 +38,9 @@ Partial Class MR_OpenTicketStatusBoard
         CommentFromQueryString = Request.QueryString("Comment")
         EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
         Dim Unit As String
+        Dim IntervalKey As String
+        Dim Interval As String
+        Dim IntervalDR As Data.DataRow
 
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
@@ -120,6 +123,70 @@ Partial Class MR_OpenTicketStatusBoard
                     IntervalInterfacePanel.Enabled = True
                 End If
 
+                'interval interface
+                Try 'in case selected checklist does NOT have a set interval
+                    IntervalDR = SatiCode.GetMyDataSet("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaFromQueryString).Tables(0).Rows(0)
+                    IntervalKey = IntervalDR("Key")
+                    Interval = IntervalDR("Interval")
+                    IntervalDropDownList.SelectedValue = IntervalKey
+                Catch ex As Exception
+                    IntervalKey = Nothing
+                End Try
+
+                'remove static ListItem for IntervalDropDownList once user has selected an interval
+                If IntervalKey IsNot Nothing Then
+                    Dim DatepickText As String = If(IsDBNull(IntervalDR("OneTimeDate")), String.Empty, Date.Parse(IntervalDR("OneTimeDate")).Date)
+                    Dim Assignee As String = If(IsDBNull(IntervalDR("Assignee")), Nothing, IntervalDR("Assignee"))
+
+                    If IntervalDropDownList.Items(0).Text = "Select Interval..." Then
+                        IntervalDropDownList.Items.RemoveAt(0)
+                    End If
+
+                    If Interval = "DAILY" Then 'doing this up here, b/c the next if statement needs these changes to already be made
+                        UserAssigneeButton.Visible = False
+
+                        'reconfigure ShiftDropDownList ListItem controls
+                        For Each ListItem As ListItem In ShiftDropDownList.Items
+                            If ListItem.Text <> ShiftDropDownList.Items(0).Text Then
+                                ListItem.Enabled = False
+                            End If
+                        Next
+
+                        CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Day Shift"}, {"Value", "Day Shift"}})
+                        CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Night Shift"}, {"Value", "Night Shift"}})
+                        CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Days (M-F)"}, {"Value", "Days (M-F)"}})
+                    End If
+
+                    'determine which ddl in AssigneeDdlPanel to display & its pre selected value
+                    If Assignee Is Nothing Then
+                        GenericDropDownList.Visible = True
+                    ElseIf ShiftDropDownList.Items.FindByText(Assignee) IsNot Nothing Then
+                        ShiftDropDownList.SelectedValue = Assignee
+                        AssignToMenu_onClick(ShiftAssigneeButton, EventArgs.Empty)
+                    ElseIf GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString & " AND Assignee='" & Assignee & "'", "Assignee") = "1" Then
+                        UsersDropDownList.DataBind()
+                        UsersDropDownList.SelectedValue = Assignee
+                        AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
+                    End If
+
+                    If Interval = "ONE TIME ONLY" Then
+                        OneTimeDatepickPanel.Visible = True
+                        DatepickTextBox.Text = DatepickText
+
+                        If String.IsNullOrEmpty(DatepickText) Then 'disable AssigneeInterfacePanel if a date is NOT set
+                            AssigneeInterfacePanel.Enabled = False
+                            Exit Sub
+                        End If
+                    ElseIf IntervalDR("DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be quarterly, bi-annual, 1 year, 2 year, etc.
+                        AssigneeInterfacePanel.Visible = False
+                    End If
+
+                    'if 1 or more associated records exist in T_LogData, disable interval ddl
+                    If GetSingleDbField("SELECT COUNT([Key]) As NumOfLogs FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaFromQueryString, "NumOfLogs") >= 1 Then
+                        IntervalDropDownList.Enabled = False
+                    End If
+                End If
+
             Else 'if here, user has just opened the webpage
                 'delete topmost dead record (dead = no records In T_LogData, And has been more 30 days since creation Of record In T_LogArea And (has a NULL Interval, Department, Or no associated Labels))
                 Dim TopmostDeadRecordKey As String = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] A WHERE (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogData] D WHERE A.[Key]= D.AreaKey) = 0  And ABS(DATEDIFF(Day, GETDATE(), A.DateCreated)) > 30 And (A.IntervalKey Is NULL Or A.DepartmentKey Is NULL Or (Select COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0)", "Key")
@@ -131,23 +198,10 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
-        Dim IntervalKey As String
-        Dim Interval As String
-        Dim IntervalDR As Data.DataRow
         Dim ListItemStylesDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: red;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: lightgray; color: gray;' ELSE 'color: black;' END AS ListItemStyles FROM [ALTS].[dbo].[T_LogArea] A")
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
-
-        'interval interface
-        Try 'in case selected checklist does NOT have a set interval
-            IntervalDR = SatiCode.GetMyDataSet("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaFromQueryString).Tables(0).Rows(0)
-            IntervalKey = IntervalDR("Key")
-            Interval = IntervalDR("Interval")
-            IntervalDropDownList.SelectedValue = IntervalKey
-        Catch ex As Exception
-            IntervalKey = Nothing
-        End Try
 
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
         For I = 0 To ListItemStylesRC
@@ -158,58 +212,6 @@ Partial Class MR_OpenTicketStatusBoard
                 AreaListItem.Attributes.Add("style", ListItemStylesDR("ListItemStyles"))
             End If
         Next
-
-        'remove static ListItem for IntervalDropDownList once user has selected an interval
-        If IntervalKey IsNot Nothing Then
-            Dim DatepickText As String = If(IsDBNull(IntervalDR("OneTimeDate")), String.Empty, Date.Parse(IntervalDR("OneTimeDate")).Date)
-            Dim Assignee As String = If(IsDBNull(IntervalDR("Assignee")), Nothing, IntervalDR("Assignee"))
-
-            If IntervalDropDownList.Items(0).Text = "Select Interval..." Then
-                IntervalDropDownList.Items.RemoveAt(0)
-            End If
-
-            If Interval = "DAILY" Then 'doing this up here, b/c the next if statement needs these changes to already be made
-                UserAssigneeButton.Visible = False
-
-                'reconfigure ShiftDropDownList ListItem controls
-                For Each ListItem As ListItem In ShiftDropDownList.Items
-                    If ListItem.Text <> ShiftDropDownList.Items(0).Text Then
-                        ListItem.Enabled = False
-                    End If
-                Next
-
-                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Day Shift"}, {"Value", "Day Shift"}})
-                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Night Shift"}, {"Value", "Night Shift"}})
-                CreateListItem(New Dictionary(Of String, String) From {{"Parent", "ShiftDropDownList"}, {"Text", "Days (M-F)"}, {"Value", "Days (M-F)"}})
-            End If
-
-            If Interval = "ONE TIME ONLY" Then
-                OneTimeDatepickPanel.Visible = True
-                DatepickTextBox.Text = DatepickText
-
-                If String.IsNullOrEmpty(DatepickText) Then 'disable AssigneeInterfacePanel if a date is NOT set
-                    AssigneeInterfacePanel.Enabled = False
-                    Exit Sub
-                End If
-            ElseIf IntervalDR("DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be quarterly, bi-annual, 1 year, 2 year, etc.
-                AssigneeInterfacePanel.Visible = False
-            End If
-
-            If Assignee Is Nothing Then
-                GenericDropDownList.Visible = True
-            ElseIf ShiftDropDownList.Items.FindByText(Assignee) IsNot Nothing Then
-                ShiftDropDownList.SelectedValue = Assignee
-                AssignToMenu_onClick(ShiftAssigneeButton, EventArgs.Empty)
-            ElseIf GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString & " AND Assignee='" & Assignee & "'", "Assignee") = "1" Then
-                UsersDropDownList.DataBind()
-                UsersDropDownList.SelectedValue = Assignee
-                AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
-            End If
-            'if 1 or more associated records exist in T_LogData, disable interval ddl
-            If GetSingleDbField("SELECT COUNT([Key]) As NumOfLogs FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaFromQueryString, "NumOfLogs") > 1 Then
-                IntervalDropDownList.Enabled = False
-            End If
-        End If
 
         'prevent default FormView behavior when 'Insert' linkbutton is clicked and associated TextBox is empty
         If AreaFromQueryString IsNot Nothing Then
@@ -224,6 +226,7 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
         FormViewInsert = Nothing
+
     End Sub
 
     Sub CreateListItem(Config As Dictionary(Of String, String))

@@ -24,7 +24,7 @@
 
             window.iframeEnabled = iframeEnabled;
 
-            iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none;" //disable iframe 'status board' anchor tag
+            if (iframeDoc.src) iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none;" //disable iframe 'status board' anchor tag
         })
 
         function getAspControl(id) {
@@ -125,13 +125,26 @@
             flex-direction: column;
             gap: var(--UWhitespace);
         }
+
+        .EditPreviewPanel {
+            gap: var(--UWhitespace);
+            overflow-y: auto;
+            height: 95%;
+            overflow-x: hidden;
+        }
+
+        @media (min-width: 1920px) {
+            .EditPreviewPanel {
+                display: flex;
+            }
+        }
     </style>
 
     <%--120px for header, 80.5px for footer (footer is actually 161px, so it's divided by 2 to reach desired effect)--%>
     <asp:Panel runat="server" Style="display: flex; justify-content: space-between; height: calc(100vh - (120px + 80.5px));">
         <asp:HiddenField ID="EditPreviewPanel_HiddenField" runat="server" Value="0" />
         <%--height is 95% to prevent weird overlap with footer--%>
-        <asp:Panel ID="EditPreviewPanel" onscroll="setScrollPos.call(this)" runat="server" Style="display: flex; gap: var(--UWhitespace); overflow-y: auto; height: 95%; overflow-x: hidden;">
+        <asp:Panel ID="EditPreviewPanel" CssClass="EditPreviewPanel" onscroll="setScrollPos.call(this)" runat="server" Style="">
             <div>
                 <asp:Panel runat="server" ID="AreaInterfacePanel" CssClass="InterfacePanel" Style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
 
@@ -161,7 +174,7 @@
                         <asp:ListItem Selected="True">Select Checklist...</asp:ListItem>
                     </asp:DropDownList>
                     <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                        SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY I.DisplayOrder, A.Active DESC, A.Assignee DESC, A.Area"></asp:SqlDataSource>
+                        SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY I.DisplayOrder, A.Area"></asp:SqlDataSource>
 
                     <asp:FormView ID="AreaFormView" CssClass="Width" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
                         <EmptyDataTemplate>
@@ -259,7 +272,7 @@
                                         Label: No data loaded yet...
                                     <br />
                                         <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                        <%--                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                         &nbsp;<asp:LinkButton ID="EmptyLabelNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                     </asp:Panel>
                                 </EmptyDataTemplate>
@@ -286,7 +299,7 @@
                     <asp:Label ID="LabelLabel" runat="server" Text='<%# Bind("Label") %>' />
                                     <br />
                                     <asp:LinkButton ID="LabelEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                    &nbsp;<asp:LinkButton ID="LabelDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                    <%--                                    &nbsp;<asp:LinkButton ID="LabelDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                     &nbsp;<asp:LinkButton ID="LabelNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                 </ItemTemplate>
                                 <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
@@ -389,7 +402,7 @@
                                     Comment: No data loaded yet...
                                     <br />
                                     <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                    <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                     &nbsp;<asp:LinkButton ID="EmptyCommentNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                 </asp:Panel>
                             </EmptyDataTemplate>
@@ -417,7 +430,7 @@
                     <asp:Label ID="CommentLabel" runat="server" Text='<%# Bind("Comment") %>' />
                                 <br />
                                 <asp:LinkButton ID="CommentEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                &nbsp;<asp:LinkButton ID="CommentDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                <%--                                &nbsp;<asp:LinkButton ID="CommentDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                 &nbsp;<asp:LinkButton ID="CommentNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
                             </ItemTemplate>
@@ -494,7 +507,7 @@
 
                     </asp:Panel>
 
-                    <asp:Panel runat="server" ID="IntervalInterfacePanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
+                    <asp:Panel runat="server" ID="IntervalInterfacePanel" Enabled="False" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
                         <div style="display: flex; flex-direction: column;">
 
                             <div style="display: flex; align-items: center;">
