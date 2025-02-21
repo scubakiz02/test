@@ -268,6 +268,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 Case "Text"
                                     InputCtrlID = "Text_" & LabelKey
                                     myTextBox.Text = Session("LabelInputMap")(LabelKey)
+                                    DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                             End Select
 
                             InputCtrl.ID = InputCtrlID
@@ -481,7 +482,7 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "HOA"
                             If Not UserInput.Contains("...") Then Exit For
                         Case "Text"
-                            If String.IsNullOrEmpty(UserInput) Then Exit For
+                            If Not String.IsNullOrEmpty(UserInput) Then Exit For
                     End Select
 
                     'if here, input is NOT valid
