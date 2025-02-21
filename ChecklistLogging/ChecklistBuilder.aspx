@@ -249,6 +249,7 @@
                                 <asp:Label Text="Field Type:" runat="server" />
                                 <asp:DropDownList ID="FieldType_DropDownList" Enabled="False" runat="server" AutoPostBack="True" OnSelectedIndexChanged="FieldType_OnSelectedIndexChanged">
                                     <asp:ListItem Text="Number" Value="" Selected="True" />
+                                    <asp:ListItem Text="Text" Value="Text" />
                                     <asp:ListItem Text="Checkbox" Value="Checkbox" />
                                     <asp:ListItem Text="HOA" Value="HOA" />
                                 </asp:DropDownList>

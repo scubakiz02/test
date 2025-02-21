@@ -253,7 +253,6 @@ Partial Class MR_OpenTicketStatusBoard
                                     Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "0") 'to prevent empty strings when checkbox is NOT checked
                                     CheckBox.Checked = If(Checked = "1", True, False)
                                     myTextBox.Text = Checked
-
                                 Case "HOA"
                                     Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
                                     InputCtrlID = "DDL_" & LabelKey
@@ -267,7 +266,8 @@ Partial Class MR_OpenTicketStatusBoard
                                         DDL.Items(0).Enabled = False
                                     End If
                                 Case "Text"
-                                    Console.WriteLine("Value is 3")
+                                    InputCtrlID = "Text_" & LabelKey
+                                    myTextBox.Text = Session("LabelInputMap")(LabelKey)
                             End Select
 
                             InputCtrl.ID = InputCtrlID

@@ -512,13 +512,16 @@
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <%--<div style="margin: 0 var(--UWhitespace);">--%>
                             <div style="margin: 0 var(--UWhitespace); width: 100%">
-                                <%--<asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>--%>
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: calc(100% - var(--UWhitespace) * 2)"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                </asp:Panel>
+
+                                <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%"></asp:TextBox>
+                                    <asp:Label runat="server" Visible="False" Text="ERROR: NO TEXT" Style="text-wrap: nowrap;"></asp:Label>
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" HOA="False" runat="server">
@@ -532,8 +535,7 @@
 
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
-                            <%--<asp:Label runat="server" ColorBlindMessage="True"></asp:Label>--%>
-                            <asp:Label runat="server" ColorBlindMessage="True" Text="ERROR: NO TEXT" style="text-wrap: nowrap; margin: 0 var(--UWhitespace)"></asp:Label>
+                            <asp:Label runat="server" ColorBlindMessage="True"></asp:Label>
                         </div>
                     </asp:Panel>
 
