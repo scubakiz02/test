@@ -38,6 +38,7 @@ Partial Class MR_OpenTicketStatusBoard
         CommentFromQueryString = Request.QueryString("Comment")
         EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
         Dim Unit As String
+        Dim TbxOverlay As String
         Dim IntervalKey As String
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
@@ -73,6 +74,8 @@ Partial Class MR_OpenTicketStatusBoard
                 LabelDropDownList.DataBind()
 
                 If LabelFromQueryString IsNot Nothing Then
+                    TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "TbxOverlay")
+
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
                     LabelOrderInterfacePanel.Enabled = True
@@ -89,7 +92,10 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
                     LabelFormView_SqlDataSource.DataBind()
 
-                    SetCheckBox()
+
+                    'set field type
+                    FieldType_DropDownList.SelectedValue = If(TbxOverlay Is Nothing, "", TbxOverlay)
+
                     SetRangeOrder()
                 End If
 
@@ -470,16 +476,6 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable()
         Return All_InputsAreValid
     End Function
-
-    Sub SetCheckBox()
-        Dim TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "TbxOverlay")
-
-        If TbxOverlay = "Checkbox" Then
-            CheckOnlyCheckBox.Checked = True
-        ElseIf TbxOverlay = "OffHandAuto" Then
-            OffHandAutoCheckbox.Checked = True
-        End If
-    End Sub
 
     Function SetCommentFromQueryString() As String
         Try
@@ -883,7 +879,7 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub FieldType_OnSelectedIndexChanged(sender As Object, e As EventArgs)
         Dim TbxOverlay As String = sender.SelectedValue
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set TbxOverlay=" & If(TbxOverlay IsNot Nothing, "'" & TbxOverlay & "'", Nothing) & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set TbxOverlay=" & If(String.IsNullOrEmpty(TbxOverlay), "NULL", "'" & TbxOverlay & "'") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
         RefreshPreview()
     End Sub
 
