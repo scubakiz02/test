@@ -880,16 +880,10 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Protected Sub TbxOverlay_onCheckedChanged(sender As Object, e As EventArgs)
-        Dim TbxOverlay As String = sender.Attributes("TbxOverlay")
+    Protected Sub FieldType_OnSelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim TbxOverlay As String = sender.SelectedValue
 
-        If TbxOverlay = "Checkbox" Then
-            OffHandAutoCheckbox.Checked = False
-        Else
-            CheckOnlyCheckBox.Checked = False
-        End If
-
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set TbxOverlay=" & If(sender.Checked, "'" & TbxOverlay & "'", "NULL") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set TbxOverlay=" & If(TbxOverlay IsNot Nothing, "'" & TbxOverlay & "'", Nothing) & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
         RefreshPreview()
     End Sub
 

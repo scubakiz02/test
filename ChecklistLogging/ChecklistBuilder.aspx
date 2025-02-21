@@ -245,14 +245,23 @@
                                 <asp:Label runat="server" Text="*Required*" Style="color: gray; font-style: italic;"></asp:Label>
                             </div>
 
+                            <div>
+                                <asp:Label Text="Field Type:" runat="server" />
+                                <asp:DropDownList runat="server" AutoPostBack="True" OnSelectedIndexChanged="FieldType_OnSelectedIndexChanged">
+                                    <asp:ListItem Text="Standard" Value="" Selected="True" />
+                                    <asp:ListItem Text="Check" Value="Checkbox" />
+                                    <asp:ListItem Text="HOA" Value="OffHandAuto" />
+                                </asp:DropDownList>
+                            </div>
+
                             <asp:Panel runat="server" Style="display: flex; gap: var(--UWhitespace); align-items: center;">
                                 <asp:Label Text="Check:" runat="server" />
-                                <asp:CheckBox TbxOverlay="Checkbox" ID="CheckOnlyCheckBox" Enabled="false" OnCheckedChanged="TbxOverlay_onCheckedChanged" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
+                                <asp:CheckBox TbxOverlay="Checkbox" ID="CheckOnlyCheckBox" Enabled="false" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
                             </asp:Panel>
 
                             <asp:Panel runat="server" Style="display: flex; gap: var(--UWhitespace); align-items: center;">
                                 <asp:Label Text="HOA:" runat="server" />
-                                <asp:CheckBox TbxOverlay="OffHandAuto" ID="OffHandAutoCheckbox" Enabled="false" OnCheckedChanged="TbxOverlay_onCheckedChanged" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
+                                <asp:CheckBox TbxOverlay="OffHandAuto" ID="OffHandAutoCheckbox" Enabled="false" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
                             </asp:Panel>
                         </div>
 
