@@ -258,7 +258,7 @@ Partial Class MR_OpenTicketStatusBoard
                                     InputCtrlID = "DDL_" & LabelKey
                                     Dim HOAValue As String = myTextBox.Text
 
-                                    If HOAValue.Contains("...") Then
+                                    If HOAValue.Contains("...") OrElse String.IsNullOrEmpty(HOAValue) Then 'if db write has NOT occured, then HOAValue will be an empty string
                                         DDL.SelectedIndex = 0
                                         myTextBox.Text = DDL.SelectedItem.Text
                                     Else
