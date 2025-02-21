@@ -243,21 +243,21 @@ Partial Class MR_OpenTicketStatusBoard
                         myTextBox.Visible = False
 
                         If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
+                            Dim InputCtrl As Control = ctrl.Controls(1)
+                            Dim InputCtrlID As String
+
                             Select Case TbxOverlay
                                 Case "Checkbox"
                                     Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
-                                    Dim CbxID As String = "CheckBox_" & LabelKey
+                                    InputCtrlID = "CheckBox_" & LabelKey
                                     Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "0") 'to prevent empty strings when checkbox is NOT checked
                                     CheckBox.Checked = If(Checked = "1", True, False)
                                     myTextBox.Text = Checked
-                                    CheckBox.ID = CbxID
-                                    DBConnections += "SetDBConnection('" & CbxID & "'); "
+
                                 Case "HOA"
                                     Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
-                                    Dim DdlID As String = "DDL_" & LabelKey
+                                    InputCtrlID = "DDL_" & LabelKey
                                     Dim HOAValue As String = myTextBox.Text
-                                    DDL.ID = DdlID
-                                    DBConnections += "SetDBConnection('" & DdlID & "'); "
 
                                     If HOAValue.Contains("...") Then
                                         DDL.SelectedIndex = 0
@@ -269,6 +269,9 @@ Partial Class MR_OpenTicketStatusBoard
                                 Case "Text"
                                     Console.WriteLine("Value is 3")
                             End Select
+
+                            InputCtrl.ID = InputCtrlID
+                            DBConnections += "SetDBConnection('" & InputCtrlID & "'); "
 
                         Else
                             MalleableCtrl.Enabled = False
