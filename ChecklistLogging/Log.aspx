@@ -511,8 +511,11 @@
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel7" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
-                            <div style="margin: 0 var(--UWhitespace);">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+
+                            <%--<div style="margin: 0 var(--UWhitespace);">--%>
+                            <div style="margin: 0 var(--UWhitespace); width: 100%">
+                                <%--<asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>--%>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: calc(100% - var(--UWhitespace) * 2)"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -529,7 +532,8 @@
 
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True"></asp:Label>
+                            <%--<asp:Label runat="server" ColorBlindMessage="True"></asp:Label>--%>
+                            <asp:Label runat="server" ColorBlindMessage="True" Text="ERROR: NO TEXT" style="text-wrap: nowrap; margin: 0 var(--UWhitespace)"></asp:Label>
                         </div>
                     </asp:Panel>
 
