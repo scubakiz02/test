@@ -436,6 +436,21 @@ Partial Class MR_OpenTicketStatusBoard
         Return Nothing
     End Function
 
+    Public Function FindOverlayControl(Attribute As String, Parent As Control) As Control
+        Dim ChildAsWebControl As WebControl
+
+        For Each child As Control In Parent.Controls
+            ChildAsWebControl = TryCast(child, WebControl)
+
+            If ChildAsWebControl IsNot Nothing AndAlso ChildAsWebControl.Attributes(Attribute) IsNot Nothing Then
+                Return child.Controls(1) 'at this point, child would be the parent panel control of the field type control
+            End If
+
+            If child.HasControls() Then
+                FindOverlayControl(Attribute, child)
+            End If
+        Next
+    End Function
 
     Function ValidateInput(ControlID As String, Value As String) As Boolean
         Dim Button As Button
@@ -487,6 +502,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                     'if here, input is NOT valid
                     SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                    DirectCast(FindOverlayControl(TbxOverlay, Pnl), WebControl).BackColor = System.Drawing.Color.Red
                     Valid = False
                     Exit For
                 ElseIf Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
@@ -635,7 +651,6 @@ Partial Class MR_OpenTicketStatusBoard
                     End If
                 End If
             End If
-
         Next
     End Sub
 
