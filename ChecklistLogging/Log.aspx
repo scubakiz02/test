@@ -343,7 +343,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -368,7 +368,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -393,7 +393,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -418,7 +418,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -443,7 +443,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -468,7 +468,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -493,7 +493,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -518,7 +518,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -543,7 +543,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -568,7 +568,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -593,7 +593,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -618,7 +618,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -643,7 +643,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -668,7 +668,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -693,7 +693,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -718,7 +718,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -743,7 +743,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -768,7 +768,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -793,7 +793,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -818,7 +818,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -843,7 +843,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -868,7 +868,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -893,7 +893,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -918,7 +918,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -943,7 +943,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -968,7 +968,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -993,7 +993,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1018,7 +1018,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1043,7 +1043,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1068,7 +1068,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1093,7 +1093,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1118,7 +1118,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1143,7 +1143,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1168,7 +1168,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1193,7 +1193,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1218,7 +1218,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1243,7 +1243,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1268,7 +1268,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1293,7 +1293,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1318,7 +1318,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1343,7 +1343,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1368,7 +1368,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1393,7 +1393,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1418,7 +1418,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1443,7 +1443,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1468,7 +1468,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1493,7 +1493,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1518,7 +1518,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1543,7 +1543,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1568,7 +1568,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1593,7 +1593,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />
@@ -1618,7 +1618,7 @@
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </asp:Panel>
 
-                                <asp:Panel Visible="False" OffHandAuto="False" runat="server">
+                                <asp:Panel Visible="False" HOA="False" runat="server">
                                     <asp:DropDownList runat="server">
                                         <asp:ListItem Selected="True" Text="Switch Select..." />
                                         <asp:ListItem Text="Hand" Value="Hand" />

@@ -252,15 +252,15 @@ Partial Class MR_OpenTicketStatusBoard
                                 CheckBox.ID = CbxID
                                 DBConnections += "SetDBConnection('" & CbxID & "'); "
 
-                            ElseIf TbxOverlay = "OffHandAuto" Then
+                            ElseIf TbxOverlay = "HOA" Then
                                 Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
                                 Dim DdlID As String = "DDL_" & LabelKey
-                                Dim OffHandAutoValue As String = myTextBox.Text
+                                Dim HOAValue As String = myTextBox.Text
                                 DDL.ID = DdlID
                                 DBConnections += "SetDBConnection('" & DdlID & "'); "
 
-                                If OffHandAutoValue = "Off" OrElse OffHandAutoValue = "Hand" OrElse OffHandAutoValue = "Auto" Then
-                                    DDL.SelectedValue = OffHandAutoValue
+                                If HOAValue = "Off" OrElse HOAValue = "Hand" OrElse HOAValue = "Auto" Then
+                                    DDL.SelectedValue = HOAValue
                                     DDL.Items(0).Enabled = False
                                 Else
                                     DDL.SelectedIndex = 0
@@ -469,7 +469,7 @@ Partial Class MR_OpenTicketStatusBoard
                 TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "TbxOverlay")
 
                 If TbxOverlay IsNot Nothing Then
-                    If (TbxOverlay = "Checkbox" AndAlso UserInput = "0") OrElse (TbxOverlay = "OffHandAuto" AndAlso UserInput = "Select Pump...") Then 'checkbox that is NOT checked OR ddl that is on the default option
+                    If (TbxOverlay = "Checkbox" AndAlso UserInput = "0") OrElse (TbxOverlay = "HOA" AndAlso UserInput.Contains("...")) Then 'checkbox that is NOT checked OR ddl that is on the default option
                         SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
                         Valid = False
                         Exit For
