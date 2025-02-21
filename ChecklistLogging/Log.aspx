@@ -520,7 +520,7 @@
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%"></asp:TextBox>
+                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" HOA="False" runat="server">
