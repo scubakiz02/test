@@ -79,10 +79,9 @@ Partial Class MR_OpenTicketStatusBoard
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
                     LabelOrderInterfacePanel.Enabled = True
-                    CheckOnlyCheckBox.Enabled = True
-                    OffHandAutoCheckbox.Enabled = True
                     RangeOrderInterfacePanel.Enabled = True
                     UnitInterfacePanel.Enabled = True
+                    FieldType_DropDownList.Enabled = True
 
                     'prep functionalities that were enabled
                     Unit = GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=" & LabelFromQueryString, "Key")
@@ -91,7 +90,6 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelDropDownList.SelectedValue = LabelFromQueryString
                     LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
                     LabelFormView_SqlDataSource.DataBind()
-
 
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(TbxOverlay Is Nothing, "", TbxOverlay)
@@ -720,7 +718,7 @@ Partial Class MR_OpenTicketStatusBoard
             RefreshIframe()
         End If
 
-        CheckOnlyCheckBox.Enabled = EnabledValue
+        FieldType_DropDownList.Enabled = EnabledValue
         LabelOrderInterfacePanel.Enabled = EnabledValue
         RangeOrderInterfacePanel.Enabled = EnabledValue
         CommentOrderInterface.Enabled = EnabledValue

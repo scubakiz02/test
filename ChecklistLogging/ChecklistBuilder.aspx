@@ -247,22 +247,13 @@
 
                             <div>
                                 <asp:Label Text="Field Type:" runat="server" />
-                                <asp:DropDownList ID="FieldType_DropDownList" runat="server" AutoPostBack="True" OnSelectedIndexChanged="FieldType_OnSelectedIndexChanged">
+                                <asp:DropDownList ID="FieldType_DropDownList" Enabled="False" runat="server" AutoPostBack="True" OnSelectedIndexChanged="FieldType_OnSelectedIndexChanged">
                                     <asp:ListItem Text="Number" Value="" Selected="True" />
                                     <asp:ListItem Text="Checkbox" Value="Checkbox" />
                                     <asp:ListItem Text="HOA" Value="OffHandAuto" />
                                 </asp:DropDownList>
                             </div>
 
-                            <asp:Panel runat="server" Style="display: flex; gap: var(--UWhitespace); align-items: center;">
-                                <asp:Label Text="Check:" runat="server" />
-                                <asp:CheckBox TbxOverlay="Checkbox" ID="CheckOnlyCheckBox" Enabled="false" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
-                            </asp:Panel>
-
-                            <asp:Panel runat="server" Style="display: flex; gap: var(--UWhitespace); align-items: center;">
-                                <asp:Label Text="HOA:" runat="server" />
-                                <asp:CheckBox TbxOverlay="OffHandAuto" ID="OffHandAutoCheckbox" Enabled="false" CssClass="LogCheckBox" runat="server" AutoPostBack="True" Style="cursor: pointer;"></asp:CheckBox>
-                            </asp:Panel>
                         </div>
 
                         <asp:DropDownList ID="LabelDropDownList" Enabled="False" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
