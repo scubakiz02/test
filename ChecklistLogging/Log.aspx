@@ -234,7 +234,7 @@
                 .EverythingExceptTitle {
                     display: flex;
                     align-items: center;
-                    font-size: calc(var(--UFontSize));
+                    font-size: calc(var(--UFontSize);
                     margin-top: var(--UWhitespace);
                 }
 
