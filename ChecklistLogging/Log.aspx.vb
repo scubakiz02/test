@@ -475,11 +475,19 @@ Partial Class MR_OpenTicketStatusBoard
                 TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "TbxOverlay")
 
                 If TbxOverlay IsNot Nothing Then
-                    If (TbxOverlay = "Checkbox" AndAlso UserInput = "0") OrElse (TbxOverlay = "HOA" AndAlso UserInput.Contains("...")) Then 'checkbox that is NOT checked OR ddl that is on the default option
-                        SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
-                        Valid = False
-                        Exit For
-                    End If
+                    Select Case TbxOverlay
+                        Case "Checkbox"
+                            If UserInput = "0" Then SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                        Case "HOA"
+                            If UserInput.Contains("...") Then SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                        Case "Text"
+                            If String.IsNullOrEmpty(UserInput) Then
+                                SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                            End If
+                    End Select
+
+                    Valid = False
+                    Exit For
                 ElseIf Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
                     SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
                     Valid = False
