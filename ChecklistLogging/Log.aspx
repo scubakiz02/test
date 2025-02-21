@@ -521,7 +521,6 @@
 
                                 <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                     <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%"></asp:TextBox>
-                                    <asp:Label runat="server" Visible="False" Text="ERROR: NO TEXT" Style="text-wrap: nowrap;"></asp:Label>
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" HOA="False" runat="server">

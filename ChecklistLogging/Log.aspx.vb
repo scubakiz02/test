@@ -475,17 +475,17 @@ Partial Class MR_OpenTicketStatusBoard
                 TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "TbxOverlay")
 
                 If TbxOverlay IsNot Nothing Then
-                    Select Case TbxOverlay
+                    Select Case TbxOverlay 'search for cases where the input would be valid
                         Case "Checkbox"
-                            If UserInput = "0" Then SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                            If UserInput = "1" Then Exit For
                         Case "HOA"
-                            If UserInput.Contains("...") Then SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
+                            If Not UserInput.Contains("...") Then Exit For
                         Case "Text"
-                            If String.IsNullOrEmpty(UserInput) Then
-                                SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
-                            End If
+                            If String.IsNullOrEmpty(UserInput) Then Exit For
                     End Select
 
+                    'if here, input is NOT valid
+                    SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
                     Valid = False
                     Exit For
                 ElseIf Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
