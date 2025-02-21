@@ -68,7 +68,7 @@ Partial Class MR_OpenTicketStatusBoard
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
 
-            DS = SatiCode.GetMyDataSet("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.TbxOverlay, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString & " ORDER BY L.LabelOrder")
+            DS = SatiCode.GetMyDataSet("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString & " ORDER BY L.LabelOrder")
             RC = DS.Tables(0).Rows.Count
 
             MostRecentRec = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC"
@@ -133,7 +133,7 @@ Partial Class MR_OpenTicketStatusBoard
             Next
 
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
-            DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.TbxOverlay, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
+            DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
             RC = DS.Tables(0).Rows.Count
 
             TitleLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
@@ -235,10 +235,10 @@ Partial Class MR_OpenTicketStatusBoard
 
                 If TypeOf ctrl Is Panel Then
                     Dim MalleableCtrl As WebControl = DirectCast(ctrl, WebControl)
-                    Dim TbxOverlay As String = If(IsDBNull(DR("TbxOverlay")), Nothing, DR("TbxOverlay")) 'using ternary operator in case field value is NULL
+                    Dim FieldType As String = If(IsDBNull(DR("FieldType")), Nothing, DR("FieldType")) 'using ternary operator in case field value is NULL
 
-                    If TbxOverlay IsNot Nothing AndAlso MalleableCtrl.Attributes(TbxOverlay) IsNot Nothing Then 'if TbxOverlay is null, it is a standard textbox
-                        MalleableCtrl.Attributes(TbxOverlay) = True
+                    If FieldType IsNot Nothing AndAlso MalleableCtrl.Attributes(FieldType) IsNot Nothing Then 'if FieldType is null, it is a standard textbox
+                        MalleableCtrl.Attributes(FieldType) = True
                         MalleableCtrl.Visible = True
                         myTextBox.Visible = False
 
@@ -246,7 +246,7 @@ Partial Class MR_OpenTicketStatusBoard
                             Dim InputCtrl As Control = ctrl.Controls(1)
                             Dim InputCtrlID As String
 
-                            Select Case TbxOverlay
+                            Select Case FieldType
                                 Case "Checkbox"
                                     Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
                                     InputCtrlID = "CheckBox_" & LabelKey
@@ -463,7 +463,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim UpperBound As Decimal
         Dim DelimitArr() As String
         Dim Valid As Boolean = True
-        Dim TbxOverlay As String
+        Dim FieldType As String
         Dim Pnl As Panel = FindPnl(ControlID)
         Dim LabelKey As Integer
 
@@ -488,10 +488,10 @@ Partial Class MR_OpenTicketStatusBoard
                 TextBox = CType(ctrl, TextBox)
                 If UserInput Is Nothing Then UserInput = SqlProofSingleQuotes(TextBox.Text)
                 LabelKey = TextBox.ID.Split("_")(1)
-                TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "TbxOverlay")
+                FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "FieldType")
 
-                If TbxOverlay IsNot Nothing Then
-                    Select Case TbxOverlay 'search for cases where the input would be valid
+                If FieldType IsNot Nothing Then
+                    Select Case FieldType 'search for cases where the input would be valid
                         Case "Checkbox"
                             If UserInput = "1" Then Exit For
                         Case "HOA"
@@ -502,7 +502,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                     'if here, input is NOT valid
                     SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
-                    DirectCast(FindOverlayControl(TbxOverlay, Pnl), WebControl).BackColor = System.Drawing.Color.Red
+                    DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
                     Valid = False
                     Exit For
                 ElseIf Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
@@ -535,7 +535,7 @@ Partial Class MR_OpenTicketStatusBoard
                     End If
 
                     If Not InRange Then
-                        If TbxOverlay Is Nothing Then 'make sure it is NOT a checkbox field
+                        If FieldType Is Nothing Then 'make sure it is NOT a checkbox field
                             SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF RANGE*", Pnl)
                             Exit For
                         End If

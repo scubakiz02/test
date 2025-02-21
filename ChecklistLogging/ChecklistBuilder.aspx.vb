@@ -38,7 +38,7 @@ Partial Class MR_OpenTicketStatusBoard
         CommentFromQueryString = Request.QueryString("Comment")
         EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
         Dim Unit As String
-        Dim TbxOverlay As String
+        Dim FieldType As String
         Dim IntervalKey As String
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
@@ -74,7 +74,7 @@ Partial Class MR_OpenTicketStatusBoard
                 LabelDropDownList.DataBind()
 
                 If LabelFromQueryString IsNot Nothing Then
-                    TbxOverlay = GetSingleDbField("SELECT TbxOverlay FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "TbxOverlay")
+                    FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "FieldType")
 
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
@@ -92,7 +92,7 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFormView_SqlDataSource.DataBind()
 
                     'set field type
-                    FieldType_DropDownList.SelectedValue = If(TbxOverlay Is Nothing, "", TbxOverlay)
+                    FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
 
                     SetRangeOrder()
                 End If
@@ -875,9 +875,9 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub FieldType_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim TbxOverlay As String = sender.SelectedValue
+        Dim FieldType As String = sender.SelectedValue
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set TbxOverlay=" & If(String.IsNullOrEmpty(TbxOverlay), "NULL", "'" & TbxOverlay & "'") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set FieldType=" & If(String.IsNullOrEmpty(FieldType), "NULL", "'" & FieldType & "'") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
         RefreshPreview()
     End Sub
 
