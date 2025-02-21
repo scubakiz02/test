@@ -243,30 +243,33 @@ Partial Class MR_OpenTicketStatusBoard
                         myTextBox.Visible = False
 
                         If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
-                            If TbxOverlay = "Checkbox" Then  'adjust checked property of CheckBox control according to associated value in DB
-                                Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
-                                Dim CbxID As String = "CheckBox_" & LabelKey
-                                Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "0") 'to prevent empty strings when checkbox is NOT checked
-                                CheckBox.Checked = If(Checked = "1", True, False)
-                                myTextBox.Text = Checked
-                                CheckBox.ID = CbxID
-                                DBConnections += "SetDBConnection('" & CbxID & "'); "
+                            Select Case TbxOverlay
+                                Case "Checkbox"
+                                    Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
+                                    Dim CbxID As String = "CheckBox_" & LabelKey
+                                    Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "0") 'to prevent empty strings when checkbox is NOT checked
+                                    CheckBox.Checked = If(Checked = "1", True, False)
+                                    myTextBox.Text = Checked
+                                    CheckBox.ID = CbxID
+                                    DBConnections += "SetDBConnection('" & CbxID & "'); "
+                                Case "HOA"
+                                    Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
+                                    Dim DdlID As String = "DDL_" & LabelKey
+                                    Dim HOAValue As String = myTextBox.Text
+                                    DDL.ID = DdlID
+                                    DBConnections += "SetDBConnection('" & DdlID & "'); "
 
-                            ElseIf TbxOverlay = "HOA" Then
-                                Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
-                                Dim DdlID As String = "DDL_" & LabelKey
-                                Dim HOAValue As String = myTextBox.Text
-                                DDL.ID = DdlID
-                                DBConnections += "SetDBConnection('" & DdlID & "'); "
+                                    If HOAValue.Contains("...") Then
+                                        DDL.SelectedIndex = 0
+                                        myTextBox.Text = DDL.SelectedItem.Text
+                                    Else
+                                        DDL.SelectedValue = HOAValue
+                                        DDL.Items(0).Enabled = False
+                                    End If
+                                Case "Text"
+                                    Console.WriteLine("Value is 3")
+                            End Select
 
-                                If HOAValue.Contains("...") Then
-                                    DDL.SelectedIndex = 0
-                                    myTextBox.Text = DDL.SelectedItem.Text
-                                Else
-                                    DDL.SelectedValue = HOAValue
-                                    DDL.Items(0).Enabled = False
-                                End If
-                            End If
                         Else
                             MalleableCtrl.Enabled = False
                         End If
