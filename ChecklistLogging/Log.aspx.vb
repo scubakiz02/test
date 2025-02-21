@@ -259,12 +259,12 @@ Partial Class MR_OpenTicketStatusBoard
                                 DDL.ID = DdlID
                                 DBConnections += "SetDBConnection('" & DdlID & "'); "
 
-                                If HOAValue = "Off" OrElse HOAValue = "Hand" OrElse HOAValue = "Auto" Then
-                                    DDL.SelectedValue = HOAValue
-                                    DDL.Items(0).Enabled = False
-                                Else
+                                If HOAValue.Contains("...") Then
                                     DDL.SelectedIndex = 0
                                     myTextBox.Text = DDL.SelectedItem.Text
+                                Else
+                                    DDL.SelectedValue = HOAValue
+                                    DDL.Items(0).Enabled = False
                                 End If
                             End If
                         Else
