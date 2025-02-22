@@ -510,7 +510,7 @@ Partial Class MR_OpenTicketStatusBoard
                     InRange = True
                     Range = TbxToRange(LabelKey)
 
-                    If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
+                    If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
                         SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
                         Valid = False
                         Exit For
