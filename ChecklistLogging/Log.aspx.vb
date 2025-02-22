@@ -505,15 +505,18 @@ Partial Class MR_OpenTicketStatusBoard
                     DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
                     Valid = False
                     Exit For
-                ElseIf Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
-                    SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
-                    Valid = False
-                    Exit For
-                ElseIf TbxToRange.ContainsKey(LabelKey) Then 'check if a range exists
+
+                Else 'check if a range exists
                     InRange = True
                     Range = TbxToRange(LabelKey)
 
-                    'decipher if it's a numerical OR Greater Than(>)/Less Than(<) range
+                    If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is valid
+                        SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
+                        Valid = False
+                        Exit For
+                    End If
+
+                    'decipher the range and if it's valid
                     If Range.Contains("-") Then
                         DelimitArr = Range.Split("-")
                         UserInputDec = Decimal.Parse(UserInput)
@@ -535,12 +538,14 @@ Partial Class MR_OpenTicketStatusBoard
                     End If
 
                     If Not InRange Then
-                        If FieldType Is Nothing Then 'make sure it is NOT a checkbox field
+                        If FieldType Is Nothing Then 'make sure FieldType is 'Number'
                             SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF RANGE*", Pnl)
                             Exit For
                         End If
                     End If
+
                 End If
+
                 'if here, value is valid and in range
                 SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#F5F5F5"), "", Pnl)
             End If
