@@ -244,7 +244,7 @@
                 }
 
                     .LogCheckBox input { /*input to hit asp CheckBox control*/
-                        transform: scale(1.5);
+                        transform: scale(1.25);
                         margin: var(--UWhitespace);
                     }
 
@@ -335,9 +335,9 @@
                 <asp:HiddenField ID="ItemsPanel_HiddenField" runat="server" Value="0" />
 
                 <iframe id="PreviewPanel_iframe" runat="server" style="display: none; border: 2px solid black; background: white;"></iframe>
-                
+
                 <asp:Panel runat="server" ID="ItemsPanel" onscroll="setScrollPos.call(this)" Style="display: grid; grid-template-columns: 49% 49%; justify-content: space-between; gap: var(--UWhitespace); overflow: auto;">
-                    
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel0" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
@@ -398,11 +398,11 @@
                         </div>
                     </asp:Panel>
 
-                                        <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel2" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
+                    <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel2" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -422,11 +422,14 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel3" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
@@ -456,6 +459,7 @@
                             <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel4" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
