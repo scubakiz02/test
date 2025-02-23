@@ -521,16 +521,18 @@ Partial Class MR_OpenTicketStatusBoard
                     'validate user input using the range
                     If Range.Contains("+/-") Then
                         Dim Temps As String() = UserInput.Split("/")
+                        Dim Temp1 As Decimal
+                        Dim Temp2 As Decimal
 
-                        If Temps.Count < 2 Then
+                        If Temps.Count < 2 OrElse String.IsNullOrEmpty(Temps(1)) Then
                             SetPanelBackColor(System.Drawing.Color.Red, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
                             Exit For
                         End If
 
-                        Dim BathTemp As Decimal = Temps(0)
-                        Dim IrGunTemp As Decimal = Temps(1)
+                        Temp1 = Decimal.Parse(Temps(0))
+                        Temp2 = Decimal.Parse(Temps(1))
 
-                        If Math.Abs(BathTemp - IrGunTemp) > Decimal.Parse(Range.Split(" ")(1)) Then
+                        If Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
                             SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF SPEC*", Pnl)
                             Exit For
                         End If
