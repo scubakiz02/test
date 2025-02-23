@@ -573,34 +573,47 @@ Partial Class MR_OpenTicketStatusBoard
         RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel)
 
         DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
+
         If DbRange IsNot Nothing Then
-            If DbRange.Contains("-") Then
+            If DbRange.Contains("+/-") Then
+                DiffTextbox.Text = DbRange.Split(" ")(1)
+                RangeOrderMenu_onClick(DiffButton, EventArgs.Empty)
+
+                'empty TextBox controls within the other DynamicRangeBoxPanel child Panel controls
+                LowerBoundTextbox.Text = ""
+                UpperBoundTextbox.Text = ""
+                GreaterThanTextbox.Text = ""
+                LessThanTextbox.Text = ""
+            ElseIf DbRange.Contains("-") Then
                 DbRangeDelimited = DbRange.Split("-")
                 LowerBoundTextbox.Text = DbRangeDelimited(0)
                 UpperBoundTextbox.Text = DbRangeDelimited(1)
                 RangeOrderMenu_onClick(RangePickButton, EventArgs.Empty)
 
-                'empty OTHER textbox controls
+                'empty TextBox controls within the other DynamicRangeBoxPanel child Panel controls
                 LessThanTextbox.Text = ""
                 GreaterThanTextbox.Text = ""
+                DiffTextbox.Text = ""
             ElseIf DbRange.Contains("<") Then
                 DbRangeDelimited = DbRange.Split("<")
                 LessThanTextbox.Text = DbRangeDelimited(1)
                 RangeOrderMenu_onClick(LessThanPickButton, EventArgs.Empty)
 
-                'empty OTHER textbox controls
+                'empty TextBox controls within the other DynamicRangeBoxPanel child Panel controls
                 LowerBoundTextbox.Text = ""
                 UpperBoundTextbox.Text = ""
                 GreaterThanTextbox.Text = ""
+                DiffTextbox.Text = ""
             ElseIf DbRange.Contains(">") Then
                 DbRangeDelimited = DbRange.Split(">")
                 GreaterThanTextbox.Text = DbRangeDelimited(1)
                 RangeOrderMenu_onClick(GreaterThanPickButton, EventArgs.Empty)
 
-                'empty OTHER textbox controls
+                'empty TextBox controls within the other DynamicRangeBoxPanel child Panel controls
                 LowerBoundTextbox.Text = ""
                 UpperBoundTextbox.Text = ""
                 LessThanTextbox.Text = ""
+                DiffTextbox.Text = ""
             End If
         End If
     End Sub

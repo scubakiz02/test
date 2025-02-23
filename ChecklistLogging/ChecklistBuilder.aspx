@@ -336,6 +336,7 @@
                             <asp:Label runat="server" Text="Range Order:"></asp:Label>
                             <asp:Panel ID="RangeOrderMenu" runat="server" Style="display: flex; gap: var(--UWhitespace);">
                                 <asp:Button Text="? - ?" ID="RangePickButton" InterfacePanel="RangePanel" OnClick="RangeOrderMenu_onClick" runat="server" />
+                                <asp:Button Text="+/- ?" ID="DiffButton" InterfacePanel="DiffPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                                 <asp:Button Text="Less Than (<)" ID="LessThanPickButton" InterfacePanel="LessThanPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                                 <asp:Button Text="Greater Than (>)" ID="GreaterThanPickButton" InterfacePanel="GreaterThanPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                             </asp:Panel>
@@ -345,14 +346,22 @@
                                     -
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
                                 </asp:Panel>
+
+                                <asp:Panel runat="server" ID="DiffPanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
+                                    +/-
+                                <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />
+                                </asp:Panel>
+
                                 <asp:Panel runat="server" ID="LessThanPanel" Visible="False">
                                     <
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LessThanTextbox" />
                                 </asp:Panel>
+
                                 <asp:Panel runat="server" ID="GreaterThanPanel" Visible="False">
                                     >
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="GreaterThanTextbox" />
                                 </asp:Panel>
+
                                 <div runat="server" style="position: absolute; bottom: var(--UWhitespace); right: var(--UWhitespace); display: flex; gap: var(--UWhitespace);">
                                     <asp:Label ID="InvalidInputLabel" Text="Invalid Input(s)" Visible="False" runat="server" Style="color: red;" />
                                     <asp:Button Text="Set" ID="SetRangeButton" OnClick="SetRangeButton_onClick" Enabled="False" runat="server" />
