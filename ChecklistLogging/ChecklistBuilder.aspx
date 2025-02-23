@@ -366,6 +366,8 @@
                                     <asp:Label ID="InvalidInputLabel" Text="Invalid Input(s)" Visible="False" runat="server" Style="color: red;" />
                                     <asp:Button Text="Set" ID="SetRangeButton" OnClick="SetRangeButton_onClick" Enabled="False" runat="server" />
                                 </div>
+
+                                <asp:Button Text="Reset" ID="ResetRangeButton" OnClick="ResetRangeButton_onClick" Enabled="False" runat="server" Style="position: absolute; top: var(--UWhitespace); right: var(--UWhitespace); gap: var(--UWhitespace);" />
                             </asp:Panel>
                         </asp:Panel>
 

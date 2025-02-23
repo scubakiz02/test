@@ -954,6 +954,7 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         SetRangeButton.Enabled = True
+        ResetRangeButton.Enabled = True
         InvalidInputLabel.Visible = False 'hide error message from user
     End Sub
 
@@ -997,6 +998,12 @@ Partial Class MR_OpenTicketStatusBoard
         ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Assignee=" & If(Assignee = "NULL", "NULL", "'" & Assignee & "'") & " WHERE [Key]=" & AreaFromQueryString)
         RefreshPreview()
     End Sub
+
+    Protected Sub ResetRangeButton_onClick(sender As Object, e As EventArgs)
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
+        RefreshPreview()
+    End Sub
+
 
     Protected Sub SetRangeButton_onClick(sender As Object, e As EventArgs)
         Dim UserInput As Double
