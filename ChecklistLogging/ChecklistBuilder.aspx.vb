@@ -87,6 +87,7 @@ Partial Class MR_OpenTicketStatusBoard
                     Else
                         RangeOrderInterfacePanel.Enabled = False
                         DynamicRangeBoxPanel.Style("border") = "2px solid lightgray" 'to further enhance disabled effect
+                        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
                     End If
 
                     'prep functionalities that were enabled

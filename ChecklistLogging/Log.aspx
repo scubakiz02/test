@@ -343,7 +343,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -373,7 +373,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -403,7 +403,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -432,7 +432,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -461,7 +461,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -490,7 +490,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -519,7 +519,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -548,7 +548,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -577,7 +577,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -606,7 +606,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -635,7 +635,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -664,7 +664,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -693,7 +693,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -722,7 +722,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -751,7 +751,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -780,7 +780,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -809,7 +809,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -838,7 +838,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -867,7 +867,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -896,7 +896,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -925,7 +925,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -954,7 +954,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -983,7 +983,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1012,7 +1012,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1041,7 +1041,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1070,7 +1070,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1099,7 +1099,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1128,7 +1128,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1157,7 +1157,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1186,7 +1186,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1215,7 +1215,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1244,7 +1244,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1273,7 +1273,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1302,7 +1302,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1331,7 +1331,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1360,7 +1360,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1389,7 +1389,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1418,7 +1418,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1447,7 +1447,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1476,7 +1476,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1505,7 +1505,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1534,7 +1534,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1563,7 +1563,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1592,7 +1592,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1621,7 +1621,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1650,7 +1650,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1679,7 +1679,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1708,7 +1708,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1737,7 +1737,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1766,7 +1766,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
@@ -1795,7 +1795,7 @@
                         <div class="EverythingExceptTitle">
 
                             <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
                                     <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
