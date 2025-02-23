@@ -1019,9 +1019,19 @@ Partial Class MR_OpenTicketStatusBoard
                 InvalidInputLabel.Visible = True
                 Exit Sub
             End If
+
         ElseIf GreaterThanPanel.Visible Then
             If Double.TryParse(GreaterThanTextbox.Text, UserInput) Then
                 DbRange = ">" & UserInput
+                InvalidInputLabel.Visible = False 'hide error message from user
+            Else
+                InvalidInputLabel.Visible = True
+                Exit Sub
+            End If
+
+        ElseIf DiffPanel.Visible Then
+            If Double.TryParse(DiffTextbox.Text, UserInput) Then
+                DbRange = "+/- " & UserInput
                 InvalidInputLabel.Visible = False 'hide error message from user
             Else
                 InvalidInputLabel.Visible = True
