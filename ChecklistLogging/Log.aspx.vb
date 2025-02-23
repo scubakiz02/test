@@ -466,6 +466,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim FieldType As String
         Dim Pnl As Panel = FindPnl(ControlID)
         Dim LabelKey As Integer
+        Dim Diff As Boolean = False
 
         'TO DO: incorporate this block of code into the next for loop, to avoid looping through panel controls twice.
         'Note: When looping through parent Panel, the TextBox control is reached before the CheckBox control. This snippet was a quick workaround
@@ -506,18 +507,38 @@ Partial Class MR_OpenTicketStatusBoard
                     Valid = False
                     Exit For
 
-                Else 'check if a range exists
+                Else 'use range to validate input
                     InRange = True
                     Range = TbxToRange(LabelKey)
+                    If Range.Contains("+/-") Then Diff = True
 
-                    If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
-                        SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
-                        Valid = False
-                        Exit For
+                    'validate user input before considering the range
+                    If Diff Then
+                        'If UserInput.Contains("/") Then
+                        'End If
+
+                        'Dim Temps As String() = UserInput.Split("/")
+                        'Dim BathTemp As Decimal = Temps(0)
+                        'Dim IrGunTemp As Decimal = Temps(1)
+
+                        'SetPanelBackColor(System.Drawing.Color.Red, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
+                    Else
+                        If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
+                            SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
+                            Valid = False
+                            Exit For
+                        End If
+
                     End If
 
-                    'decipher the range and if it's valid
-                    If Range.Contains("-") Then
+                    'validate user input using the range
+                    If Diff Then
+                        Dim Temps As String() = UserInput.Split("/")
+                        Dim BathTemp As Decimal = Temps(0)
+                        Dim IrGunTemp As Decimal = Temps(1)
+
+                        If Math.Abs(BathTemp - IrGunTemp) > Decimal.Parse(Range.Split(" ")(1)) Then InRange = False
+                    ElseIf Range.Contains("-") Then
                         DelimitArr = Range.Split("-")
                         UserInputDec = Decimal.Parse(UserInput)
 
