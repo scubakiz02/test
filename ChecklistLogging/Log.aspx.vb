@@ -510,34 +510,30 @@ Partial Class MR_OpenTicketStatusBoard
                 Else 'use range to validate input
                     InRange = True
                     Range = TbxToRange(LabelKey)
-                    If Range.Contains("+/-") Then Diff = True
 
                     'validate user input before considering the range
-                    If Diff Then
-                        'If UserInput.Contains("/") Then
-                        'End If
-
-                        'Dim Temps As String() = UserInput.Split("/")
-                        'Dim BathTemp As Decimal = Temps(0)
-                        'Dim IrGunTemp As Decimal = Temps(1)
-
-                        'SetPanelBackColor(System.Drawing.Color.Red, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
-                    Else
-                        If Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
-                            SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
-                            Valid = False
-                            Exit For
-                        End If
-
+                    If Not Range.Contains("+/-") And Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
+                        SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
+                        Valid = False
+                        Exit For
                     End If
 
                     'validate user input using the range
-                    If Diff Then
+                    If Range.Contains("+/-") Then
                         Dim Temps As String() = UserInput.Split("/")
+
+                        If Temps.Count < 2 Then
+                            SetPanelBackColor(System.Drawing.Color.Red, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
+                            Exit For
+                        End If
+
                         Dim BathTemp As Decimal = Temps(0)
                         Dim IrGunTemp As Decimal = Temps(1)
 
-                        If Math.Abs(BathTemp - IrGunTemp) > Decimal.Parse(Range.Split(" ")(1)) Then InRange = False
+                        If Math.Abs(BathTemp - IrGunTemp) > Decimal.Parse(Range.Split(" ")(1)) Then
+                            SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF SPEC*", Pnl)
+                            Exit For
+                        End If
                     ElseIf Range.Contains("-") Then
                         DelimitArr = Range.Split("-")
                         UserInputDec = Decimal.Parse(UserInput)
