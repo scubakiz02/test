@@ -342,7 +342,7 @@
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -362,9 +362,11 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
 
@@ -372,7 +374,7 @@
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -392,9 +394,11 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
 
@@ -434,7 +438,7 @@
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -454,9 +458,11 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
 
@@ -464,7 +470,7 @@
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -484,16 +490,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel5" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -513,16 +522,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel6" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -542,16 +554,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel7" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -571,16 +586,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel8" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -600,16 +618,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel9" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -629,16 +650,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel10" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -658,16 +682,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel11" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -687,16 +714,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel12" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -716,16 +746,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel13" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -745,16 +778,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel14" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -774,16 +810,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel15" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -803,16 +842,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel16" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -832,16 +874,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel17" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -861,16 +906,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel18" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -890,16 +938,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel19" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -919,16 +970,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel20" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -948,16 +1002,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel21" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -977,16 +1034,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel22" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1006,16 +1066,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel23" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1035,16 +1098,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel24" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1064,16 +1130,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel25" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1093,16 +1162,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel26" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1122,16 +1194,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel27" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1151,16 +1226,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel28" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1180,16 +1258,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel29" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1209,16 +1290,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel30" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1238,16 +1322,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel31" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1267,16 +1354,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel32" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1296,16 +1386,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel33" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1325,16 +1418,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel34" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1354,16 +1450,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel35" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1383,16 +1482,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel36" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1412,16 +1514,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel37" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1441,16 +1546,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel38" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1470,16 +1578,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel39" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1499,16 +1610,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel40" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1528,16 +1642,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel41" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1557,16 +1674,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel42" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1586,16 +1706,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel43" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1615,16 +1738,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel44" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1644,16 +1770,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel45" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1673,16 +1802,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel46" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1702,16 +1834,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel47" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1731,16 +1866,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel48" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1760,16 +1898,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel49" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1789,16 +1930,19 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                         </div>
                     </asp:Panel>
+
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel50" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
                         <div class="EverythingExceptTitle">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; align-items: center; font-size: calc(var(--UFontSize));">
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
                                 <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
 
                                 <asp:Panel Visible="False" Checkbox="False" runat="server">
@@ -1818,9 +1962,43 @@
                                     </asp:DropDownList>
                                 </asp:Panel>
 
-                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
                             </div>
-                            <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                        </div>
+                    </asp:Panel>
+
+                    <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel51" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
+                        <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
+                        <div class="EverythingExceptTitle">
+
+                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
+
+                                <asp:Panel Visible="False" Checkbox="False" runat="server">
+                                    <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                </asp:Panel>
+
+                                <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                                </asp:Panel>
+
+                                <asp:Panel Visible="False" HOA="False" runat="server">
+                                    <asp:DropDownList runat="server">
+                                        <asp:ListItem Selected="True" Text="Switch Select..." />
+                                        <asp:ListItem Text="Hand" Value="Hand" />
+                                        <asp:ListItem Text="Off" Value="Off" />
+                                        <asp:ListItem Text="Auto" Value="Auto" />
+                                    </asp:DropDownList>
+                                </asp:Panel>
+
+                                <div style="display: block">
+                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                                </div>
+                            </div>
                         </div>
                     </asp:Panel>
 
