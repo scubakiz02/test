@@ -156,13 +156,13 @@
                                 <svg style="width: 15px; margin-right: var(--UWhitespace);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                     <path d="m0,0h1v1H0" fill="#D3D3D3" />
                                 </svg>
-                                <p style="margin: 0">= missing requirements</p>
+                                <p style="margin: 0">= disabled</p>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <svg style="width: 15px; margin: 0 var(--UWhitespace);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                     <path d="m0,0h1v1H0" fill="#FF0000" />
                                 </svg>
-                                <p style="margin: 0">= disabled</p>
+                                <p style="margin: 0">= missing requirements</p>
                             </div>
                         </div>
                     </div>
@@ -242,7 +242,7 @@
 
                             <div style="display: flex; align-items: center;">
                                 <asp:Label runat="server" Text="Select Label:"></asp:Label>
-                                <asp:Label runat="server" Text="*Required*" Style="color: gray; font-style: italic;"></asp:Label>
+                                <asp:Label runat="server" Text="*Required*" Style="color: red; font-style: italic;"></asp:Label>
                             </div>
 
                             <div>
@@ -367,7 +367,7 @@
                                     <asp:Button Text="Set" ID="SetRangeButton" OnClick="SetRangeButton_onClick" Enabled="False" runat="server" />
                                 </div>
 
-                                <asp:ImageButton  ID="ResetRangeButton" OnClick="ResetRangeButton_onClick" Enabled="False" runat="server" Style="width: 25px; position: absolute; top: var(--UWhitespace); right: var(--UWhitespace); gap: var(--UWhitespace);" ImageUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAjFJREFUWEft1surzVEUwPHPnTFRGBlIUfKakGQkikIGniPySCkppQhFXoWUKBIpURgg/4ABJQPkkYiBvPKYSJSJEb+ldXTucR6/c0/d3+Su2p1z9llr7+9ea++1Vp+Kpa/i/Q0BDMQDi7AWEzEqxy9cxy3cwfeyoS0LMAa7sRRjOyz+Cadz/OwEUg9wO5XnNRgtwdHihFNz/iYe40mOmJ6eYwaWp96LhDjbDqIe4Hcq1s/tK+b25/wr7MWNDqdaiUOYlHrbcLKVTTuAY9iRhhewB186ubTu/wjZ4fy9AReb2bYCiBhuSYOdCJiByGacScMI09PGRZoBXMK6VNyIOH0vEiFbkWGIcPSTZgCh8BUL8aiXndN2Mu7xN+mFF97Vr9kKoHHfeNuNr6MbtstYnRf6QCuAeIZzW6zaK8AuHMEVrGkF0M2JutWdn1nyPmZXATACP/ANo6sAmFC4/jU+YFwVAMsQKfxqXsZ/DGWLUbcxb9SPdB5pfWsRglNVeCBOH16Yg7uDDRDFKXqFj4ik1K9ED0YIXmZl3I7j7VJxr3FuZl+riA8xq5lCJw9swrm8ONGUfO6Csr4Sji8K3NuBAKzCtTR8k53R+Q4QEedoSKIChkTurzU1/5l28kAYRBo9UXRC09I6Gs/nRev1DJFaowcM985MncUYmc3perxvB1wGIOyH42Bxg+MilZHSTUxZgNqmC/IpTcnPcPcwPMgRly2+h1dKSbcApRbtRmkIoHIP/AFn7WAh9AkzDQAAAABJRU5ErkJggg=="/>
+                                <asp:ImageButton ID="ResetRangeButton" OnClick="ResetRangeButton_onClick" Enabled="False" runat="server" Style="width: 25px; position: absolute; top: var(--UWhitespace); right: var(--UWhitespace); gap: var(--UWhitespace);" ImageUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAjFJREFUWEft1surzVEUwPHPnTFRGBlIUfKakGQkikIGniPySCkppQhFXoWUKBIpURgg/4ABJQPkkYiBvPKYSJSJEb+ldXTucR6/c0/d3+Su2p1z9llr7+9ea++1Vp+Kpa/i/Q0BDMQDi7AWEzEqxy9cxy3cwfeyoS0LMAa7sRRjOyz+Cadz/OwEUg9wO5XnNRgtwdHihFNz/iYe40mOmJ6eYwaWp96LhDjbDqIe4Hcq1s/tK+b25/wr7MWNDqdaiUOYlHrbcLKVTTuAY9iRhhewB186ubTu/wjZ4fy9AReb2bYCiBhuSYOdCJiByGacScMI09PGRZoBXMK6VNyIOH0vEiFbkWGIcPSTZgCh8BUL8aiXndN2Mu7xN+mFF97Vr9kKoHHfeNuNr6MbtstYnRf6QCuAeIZzW6zaK8AuHMEVrGkF0M2JutWdn1nyPmZXATACP/ANo6sAmFC4/jU+YFwVAMsQKfxqXsZ/DGWLUbcxb9SPdB5pfWsRglNVeCBOH16Yg7uDDRDFKXqFj4ik1K9ED0YIXmZl3I7j7VJxr3FuZl+riA8xq5lCJw9swrm8ONGUfO6Csr4Sji8K3NuBAKzCtTR8k53R+Q4QEedoSKIChkTurzU1/5l28kAYRBo9UXRC09I6Gs/nRev1DJFaowcM985MncUYmc3perxvB1wGIOyH42Bxg+MilZHSTUxZgNqmC/IpTcnPcPcwPMgRly2+h1dKSbcApRbtRmkIoHIP/AFn7WAh9AkzDQAAAABJRU5ErkJggg==" />
                             </asp:Panel>
                         </asp:Panel>
 
@@ -505,7 +505,7 @@
 
                         <div style="display: flex; align-items: center;">
                             <asp:Label runat="server" Text="Select Department:"></asp:Label>
-                            <asp:Label runat="server" Text="*Required*" Style="color: gray; font-style: italic;"></asp:Label>
+                            <asp:Label runat="server" Text="*Required*" Style="color: red; font-style: italic;"></asp:Label>
                         </div>
 
                         <asp:DropDownList ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
@@ -524,7 +524,7 @@
 
                             <div style="display: flex; align-items: center;">
                                 <asp:Label runat="server" Text="Select Interval:"></asp:Label>
-                                <asp:Label runat="server" Text="*Required*" Style="color: gray; font-style: italic;"></asp:Label>
+                                <asp:Label runat="server" Text="*Required*" Style="color: red; font-style: italic;"></asp:Label>
                             </div>
 
                             <asp:DropDownList ID="IntervalDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
@@ -553,7 +553,7 @@
                                     <asp:Button Text="User" ID="UserAssigneeButton" Ddl="UsersDropDownList" OnClick="AssignToMenu_onClick" runat="server" />
                                     <asp:Button Text="Shift" ID="ShiftAssigneeButton" Ddl="ShiftDropDownList" OnClick="AssignToMenu_onClick" runat="server" />
                                 </asp:Panel>
-                                <asp:Label runat="server" Text="*Required*" Style="color: gray; font-style: italic;"></asp:Label>
+                                <asp:Label runat="server" Text="*Required*" Style="color: red; font-style: italic;"></asp:Label>
                             </div>
 
                             <asp:Panel runat="server" ID="AssigneeDdlPanel">

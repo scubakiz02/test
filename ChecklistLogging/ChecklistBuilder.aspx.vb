@@ -209,7 +209,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
-        Dim ListItemStylesDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: red;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: lightgray; color: gray;' ELSE 'color: black;' END AS ListItemStyles FROM [ALTS].[dbo].[T_LogArea] A")
+        Dim ListItemStylesDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: gray;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: red; color: black;' ELSE 'color: black;' END AS ListItemStyles FROM [ALTS].[dbo].[T_LogArea] A")
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
