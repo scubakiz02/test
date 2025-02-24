@@ -354,7 +354,14 @@
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                                    <div style="display: block">
+                                        <asp:Label Text="Bath Temp" runat="server" />
+                                        <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                    </div>
+                                    <div style="display: block">
+                                        <asp:Label Text="IR Gun Temp" runat="server" />
+                                        <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                    </div>
                                 </asp:Panel>
 
                                 <asp:Panel Visible="False" HOA="False" runat="server">

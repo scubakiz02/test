@@ -270,9 +270,17 @@ Partial Class MR_OpenTicketStatusBoard
                                     myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                     DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                                 Case "STC"
-                                    InputCtrlID = "STC_" & LabelKey
-                                    myTextBox.Text = Session("LabelInputMap")(LabelKey)
-                                    DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                                    Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
+                                    Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
+                                    Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                    Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+
+                                    myTextBox.Text = UnderlyingTextBoxText
+
+                                    BathTextBox.Text = Temps(0)
+                                    IRGunTextBox.Text = If(Temps.Count > 1, Temps(1), String.Empty)
+
+                                    Continue For
                             End Select
 
                             InputCtrl.ID = InputCtrlID
