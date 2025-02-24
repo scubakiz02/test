@@ -269,6 +269,10 @@ Partial Class MR_OpenTicketStatusBoard
                                     InputCtrlID = "Text_" & LabelKey
                                     myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                     DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                                Case "STC"
+                                    InputCtrlID = "STC_" & LabelKey
+                                    myTextBox.Text = Session("LabelInputMap")(LabelKey)
+                                    DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                             End Select
 
                             InputCtrl.ID = InputCtrlID

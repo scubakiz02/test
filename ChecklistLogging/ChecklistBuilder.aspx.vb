@@ -81,14 +81,15 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelOrderInterfacePanel.Enabled = True
                     UnitInterfacePanel.Enabled = True
                     FieldType_DropDownList.Enabled = True
+                    RangeOrderInterfacePanel.Enabled = True
 
-                    If FieldType Is Nothing Then ' If field type Is anything other than Default Option (Number), Then RangeOrderInterface Is disabled
-                        RangeOrderInterfacePanel.Enabled = True
-                    Else
-                        RangeOrderInterfacePanel.Enabled = False
-                        DynamicRangeBoxPanel.Style("border") = "2px solid lightgray" 'to further enhance disabled effect
-                        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
-                    End If
+                    'If FieldType Is Nothing Then ' If field type Is anything other than Default Option (Number), Then RangeOrderInterface Is disabled
+                    '    RangeOrderInterfacePanel.Enabled = True
+                    'Else
+                    '    RangeOrderInterfacePanel.Enabled = False
+                    '    DynamicRangeBoxPanel.Style("border") = "2px solid lightgray" 'to further enhance disabled effect
+                    '    ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
+                    'End If
 
                     'prep functionalities that were enabled
                     Unit = GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=" & LabelFromQueryString, "Key")
