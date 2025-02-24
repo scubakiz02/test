@@ -148,10 +148,21 @@
             <div>
                 <asp:Panel runat="server" ID="AreaInterfacePanel" CssClass="InterfacePanel" Style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
 
-                    <div style="display: flex; gap: var(--UWhitespace);">
-                        <asp:Label Text="Select Checklist:" runat="server" />
+                    <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
 
-                        <div style="display: flex; align-items: center; justify-content: center;">
+                        <div style="display: flex; justify-content: space-between; gap: var(--UWhitespace);">
+                            <asp:Label Text="Select Checklist:" runat="server" />
+
+                            <div>
+                                <asp:Label Text="Interval:" runat="server" />
+                                <asp:DropDownList ID="AreaIntervalDropDownList" AppendDataBoundItems="True" AutoPostBack="True"
+                                    DataTextField="Interval" DataValueField="Key" OnSelectedIndexChanged="AreaInterval_OnSelectedIndexChanged" runat="server" DataSourceID="IntervalDropDownList_SqlDataSource">
+                                    <asp:ListItem Text="All" Value="All" Selected="True"/>
+                                </asp:DropDownList>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center;">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <svg style="width: 15px; margin-right: var(--UWhitespace);" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                     <path d="m0,0h1v1H0" fill="#D3D3D3" />
@@ -165,6 +176,7 @@
                                 <p style="margin: 0">= missing requirements</p>
                             </div>
                         </div>
+
                     </div>
 
                     <asp:DropDownList ID="AreaDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
@@ -347,7 +359,7 @@
                                     -
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
                                 </asp:Panel>
-                               
+
                                 <asp:Panel runat="server" ID="DiffPanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
                                     +/-
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />

@@ -899,6 +899,10 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
+    Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
+
+    End Sub
+
     Protected Sub CommentOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String
 
