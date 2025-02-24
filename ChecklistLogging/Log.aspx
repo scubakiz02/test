@@ -187,13 +187,11 @@
 
                     elem.addEventListener("keydown", function (e) {
                         if (event.key !== "Enter" && event.key !== "Tab") return;
-
                         callCodeBehindEvent.call(underlayTbxValue.call(this));
                     });
                     elem.addEventListener("blur", function (e) {
                         if (this.value === "") return;
-                        callCodeBehindEvent.call(getAspControl("TextBox_" + this.id.split("_")[1]));
-                        debugger;
+                        callCodeBehindEvent.call(underlayTbxValue.call(this));
                     });
                 }
 

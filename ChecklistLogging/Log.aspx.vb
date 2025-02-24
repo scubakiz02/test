@@ -720,14 +720,19 @@ Partial Class MR_OpenTicketStatusBoard
     Public Delegate Function ModifyInputDelegate(ID As String, Value As String) As Boolean
     Function ModifyInput(ID As String, Value As String) As Boolean
         Dim LabelKey As String = ID.Split("_")(1)
+        Dim PrevValue As String = Session("LabelInputMap")(LabelKey)
 
-        If Session("LabelInputMap")(LabelKey) = Value Then Return False 'value has NOT changed, so do NOT modify input
+        If Value = PrevValue Then Return False 'value has NOT changed, so do NOT modify input
 
         ValidateInput(ID, Value)
         UploadToDataTable()
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
-            ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
+            If Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0) Then 'STC FieldType 'Bath Temp' TextBox control has been modified
+                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
+            Else
+                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
+            End If
         Catch ex As Exception
 
         End Try
