@@ -43,6 +43,8 @@ Partial Class MR_OpenTicketStatusBoard
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
 
+        AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
 
@@ -51,7 +53,6 @@ Partial Class MR_OpenTicketStatusBoard
                 DepartmentInterfacePanel.Enabled = True
 
                 AreaDropDownList.SelectedValue = AreaFromQueryString
-                AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
 
                 If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
                     Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
@@ -900,7 +901,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-
+        RefreshPreview()
     End Sub
 
     Protected Sub CommentOrderInterface_onClick(sender As Object, e As EventArgs)

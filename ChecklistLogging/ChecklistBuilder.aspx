@@ -157,7 +157,7 @@
                                 <asp:Label Text="Interval:" runat="server" />
                                 <asp:DropDownList ID="AreaIntervalDropDownList" AppendDataBoundItems="True" AutoPostBack="True"
                                     DataTextField="Interval" DataValueField="Key" OnSelectedIndexChanged="AreaInterval_OnSelectedIndexChanged" runat="server" DataSourceID="IntervalDropDownList_SqlDataSource">
-                                    <asp:ListItem Text="All" Value="All" Selected="True"/>
+                                    <asp:ListItem Text="All" Value="All" Selected="True" />
                                 </asp:DropDownList>
                             </div>
                         </div>
@@ -185,8 +185,7 @@
                         CssClass="Width">
                         <asp:ListItem Selected="True">Select Checklist...</asp:ListItem>
                     </asp:DropDownList>
-                    <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                        SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"></asp:SqlDataSource>
+                    <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
 
                     <asp:FormView ID="AreaFormView" CssClass="Width" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
                         <EmptyDataTemplate>
