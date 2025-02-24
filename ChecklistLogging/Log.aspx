@@ -168,30 +168,33 @@
 
                 }
 
+                function underlayTbxValue() {
+                    let underlyingTbx;
+                    let temps = [];
+                    let temp1;
+                    let temp2;
+                    let idSplit = [];
+
+                    idSplit = this.id.split("_")
+                    underlyingTbx = getAspControl("TextBox_" + idSplit[idSplit.length - 1]);
+                    temps = underlyingTbx.value.split("/");
+                    temp1 = temps[0] && temps[0] != "undefined" ? temps[0] : "";
+                    temp2 = temps[1] && temps[1] != "undefined" ? temps[1] : "";
+
+                    if (this.id.includes("Bath")) underlyingTbx.value = this.value + "/" + temp2;
+                    else underlyingTbx.value = temp1 + "/" + this.value;
+
+                    return underlyingTbx;
+                }
+
                 function STC_TbxOverlay(id) {
                     let elem = getAspControl(id);
                     if (!elem) return; //if elem is undefined
 
                     elem.addEventListener("keydown", function (e) {
-                        let underlyingTbx;
-                        let temps = [];
-                        let temp1;
-                        let temp2;
-                        let idSplit = [];
-
                         if (event.key !== "Enter" && event.key !== "Tab") return;
 
-                        idSplit = this.id.split("_")
-                        underlyingTbx = getAspControl("TextBox_" + idSplit[idSplit.length - 1]);
-                        temps = underlyingTbx.value.split("/");
-                        temp1 = temps[0] && temps[0] != "undefined" ? temps[0] : "";
-                        temp2 = temps[1] && temps[1] != "undefined" ? temps[1] : "";
-
-                        if (elem.id.includes("Bath")) underlyingTbx.value = elem.value + "/" + temp2;
-                        else underlyingTbx.value = temp1 +  "/" + elem.value;
-                        debugger;
-
-                        callCodeBehindEvent.call(underlyingTbx);
+                        callCodeBehindEvent.call(underlayTbxValue.call(this));
                     });
                     elem.addEventListener("blur", function (e) {
                         if (this.value === "") return;
