@@ -571,13 +571,14 @@ Partial Class MR_OpenTicketStatusBoard
     Sub SetRangeOrder()
         Dim DbRange As String
         Dim DbRangeDelimited As String()
+        Dim FieldTypeIsSTC As Boolean = If(FieldType_DropDownList.SelectedValue = "STC", True, False)
 
         RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel)
 
         DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
 
-        If DbRange IsNot Nothing OrElse FieldType_DropDownList.SelectedValue = "STC" Then
-            If FieldType_DropDownList.SelectedValue = "STC" Then
+        If DbRange IsNot Nothing OrElse FieldTypeIsSTC Then
+            If FieldTypeIsSTC Then
                 RangeOrderMenu.Enabled = False
                 DiffPanel.Visible = True
                 DiffTextbox.Text = If(DbRange IsNot Nothing, DbRange.Split(" ")(1), String.Empty)
