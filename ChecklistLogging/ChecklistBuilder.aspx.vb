@@ -576,8 +576,12 @@ Partial Class MR_OpenTicketStatusBoard
 
         DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
 
-        If DbRange IsNot Nothing Then
-            If DbRange.Contains("+/-") Then
+        If DbRange IsNot Nothing OrElse FieldType_DropDownList.SelectedValue = "STC" Then
+            If DbRange Is Nothing AndAlso FieldType_DropDownList.SelectedValue = "STC" Then 'this means reset button was hit while FieldType is STC 
+                RangeOrderMenu.Enabled = False
+                DiffPanel.Visible = True
+
+            ElseIf DbRange.Contains("+/-") Then
                 DiffTextbox.Text = DbRange.Split(" ")(1)
                 RangeOrderMenu_onClick(DiffButton, EventArgs.Empty)
 

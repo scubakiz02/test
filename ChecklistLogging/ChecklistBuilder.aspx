@@ -347,7 +347,7 @@
                                     -
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
                                 </asp:Panel>
-
+                               
                                 <asp:Panel runat="server" ID="DiffPanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
                                     +/-
                                 <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />
