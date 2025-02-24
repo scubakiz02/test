@@ -168,6 +168,38 @@
 
                 }
 
+                function STC_TbxOverlay(id) {
+                    let elem = getAspControl(id);
+                    if (!elem) return; //if elem is undefined
+
+                    elem.addEventListener("keydown", function (e) {
+                        let underlyingTbx;
+                        let temps = [];
+                        let temp1;
+                        let temp2;
+                        let idSplit = [];
+
+                        if (event.key !== "Enter" && event.key !== "Tab") return;
+
+                        idSplit = this.id.split("_")
+                        underlyingTbx = getAspControl("TextBox_" + idSplit[idSplit.length - 1]);
+                        temps = underlyingTbx.value.split("/");
+                        temp1 = temps[0] && temps[0] != "undefined" ? temps[0] : "";
+                        temp2 = temps[1] && temps[1] != "undefined" ? temps[1] : "";
+
+                        if (elem.id.includes("Bath")) underlyingTbx.value = elem.value + "/" + temp2;
+                        else underlyingTbx.value = temp1 +  "/" + elem.value;
+                        debugger;
+
+                        callCodeBehindEvent.call(underlyingTbx);
+                    });
+                    elem.addEventListener("blur", function (e) {
+                        if (this.value === "") return;
+                        callCodeBehindEvent.call(getAspControl("TextBox_" + this.id.split("_")[1]));
+                        debugger;
+                    });
+                }
+
                 function SetDBConnection(id) {
                     let elem = getAspControl(id);
                     if (!elem) return; //if elem is undefined
@@ -356,11 +388,11 @@
                                 <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                     <div style="display: flex; flex-direction: column">
                                         <asp:Label Text="Bath Temp" runat="server" />
-                                        <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                        <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                     </div>
                                     <div style="display: flex; flex-direction: column">
                                         <asp:Label Text="IR Gun Temp" runat="server" />
-                                        <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                        <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                     </div>
                                 </asp:Panel>
 

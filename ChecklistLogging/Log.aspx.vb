@@ -23,6 +23,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DRC As Data.DataRowCollection
     Dim JsFunctionCalls As String
     Dim DBConnections As String
+    Dim STC_TbxOverlays As String
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
@@ -32,7 +33,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
-        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections, True)
+        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays, True)
     End Sub
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -240,7 +241,7 @@ Partial Class MR_OpenTicketStatusBoard
                     If FieldType IsNot Nothing AndAlso MalleableCtrl.Attributes(FieldType) IsNot Nothing Then 'if FieldType is null, it is a standard textbox
                         MalleableCtrl.Attributes(FieldType) = True
                         MalleableCtrl.Visible = True
-                        myTextBox.Visible = False
+                        myTextBox.Style("display") = "none"
 
                         If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
                             Dim InputCtrl As Control = ctrl.Controls(1)
@@ -272,15 +273,27 @@ Partial Class MR_OpenTicketStatusBoard
                                 Case "STC"
                                     Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                     Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
+                                    Dim BathTextBoxID As String = "BathTemp_" & LabelKey
+                                    Dim IRGunTextBoxID As String = "IrGunTemp_" & LabelKey
                                     Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
                                     Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+
+                                    BathTextBox.ID = BathTextBoxID
+                                    IRGunTextBox.ID = IRGunTextBoxID
 
                                     myTextBox.Text = UnderlyingTextBoxText
 
                                     BathTextBox.Text = Temps(0)
                                     IRGunTextBox.Text = If(Temps.Count > 1, Temps(1), String.Empty)
 
-                                    Continue For
+                                    ' DBConnections += "SetDBConnection('" & BathTextBoxID & "'); SetDBConnection('" & BathTextBoxID & "'); "
+
+                                    'AddHandler BathTextBox.TextChanged, AddressOf StcTextBox_onTextChanged
+                                    'AddHandler IRGunTextBox.TextChanged, AddressOf StcTextBox_onTextChanged
+
+                                    STC_TbxOverlays += "STC_TbxOverlay('" & BathTextBoxID & "'); STC_TbxOverlay('" & IRGunTextBoxID & "'); "
+
+                                    Continue For 'to avoid SetDBConnection being called on InputCtrl control
                             End Select
 
                             InputCtrl.ID = InputCtrlID
@@ -309,7 +322,11 @@ Partial Class MR_OpenTicketStatusBoard
         sender.Enabled = False
     End Sub
 
-    Protected Sub DynamicButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+    Protected Sub StcTextBox_onTextChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Dim LabelKey As String = sender.ID.Split("_")(1)
+        Dim BathTempTextBox As TextBox = DirectCast(sender.Parent.Parent.FindControl("BathTemp_") & LabelKey, TextBox)
+        Dim IrGunTextBox As TextBox = DirectCast(sender.Parent.Parent.FindControl("IrGunTemp_") & LabelKey, TextBox)
+        Dim DbValue As String = BathTempTextBox.Text & "/" & IrGunTextBox.Text
     End Sub
 
     Public Function GetRandom(ByVal Min As Integer, ByVal Max As Integer) As Integer
@@ -525,11 +542,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 Exit Select
                             End Try
 
-                            If Temps.Count < 2 OrElse String.IsNullOrEmpty(Temps(1)) Then
-                                BackPanelColor = System.Drawing.Color.Red
-                                SetPanelBackColor(BackPanelColor, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
-
-                            ElseIf Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
+                            If Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
                                 BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#E6E600")
                                 SetPanelBackColor(BackPanelColor, "*CAUTION: OUT OF SPEC*", Pnl)
                             Else
