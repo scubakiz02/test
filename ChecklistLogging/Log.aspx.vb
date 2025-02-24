@@ -494,6 +494,7 @@ Partial Class MR_OpenTicketStatusBoard
                 If UserInput Is Nothing Then UserInput = SqlProofSingleQuotes(TextBox.Text)
                 LabelKey = TextBox.ID.Split("_")(1)
                 FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "FieldType")
+                Range = TbxToRange(LabelKey)
 
                 If FieldType IsNot Nothing Then
                     Select Case FieldType 'search for cases where the input would be valid
@@ -503,6 +504,33 @@ Partial Class MR_OpenTicketStatusBoard
                             If Not UserInput.Contains("...") Then Exit For
                         Case "Text"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
+                        Case "STC"
+                            Dim Temps As String() = UserInput.Split("/")
+                            Dim BackPanelColor As System.Drawing.Color
+                            Dim Temp1 As Decimal
+                            Dim Temp2 As Decimal
+
+                            Try 'in case user types in invlaid characters
+                                Temp1 = Decimal.Parse(Temps(0))
+                                Temp2 = Decimal.Parse(Temps(1))
+                            Catch ex As Exception
+                                Exit Select
+                            End Try
+
+                            If Temps.Count < 2 OrElse String.IsNullOrEmpty(Temps(1)) Then
+                                BackPanelColor = System.Drawing.Color.Red
+                                SetPanelBackColor(BackPanelColor, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
+
+                            ElseIf Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
+                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#E6E600")
+                                SetPanelBackColor(BackPanelColor, "*CAUTION: OUT OF SPEC*", Pnl)
+                            Else
+                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
+                                SetPanelBackColor(BackPanelColor, "", Pnl)
+                            End If
+
+                            DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = BackPanelColor
+                            Exit For
                     End Select
 
                     'if here, input is NOT valid
@@ -513,7 +541,6 @@ Partial Class MR_OpenTicketStatusBoard
 
                 Else 'use range to validate input
                     InRange = True
-                    Range = TbxToRange(LabelKey)
 
                     'validate user input before considering the range
                     If Not Range.Contains("+/-") And Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
@@ -523,24 +550,7 @@ Partial Class MR_OpenTicketStatusBoard
                     End If
 
                     'validate user input using the range
-                    If Range.Contains("+/-") Then
-                        Dim Temps As String() = UserInput.Split("/")
-                        Dim Temp1 As Decimal
-                        Dim Temp2 As Decimal
-
-                        If Temps.Count < 2 OrElse String.IsNullOrEmpty(Temps(1)) Then
-                            SetPanelBackColor(System.Drawing.Color.Red, "*INCORRECT FORMAT (EX: 65.7/66.8)*", Pnl)
-                            Exit For
-                        End If
-
-                        Temp1 = Decimal.Parse(Temps(0))
-                        Temp2 = Decimal.Parse(Temps(1))
-
-                        If Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
-                            SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF SPEC*", Pnl)
-                            Exit For
-                        End If
-                    ElseIf Range.Contains("-") Then
+                    If Range.Contains("-") Then
                         DelimitArr = Range.Split("-")
                         UserInputDec = Decimal.Parse(UserInput)
 
