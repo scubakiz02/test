@@ -577,19 +577,11 @@ Partial Class MR_OpenTicketStatusBoard
         DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
 
         If DbRange IsNot Nothing OrElse FieldType_DropDownList.SelectedValue = "STC" Then
-            If DbRange Is Nothing AndAlso FieldType_DropDownList.SelectedValue = "STC" Then 'this means reset button was hit while FieldType is STC 
+            If FieldType_DropDownList.SelectedValue = "STC" Then
                 RangeOrderMenu.Enabled = False
                 DiffPanel.Visible = True
+                DiffTextbox.Text = If(DbRange IsNot Nothing, DbRange.Split(" ")(1), String.Empty)
 
-            ElseIf DbRange.Contains("+/-") Then
-                DiffTextbox.Text = DbRange.Split(" ")(1)
-                RangeOrderMenu_onClick(DiffButton, EventArgs.Empty)
-
-                'empty TextBox controls within the other DynamicRangeBoxPanel child Panel controls
-                LowerBoundTextbox.Text = ""
-                UpperBoundTextbox.Text = ""
-                GreaterThanTextbox.Text = ""
-                LessThanTextbox.Text = ""
             ElseIf DbRange.Contains("-") Then
                 DbRangeDelimited = DbRange.Split("-")
                 LowerBoundTextbox.Text = DbRangeDelimited(0)
