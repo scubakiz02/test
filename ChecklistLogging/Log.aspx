@@ -77,8 +77,6 @@
                     UpdatePanel = getAspControl("UpdatePanel");
                     let UWhitespaceInPx = emToPx(parseFloat(getComputedStyle(UpdatePanel).getPropertyValue('--UWhitespace')));
 
-                    for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
-
                     document.getElementById("ctl00_MasterPagePanelTop").style.display = "none"; //hide header
                     document.getElementById("ctl00_MasterPagePanelBottom").style.display = "none"; //hide footer
                     document.getElementById("ctl00_MasterPagePanel").style.minWidth = "unset"; //prevent min-width on div with id of 'ctl00_MasterPagePanel'
@@ -93,6 +91,8 @@
                     if (ItemsPanel.style.maxHeight) ItemsPanel.style.maxHeight = "none";
 
                     ItemsPanel.style.maxHeight = (window.innerHeight - (UWhitespaceInPx * 2)) - (FooterPanel.offsetHeight + HeaderPanel.offsetHeight) + "px";
+
+                    for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
                 }
 
                 function getAspControl(id) {
