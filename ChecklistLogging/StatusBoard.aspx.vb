@@ -11,9 +11,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
 
-    Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
-        'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
-        'MenuAuthenication.CheckGroupAuthenication("Office", Server)
+    Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         Dim DS As New Data.DataSet
         Dim RC As Integer = 0
         Dim AreaKey As Integer
@@ -24,8 +22,9 @@ Partial Class MR_OpenTicketStatusBoard
 
         'update session state variables if querystring values exist
         If Request.QueryString.Count > 0 Then
-            'Session("WhereFromQueryString") = If(Request.QueryString("WHERE") IsNot Nothing, Request.QueryString("WHERE"), Session("WhereFromQueryString"))
-            If Request.QueryString("WHERE") IsNot Nothing Then
+            If Session("WhereFromQueryString") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
+                Session("WhereFromQueryString") = TodaysDate.Date
+            ElseIf Request.QueryString("WHERE") IsNot Nothing Then
                 Session("WhereFromQueryString") = Request.QueryString("WHERE")
             ElseIf Session("WhereFromQueryString") Is Nothing Then
                 Session("WhereFromQueryString") = TodaysDate.Date
@@ -35,15 +34,9 @@ Partial Class MR_OpenTicketStatusBoard
             Session("ViewFromQueryString") = If(Request.QueryString("View") IsNot Nothing, Request.QueryString("View"), Session("ViewFromQueryString"))
 
             Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
-        Else '60 second page refresh
-            'TodaysDate = Date.Parse("02/20/2025 00:34:00") 'to test midnight rollover
-
-            If Session("WhereFromQueryString") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
-                Session("WhereFromQueryString") = TodaysDate.Date
-            End If
-
-            WhereLabel.Text = Session("WhereFromQueryString")
         End If
+
+        WhereLabel.Text = Session("WhereFromQueryString")
 
         If Not String.IsNullOrEmpty(Session("ViewFromQueryString")) Then
             'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
@@ -107,6 +100,12 @@ Partial Class MR_OpenTicketStatusBoard
 
             Build(AreaKey)
         Next
+    End Sub
+
+
+    Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
+        'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
+        'MenuAuthenication.CheckGroupAuthenication("Office", Server)
     End Sub
 
     Sub MaybeCreateRecord(AreaKey As Integer, CalendarDate As Date)
@@ -399,6 +398,10 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub ViewMenu_onClick(sender As Object, e As EventArgs)
         Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & Request.QueryString("Department") & "&View=" & sender.Text)
+    End Sub
+
+    Protected Sub PageRefresh_OnTick(sender As Object, e As EventArgs)
+        Response.Redirect(Request.Url.ToString & "?Department=" & Session("DepartmentFromQueryString") & "&View=" & Session("ViewFromQueryString") & "&WHERE=" & Session("WhereFromQueryString"))
     End Sub
 
 End Class

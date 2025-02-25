@@ -3,9 +3,8 @@
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    <meta http-equiv="refresh" content="60">
-
-    <asp:Panel ID="Panel2" runat="server"></asp:Panel>
+    <%--<asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="60000"></asp:Timer>--%>
+    <asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="10000"></asp:Timer>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
 
         <ContentTemplate>
@@ -14,7 +13,7 @@
 
                 window.addEventListener("load", function () {
                     SessionInterval = setInterval(function () { // Sends request every 19 minutes 59 seconds, to keep session alive despite inactivity
-                        fetch('StatusBoard.aspx'); 
+                        fetch('StatusBoard.aspx');
                     }, 1199000); // 1,199,000 ms = 19 minutes 59 seconds
                 })
 
