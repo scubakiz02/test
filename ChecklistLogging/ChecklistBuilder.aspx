@@ -24,7 +24,7 @@
 
             window.iframeEnabled = iframeEnabled;
 
-            if (iframeDoc.src) iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none;" //disable iframe 'status board' anchor tag
+            if (iframeDoc) iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
         })
 
         function getAspControl(id) {
