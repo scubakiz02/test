@@ -44,16 +44,13 @@ Partial Class MR_OpenTicketStatusBoard
         Dim IntervalDR As Data.DataRow
         Dim AreaIntervalSelectedValue As String = AreaIntervalDropDownList.SelectedValue
 
-        AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL))" & If(AreaIntervalSelectedValue <> "All", " WHERE A.IntervalKey=" & AreaIntervalSelectedValue, String.Empty) & " ORDER BY A.Area"
-
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
+            AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaInterval") Is Nothing OrElse Session("AreaInterval") = "All", String.Empty, " A.IntervalKey=" & Session("AreaInterval") & " AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
 
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
                 DepartmentInterfacePanel.Enabled = True
-
-                AreaDropDownList.SelectedValue = AreaFromQueryString
 
                 If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
                     Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
@@ -210,7 +207,7 @@ Partial Class MR_OpenTicketStatusBoard
             End If
 
         Else
-            ViewState("AreaInterval") = AreaIntervalDropDownList.SelectedValue
+            Session("AreaInterval") = AreaIntervalDropDownList.SelectedValue
         End If
     End Sub
 
@@ -219,6 +216,10 @@ Partial Class MR_OpenTicketStatusBoard
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
+
+        ' setting AreaDropDownList & AreaIntervalDropDownList SelectedValue properties here, because ddl controls are not visible in Page_Load, but are in Page_PreRender
+        AreaIntervalDropDownList.SelectedValue = Session("AreaInterval")
+        AreaDropDownList.SelectedValue = AreaFromQueryString
 
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
         For I = 0 To ListItemStylesRC
@@ -243,7 +244,6 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
         FormViewInsert = Nothing
-
     End Sub
 
     Sub CreateListItem(Config As Dictionary(Of String, String))
