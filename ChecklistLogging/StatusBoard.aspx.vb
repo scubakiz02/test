@@ -33,72 +33,78 @@ Partial Class MR_OpenTicketStatusBoard
             Session("ViewFromQueryString") = Request.QueryString("View")
 
             Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
-        End If
-
-        WhereLabel.Text = Session("WhereFromQueryString")
-
-        If Not String.IsNullOrEmpty(Session("ViewFromQueryString")) Then
-            'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
-            For Each Ctrl In ViewMenu.Controls
-                If TypeOf Ctrl Is Button Then
-                    If Ctrl.ID.Contains(Session("ViewFromQueryString")) Then
-                        Ctrl.Enabled = False
-                    Else
-                        Ctrl.Enabled = True
-                    End If
-                End If
-            Next
+        Else
+            WhereLabel.Text = Session("WhereFromQueryString")
 
             If Session("ViewFromQueryString") = "Full" Then
                 AdminPanel.Visible = True
             End If
-        Else
-            Session("ViewFromQueryString") = "Focus"
-            ViewMenu_onClick(FocusViewButton, EventArgs.Empty) 'maintenance by default
-        End If
 
-        If Not String.IsNullOrEmpty(Session("DepartmentFromQueryString")) Then
-            'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
-            For Each Ctrl In DepartmentMenu.Controls
-                If TypeOf Ctrl Is Button Then
-                    If Ctrl.ID.Contains(Session("DepartmentFromQueryString")) Then
-                        Ctrl.Enabled = False
-                    Else
-                        Ctrl.Enabled = True
-                    End If
-                End If
-            Next
-        Else
-            Session("ViewFromQueryString") = "Maintenance"
-            DepartmentMenu_onClick(AllButton, EventArgs.Empty) 'all by default
-        End If
 
-        'build button controls for checklists that have a department, interval, assignee, & at least 1 input
-        AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department='" & Session("DepartmentFromQueryString") & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area")
-        AreaRC = AreaDS.Tables(0).Rows.Count
+            'If Not String.IsNullOrEmpty(Session("ViewFromQueryString")) Then
+            '    'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
+            '    For Each Ctrl In ViewMenu.Controls
+            '        If TypeOf Ctrl Is Button Then
+            '            If Ctrl.ID.Contains(Session("ViewFromQueryString")) Then
+            '                Ctrl.Enabled = False
+            '            Else
+            '                Ctrl.Enabled = True
+            '            End If
+            '        End If
+            '    Next
 
-        For I = 0 To AreaRC - 1
-            AreaKey = AreaDS.Tables(0).Rows(I)("Key")
-            SqlFuncDR = SatiCode.GetMyDataSet("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaKey).Tables(0).Rows(0)
-            SqlFunc = SqlFuncDR("SqlFunc")
-            Dim DailyOrWeeklyChecklist As Boolean = If(SqlFunc = "[ALTS].[dbo].[T_Log_DailyChecklistInfo]" OrElse SqlFunc = "[ALTS].[dbo].[T_Log_WeeklyChecklistInfo]", True, False)
-
-            'If Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date AndAlso DailyOrWeeklyChecklist Then 'do NOT display daily or weekly checklists during time travel
-            '    TimeTravelMessageLabel.Visible = True
-            '    Continue For
+            '    If Session("ViewFromQueryString") = "Full" Then
+            '        AdminPanel.Visible = True
+            '    End If
+            'Else
+            '    Session("ViewFromQueryString") = "Focus"
+            '    ViewMenu_onClick(FocusViewButton, EventArgs.Empty) 'maintenance by default
             'End If
 
-            LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
-            LogDR = LogDS.Tables(0).Rows(0)
-            TimeForNewLog = LogDR("TimeForNewLog")
-            CurrLogDate = LogDR("CurrLogDate")
+            'If Not String.IsNullOrEmpty(Session("DepartmentFromQueryString")) Then
+            '    'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
+            '    For Each Ctrl In DepartmentMenu.Controls
+            '        If TypeOf Ctrl Is Button Then
+            '            If Ctrl.ID.Contains(Session("DepartmentFromQueryString")) Then
+            '                Ctrl.Enabled = False
+            '            Else
+            '                Ctrl.Enabled = True
+            '            End If
+            '        End If
+            '    Next
+            'Else
+            '    Session("ViewFromQueryString") = "Maintenance"
+            '    DepartmentMenu_onClick(AllButton, EventArgs.Empty) 'all by default
+            'End If
 
-            If TimeForNewLog Then
-                CreateRecord(AreaKey)
-            End If
+            'build button controls for checklists that have a department, interval, assignee, & at least 1 input
+            AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department='" & Session("DepartmentFromQueryString") & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area")
+            AreaRC = AreaDS.Tables(0).Rows.Count
 
-            Build(AreaKey)
-        Next
+            For I = 0 To AreaRC - 1
+                AreaKey = AreaDS.Tables(0).Rows(I)("Key")
+                SqlFuncDR = SatiCode.GetMyDataSet("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaKey).Tables(0).Rows(0)
+                SqlFunc = SqlFuncDR("SqlFunc")
+                Dim DailyOrWeeklyChecklist As Boolean = If(SqlFunc = "[ALTS].[dbo].[T_Log_DailyChecklistInfo]" OrElse SqlFunc = "[ALTS].[dbo].[T_Log_WeeklyChecklistInfo]", True, False)
+
+                'If Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date AndAlso DailyOrWeeklyChecklist Then 'do NOT display daily or weekly checklists during time travel
+                '    TimeTravelMessageLabel.Visible = True
+                '    Continue For
+                'End If
+
+                LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
+                LogDR = LogDS.Tables(0).Rows(0)
+                TimeForNewLog = LogDR("TimeForNewLog")
+                CurrLogDate = LogDR("CurrLogDate")
+
+                If TimeForNewLog Then
+                    CreateRecord(AreaKey)
+                End If
+
+                Build(AreaKey)
+            Next
+
+        End If
     End Sub
 
 
