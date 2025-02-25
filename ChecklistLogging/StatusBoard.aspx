@@ -127,6 +127,8 @@
                     .ChecklistButton {
                         max-width: calc(100vw / 5); /*5 so there is room for the 'special' (> monthly) checklists column*/
                         text-overflow: ellipsis;
+                        padding: var(--UWhitespace);
+                        height: auto;
                     }
 
                     .DepAndViewMenus {
@@ -139,17 +141,14 @@
                     }
                 }
 
-                @media (min-width: 1920px) {
+                @media (min-width: 1280px) {
                     :root {
                         --UFontSize: calc(var(--UWhitespace)* 2);
                     }
 
                     .ChecklistButton {
                         font-size: var(--UFontSize);
-                        height: auto;
-                        padding: calc(var(--UWhitespace)* 2);
                     }
-
 
                     .TimeTravelCalendar td {
                         padding: .25em;
@@ -392,6 +391,7 @@
 
                         </asp:Panel>
 
+                        <%--<asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server">--%>
                         <asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server" Visible="False">
                             <asp:Label runat="server" Text="Special Logs" CssClass="SectionLabel"></asp:Label>
 
