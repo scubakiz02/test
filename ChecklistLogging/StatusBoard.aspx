@@ -18,6 +18,7 @@
                 :root {
                     --UWhitespace: 0.5em;
                     --UFontSize: calc(var(--UWhitespace) * 1.5);
+                    --ChecklistButtonWidth: calc(100vw / 5); /*5 so there is room for the 'special' (> monthly) checklists column*/
                 }
 
                 .SectionPanel {
@@ -125,7 +126,7 @@
                     }
 
                     .ChecklistButton {
-                        max-width: calc(100vw / 5); /*5 so there is room for the 'special' (> monthly) checklists column*/
+                        max-width: var(--ChecklistButtonWidth);
                         text-overflow: ellipsis;
                         padding: var(--UWhitespace);
                         height: auto;
@@ -161,7 +162,7 @@
                     }
 
                     .MonthlyLogsPanel .ChecklistButton {
-                        max-width: calc(100vw / 10); /*cut max-width in half compared to before*/
+                        max-width: calc(var(--ChecklistButtonWidth) / 2); /*cut max-width in half compared to before*/
                     }
                 }
 
