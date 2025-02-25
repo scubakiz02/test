@@ -40,43 +40,6 @@ Partial Class MR_OpenTicketStatusBoard
                 AdminPanel.Visible = True
             End If
 
-
-            'If Not String.IsNullOrEmpty(Session("ViewFromQueryString")) Then
-            '    'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
-            '    For Each Ctrl In ViewMenu.Controls
-            '        If TypeOf Ctrl Is Button Then
-            '            If Ctrl.ID.Contains(Session("ViewFromQueryString")) Then
-            '                Ctrl.Enabled = False
-            '            Else
-            '                Ctrl.Enabled = True
-            '            End If
-            '        End If
-            '    Next
-
-            '    If Session("ViewFromQueryString") = "Full" Then
-            '        AdminPanel.Visible = True
-            '    End If
-            'Else
-            '    Session("ViewFromQueryString") = "Focus"
-            '    ViewMenu_onClick(FocusViewButton, EventArgs.Empty) 'maintenance by default
-            'End If
-
-            'If Not String.IsNullOrEmpty(Session("DepartmentFromQueryString")) Then
-            '    'iterate through child controls within DepartmentMenu, check if it's it the sender. If so, disable. Otherwise, enable
-            '    For Each Ctrl In DepartmentMenu.Controls
-            '        If TypeOf Ctrl Is Button Then
-            '            If Ctrl.ID.Contains(Session("DepartmentFromQueryString")) Then
-            '                Ctrl.Enabled = False
-            '            Else
-            '                Ctrl.Enabled = True
-            '            End If
-            '        End If
-            '    Next
-            'Else
-            '    Session("ViewFromQueryString") = "Maintenance"
-            '    DepartmentMenu_onClick(AllButton, EventArgs.Empty) 'all by default
-            'End If
-
             'build button controls for checklists that have a department, interval, assignee, & at least 1 input
             AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department='" & Session("DepartmentFromQueryString") & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area")
             AreaRC = AreaDS.Tables(0).Rows.Count

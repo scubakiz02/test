@@ -3,8 +3,8 @@
 
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    <%--<asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="60000"></asp:Timer>--%>
-    <asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="10000"></asp:Timer>
+    <asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="60000"></asp:Timer>
+    <%--<asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="10000"></asp:Timer>--%>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
 
         <ContentTemplate>
@@ -208,23 +208,6 @@
                 </asp:Panel>
 
                 <asp:Panel runat="server">
-                    <div class="DepAndViewMenus" style="display: none;">
-                        <asp:Panel ID="DepartmentMenu" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace);">
-                            <asp:Label CssClass="DepartmentMenu" Text="Department: " runat="server" />
-                            <asp:Button Text="Production" ID="ProductionButton" CssClass="DepartmentMenu" OnClick="DepartmentMenu_onClick" runat="server" />
-                            <asp:Button Text="Maintenance" ID="MaintenanceButton" CssClass="DepartmentMenu" OnClick="DepartmentMenu_onClick" runat="server" />
-                            <asp:Button Text="All" ID="AllButton" CssClass="DepartmentMenu" OnClick="DepartmentMenu_onClick" runat="server" />
-                        </asp:Panel>
-
-                        <asp:Panel ID="ViewMenu" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace);">
-                            <asp:Label CssClass="DepartmentMenu" Text="View: " runat="server" />
-                            <asp:Button Text="Full" ID="FullViewButton" CssClass="DepartmentMenu" OnClick="ViewMenu_onClick" runat="server" />
-                            <asp:Button Text="Focus" ID="FocusViewButton" CssClass="DepartmentMenu" OnClick="ViewMenu_onClick" runat="server" />
-                        </asp:Panel>
-
-                        <asp:Label ID="TimeTravelMessageLabel" CssClass="ItalicizeLabel" Visible="False" Style="color: red;" Text="*Daily & Weekly Logs do NOT appear during time travel*" runat="server" />
-                    </div>
-
                     <div style="display: flex; justify-content: space-between">
                         <asp:Panel ID="ColorCodingMessages" CssClass="ColorCodingMessages" runat="server" Style="">
                             <div style="display: flex; align-items: center; justify-content: center;">
