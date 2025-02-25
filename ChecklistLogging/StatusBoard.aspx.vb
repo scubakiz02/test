@@ -22,16 +22,15 @@ Partial Class MR_OpenTicketStatusBoard
 
         'update session state variables if querystring values exist
         If Request.QueryString.Count > 0 Then
-            If Session("WhereFromQueryString") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
+            'if where waa NOT passed to querystring OR midnight rollover occurs
+            If Request.QueryString("WHERE") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
                 Session("WhereFromQueryString") = TodaysDate.Date
-            ElseIf Request.QueryString("WHERE") IsNot Nothing Then
+            Else 'If Request.QueryString("WHERE") IsNot Nothing Then
                 Session("WhereFromQueryString") = Request.QueryString("WHERE")
-            ElseIf Session("WhereFromQueryString") Is Nothing Then
-                Session("WhereFromQueryString") = TodaysDate.Date
             End If
 
-            Session("DepartmentFromQueryString") = If(Request.QueryString("Department") IsNot Nothing, Request.QueryString("Department"), Session("DepartmentFromQueryString"))
-            Session("ViewFromQueryString") = If(Request.QueryString("View") IsNot Nothing, Request.QueryString("View"), Session("ViewFromQueryString"))
+            Session("DepartmentFromQueryString") = Request.QueryString("Department")
+            Session("ViewFromQueryString") = Request.QueryString("View")
 
             Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
         End If
