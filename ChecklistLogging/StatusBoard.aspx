@@ -155,6 +155,16 @@
                     }
                 }
 
+                @media (min-width: 1920px) {
+                    .MonthlyLogsPanel .SubSection {
+                        grid-template-columns: 1fr 1fr;
+                    }
+
+                    .MonthlyLogsPanel .ChecklistButton {
+                        max-width: calc(100vw / 10); /*cut max-width in half compared to before*/
+                    }
+                }
+
                 @media (min-width: 2560px) {
                     :root {
                         --UFontSize: calc(var(--UWhitespace)* 3);
@@ -344,7 +354,7 @@
                             </div>
 
                         </asp:Panel>
-                        <asp:Panel Style="margin: var(--UWhitespace) 0" ID="MonthlyLogsPanel" runat="server">
+                        <asp:Panel Style="margin: var(--UWhitespace) 0" ID="MonthlyLogsPanel" CssClass="MonthlyLogsPanel" runat="server">
                             <asp:Label runat="server" Text="Monthly Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
@@ -391,8 +401,8 @@
 
                         </asp:Panel>
 
-                        <%--<asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server">--%>
-                        <asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server" Visible="False">
+                        <%--<asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server" Visible="False">--%>
+                        <asp:Panel Style="margin: var(--UWhitespace) 0" ID="SpecialLogsPanel" runat="server">
                             <asp:Label runat="server" Text="Special Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
