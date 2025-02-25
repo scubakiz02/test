@@ -190,7 +190,6 @@
                         callCodeBehindEvent.call(underlayTbxValue.call(this));
                     });
                     elem.addEventListener("blur", function (e) {
-                        if (this.value === "") return;
                         callCodeBehindEvent.call(underlayTbxValue.call(this));
                     });
                 }

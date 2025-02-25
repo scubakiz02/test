@@ -42,8 +42,9 @@ Partial Class MR_OpenTicketStatusBoard
         Dim IntervalKey As String
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
+        Dim AreaIntervalSelectedValue As String = AreaIntervalDropDownList.SelectedValue
 
-        AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+        AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL))" & If(AreaIntervalSelectedValue <> "All", " WHERE A.IntervalKey=" & AreaIntervalSelectedValue, String.Empty) & " ORDER BY A.Area"
 
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
@@ -207,6 +208,9 @@ Partial Class MR_OpenTicketStatusBoard
                     ExecuteSqlQuery("DELETE FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & TopmostDeadRecordKey)
                 End If
             End If
+
+        Else
+            ViewState("AreaInterval") = AreaIntervalDropDownList.SelectedValue
         End If
     End Sub
 
@@ -562,7 +566,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Sub RefreshPreview()
-        Response.Redirect(WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & "&Area=" & AreaFromQueryString & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing))
+        Response.Redirect(WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing))
     End Sub
 
     Sub RefreshIframe()
