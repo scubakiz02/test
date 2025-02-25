@@ -360,14 +360,6 @@ Partial Class MR_OpenTicketStatusBoard
         Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID)
     End Sub
 
-    Protected Sub DepartmentMenu_onClick(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & sender.Text & "&View=" & Request.QueryString("View"))
-    End Sub
-
-    Protected Sub ViewMenu_onClick(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?" & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE") & "&", String.Empty) & "Department=" & Request.QueryString("Department") & "&View=" & sender.Text)
-    End Sub
-
     Protected Sub PageRefresh_OnTick(sender As Object, e As EventArgs)
         Response.Redirect(Request.Url.ToString & "?Department=" & Session("DepartmentFromQueryString") & "&View=" & Session("ViewFromQueryString") & "&WHERE=" & Session("WhereFromQueryString"))
     End Sub

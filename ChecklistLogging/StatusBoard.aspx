@@ -9,20 +9,6 @@
 
         <ContentTemplate>
             <script type="text/javascript">
-                let SessionInterval;
-
-                window.addEventListener("load", function () {
-                    SessionInterval = setInterval(function () { // Sends request every 19 minutes 59 seconds, to keep session alive despite inactivity
-                        fetch('StatusBoard.aspx');
-                    }, 1199000); // 1,199,000 ms = 19 minutes 59 seconds
-                })
-
-                window.addEventListener("unload", function () {
-                    clearInterval(SessionInterval)
-                    SessionInterval = null;
-                })
-
-
                 function redirect(url) {
                     window.location.href = url + this.id
                 }
