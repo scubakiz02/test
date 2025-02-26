@@ -118,7 +118,7 @@
                 @media (min-width: 601px) and (orientation: landscape) { /*tablets in landscape mode*/
                     .CurrentLogsPanel {
                         display: flex;
-                        justify-content: space-between;
+                        justify-content: space-around;
                     }
 
                     .ItalicizeLabel {
@@ -162,7 +162,7 @@
                     }
 
                     .MonthlyLogsPanel .ChecklistButton {
-                        max-width: calc(var(--ChecklistButtonWidth) / 2); /*cut max-width in half compared to before*/
+                        max-width: calc(var(--ChecklistButtonWidth) / 1.5); /*trim max-width compared to smaller devices*/
                     }
                 }
 
