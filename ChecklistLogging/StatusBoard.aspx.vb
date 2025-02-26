@@ -11,7 +11,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
 
-    Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+    Private Sub PageInit(sender As Object, e As EventArgs) Handles Me.Init
         Dim DS As New Data.DataSet
         Dim RC As Integer = 0
         Dim AreaKey As Integer
