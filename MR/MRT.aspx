@@ -105,7 +105,7 @@
 
                 <tr>
                     <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" /><br />
-                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px"></asp:Label>
+                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" style="color: red;"></asp:Label>
                     </td>
                 </tr>
 
