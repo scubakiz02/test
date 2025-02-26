@@ -20,8 +20,13 @@ Partial Class MR_OpenTicketStatusBoard
         Dim SqlFuncDR As Data.DataRow
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
 
-        'update session state variables if querystring values exist
-        If Request.QueryString.Count > 0 Then
+        'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMain.aspx
+        If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
+            Response.Redirect("/ChecklistLogging/ChecklistLoggingMain.aspx")
+        ElseIf Request.QueryString.Count > 0 Then
+            Dim QsDepartment As String = Request.QueryString("Department")
+            Dim QsView As String = Request.QueryString("View")
+
             'if where waa NOT passed to querystring OR midnight rollover occurs
             If Request.QueryString("WHERE") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
                 Session("WhereFromQueryString") = TodaysDate.Date
@@ -29,8 +34,8 @@ Partial Class MR_OpenTicketStatusBoard
                 Session("WhereFromQueryString") = Request.QueryString("WHERE")
             End If
 
-            Session("DepartmentFromQueryString") = Request.QueryString("Department")
-            Session("ViewFromQueryString") = Request.QueryString("View")
+            Session("DepartmentFromQueryString") = If(QsDepartment Is Nothing, Session("DepartmentFromQueryString"), QsDepartment)
+            Session("ViewFromQueryString") = If(QsView Is Nothing, Session("ViewFromQueryString"), QsView)
 
             Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
         Else
