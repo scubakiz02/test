@@ -1,6 +1,14 @@
 ﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="MR_Viewer.aspx.vb" Inherits="MR_MR_Viewer" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+
+    <script type="text/javascript">
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) { // The page is visible (user has returned to the tab)
+                __doPostBack('<%= GridView1.ClientID %>', ''); //refresh 'GridView1' GridView control
+            } 
+        });
+    </script>
     
     <asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request Viewer"></asp:Label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:Button ID="Button2" runat="server" Text="Grid View Status Board" BackColor="#FFFF99" PostBackUrl="~/MR/OpenTicketStatusBoard.aspx" /><br />
     <br />
