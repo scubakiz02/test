@@ -235,7 +235,7 @@
                             </div>
                         </asp:Panel>
 
-                        <asp:Label ID="WhereLabel" Style="padding: var(--UWhitespace);" runat="server" />
+                        <asp:Label ID="WhereLabel" CssClass="SubSectionLabel" Style="padding: var(--UWhitespace);" runat="server" />
                     </div>
 
                     <asp:Panel runat="server" ID="CurrentLogsPanel" CssClass="CurrentLogsPanel">
