@@ -9,7 +9,7 @@ Partial Class MR_MRT
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
 
-        Me.infoLabel.Text = MaybeEnableSubmit()
+        Me.infoLabel.Text = RequirementCheck()
         If Me.infoLabel.Text = "" Then
             Me.Button1.Enabled = True
         Else
@@ -21,6 +21,12 @@ Partial Class MR_MRT
         Look_For_SG_Tags()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
+        Me.infoLabel.Text = RequirementCheck()
+        If Me.infoLabel.Text = "" Then
+            Me.Button1.Enabled = True
+        Else
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
+        End If
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -37,12 +43,12 @@ Partial Class MR_MRT
 
     <WebMethod()>
     Public Shared Function EvaluateSubmitEnable() As String
-        Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
-        Return MaybeEnableSubmit()
+        Dim RequirementCheck As RequirementCheckDelegate = HttpContext.Current.Session("RequirementCheck")
+        Return RequirementCheck()
     End Function
 
-    Public Delegate Function MaybeEnableSubmitDelegate() As String
-    Function MaybeEnableSubmit() As String
+    Public Delegate Function RequirementCheckDelegate() As String
+    Function RequirementCheck() As String
         Try
             If Me.ToolDropDownList.SelectedValue.ToString = "" Then
                 Throw New Exception("Select a Tool")
@@ -145,7 +151,7 @@ Partial Class MR_MRT
             Server.Transfer("~/Login.aspx")
         End If
 
-        Dim MaybeEnableSubmitDelegate As MaybeEnableSubmitDelegate = AddressOf MaybeEnableSubmit
-        Session("MaybeEnableSubmit") = MaybeEnableSubmitDelegate
+        Dim RequirementCheckDelegate As RequirementCheckDelegate = AddressOf RequirementCheck
+        Session("RequirementCheck") = RequirementCheckDelegate
     End Sub
 End Class
