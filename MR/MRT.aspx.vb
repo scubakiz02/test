@@ -9,24 +9,14 @@ Partial Class MR_MRT
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
 
-        Me.infoLabel.Text = RequirementCheck()
-        If Me.infoLabel.Text = "" Then
-            Me.Button1.Enabled = True
-        Else
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-        End If
+        MaybeEnableSubmit()
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        Me.infoLabel.Text = RequirementCheck()
-        If Me.infoLabel.Text = "" Then
-            Me.Button1.Enabled = True
-        Else
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-        End If
+        MaybeEnableSubmit()
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -48,6 +38,15 @@ Partial Class MR_MRT
     End Function
 
     Public Delegate Function RequirementCheckDelegate() As String
+    Sub MaybeEnableSubmit()
+        Me.infoLabel.Text = RequirementCheck()
+        If Me.infoLabel.Text = "" Then
+            Me.Button1.Enabled = True
+        Else
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
+        End If
+    End Sub
+
     Function RequirementCheck() As String
         Try
             If Me.ToolDropDownList.SelectedValue.ToString = "" Then
