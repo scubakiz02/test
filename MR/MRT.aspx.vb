@@ -34,35 +34,33 @@ Partial Class MR_MRT
     End Sub
 
     Sub MaybeEnableButton1()
-        If Me.ToolDropDownList.SelectedValue.ToString = "" Then
-            Me.infoLabel.Text = "Select a Tool"
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-            Exit Sub
-        End If
-
-        If Me.DropDownListTicketType.SelectedValue = "Select..." Then
-            Me.infoLabel.Text = "Select Ticket Type"
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-            Exit Sub
-        End If
-
-        If Me.ProblemTextBox.Text = "" Then
-            Me.infoLabel.Text = "Describe Problem"
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-            Exit Sub
-        End If
-
-        If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
-            ' check to see if a "down" tickit is alread on this tool
-            If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
-                Me.infoLabel.Text = "SATI.Net already has a Down ticket for this tool. "
-                Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-                Exit Sub
+        Try
+            If Me.ToolDropDownList.SelectedValue.ToString = "" Then
+                Throw New Exception("Select a Tool")
             End If
-        End If
 
-        Me.Button1.Enabled = True
-        Me.infoLabel.Text = ""
+            If Me.DropDownListTicketType.SelectedValue = "Select..." Then
+                Throw New Exception("Select Ticket Type")
+            End If
+
+            If Me.ProblemTextBox.Text = "" Then
+                Throw New Exception("Describe Problem")
+            End If
+
+            If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
+                ' check to see if a "down" tickit is alread on this tool
+                If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
+                    Throw New Exception("SATI.Net already has a Down ticket for this tool. ")
+                End If
+            End If
+
+            Me.Button1.Enabled = True
+            Me.infoLabel.Text = ""
+        Catch ex As Exception
+            Me.infoLabel.Text = ex.Message.ToString()
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
+        End Try
+
     End Sub
 
     Function DownTicket(tool As String) As Boolean
@@ -129,7 +127,7 @@ Partial Class MR_MRT
     End Sub
 
     Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        'Me.Button1.Enabled = False
+        Me.Button1.Enabled = False
         Submit()
     End Sub
 
