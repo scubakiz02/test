@@ -33,19 +33,21 @@ Partial Class MR_MRT
 
     <WebMethod()>
     Public Shared Function EvaluateSubmitEnable() As String
-        Dim RequirementCheck As RequirementCheckDelegate = HttpContext.Current.Session("RequirementCheck")
-        Return RequirementCheck()
+        Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
+        Return MaybeEnableSubmit()
     End Function
 
-    Public Delegate Function RequirementCheckDelegate() As String
-    Sub MaybeEnableSubmit()
+    Public Delegate Function MaybeEnableSubmitDelegate() As String
+    Function MaybeEnableSubmit() As String
         Me.infoLabel.Text = RequirementCheck()
         If Me.infoLabel.Text = "" Then
             Me.Button1.Enabled = True
         Else
             Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
         End If
-    End Sub
+
+        Return Me.infoLabel.Text
+    End Function
 
     Function RequirementCheck() As String
         Try
@@ -150,7 +152,7 @@ Partial Class MR_MRT
             Server.Transfer("~/Login.aspx")
         End If
 
-        Dim RequirementCheckDelegate As RequirementCheckDelegate = AddressOf RequirementCheck
-        Session("RequirementCheck") = RequirementCheckDelegate
+        Dim MaybeEnableSubmitDelegate As MaybeEnableSubmitDelegate = AddressOf MaybeEnableSubmit
+        Session("MaybeEnableSubmit") = MaybeEnableSubmitDelegate
     End Sub
 End Class
