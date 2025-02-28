@@ -85,6 +85,9 @@ Partial Class MR_MRT
         Dim TheSubject As String = ""
         Dim TAGs As String = " "
 
+        tool = Me.ToolDropDownList.SelectedValue.ToString
+        status = Me.DropDownListTicketType.SelectedValue.ToString
+
         '******add the sub grouping tags***
         If Me.PanelSGT.Visible = True Then
             If Me.CheckBoxList_SGL.Items.Count > 0 Then
