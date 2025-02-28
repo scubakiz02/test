@@ -52,7 +52,7 @@
                     </td>
                     <td>
                         Is the tool down &nbsp;
-                        <asp:DropDownList ID="DropDownListTicketType" runat="server">
+                        <asp:DropDownList ID="DropDownListTicketType" OnSelectedIndexChanged="DropDownListTicketType_OnSelectedIndexChanged" AutoPostBack="True" runat="server">
                             <asp:ListItem>Select...</asp:ListItem>
                             <asp:ListItem Value="Standard">No</asp:ListItem>
                             <asp:ListItem Value="Down">Yes</asp:ListItem>
@@ -104,7 +104,7 @@
                 </tr>
 
                 <tr>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" /><br />
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" style="color: red;"></asp:Label>
                     </td>
                 </tr>

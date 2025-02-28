@@ -7,10 +7,15 @@ Partial Class MR_MRT
         Me.ToolSqlDataSource.SelectCommand = "SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '" & Me.DepartmentDropDownList.SelectedItem.Text & "') ORDER BY Tool"
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
+        MaybeEnableButton1()
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
+        MaybeEnableButton1()
+    End Sub
+    Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
+        MaybeEnableButton1()
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -23,6 +28,29 @@ Partial Class MR_MRT
         Else
             Me.PanelSGT.Visible = False
         End If
+    End Sub
+
+    Sub MaybeEnableButton1()
+        If Me.ToolDropDownList.SelectedValue.ToString = "" Then
+            Exit Sub
+        End If
+
+        If Me.DropDownListTicketType.SelectedValue = "Select..." Then
+            Exit Sub
+        End If
+
+        If Me.ProblemTextBox.Text = "" Then
+            Exit Sub
+        End If
+
+        If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
+            ' check to see if a "down" tickit is alread on this tool
+            If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
+                Exit Sub
+            End If
+        End If
+
+        Me.Button1.Enabled = True
     End Sub
 
     Function DownTicket(tool As String) As Boolean
@@ -92,27 +120,27 @@ Partial Class MR_MRT
         End If
 
 
-        TicketNumber = SatiCode.MaintenanceRequestTicket("New", "0", tool, status)
+        'TicketNumber = SatiCode.MaintenanceRequestTicket("New", "0", tool, status)
 
 
 
         Try
-            SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
+            'SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
 
-            TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
-            & Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
-            & "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
-            & Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
+            'TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
+            '& Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
+            '& "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
+            '& Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
 
-            If status = "Down" Then
-                TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
-            Else
-                TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
-            End If
-            Me.Button1.Enabled = False
-            'SatiCode.SendMail(TheMail, TheSubject, "MaintenanceRequest")
-            'SatiCode.SendMail_MaintenRequest(TheMail, TheSubject, "New", TicketNumber)
-            SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
+            'If status = "Down" Then
+            '    TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
+            'Else
+            '    TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
+            'End If
+            'Me.Button1.Enabled = False
+            ''SatiCode.SendMail(TheMail, TheSubject, "MaintenanceRequest")
+            ''SatiCode.SendMail_MaintenRequest(TheMail, TheSubject, "New", TicketNumber)
+            'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
         Catch ex As Exception
