@@ -39,14 +39,16 @@ Partial Class MR_MRT
 
     Public Delegate Function MaybeEnableSubmitDelegate() As String
     Function MaybeEnableSubmit() As String
-        Me.infoLabel.Text = RequirementCheck()
-        If Me.infoLabel.Text = "" Then
+        Dim infoLabelText As String = RequirementCheck()
+
+        Me.infoLabel.Text = infoLabelText
+        If infoLabelText = "" Then
             Me.Button1.Enabled = True
         Else
             Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
         End If
 
-        Return Me.infoLabel.Text
+        Return infoLabelText
     End Function
 
     Function RequirementCheck() As String
