@@ -1,4 +1,5 @@
-﻿
+﻿Imports System.Web.Services
+
 Partial Class MR_MRT
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
@@ -17,9 +18,6 @@ Partial Class MR_MRT
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         MaybeEnableSubmit()
     End Sub
-    Protected Sub ProblemTextBox_OnTextChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableSubmit()
-    End Sub
 
     Sub Look_For_SG_Tags()
         '"SELECT T_Tool_SubGroup_Tag_Names.SG_Name, T_Tool_SubGroup_Tag_Names.SB_Tag FROM T_Tools INNER JOIN T_Tool_SubGroup_Tag_Names ON T_Tools.[Key] = T_Tool_SubGroup_Tag_Names.Tool_Key WHERE (T_Tools.Tool = 'CMP 1')"
@@ -33,6 +31,14 @@ Partial Class MR_MRT
         End If
     End Sub
 
+    <WebMethod()>
+    Public Shared Function EvaluateSubmitEnable() As Boolean
+        Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
+        MaybeEnableSubmit()
+        Return True ' Return a response back to the JavaScript function
+    End Function
+
+    Public Delegate Sub MaybeEnableSubmitDelegate()
     Sub MaybeEnableSubmit()
         Try
             If Me.ToolDropDownList.SelectedValue.ToString = "" Then
@@ -57,8 +63,8 @@ Partial Class MR_MRT
             Me.Button1.Enabled = True
             Me.infoLabel.Text = ""
         Catch ex As Exception
-            Me.infoLabel.Text = ex.Message.ToString()
             Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
+            Me.infoLabel.Text = ex.Message.ToString()
         End Try
 
     End Sub
@@ -137,5 +143,8 @@ Partial Class MR_MRT
         If User.Identity.IsAuthenticated = False Then
             Server.Transfer("~/Login.aspx")
         End If
+
+        Dim MaybeEnableSubmitDelegate As MaybeEnableSubmitDelegate = AddressOf MaybeEnableSubmit
+        Session("MaybeEnableSubmit") = MaybeEnableSubmitDelegate
     End Sub
 End Class

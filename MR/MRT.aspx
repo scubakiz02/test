@@ -15,6 +15,13 @@
                 }
             } else {
                 document.getElementById("charNum").innerHTML = 'Characters Remaining: ' + charRemain;
+
+                // Call the server-side method asynchronously
+                PageMethods.EvaluateSubmitEnable(function (success) {
+                }, function (error) {
+                    console.error("Error writing to DB: " + error.get_message());
+                });
+
             }
         }
     </script>
@@ -24,16 +31,16 @@
 
             <table style="margin-bottom: 0px">
                 <tr>
-                    <td colspan="3" style="height: 23px; ">
+                    <td colspan="3" style="height: 23px;">
 
                         <table class="MasterPagePanelSub">
                             <tr>
                                 <td>&nbsp;<asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label></td>
-                                <td style="text-align: right" >&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" /></td>
+                                <td style="text-align: right">&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" /></td>
                             </tr>
                         </table>
-                        
-                        
+
+
                     </td>
                 </tr>
 
@@ -50,13 +57,12 @@
                             DataTextField="Tool" DataValueField="Key" Width="168px" AutoPostBack="True">
                         </asp:DropDownList>
                     </td>
-                    <td>
-                        Is the tool down &nbsp;
+                    <td>Is the tool down &nbsp;
                         <asp:DropDownList ID="DropDownListTicketType" OnSelectedIndexChanged="DropDownListTicketType_OnSelectedIndexChanged" AutoPostBack="True" runat="server">
                             <asp:ListItem>Select...</asp:ListItem>
                             <asp:ListItem Value="Standard">No</asp:ListItem>
                             <asp:ListItem Value="Down">Yes</asp:ListItem>
-                        </asp:DropDownList>                        
+                        </asp:DropDownList>
                     </td>
                 </tr>
 
@@ -96,16 +102,16 @@
 
                 <tr>
                     <td colspan="3" style="padding-top: 20px">&nbsp;Describe the Problem Below 
-                        <asp:Panel ID="Panel1" runat="server" Height="17px" style="padding-left:4px">
+                        <asp:Panel ID="Panel1" runat="server" Height="17px" Style="padding-left: 4px">
                             <p id="charNum" style="color: blue">Characters Remaining: 1000 </p>
                         </asp:Panel>
-                        <asp:TextBox ID="ProblemTextBox" OnTextChanged="ProblemTextBox_OnTextChanged" AutoPostBack="True" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
+                        <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
                     </td>
                 </tr>
 
                 <tr>
                     <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />
-                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" style="color: red;"></asp:Label>
+                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
 
