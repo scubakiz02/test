@@ -35,29 +35,34 @@ Partial Class MR_MRT
 
     Sub MaybeEnableButton1()
         If Me.ToolDropDownList.SelectedValue.ToString = "" Then
-            Me.Button1.Enabled = False
+            Me.infoLabel.Text = "Select a Tool"
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
             Exit Sub
         End If
 
         If Me.DropDownListTicketType.SelectedValue = "Select..." Then
-            Me.Button1.Enabled = False
+            Me.infoLabel.Text = "Select Ticket Type"
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
             Exit Sub
         End If
 
         If Me.ProblemTextBox.Text = "" Then
-            Me.Button1.Enabled = False
+            Me.infoLabel.Text = "Describe Problem"
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
             Exit Sub
         End If
 
         If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
             ' check to see if a "down" tickit is alread on this tool
             If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
-                Me.Button1.Enabled = False
+                Me.infoLabel.Text = "SATI.Net already has a Down ticket for this tool. "
+                Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
                 Exit Sub
             End If
         End If
 
         Me.Button1.Enabled = True
+        Me.infoLabel.Text = ""
     End Sub
 
     Function DownTicket(tool As String) As Boolean
