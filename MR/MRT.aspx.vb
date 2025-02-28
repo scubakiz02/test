@@ -7,18 +7,18 @@ Partial Class MR_MRT
         Me.ToolSqlDataSource.SelectCommand = "SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '" & Me.DepartmentDropDownList.SelectedItem.Text & "') ORDER BY Tool"
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
-        MaybeEnableButton1()
+        MaybeEnableSubmit()
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
-        MaybeEnableButton1()
+        MaybeEnableSubmit()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableButton1()
+        MaybeEnableSubmit()
     End Sub
     Protected Sub ProblemTextBox_OnTextChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableButton1()
+        MaybeEnableSubmit()
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -33,7 +33,7 @@ Partial Class MR_MRT
         End If
     End Sub
 
-    Sub MaybeEnableButton1()
+    Sub MaybeEnableSubmit()
         Try
             If Me.ToolDropDownList.SelectedValue.ToString = "" Then
                 Throw New Exception("Select a Tool")
