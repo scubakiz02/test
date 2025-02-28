@@ -17,6 +17,9 @@ Partial Class MR_MRT
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         MaybeEnableButton1()
     End Sub
+    Protected Sub ProblemTextBox_OnTextChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
+        MaybeEnableButton1()
+    End Sub
 
     Sub Look_For_SG_Tags()
         '"SELECT T_Tool_SubGroup_Tag_Names.SG_Name, T_Tool_SubGroup_Tag_Names.SB_Tag FROM T_Tools INNER JOIN T_Tool_SubGroup_Tag_Names ON T_Tools.[Key] = T_Tool_SubGroup_Tag_Names.Tool_Key WHERE (T_Tools.Tool = 'CMP 1')"
@@ -32,20 +35,24 @@ Partial Class MR_MRT
 
     Sub MaybeEnableButton1()
         If Me.ToolDropDownList.SelectedValue.ToString = "" Then
+            Me.Button1.Enabled = False
             Exit Sub
         End If
 
         If Me.DropDownListTicketType.SelectedValue = "Select..." Then
+            Me.Button1.Enabled = False
             Exit Sub
         End If
 
         If Me.ProblemTextBox.Text = "" Then
+            Me.Button1.Enabled = False
             Exit Sub
         End If
 
         If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
             ' check to see if a "down" tickit is alread on this tool
             If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
+                Me.Button1.Enabled = False
                 Exit Sub
             End If
         End If

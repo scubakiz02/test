@@ -99,7 +99,7 @@
                         <asp:Panel ID="Panel1" runat="server" Height="17px" style="padding-left:4px">
                             <p id="charNum" style="color: blue">Characters Remaining: 1000 </p>
                         </asp:Panel>
-                        <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
+                        <asp:TextBox ID="ProblemTextBox" OnTextChanged="ProblemTextBox_OnTextChanged" AutoPostBack="True" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
                     </td>
                 </tr>
 
