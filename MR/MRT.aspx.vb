@@ -85,31 +85,6 @@ Partial Class MR_MRT
         Dim TheSubject As String = ""
         Dim TAGs As String = " "
 
-        If Me.ToolDropDownList.SelectedValue.ToString = "" Then
-            Me.infoLabel.Text = "Select a Tool"
-            Exit Sub
-        End If
-        tool = Me.ToolDropDownList.SelectedValue.ToString
-
-        If Me.DropDownListTicketType.SelectedValue = "Select..." Then
-            Me.infoLabel.Text = "Select Ticket Type"
-            Exit Sub
-        Else
-            status = Me.DropDownListTicketType.SelectedValue.ToString
-        End If
-
-
-        'If Me.StatusDownRadioButton.Checked = True Then
-        '    status = "Down"
-        'Else
-        '    status = "Standard"
-        'End If
-
-        If Me.ProblemTextBox.Text = "" Then
-            Me.infoLabel.Text = "Describe Problem"
-            Exit Sub
-        End If
-
         '******add the sub grouping tags***
         If Me.PanelSGT.Visible = True Then
             If Me.CheckBoxList_SGL.Items.Count > 0 Then
@@ -120,17 +95,6 @@ Partial Class MR_MRT
                 Next
             End If
         End If
-
-        If status = "Down" Then
-            ' check to see if a "down" tickit is alread on this tool
-            If DownTicket(tool) = True Then
-                Me.infoLabel.Text = "SATI.Net already has a Down ticket for this tool. "
-
-                Exit Sub
-            End If
-
-        End If
-
 
         'TicketNumber = SatiCode.MaintenanceRequestTicket("New", "0", tool, status)
 
