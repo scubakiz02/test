@@ -8,15 +8,19 @@ Partial Class MR_MRT
         Me.ToolSqlDataSource.SelectCommand = "SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '" & Me.DepartmentDropDownList.SelectedItem.Text & "') ORDER BY Tool"
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
-        MaybeEnableSubmit()
+
+        Me.infoLabel.Text = MaybeEnableSubmit()
+        If Me.infoLabel.Text = "" Then
+            Me.Button1.Enabled = True
+        Else
+            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
+        End If
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
-        MaybeEnableSubmit()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableSubmit()
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -32,14 +36,13 @@ Partial Class MR_MRT
     End Sub
 
     <WebMethod()>
-    Public Shared Function EvaluateSubmitEnable() As Boolean
+    Public Shared Function EvaluateSubmitEnable() As String
         Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
-        MaybeEnableSubmit()
-        Return True ' Return a response back to the JavaScript function
+        Return MaybeEnableSubmit()
     End Function
 
-    Public Delegate Sub MaybeEnableSubmitDelegate()
-    Sub MaybeEnableSubmit()
+    Public Delegate Function MaybeEnableSubmitDelegate() As String
+    Function MaybeEnableSubmit() As String
         Try
             If Me.ToolDropDownList.SelectedValue.ToString = "" Then
                 Throw New Exception("Select a Tool")
@@ -60,14 +63,12 @@ Partial Class MR_MRT
                 End If
             End If
 
-            Me.Button1.Enabled = True
-            Me.infoLabel.Text = ""
+            Return ""
         Catch ex As Exception
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-            Me.infoLabel.Text = ex.Message.ToString()
+            Return ex.Message.ToString()
         End Try
 
-    End Sub
+    End Function
 
     Function DownTicket(tool As String) As Boolean
         Dim ds As Data.DataSet
