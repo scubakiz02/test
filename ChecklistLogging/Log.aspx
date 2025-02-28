@@ -2561,14 +2561,14 @@
 
                 <%--<asp:Timer ID="DbUploadTimer" OnTick="DbUploadTimer_Tick" Interval="15000" runat="server"></asp:Timer>--%>
 
-                <asp:Panel runat="server" ID="FooterPanel" Style="position: fixed; bottom: 0; width: calc(100% - 20px); display: flex; flex-direction: column; gap: var(--UWhitespace);">
+                <asp:Panel runat="server" ID="FooterPanel" Style="position: fixed; bottom: 0; width: calc(100% - 20px); display: flex; flex-direction: column;">
 
                     <%-- max-width of 100vw b/c setFooterAtBottom is called AFTER SetHoverEffect function--%>
                     <asp:Panel ID="ImageHoverLinkPanel" Style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--UWhitespace); max-width: 100vw;" runat="server">
                         <asp:ImageButton OnClick="AddPhotoButton_OnClick" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
                     </asp:Panel>
 
-                    <asp:Panel ID="AddCommentPanel" runat="server">
+                    <asp:Panel ID="AddCommentPanel" runat="server" style="margin-top: var(--UWhitespace);">
                         <asp:Label runat="server">Add note: </asp:Label>
                         <asp:Label runat="server" ID="NoteErrorLabel" Style="color: red"></asp:Label>
                         <br />
@@ -2599,7 +2599,7 @@
                         SelectCommand=""
                         UpdateCommand="UPDATE [ALTS].[dbo].[T_LogOperatorComments] SET Comment=@Comment WHERE [Key]=@Key"></asp:SqlDataSource>
 
-                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board"></asp:LinkButton>
+                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" style="padding: var(--UWhitespace) 0;"></asp:LinkButton>
 
                     <%--                    <asp:Label ID="MessageToUser" Text="" runat="server" Style="font-size: 25px; font-weight: bolder;"></asp:Label>
                     <svg id="loadingSpinner" style="visibility: hidden" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
