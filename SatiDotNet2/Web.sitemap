@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+        <siteMapNode url="~/Main1.aspx" title="main"  description="">
+        
+        <siteMapNode url="~/Production/ProductionMain.aspx" title="Production"  description="Production" >
+          <siteMapNode url="~/Production/ProcessWafers.aspx" title="Process Wafers"  description="Process Wafers" ></siteMapNode>
+          <siteMapNode url="~/Production/MakeLabels.aspx" title="Make Labels"  description="Make Labels" ></siteMapNode>
+          <siteMapNode url="~/Production/RunSheets.aspx" title="Make RunSheets"  description="Make RunSheets" ></siteMapNode>
+          <siteMapNode url="~/Production/T7InstanceView.aspx" title="View T7 Box"  description="View T7 Box" ></siteMapNode>
+          <siteMapNode url="~/Production/SPxT7DupeCompatibilityCheck.aspx" title="SPx Dupe Compatiblity"  description="SPx Dupe Compatiblity" ></siteMapNode>
+        </siteMapNode>
+      
+        <siteMapNode url="~/PC/MainPC.aspx" title="Production Control"  description="Production Control" ></siteMapNode>
+        <siteMapNode url="~/Reports/Reports.aspx" title="Reports"  description="Reports" ></siteMapNode>
+        
+        <siteMapNode url="~/CustomerMaintenance/CMMain.aspx" title="Customer Maintenance"  description="Customer Maintenance" >
+          <siteMapNode url="~/CustomerMaintenance/TestLabel.aspx" title="Test Labels"  description="Test Labels" ></siteMapNode>
+        </siteMapNode>
+      
+        <siteMapNode url="~/DBMaintenance/DBMaintenanceMain.aspx" title="DB Maintenance"  description="DB Maintenance" ></siteMapNode>
+        <siteMapNode url="~/Sales/MainSales.aspx" title="Sales Maintenance"  description="Sales Maintenance" ></siteMapNode>
+        <siteMapNode url="~/MaintenanceDepartment/MD_Main.aspx" title="Maintenance Department"  description="Maintenance Department" ></siteMapNode>
+           
+    </siteMapNode>
+</siteMap>
