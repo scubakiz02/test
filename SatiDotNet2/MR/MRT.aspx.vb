@@ -1,6 +1,6 @@
 ﻿Imports System.Web.Services
 
-Partial Class MR_MRT
+Public Class MR_MRT
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
 
