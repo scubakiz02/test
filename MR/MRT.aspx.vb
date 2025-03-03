@@ -9,14 +9,14 @@ Public Class MR_MRT
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
 
-        MaybeEnableSubmit()
+        MaybeEnableSubmit(ProblemTextBox.Text)
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableSubmit()
+        MaybeEnableSubmit(ProblemTextBox.Text)
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -32,14 +32,17 @@ Public Class MR_MRT
     End Sub
 
     <WebMethod()>
-    Public Shared Function EvaluateSubmitEnable() As String
+    Public Shared Function EvaluateSubmitEnable(ProblemTextBoxText As String) As String
         Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
-        Return MaybeEnableSubmit()
+        Return MaybeEnableSubmit(ProblemTextBoxText)
     End Function
 
-    Public Delegate Function MaybeEnableSubmitDelegate() As String
-    Function MaybeEnableSubmit() As String
-        Dim infoLabelText As String = RequirementCheck()
+    Public Delegate Function MaybeEnableSubmitDelegate(ProblemTextBoxText As String) As String
+    Function MaybeEnableSubmit(ProblemTextBoxText As String) As String
+        Dim infoLabelText As String
+
+        infoLabelText = RequirementCheck()
+        If infoLabelText = "" AndAlso String.IsNullOrEmpty(ProblemTextBoxText) Then infoLabelText = "Describe Problem"
 
         Me.infoLabel.Text = infoLabelText
         If infoLabelText = "" Then
@@ -61,9 +64,9 @@ Public Class MR_MRT
                 Throw New Exception("Select Ticket Type")
             End If
 
-            If Me.ProblemTextBox.Text = "" Then
-                Throw New Exception("Describe Problem")
-            End If
+            'If Me.ProblemTextBox.Text = "" Then
+            '    Throw New Exception("Describe Problem")
+            'End If
 
             If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
                 ' check to see if a "down" tickit is alread on this tool

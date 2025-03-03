@@ -17,7 +17,7 @@
                 document.getElementById("charNum").innerHTML = 'Characters Remaining: ' + charRemain;
 
                 // Call the server-side method asynchronously
-                PageMethods.EvaluateSubmitEnable(function (infoLabelText) {
+                PageMethods.EvaluateSubmitEnable(document.getElementById('<%= ProblemTextBox.ClientID %>').innerText, function (infoLabelText) {
                     document.getElementById('<%= infoLabel.ClientID %>').innerText = infoLabelText
                 }, function (error) {
                     console.error("Error writing to DB: " + error.get_message());
