@@ -17,9 +17,9 @@
                 document.getElementById("charNum").innerHTML = 'Characters Remaining: ' + charRemain;
 
                 // Call the server-side method asynchronously
-                PageMethods.EvaluateSubmitEnable(obj.value, function (infoLabelText) {
+                PageMethods.EvaluateProblemTextBox(obj.value, function (infoLabelText) {
                     document.getElementById('<%= infoLabel.ClientID %>').innerText = infoLabelText
-                    if (infoLabelText === "") document.getElementById('<%= Button1.ClientID %>').disabled = false; //because delegated function in code-behind cannot access asp elements
+                    document.getElementById('<%= Button1.ClientID %>').disabled = infoLabelText === "" ? false : true; //because delegated function in code-behind cannot access asp elements
                 }, function (error) {
                     console.error("Error writing to DB: " + error.get_message());
                 });

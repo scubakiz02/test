@@ -9,14 +9,14 @@ Public Class MR_MRT
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
 
-        MaybeEnableSubmit(ProblemTextBox.Text)
+        EvalProblemDesc(ProblemTextBox.Text)
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
     End Sub
     Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        MaybeEnableSubmit(ProblemTextBox.Text)
+        EvalProblemDesc(ProblemTextBox.Text)
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -32,13 +32,13 @@ Public Class MR_MRT
     End Sub
 
     <WebMethod()>
-    Public Shared Function EvaluateSubmitEnable(ProblemTextBoxText As String) As String
-        Dim MaybeEnableSubmit As MaybeEnableSubmitDelegate = HttpContext.Current.Session("MaybeEnableSubmit")
-        Return MaybeEnableSubmit(ProblemTextBoxText)
+    Public Shared Function EvaluateProblemTextBox(ProblemTextBoxText As String) As String
+        Dim EvalProblemDesc As EvalProblemDescDelegate = HttpContext.Current.Session("EvalProblemDesc")
+        Return EvalProblemDesc(ProblemTextBoxText)
     End Function
 
-    Public Delegate Function MaybeEnableSubmitDelegate(ProblemTextBoxText As String) As String
-    Function MaybeEnableSubmit(ProblemTextBoxText As String) As String
+    Public Delegate Function EvalProblemDescDelegate(ProblemTextBoxText As String) As String
+    Function EvalProblemDesc(ProblemTextBoxText As String) As String
         Dim infoLabelText As String
 
         infoLabelText = RequirementCheck()
@@ -157,7 +157,7 @@ Public Class MR_MRT
             Server.Transfer("~/Login.aspx")
         End If
 
-        Dim MaybeEnableSubmitDelegate As MaybeEnableSubmitDelegate = AddressOf MaybeEnableSubmit
-        Session("MaybeEnableSubmit") = MaybeEnableSubmitDelegate
+        Dim EvalProblemDescDelegate As EvalProblemDescDelegate = AddressOf EvalProblemDesc
+        Session("EvalProblemDesc") = EvalProblemDescDelegate
     End Sub
 End Class
