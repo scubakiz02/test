@@ -33,13 +33,9 @@
         function detectRapidClick(event) {
             let currentTime = new Date().getTime();
 
-            if (currentTime - lastClickTime < clickThreshold) { // Prevent postback
-                event.preventDefault(); 
-                return false;
-            }
+            if (lastClickTime !== 0) event.preventDefault();
 
             lastClickTime = currentTime;
-            return true; //ensures postback
         }
 
     </script>
@@ -128,8 +124,8 @@
                 </tr>
 
                 <tr>
-<%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="return detectRapidClick(event);"/><br />
+                    <%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="detectRapidClick(event);" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
