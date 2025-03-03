@@ -29,11 +29,6 @@
             }
         }
 
-        function PreventAfterFirstClick(event) {
-            if (!firstClick) event.preventDefault();
-            firstClick = false;
-        }
-
     </script>
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
@@ -121,7 +116,7 @@
 
                 <tr>
                     <%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" OnClientClick="PreventAfterFirstClick(event);" /><br />
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
