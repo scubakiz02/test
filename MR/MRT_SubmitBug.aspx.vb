@@ -3,7 +3,6 @@
 Public Class MR_MRT
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
-    Dim BeenSubmitted As Boolean = False
 
     Protected Sub departmentDropDownList_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs)
         Me.ToolSqlDataSource.SelectCommand = "SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '" & Me.DepartmentDropDownList.SelectedItem.Text & "') ORDER BY Tool"
@@ -103,9 +102,6 @@ Public Class MR_MRT
         Dim TheSubject As String = ""
         Dim TAGs As String = " "
 
-        If BeenSubmitted Then Exit Sub
-        BeenSubmitted = True
-
         tool = Me.ToolDropDownList.SelectedValue.ToString
         status = Me.DropDownListTicketType.SelectedValue.ToString
 
@@ -146,14 +142,12 @@ Public Class MR_MRT
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
         Catch ex As Exception
-            BeenSubmitted = False
             Me.infoLabel.Text = "Error, Contact Your Sati.Net Admin"
         End Try
-
     End Sub
 
     Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Me.Button1.Enabled = False
+        Me.Button1.Enabled = False 'isn't reflected in client side for some reason
         Submit()
     End Sub
 

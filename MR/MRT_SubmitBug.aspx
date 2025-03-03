@@ -26,6 +26,22 @@
 
             }
         }
+
+        let lastClickTime = 0;
+        const clickThreshold = 5000;
+
+        function detectRapidClick(event) {
+            let currentTime = new Date().getTime();
+
+            if (currentTime - lastClickTime < clickThreshold) { // Prevent postback
+                event.preventDefault(); 
+                return false;
+            }
+
+            lastClickTime = currentTime;
+            return true; //ensures postback
+        }
+
     </script>
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
@@ -112,7 +128,8 @@
                 </tr>
 
                 <tr>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />
+<%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="return detectRapidClick(event);"/><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
