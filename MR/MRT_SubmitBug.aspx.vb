@@ -141,14 +141,15 @@ Public Class MR_MRT
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
+            Session("Button1_Click") = False
         Catch ex As Exception
             Me.infoLabel.Text = "Error, Contact Your Sati.Net Admin"
         End Try
     End Sub
 
     Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Me.Button1.Enabled = False 'isn't reflected in client side for some reason
-        Submit()
+        If Not Session("Button1_Click") Then Submit()
+        Session("Button1_Click") = True
     End Sub
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -157,6 +158,8 @@ Public Class MR_MRT
         If User.Identity.IsAuthenticated = False Then
             Server.Transfer("~/Login.aspx")
         End If
+
+        If Not IsPostBack Then Session("Button1_Click") = False
 
         Dim EvalProblemDescDelegate As EvalProblemDescDelegate = AddressOf EvalProblemDesc
         Session("EvalProblemDesc") = EvalProblemDescDelegate

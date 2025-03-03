@@ -121,7 +121,7 @@
 
                 <tr>
                     <%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="PreventAfterFirstClick(event);" /><br />
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" OnClientClick="PreventAfterFirstClick(event);" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
