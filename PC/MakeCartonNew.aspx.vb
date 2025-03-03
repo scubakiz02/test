@@ -355,7 +355,7 @@ Partial Class PC_MakeCartonNew
         Me.TextBoxScanInput.Focus()
         Me.LabelBoxQty.Text = Me.LabelBoxQty.Text + 1
 
-        If Me.LabelUnits.Text = Me.LabelBoxQty.Text Or SatiCode.IS_RFID_Enable(DR("BoxID").ToString) = True Then
+        If Me.LabelUnits.Text = Me.LabelBoxQty.Text Then 'Or SatiCode.IS_RFID_Enable(DR("BoxID").ToString) = True
             Me.TextBoxScanInfo.Text = "Building Carton.."
             MakeTheLabel()
             AfterPrint()

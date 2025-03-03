@@ -1,6 +1,5 @@
-﻿Imports System.Web.Services
-
-Public Class MR_MRT
+﻿
+Partial Class MR_MRT
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
 
@@ -8,15 +7,10 @@ Public Class MR_MRT
         Me.ToolSqlDataSource.SelectCommand = "SELECT Tool, [Key] FROM dbo.T_Tools WHERE (Department = '" & Me.DepartmentDropDownList.SelectedItem.Text & "') ORDER BY Tool"
         Me.ToolDropDownList.DataBind()
         Look_For_SG_Tags()
-
-        EvalProblemDesc(ProblemTextBox.Text)
     End Sub
 
     Protected Sub ToolDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
         Look_For_SG_Tags()
-    End Sub
-    Protected Sub DropDownListTicketType_OnSelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolDropDownList.SelectedIndexChanged
-        EvalProblemDesc(ProblemTextBox.Text)
     End Sub
 
     Sub Look_For_SG_Tags()
@@ -30,57 +24,6 @@ Public Class MR_MRT
             Me.PanelSGT.Visible = False
         End If
     End Sub
-
-    <WebMethod()>
-    Public Shared Function EvaluateProblemTextBox(ProblemTextBoxText As String) As String
-        Dim EvalProblemDesc As EvalProblemDescDelegate = HttpContext.Current.Session("EvalProblemDesc")
-        Return EvalProblemDesc(ProblemTextBoxText)
-    End Function
-
-    Public Delegate Function EvalProblemDescDelegate(ProblemTextBoxText As String) As String
-    Function EvalProblemDesc(ProblemTextBoxText As String) As String
-        Dim infoLabelText As String
-
-        infoLabelText = RequirementCheck()
-        If infoLabelText = "" AndAlso String.IsNullOrEmpty(ProblemTextBoxText) Then infoLabelText = "Describe Problem"
-
-        Me.infoLabel.Text = infoLabelText
-        If infoLabelText = "" Then
-            Me.Button1.Enabled = True
-        Else
-            Me.Button1.Enabled = False 'in case all requirements were present but are NOT anymore
-        End If
-
-        Return infoLabelText
-    End Function
-
-    Function RequirementCheck() As String
-        Try
-            If Me.ToolDropDownList.SelectedValue.ToString = "" Then
-                Throw New Exception("Select a Tool")
-            End If
-
-            If Me.DropDownListTicketType.SelectedValue = "Select..." Then
-                Throw New Exception("Select Ticket Type")
-            End If
-
-            'If Me.ProblemTextBox.Text = "" Then
-            '    Throw New Exception("Describe Problem")
-            'End If
-
-            If Me.DropDownListTicketType.SelectedValue.ToString = "Down" Then
-                ' check to see if a "down" tickit is alread on this tool
-                If DownTicket(Me.ToolDropDownList.SelectedValue.ToString) = True Then
-                    Throw New Exception("SATI.Net already has a Down ticket for this tool. ")
-                End If
-            End If
-
-            Return ""
-        Catch ex As Exception
-            Return ex.Message.ToString()
-        End Try
-
-    End Function
 
     Function DownTicket(tool As String) As Boolean
         Dim ds As Data.DataSet
@@ -102,8 +45,30 @@ Public Class MR_MRT
         Dim TheSubject As String = ""
         Dim TAGs As String = " "
 
+        If Me.ToolDropDownList.SelectedValue.ToString = "" Then
+            Me.infoLabel.Text = "Select a Tool"
+            Exit Sub
+        End If
         tool = Me.ToolDropDownList.SelectedValue.ToString
-        status = Me.DropDownListTicketType.SelectedValue.ToString
+
+        If Me.DropDownListTicketType.SelectedValue = "Select..." Then
+            Me.infoLabel.Text = "Select Ticket Type"
+            Exit Sub
+        Else
+            status = Me.DropDownListTicketType.SelectedValue.ToString
+        End If
+
+
+        'If Me.StatusDownRadioButton.Checked = True Then
+        '    status = "Down"
+        'Else
+        '    status = "Standard"
+        'End If
+
+        If Me.ProblemTextBox.Text = "" Then
+            Me.infoLabel.Text = "Describe Problem"
+            Exit Sub
+        End If
 
         '******add the sub grouping tags***
         If Me.PanelSGT.Visible = True Then
@@ -116,27 +81,38 @@ Public Class MR_MRT
             End If
         End If
 
-        'TicketNumber = SatiCode.MaintenanceRequestTicket("New", "0", tool, status)
+        If status = "Down" Then
+            ' check to see if a "down" tickit is alread on this tool
+            If DownTicket(tool) = True Then
+                Me.infoLabel.Text = "SATI.Net already has a Down ticket for this tool. "
+
+                Exit Sub
+            End If
+
+        End If
+
+
+        TicketNumber = SatiCode.MaintenanceRequestTicket("New", "0", tool, status)
 
 
 
         Try
-            'SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
+            SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
 
-            'TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
-            '& Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
-            '& "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
-            '& Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
+            TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
+            & Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
+            & "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
+            & Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
 
-            'If status = "Down" Then
-            '    TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
-            'Else
-            '    TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
-            'End If
-            'Me.Button1.Enabled = False
-            ''SatiCode.SendMail(TheMail, TheSubject, "MaintenanceRequest")
-            ''SatiCode.SendMail_MaintenRequest(TheMail, TheSubject, "New", TicketNumber)
-            'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
+            If status = "Down" Then
+                TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
+            Else
+                TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
+            End If
+            Me.Button1.Enabled = False
+            'SatiCode.SendMail(TheMail, TheSubject, "MaintenanceRequest")
+            'SatiCode.SendMail_MaintenRequest(TheMail, TheSubject, "New", TicketNumber)
+            SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
         Catch ex As Exception
@@ -156,8 +132,5 @@ Public Class MR_MRT
         If User.Identity.IsAuthenticated = False Then
             Server.Transfer("~/Login.aspx")
         End If
-
-        Dim EvalProblemDescDelegate As EvalProblemDescDelegate = AddressOf EvalProblemDesc
-        Session("EvalProblemDesc") = EvalProblemDescDelegate
     End Sub
 End Class

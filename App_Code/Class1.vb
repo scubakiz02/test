@@ -26665,6 +26665,12 @@ Public Class Class1
                 Next
         End Select
 
+        If IS_RFID_Enable(DR("MainID")) = True Then
+            If DR("RFIDChecked") = False Then
+                Return "Error, RFID was not Verified! " '>< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< >< ><
+                Exit Function
+            End If
+        End If
 
         If DR("RFIDChecked") = True Then
             If DR("LabelRFID").ToString.Contains("No") Or DR("LabelRFID").ToString.Contains("Error") Or DR("LabelRFID").ToString = "" Then
