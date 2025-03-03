@@ -19,6 +19,7 @@
                 // Call the server-side method asynchronously
                 PageMethods.EvaluateSubmitEnable(obj.value, function (infoLabelText) {
                     document.getElementById('<%= infoLabel.ClientID %>').innerText = infoLabelText
+                    if (infoLabelText === "") document.getElementById('<%= Button1.ClientID %>').disabled = false; //because delegated function in code-behind cannot access asp elements
                 }, function (error) {
                     console.error("Error writing to DB: " + error.get_message());
                 });
