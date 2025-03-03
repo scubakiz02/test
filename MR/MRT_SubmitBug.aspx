@@ -2,7 +2,9 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
 
-    <script type="text/javascript"> 
+    <script type="text/javascript">
+        let firstClick = true;
+
         function countChars(obj) {
             var maxLength = 1000;
             var strLength = obj.value.length;
@@ -27,15 +29,9 @@
             }
         }
 
-        let lastClickTime = 0;
-        const clickThreshold = 5000;
-
-        function detectRapidClick(event) {
-            let currentTime = new Date().getTime();
-
-            if (lastClickTime !== 0) event.preventDefault();
-
-            lastClickTime = currentTime;
+        function PreventAfterFirstClick(event) {
+            if (!firstClick) event.preventDefault();
+            firstClick = false;
         }
 
     </script>
@@ -125,7 +121,7 @@
 
                 <tr>
                     <%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="detectRapidClick(event);" /><br />
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" OnClientClick="PreventAfterFirstClick(event);" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>
