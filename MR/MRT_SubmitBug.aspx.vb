@@ -95,7 +95,7 @@ Public Class MR_MRT
         End If
     End Function
 
-    Sub Submit()
+    Function Submit() As String
         Dim tool As String
         Dim status As String = ""
         Dim TicketNumber As String = ""
@@ -139,16 +139,18 @@ Public Class MR_MRT
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
             SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
 
-            Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
+            Return "Your Request Was Submited. Your Ticket Number is " & TicketNumber
         Catch ex As Exception
-            Me.infoLabel.Text = "Error, Contact Your Sati.Net Admin"
+            Return "Error, Contact Your Sati.Net Admin"
         End Try
-    End Sub
+    End Function
 
-    Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Protected Async Function Button1_Click(sender As Object, e As EventArgs) As Task Handles Button1.Click
         Me.Button1.Enabled = False
-        Task.Run(Sub() Submit()) 'run Submit function asynchronously
-    End Sub
+        'Task.Run(Sub() Submit()) 'run Submit function asynchronously
+
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "alertScript", "document.getElementById('<%= infoLabel.ClientID %>').innerText=" & Await Task.Run(Function() Submit()), True)
+    End Function
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.AuthenicationByPass(Page)
