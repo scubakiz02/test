@@ -146,11 +146,11 @@ Public Class MR_MRT
         End Try
     End Function
 
-    Protected Async Function Button1_Click(sender As Object, e As EventArgs) As Task Handles Button1.Click
+    Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Me.Button1.Enabled = False
-        Await Submit()
+        Task.Run(Function() Submit())
         Session("Button1_Click") = True
-    End Function
+    End Sub
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.AuthenicationByPass(Page)
