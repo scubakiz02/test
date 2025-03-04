@@ -514,6 +514,14 @@ Partial Class MR_OpenTicketStatusBoard
                 Button = CType(ctrl, Button)
             End If
 
+            If TypeOf ctrl Is Label Then
+                Dim CtrlAsLabel As Label = DirectCast(ctrl, Label)
+
+                If CtrlAsLabel.Attributes("ColorBlindMessage") IsNot Nothing AndAlso FieldType = "Text" Then
+                    CtrlAsLabel.Visible = False
+                End If
+            End If
+
             If TypeOf ctrl Is TextBox Then
                 TextBox = CType(ctrl, TextBox)
                 If UserInput Is Nothing Then UserInput = SqlProofSingleQuotes(TextBox.Text)
@@ -551,14 +559,14 @@ Partial Class MR_OpenTicketStatusBoard
                             End If
 
                             DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = BackPanelColor
-                            Exit For
+                            Continue For
                     End Select
 
                     'if here, input is NOT valid
                     SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
                     DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
                     Valid = False
-                    Exit For
+                    Continue For
 
                 Else 'use range to validate input
                     InRange = True
@@ -567,7 +575,7 @@ Partial Class MR_OpenTicketStatusBoard
                     If Not Range.Contains("+/-") And Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
                         SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
                         Valid = False
-                        Exit For
+                        Continue For
                     End If
 
                     'validate user input using the range
@@ -594,7 +602,7 @@ Partial Class MR_OpenTicketStatusBoard
                     If Not InRange Then
                         If FieldType Is Nothing Then 'make sure FieldType is 'Number'
                             SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF RANGE*", Pnl)
-                            Exit For
+                            Continue For
                         End If
                     End If
 
