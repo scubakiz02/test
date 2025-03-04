@@ -160,6 +160,8 @@ Public Class MR_MRT
         If Boolean.Parse(SubmitRes("Success")) Then  'send email in background thread, so the UI is not blocked (asynchronous behavior)
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
             Await Task.Run(Sub() SatiCode.SendMail_HTML(SubmitRes("TheMail"), SubmitRes("TheSubject"), "szymon.tyburek@purewafer.com", "Sati@purewafer.com"))
+
+            'CreateNewMR_Button.Enabled = True
         End If
     End Function
 
