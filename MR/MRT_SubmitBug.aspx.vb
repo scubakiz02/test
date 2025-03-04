@@ -95,13 +95,14 @@ Public Class MR_MRT
         End If
     End Function
 
-    Function Submit() As String
+    Function Submit() As Dictionary(Of String, String)
         Dim tool As String
         Dim status As String = ""
         Dim TicketNumber As String = ""
         Dim TheMail As String = ""
         Dim TheSubject As String = ""
         Dim TAGs As String = " "
+        Dim Res As New Dictionary(Of String, String)
 
         tool = Me.ToolDropDownList.SelectedValue.ToString
         status = Me.DropDownListTicketType.SelectedValue.ToString
@@ -125,31 +126,41 @@ Public Class MR_MRT
         Try
             'SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
 
-            'TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
-            '& Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
-            '& "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
-            '& Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
+            TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
+            & Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
+            & "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
+            & Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
 
-            'If status = "Down" Then
-            '    TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
-            'Else
-            '    TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
-            'End If
+            If status = "Down" Then
+                TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
+            Else
+                TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
+            End If
 
-            'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
-            SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
-
-            Return "Your Request Was Submited. Your Ticket Number is " & TicketNumber
+            Res("Message") = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
+            Res("Success") = "True"
+            Res("TheSubject") = TheSubject
+            Res("TheMail") = TheMail
         Catch ex As Exception
-            Return "Error, Contact Your Sati.Net Admin"
+            Res("Message") = "Error, Contact Your Sati.Net Admin"
+            Res("Success") = "False"
         End Try
+
+        Return Res
     End Function
 
     Protected Async Function Button1_Click(sender As Object, e As EventArgs) As Task Handles Button1.Click
-        Me.Button1.Enabled = False
-        'Task.Run(Sub() Submit()) 'run Submit function asynchronously
+        Dim SubmitRes As New Dictionary(Of String, String)
 
-        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "alertScript", "document.getElementById('<%= infoLabel.ClientID %>').innerText=" & Await Task.Run(Function() Submit()), True)
+        Me.Button1.Enabled = False
+
+        SubmitRes = Submit()
+        infoLabel.Text = SubmitRes("Message")
+
+        If Boolean.Parse(SubmitRes("Success")) Then  'send email in background thread, so the UI is not blocked (asynchronous behavior)
+            'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
+            Await Task.Run(Sub() SatiCode.SendMail_HTML(SubmitRes("TheMail"), SubmitRes("TheSubject"), "szymon.tyburek@purewafer.com", "Sati@purewafer.com"))
+        End If
     End Function
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
