@@ -1,4 +1,5 @@
 ﻿Imports System.Web.Services
+Imports System.Threading.Tasks
 
 Public Class MR_MRT
     Inherits System.Web.UI.Page
@@ -94,7 +95,7 @@ Public Class MR_MRT
         End If
     End Function
 
-    Async Sub Submit()
+    Async Function Submit() As Task
         Dim tool As String
         Dim status As String = ""
         Dim TicketNumber As String = ""
@@ -134,7 +135,6 @@ Public Class MR_MRT
             'Else
             '    TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
             'End If
-            Me.Button1.Enabled = False
 
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
             Await SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
@@ -144,12 +144,13 @@ Public Class MR_MRT
         Catch ex As Exception
             Me.infoLabel.Text = "Error, Contact Your Sati.Net Admin"
         End Try
-    End Sub
+    End Function
 
-    Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Submit()
+    Protected Async Function Button1_Click(sender As Object, e As EventArgs) As Task Handles Button1.Click
+        Me.Button1.Enabled = False
+        Await Submit()
         Session("Button1_Click") = True
-    End Sub
+    End Function
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.AuthenicationByPass(Page)
