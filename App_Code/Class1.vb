@@ -4,7 +4,6 @@ Imports System.Net.Mail
 Imports System.IO
 Imports System.Xml
 Imports System.Data
-Imports System.Threading.Tasks
 
 
 Public Class Class1
@@ -22919,29 +22918,8 @@ Public Class Class1
 
     End Sub
 
-    'Sub SendMail_HTML(ByVal Message As String, ByVal Subject As String, ByVal MailTo As String, ByVal MailFrom As String)
+    Sub SendMail_HTML(ByVal Message As String, ByVal Subject As String, ByVal MailTo As String, ByVal MailFrom As String)
 
-    '    Dim To_MA As New MailAddress(MailTo)
-    '    Dim From_MA As New MailAddress("SATI@purewafer.com")
-    '    Dim Mail As New MailMessage(From_MA, To_MA)
-
-    '    Dim SMTP_C As New SmtpClient("localhost")
-
-    '    SMTP_C.UseDefaultCredentials = False
-    '    SMTP_C.Credentials = New System.Net.NetworkCredential("SATI@purewafer.com", "Fishbone2019")
-    '    SMTP_C.Host = "smtp.office365.com"
-    '    SMTP_C.DeliveryMethod = SmtpDeliveryMethod.Network
-    '    SMTP_C.EnableSsl = True
-
-    '    Mail.IsBodyHtml = True
-    '    Mail.Body = Message
-    '    Mail.Subject = Subject
-    '    SMTP_C.Send(Mail)
-
-
-    'End Sub
-
-    Async Function SendMail_HTML(ByVal Message As String, ByVal Subject As String, ByVal MailTo As String, ByVal MailFrom As String) As Task
         Dim To_MA As New MailAddress(MailTo)
         Dim From_MA As New MailAddress("SATI@purewafer.com")
         Dim Mail As New MailMessage(From_MA, To_MA)
@@ -22957,8 +22935,10 @@ Public Class Class1
         Mail.IsBodyHtml = True
         Mail.Body = Message
         Mail.Subject = Subject
-        Await SMTP_C.SendMailAsync(Mail)
-    End Function
+        SMTP_C.Send(Mail)
+
+
+    End Sub
 
 
 

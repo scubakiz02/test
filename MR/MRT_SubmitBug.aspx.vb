@@ -95,7 +95,7 @@ Public Class MR_MRT
         End If
     End Function
 
-    Async Function Submit() As Task
+    Sub Submit()
         Dim tool As String
         Dim status As String = ""
         Dim TicketNumber As String = ""
@@ -137,17 +137,17 @@ Public Class MR_MRT
             'End If
 
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
-            Await SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
+            SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
         Catch ex As Exception
             Me.infoLabel.Text = "Error, Contact Your Sati.Net Admin"
         End Try
-    End Function
+    End Sub
 
     Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Me.Button1.Enabled = False
-        Task.Run(Function() Submit())
+        Task.Run(Sub() Submit()) 'run Submit function asynchronously
     End Sub
 
     Private Sub MR_MRT_Load(sender As Object, e As EventArgs) Handles Me.Load
