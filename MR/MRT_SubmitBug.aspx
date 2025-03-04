@@ -5,6 +5,10 @@
     <script type="text/javascript">
         let firstClick = true;
 
+        window.addEventListener("load", function () {
+            document.getElementById("Header").style.width = document.getElementById("MainContent").offsetWidth + "px"
+        })
+
         function countChars(obj) {
             var maxLength = 1000;
             var strLength = obj.value.length;
@@ -33,12 +37,15 @@
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
-            <td>&nbsp;<asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label></td>
-            <td style="text-align: right">&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" /></td>
+
+            <div id="Header" style="display: flex; justify-content: space-between; align-items: center;">
+                <asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label>
+                <asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" />
+            </div>
 
             <asp:Panel runat="server" ID="TablePanel">
-                <table style="margin-bottom: 0px">
-                    <tr>
+                <table id="MainContent" style="margin-bottom: 0px">
+                    <tr style="display:flex; justify-content: space-between">
                         <td>Select Department&nbsp;
                         <asp:DropDownList ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
                             DataSourceID="DepartmentSqlDataSource" DataTextField="Department" DataValueField="Department"
@@ -105,6 +112,7 @@
 
                 </table>
             </asp:Panel>
+
 
             <asp:Button ID="Button1" runat="server" Text="Submit" />
             <asp:Button ID="CreateNewMR_Button" BackColor="#80BEFD" Enabled="False" Text="Create New" OnClientClick="window.location.reload();" runat="server" />
