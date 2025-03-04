@@ -7,7 +7,7 @@
     <br />
     Users:<br />
     <asp:HyperLink ID="HyperLink12" runat="server" NavigateUrl="~/NewUser.aspx">Make New User</asp:HyperLink><br />
-    <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/DBMaintenance/EditRoles.aspx">Edit User Roles</asp:HyperLink><br />
+    <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/DBMaintenance/EditAccounts.aspx">Edit User Account</asp:HyperLink><br />
     <asp:HyperLink ID="HyperLink33" runat="server" NavigateUrl="~/ModifyRoleList.aspx">Modify Roles</asp:HyperLink><br />
     <br />
     Test area:<br />
