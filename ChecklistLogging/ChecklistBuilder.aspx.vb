@@ -586,7 +586,7 @@ Partial Class MR_OpenTicketStatusBoard
             If FieldTypeIsSTC Then
                 RangeOrderMenu.Enabled = False
                 DiffPanel.Visible = True
-                DiffTextbox.Text = If(DbRange IsNot Nothing, DbRange.Split(" ")(1), String.Empty)
+                DiffTextbox.Text = If(DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
 
             ElseIf DbRange.Contains("-") Then
                 DbRangeDelimited = DbRange.Split("-")

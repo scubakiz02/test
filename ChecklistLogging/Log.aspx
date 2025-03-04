@@ -366,43 +366,41 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel0" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle">
+                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
 
-                            <div style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
-                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%;"></asp:TextBox>
+                            <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
-                                <asp:Panel Visible="False" Checkbox="False" runat="server">
-                                    <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
-                                </asp:Panel>
+                            <asp:Panel Visible="False" Checkbox="False" runat="server">
+                                <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            </asp:Panel>
 
-                                <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                                    <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
-                                </asp:Panel>
+                            <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace); width: 100%;">
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                            </asp:Panel>
 
-                                <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                                    <div style="display: flex; flex-direction: column">
-                                        <asp:Label Text="Bath Temp" runat="server" />
-                                        <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
-                                    </div>
-                                    <div style="display: flex; flex-direction: column">
-                                        <asp:Label Text="IR Gun Temp" runat="server" />
-                                        <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
-                                    </div>
-                                </asp:Panel>
-
-                                <asp:Panel Visible="False" HOA="False" runat="server">
-                                    <asp:DropDownList runat="server">
-                                        <asp:ListItem Selected="True" Text="Switch Select..." />
-                                        <asp:ListItem Text="Hand" Value="Hand" />
-                                        <asp:ListItem Text="Off" Value="Off" />
-                                        <asp:ListItem Text="Auto" Value="Auto" />
-                                    </asp:DropDownList>
-                                </asp:Panel>
-
-                                <div style="display: block">
-                                    <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
-                                    <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                            <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" HOA="False" runat="server">
+                                <asp:DropDownList runat="server">
+                                    <asp:ListItem Selected="True" Text="Switch Select..." />
+                                    <asp:ListItem Text="Hand" Value="Hand" />
+                                    <asp:ListItem Text="Off" Value="Off" />
+                                    <asp:ListItem Text="Auto" Value="Auto" />
+                                </asp:DropDownList>
+                            </asp:Panel>
+
+                            <div style="display: block">
+                                <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
                         </div>
                     </asp:Panel>
@@ -2568,7 +2566,7 @@
                         <asp:ImageButton OnClick="AddPhotoButton_OnClick" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
                     </asp:Panel>
 
-                    <asp:Panel ID="AddCommentPanel" runat="server" style="margin-top: var(--UWhitespace);">
+                    <asp:Panel ID="AddCommentPanel" runat="server" Style="margin-top: var(--UWhitespace);">
                         <asp:Label runat="server">Add note: </asp:Label>
                         <asp:Label runat="server" ID="NoteErrorLabel" Style="color: red"></asp:Label>
                         <br />
@@ -2599,7 +2597,7 @@
                         SelectCommand=""
                         UpdateCommand="UPDATE [ALTS].[dbo].[T_LogOperatorComments] SET Comment=@Comment WHERE [Key]=@Key"></asp:SqlDataSource>
 
-                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" style="padding: var(--UWhitespace) 0;"></asp:LinkButton>
+                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding: var(--UWhitespace) 0;"></asp:LinkButton>
 
                     <%--                    <asp:Label ID="MessageToUser" Text="" runat="server" Style="font-size: 25px; font-weight: bolder;"></asp:Label>
                     <svg id="loadingSpinner" style="visibility: hidden" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
