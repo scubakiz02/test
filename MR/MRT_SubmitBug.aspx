@@ -33,97 +33,84 @@
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+            <td>&nbsp;<asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label></td>
+            <td style="text-align: right">&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" /></td>
 
-            <table style="margin-bottom: 0px">
-                <tr>
-                    <td colspan="3" style="height: 23px;">
-
-                        <table class="MasterPagePanelSub">
-                            <tr>
-                                <td>&nbsp;<asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label></td>
-                                <td style="text-align: right">&nbsp;<asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" /></td>
-                            </tr>
-                        </table>
-
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Select Department&nbsp;
+            <asp:Panel runat="server" ID="TablePanel">
+                <table style="margin-bottom: 0px">
+                    <tr>
+                        <td>Select Department&nbsp;
                         <asp:DropDownList ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
                             DataSourceID="DepartmentSqlDataSource" DataTextField="Department" DataValueField="Department"
                             OnSelectedIndexChanged="departmentDropDownList_SelectedIndexChanged" Width="168px">
                             <asp:ListItem>Select One...</asp:ListItem>
                         </asp:DropDownList>
-                    </td>
-                    <td>Select Tool&nbsp;
+                        </td>
+                        <td>Select Tool&nbsp;
                         <asp:DropDownList ID="ToolDropDownList" runat="server" DataSourceID="ToolSqlDataSource"
                             DataTextField="Tool" DataValueField="Key" Width="168px" AutoPostBack="True">
                         </asp:DropDownList>
-                    </td>
-                    <td>Is the tool down &nbsp;
+                        </td>
+                        <td>Is the tool down &nbsp;
                         <asp:DropDownList ID="DropDownListTicketType" OnSelectedIndexChanged="DropDownListTicketType_OnSelectedIndexChanged" AutoPostBack="True" runat="server">
                             <asp:ListItem>Select...</asp:ListItem>
                             <asp:ListItem Value="Standard">No</asp:ListItem>
                             <asp:ListItem Value="Down">Yes</asp:ListItem>
                         </asp:DropDownList>
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td style="border-style: solid; border-width: thin" valign="top">
-                        <table class="style1" bgcolor="#CCFFCC">
-                            <tr>
-                                <td colspan="2" style="width: 118px">Wafer Infomation:
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 118px">Lot Number?</td>
-                                <td>
-                                    <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox></td>
-                            </tr>
-                            <tr>
-                                <td style="width: 118px">Instance Number?</td>
-                                <td>
-                                    <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox></td>
-                            </tr>
-                        </table>
+                    <tr>
+                        <td style="border-style: solid; border-width: thin" valign="top">
+                            <table class="style1" bgcolor="#CCFFCC">
+                                <tr>
+                                    <td colspan="2" style="width: 118px">Wafer Infomation:
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 118px">Lot Number?</td>
+                                    <td>
+                                        <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 118px">Instance Number?</td>
+                                    <td>
+                                        <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox></td>
+                                </tr>
+                            </table>
 
-                    </td>
-                    <td colspan="2" valign="top">
-                        <asp:Panel ID="PanelSGT" runat="server" BackColor="#66CCFF" Visible="False">
-                            Select problem areas.<br />
-                            <asp:CheckBoxList
-                                ID="CheckBoxList_SGL"
-                                runat="server"
-                                DataSourceID="SqlDataSource_SGN"
-                                DataTextField="SG_Name"
-                                DataValueField="SB_Tag" RepeatLayout="Flow">
-                            </asp:CheckBoxList>
-                        </asp:Panel>
-                    </td>
-                </tr>
+                        </td>
+                        <td colspan="2" valign="top">
+                            <asp:Panel ID="PanelSGT" runat="server" BackColor="#66CCFF" Visible="False">
+                                Select problem areas.<br />
+                                <asp:CheckBoxList
+                                    ID="CheckBoxList_SGL"
+                                    runat="server"
+                                    DataSourceID="SqlDataSource_SGN"
+                                    DataTextField="SG_Name"
+                                    DataValueField="SB_Tag" RepeatLayout="Flow">
+                                </asp:CheckBoxList>
+                            </asp:Panel>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td colspan="3" style="padding-top: 20px">&nbsp;Describe the Problem Below 
+                    <tr>
+                        <td colspan="3" style="padding-top: 20px">&nbsp;Describe the Problem Below 
                         <asp:Panel ID="Panel1" runat="server" Height="17px" Style="padding-left: 4px">
                             <p id="charNum" style="color: blue">Characters Remaining: 1000 </p>
                         </asp:Panel>
-                        <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
-                    </td>
-                </tr>
+                            <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td colspan="3" style="height: 53px">
-                        <asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" />
-                        <asp:Button ID="CreateNewMR_Button" BackColor="#80BEFD" Enabled="False" Text="Create New" OnClientClick="window.location.reload();" runat="server" />
-                        <br />
-                        &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
-                    </td>
-                </tr>
+                </table>
+            </asp:Panel>
 
-            </table>
+            <asp:Button ID="Button1" runat="server" Text="Submit" />
+            <asp:Button ID="CreateNewMR_Button" BackColor="#80BEFD" Enabled="False" Text="Create New" OnClientClick="window.location.reload();" runat="server" />
+            <br />
+            &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
+
             <asp:SqlDataSource ID="DepartmentSqlDataSource" runat="server"
                 ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>" SelectCommand="SELECT [Department] FROM [T_Departments] ORDER BY [Department]"></asp:SqlDataSource>
 

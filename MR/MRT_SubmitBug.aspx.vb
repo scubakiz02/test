@@ -126,10 +126,10 @@ Public Class MR_MRT
         Try
             'SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
 
-            TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
-            & Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
-            & "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
-            & Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
+            'TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
+            '& Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
+            '& "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
+            '& Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
 
             If status = "Down" Then
                 TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
@@ -158,10 +158,12 @@ Public Class MR_MRT
         infoLabel.Text = SubmitRes("Message")
 
         If Boolean.Parse(SubmitRes("Success")) Then  'send email in background thread, so the UI is not blocked (asynchronous behavior)
+            TablePanel.Enabled = False
+            Button1.Enabled = False
+            CreateNewMR_Button.Enabled = True
+
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
             Await Task.Run(Sub() SatiCode.SendMail_HTML(SubmitRes("TheMail"), SubmitRes("TheSubject"), "szymon.tyburek@purewafer.com", "Sati@purewafer.com"))
-
-            'CreateNewMR_Button.Enabled = True
         End If
     End Function
 
