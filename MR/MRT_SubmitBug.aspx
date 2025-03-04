@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="true" CodeFile="MRT_SubmitBug.aspx.vb" Inherits="MR_MRT" %>
+﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="true" CodeFile="MRT_SubmitBug.aspx.vb" Inherits="MR_MRT" Async="true" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
 
@@ -115,8 +115,7 @@
                 </tr>
 
                 <tr>
-                    <%--                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />--%>
-                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" Enabled="False" runat="server" Text="Submit" /><br />
+                    <td colspan="3" style="height: 53px">&nbsp;<asp:Button ID="Button1" runat="server" Text="Submit" /><br />
                         &nbsp;<asp:Label ID="infoLabel" runat="server" Width="640px" Style="color: red;"></asp:Label>
                     </td>
                 </tr>

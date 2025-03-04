@@ -94,7 +94,7 @@ Public Class MR_MRT
         End If
     End Function
 
-    Sub Submit()
+    Async Sub Submit()
         Dim tool As String
         Dim status As String = ""
         Dim TicketNumber As String = ""
@@ -124,20 +124,20 @@ Public Class MR_MRT
         Try
             'SatiCode.MaintenanceRequestNote(TicketNumber, "Org", Me.ProblemTextBox.Text & TAGs)
 
-            TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
-            & Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
-            & "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
-            & Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
+            'TheMail = "Sati.Net has received a Maintenance Request from " & User.Identity.Name.ToString & " In the " _
+            '& Me.DepartmentDropDownList.SelectedItem.Text.ToString & " Department. " & Chr(13) & Chr(13) _
+            '& "The " & Me.ToolDropDownList.SelectedItem.Text.ToString & " has the following problem. " & Chr(13) _
+            '& Me.ProblemTextBox.Text & TAGs & Chr(13) & Chr(13) & "The Maintenance Request is under Ticket Number: " & TicketNumber
 
-            If status = "Down" Then
-                TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
-            Else
-                TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
-            End If
+            'If status = "Down" Then
+            '    TheSubject = "Tool: " & Me.ToolDropDownList.SelectedItem.Text.ToString & " Is Down! Ticket Number: " & TicketNumber
+            'Else
+            '    TheSubject = "Maintenance Request Issued. Ticket Number: " & TicketNumber
+            'End If
             Me.Button1.Enabled = False
 
             'SatiCode.SendMail_HTML(TheMail, TheSubject, "AZ.SatiMaintenanceRequest@purewafer.com", "Sati@purewafer.com")
-            SatiCode.SendMail_HTML(TheMail, TheSubject, "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
+            Await SatiCode.SendMail_HTML("mail", "subject", "szymon.tyburek@purewafer.com", "Sati@purewafer.com")
 
             Me.infoLabel.Text = "Your Request Was Submited. Your Ticket Number is " & TicketNumber
             Session("Button1_Click") = False
@@ -147,7 +147,7 @@ Public Class MR_MRT
     End Sub
 
     Protected Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If Not Session("Button1_Click") Then Submit()
+        Submit()
         Session("Button1_Click") = True
     End Sub
 
