@@ -31,10 +31,16 @@
 
     </script>
 
+    <style>
+        :root {
+            --UWidth: 900px;
+        }
+    </style>
+
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 900px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: var(--UWidth);">
                 <asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Request for Process Tools"></asp:Label>
                 <asp:Button ID="Button2" runat="server" Text="View Open Tickets" BackColor="#FFFF99" PostBackUrl="~/MR/OpenMRQuickView.aspx" />
             </div>
@@ -102,7 +108,7 @@
                         <asp:Panel ID="Panel1" runat="server" Height="17px" Style="padding-left: 4px">
                             <p id="charNum" style="color: blue">Characters Remaining: 1000 </p>
                         </asp:Panel>
-                            <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" Width="900px" onkeyup="countChars(this);"></asp:TextBox>
+                            <asp:TextBox ID="ProblemTextBox" runat="server" Height="75px" TextMode="MultiLine" Rows="3" style="width: var(--UWidth);" onkeyup="countChars(this);"></asp:TextBox>
                         </td>
                     </tr>
 
