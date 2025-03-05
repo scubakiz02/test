@@ -253,26 +253,29 @@
                             let focusInputElement = currInputElement;
                             let isFocusSTC;
 
-                            do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
-                                let nextInputElement = focusInputElement.nextElementSibling;
+                            if (isCurrSTC) {
+                                do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
+                                    let nextInputElement = focusInputElement.nextElementSibling;
 
-                                if (!focusInputElement.nextElementSibling) { 
-                                    for (const child of focusInputElement.parentElement.children) {
-                                        if (isSTC.call(child)) {
-                                            nextInputElement = child;
-                                            break;
+                                    if (!focusInputElement.nextElementSibling) {
+                                        for (const child of focusInputElement.parentElement.children) {
+                                            if (isSTC.call(child)) {
+                                                nextInputElement = child;
+                                                break;
+                                            }
                                         }
                                     }
+
+                                    focusInputElement = getInputElement.call(nextInputElement);
+                                    isFocusSTC = isSTC.call(focusInputElement);
                                 }
+                                while (!isFocusSTC)
 
-                                focusInputElement = getInputElement.call(nextInputElement);
-                                isFocusSTC = isSTC.call(focusInputElement);
+                                debugger;
+
+                                //determine whether cursor should be on 'BathTemp" or 'IrGunTemp' textbox element
+
                             }
-                            while (!isFocusSTC)
-
-                            debugger;
-
-                            //determine whether cursor should be on 'BathTemp" or 'IrGunTemp' textbox element
 
                             url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
                             window.location.href = url.toString();
