@@ -352,7 +352,7 @@ Partial Class MR_OpenTicketStatusBoard
         Next
     End Sub
 
-    Sub UploadToDataTable()
+    Sub UploadToDataTable(LogOperator As String)
         Dim Connection As New Data.SqlClient.SqlConnection
         Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=sati;Password=laptopia"
         Connection.Open()
@@ -416,7 +416,7 @@ Partial Class MR_OpenTicketStatusBoard
             My_DR = My_DS.Tables(0).Rows(0)
             My_DR.AcceptChanges()
             My_DR.BeginEdit()
-            My_DR("Operator") = User.Identity.Name.ToString
+            My_DR("Operator") = LogOperator
             My_DR("CompleteLog") = False
             My_DR("Inputs") = JsonSerializer.Serialize(Session("LabelInputMap"))
             My_DR("OutOfRange") = JsonSerializer.Serialize(LabelOutOfRangeMap)
@@ -640,7 +640,7 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         Next
 
-        UploadToDataTable()
+        UploadToDataTable(User.Identity.Name.ToString)
         Return All_InputsAreValid
     End Function
 
@@ -683,7 +683,7 @@ Partial Class MR_OpenTicketStatusBoard
         CheckedStatus = Not sender.Checked 'because view state is reset after postback, the true Checked value is the opposite of the current one
         LabelOutOfRangeMap(Tbx.ID.Split("_")(1)) = CheckedStatus
         Cbx.Checked = CheckedStatus
-        UploadToDataTable()
+        UploadToDataTable(User.Identity.Name.ToString)
         SetScrollPos()
     End Sub
 
@@ -725,7 +725,7 @@ Partial Class MR_OpenTicketStatusBoard
         If Value = PrevValue Then Return False 'value has NOT changed, so do NOT modify input
 
         ValidateInput(ID, Value)
-        UploadToDataTable()
+        UploadToDataTable(User.Identity.Name.ToString)
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
             If Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0) Then 'STC FieldType 'Bath Temp' TextBox control has been modified
@@ -945,5 +945,20 @@ Partial Class MR_OpenTicketStatusBoard
         PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/AddPhoto.aspx" & "?" & Request.RawUrl.Split("?")(1) & "&DataKey=" & KeyFromQueryString)
     End Sub
 
+    Protected Sub ResetLog_OnClick(sender As Object, e As EventArgs)
+        Dim LabelKeys As List(Of Integer) = LabelOutOfRangeMap.Keys.ToList()
+
+        'reset Inputs, OutOfRange, and Operator field values in DB
+        For i As Integer = 0 To LabelKeys.Count - 1
+            Dim LabelKey As Integer = LabelKeys(i)
+
+            LabelOutOfRangeMap(LabelKey) = Nothing
+            Session("LabelInputMap")(LabelKey) = String.Empty
+        Next
+
+        UploadToDataTable(Nothing)
+
+        Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
+    End Sub
 End Class
 
