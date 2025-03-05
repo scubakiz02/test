@@ -541,6 +541,12 @@ Partial Class MR_OpenTicketStatusBoard
                             Dim Temp2 As Decimal
 
                             Try 'in case user types in invlaid characters
+                                If String.IsNullOrEmpty(Temps(0)) AndAlso String.IsNullOrEmpty(Temps(1)) Then 'user has NOT interacted with this input yet
+                                    BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
+                                    SetPanelBackColor(BackPanelColor, "", Pnl)
+                                    Continue For
+                                End If
+
                                 Temp1 = Decimal.Parse(Temps(0))
                                 Temp2 = Decimal.Parse(Temps(1))
                             Catch ex As Exception
@@ -728,7 +734,8 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable(User.Identity.Name.ToString)
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
-            If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0)) Then ' field value went from not empty to empty OR STC FieldType 'Bath Temp' TextBox control has been modified
+            'If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0)) Then ' field value went from not empty to empty OR STC FieldType 'Bath Temp' TextBox control has been modified
+            If String.IsNullOrEmpty(Value) OrElse Value.Contains("/") Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
             Else
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
