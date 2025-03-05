@@ -254,7 +254,7 @@
                             let isFocusSTC;
 
                             do {
-                                focusInputElement = getInputElement.call();
+                                focusInputElement = getInputElement.call(focusInputElement.nextElementSibling);
                                 isFocusSTC = isSTC.call(focusInputElement);
                                 debugger;
                             }
