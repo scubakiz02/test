@@ -248,7 +248,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 Case "Checkbox"
                                     Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
                                     InputCtrlID = "CheckBox_" & LabelKey
-                                    Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "0") 'to prevent empty strings when checkbox is NOT checked
+                                    Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "") 'to prevent empty strings when checkbox is NOT checked
                                     CheckBox.Checked = If(Checked = "1", True, False)
                                     myTextBox.Text = Checked
                                 Case "HOA"
@@ -728,7 +728,7 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable(User.Identity.Name.ToString)
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
-            If Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0) Then 'STC FieldType 'Bath Temp' TextBox control has been modified
+            If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0)) Then ' field value went from not empty to empty OR STC FieldType 'Bath Temp' TextBox control has been modified
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
             Else
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB

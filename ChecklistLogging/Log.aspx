@@ -326,7 +326,7 @@
                     switch (this.type) {
                         case "checkbox":
                             if (this.checked) value = 1;
-                            else value = 0;
+                            else value = "";
                             break;
                         default: //textbox or select (ddl)
                             value = this.value;
