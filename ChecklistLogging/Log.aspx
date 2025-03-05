@@ -250,15 +250,15 @@
                         if (ChangeInValue.toLowerCase() === "true") {
                             let currInputElement = getInputElement.call(self);
                             let isCurrSTC = isSTC.call(currInputElement);
-                            let focusInputElement;
+                            let focusInputElement = currInputElement;
                             let isFocusSTC;
 
-                            focusInputElement = getInputElement.call(currInputElement.nextElementSibling);
-                            isFocusSTC = isSTC.call(focusInputElement);
-                            debugger;
-                            //do {
-                            //}
-                            //while (focusInputElement != currInputElement.parentElement.children[currInputElement.parentElement.children.length - 1])
+                            do {
+                                focusInputElement = getInputElement.call();
+                                isFocusSTC = isSTC.call(focusInputElement);
+                                debugger;
+                            }
+                            while (!isFocusSTC)
 
                             //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
                             //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
