@@ -152,6 +152,7 @@
                     let nextBathTempTbx;
                     let nextIrGunTempTbx;
                     let textboxFromArg;
+                    let focusTextbox;
 
                     textboxArr = document.querySelectorAll('input[type="text"]');
                     for (const textbox of textboxArr) {
@@ -163,7 +164,8 @@
                     currInputElement = getInputElement.call(textboxFromArg);
                     focusInputElement = currInputElement;
 
-                    if (isSTC.call(currInputElement)) {
+                    if (!isSTC.call(currInputElement)) focusTextbox = textboxFromArg;
+                    else {
                         do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
                             let nextInputElement = focusInputElement.nextElementSibling;
 
@@ -200,15 +202,16 @@
                          * */
 
                         if (currBathTempTbx.value) {
-                            if (!nextBathTempTbx.value) nextBathTempTbx.focus();
-                            else if (!nextIrGunTempTbx.value) nextIrGunTempTbx.focus();
-                            else currIrGunTempTbx.focus()
+                            if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
+                            else if (!nextIrGunTempTbx.value) focusTextbox = nextIrGunTempTbx;
+                            else focusTextbox = currIrGunTempTbx;
                         }
-                        else currBathTempTbx.focus();
+                        else focusTextbox = currBathTempTbx;
                     }
-                    else {
-                        textboxFromArg.focus();
-                        textboxFromArg.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
+
+                    if (focusTextbox.style.display !== "none") {
+                        focusTextbox.focus();
+                        focusTextbox.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
                     }
                 }
 
