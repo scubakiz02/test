@@ -150,7 +150,7 @@
                     let currBathTempTbx;
                     let currIrGunTempTbx;
                     let nextBathTempTbx;
-                    let mextIrGunTempTbx;
+                    let nextIrGunTempTbx;
                     let textboxFromArg;
 
                     textboxArr = document.querySelectorAll('input[type="text"]');
@@ -184,14 +184,32 @@
                         currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
                         currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
                         nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
-                        mextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
+                        nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
 
                         //determine where to place cursor
-                        debugger;
-                    }
 
-                    textboxFromArg.focus();
-                    textboxFromArg.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
+                        /**
+                         * if curr bath tbx has value 
+                         *      if next bath tbx has no value
+                         *          next bath tbx focus
+                         *      else
+                         *          curr ir gun tbx focus
+                         * else
+                         *      curr bath tbx focus
+                         * 
+                         * */
+
+                        if (currBathTempTbx.value) {
+                            if (!nextBathTempTbx.value) nextBathTempTbx.focus();
+                            else if (!nextIrGunTempTbx.value) nextIrGunTempTbx.focus();
+                            else currIrGunTempTbx.focus()
+                        }
+                        else currBathTempTbx.focus();
+                    }
+                    else {
+                        textboxFromArg.focus();
+                        textboxFromArg.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
+                    }
                 }
 
                 function showSpinner() {
