@@ -295,34 +295,7 @@
                     </div>
 
                     <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
-                        <asp:FormView ID="ShiftFormView" runat="server" DataSourceID="ShiftSqlDataSource" Style="text-wrap: nowrap;">
-                            <EditItemTemplate>
-                                <asp:LinkButton ID="UpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
-                                &nbsp;<asp:LinkButton ID="UpdateCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
-                                <asp:Label runat="server" Text='Shift:' Font-Bold="true" />
-                                <asp:DropDownList ID="ShiftDropDownList" runat="server" Text='<%# Bind("Shift") %>' Font-Bold="true">
-                                    <asp:ListItem>D1</asp:ListItem>
-                                    <asp:ListItem>D2</asp:ListItem>
-                                    <asp:ListItem>N1</asp:ListItem>
-                                    <asp:ListItem>N2</asp:ListItem>
-                                </asp:DropDownList>
-                            </EditItemTemplate>
-                            <InsertItemTemplate>
-                                <asp:LinkButton ID="InsertButton" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
-                                &nbsp;<asp:LinkButton ID="InsertCancelButton" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
-                                <asp:Label runat="server" Text='Shift:' Font-Bold="true" />
-                                <asp:TextBox ID="ShiftTextBox" runat="server" Text='<%# Bind("Shift") %>' />
-                            </InsertItemTemplate>
-                            <ItemTemplate>
-                                <asp:LinkButton ID="EditButton" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                <asp:Label runat="server" Text='Shift:' Font-Bold="true" />
-                                <asp:Label ID="ShiftLabel" runat="server" Text='<%# Bind("Shift") %>' Font-Bold="true" />
-                            </ItemTemplate>
-                        </asp:FormView>
-
-                        <asp:SqlDataSource ID="ShiftSqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                            SelectCommand="SELECT Shift FROM [ALTS].[dbo].[T_Log_GetShift]()"
-                            UpdateCommand=""></asp:SqlDataSource>
+                        <asp:Button Text="Reset Log" runat="server" />
 
                         <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                             <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>

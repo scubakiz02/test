@@ -80,9 +80,6 @@ Partial Class MR_OpenTicketStatusBoard
                 CommentGridView.Visible = True
             End If
 
-            ShiftSqlDataSource.SelectCommand = "SELECT Top(1) Shift FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date Desc"
-            ShiftSqlDataSource.DataBind()
-
             ClientScript.RegisterStartupScript(Me.GetType(), "callFunction", "textboxFocus(" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("KeyOfLastLabel") & ");", True) 'set focus on current textbox noted in DB
 
             DR1 = DS.Tables(0).Rows(0)
@@ -662,11 +659,6 @@ Partial Class MR_OpenTicketStatusBoard
     'Protected Sub LogAreasDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
     '    Response.Redirect(WebpageUrl & "?Area=" & LogAreasDropDownList.SelectedValue)
     'End Sub
-
-    Protected Sub UpdateButton_onClick(sender As Object, e As EventArgs)
-        ShiftSqlDataSource.UpdateCommand = "UPDATE [ALTS].[dbo].[T_LogData] SET [Shift] ='" & sender.Parent.FindControl("ShiftDropDownList").SelectedValue & "' WHERE [Key]=(SELECT Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date Desc)"
-        ShiftSqlDataSource.Update()
-    End Sub
 
     Protected Sub VerifyValue_Check(sender As Object, e As EventArgs)
         Dim Button As Button
