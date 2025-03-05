@@ -226,26 +226,41 @@
                             value = this.value;
                     }
 
+                    function getInputElement() { //get parent Input element (Panel0, Panel1, etc)
+                        let element = this;
+
+                        while (!element.id.includes("Panel")) element = element.parentElement;
+
+                        return element;
+                    }
+
+                    function isSTC() {
+                        let element = this;
+
+                        if (this.getAttribute("stc")) return true;
+
+                        for (const child of element.children) {
+                            if (isSTC.call(child)) return true; //traverse through element
+                        }
+
+                        return false;
+                    }
+
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
-                            let element = self;
-                            let inputElement = self;
+                            let currInputElement = getInputElement.call(self);
+                            let isCurrSTC = isSTC.call(currInputElement);
+                            let focusInputElement;
+                            let isFocusSTC;
+
+                            focusInputElement = getInputElement.call(currInputElement.nextElementSibling);
+                            isFocusSTC = isSTC.call(focusInputElement);
+                            debugger;
+                            //do {
+                            //}
+                            //while (focusInputElement != currInputElement.parentElement.children[currInputElement.parentElement.children.length - 1])
 
                             //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
-                            while (element.nextElementSibling) {
-                                element = element.nextElementSibling;
-
-                                if (element.getAttribute("stc")) { //is FieldType STC???
-                                    //get parent Input element (Panel0, Panel1, etc)
-
-                                    do {
-                                        inputElement = inputElement.parentElement
-                                    } while (!inputElement.id.includes("Panel"));
-
-                                    debugger;
-                                    return;
-                                }
-                            }
                             //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
 
                             url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
