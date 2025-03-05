@@ -246,18 +246,34 @@
                         return false;
                     }
 
+                    function getTempTbx(typeOf) {
+                        let element = this;
+
+                        if (this.id.includes(typeOf)) return this;
+
+                        for (const child of element.children) {
+                            let res = getTempTbx.call(child, typeOf);
+                            if (res) return res; //do NOT return res if it is null
+                        }
+
+                        return null;
+                    }
+
+
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
                             let currInputElement = getInputElement.call(self);
                             let isCurrSTC = isSTC.call(currInputElement);
                             let focusInputElement = currInputElement;
                             let isFocusSTC;
+                            let BathTempTbx;
+                            let IrGunTempTbx
 
                             if (isCurrSTC) {
                                 do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
                                     let nextInputElement = focusInputElement.nextElementSibling;
 
-                                    if (!focusInputElement.nextElementSibling) {
+                                    if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
                                         for (const child of focusInputElement.parentElement.children) {
                                             if (isSTC.call(child)) {
                                                 nextInputElement = child;
@@ -271,10 +287,10 @@
                                 }
                                 while (!isFocusSTC)
 
-                                debugger;
-
                                 //determine whether cursor should be on 'BathTemp" or 'IrGunTemp' textbox element
-
+                                BathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
+                                IrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
+                                debugger;
                             }
 
                             url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
