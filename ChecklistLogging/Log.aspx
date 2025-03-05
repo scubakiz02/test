@@ -99,14 +99,99 @@
                     return document.querySelector('[id$="' + id + '"]');
                 }
 
+                //function textboxFocus(id) {
+                //    textboxArr = document.querySelectorAll('input[type="text"]');
+                //    for (const textbox of textboxArr) {
+                //        if (textbox.id.endsWith("_" + id)) {
+                //            textbox.focus();
+                //            textbox.setSelectionRange(textbox.value.length, textbox.value.length);
+                //        }
+                //    }
+                //}
+
+                function isSTC() {
+                    let element = this;
+
+                    if (this.getAttribute("stc")) return true;
+
+                    for (const child of element.children) {
+                        if (isSTC.call(child)) return true; //traverse through element
+                    }
+
+                    return false;
+                }
+
+                function getTempTbx(typeOf) {
+                    let element = this;
+
+                    if (this.id.includes(typeOf)) return this;
+
+                    for (const child of element.children) {
+                        let res = getTempTbx.call(child, typeOf);
+                        if (res) return res; //do NOT return res if it is null
+                    }
+
+                    return null;
+                }
+
+                function getInputElement() { //get parent Input element (Panel0, Panel1, etc)
+                    let element = this;
+
+                    while (!element.id.includes("Panel")) element = element.parentElement;
+
+                    return element;
+                }
+
                 function textboxFocus(id) {
+                    let currInputElement;
+                    let isCurrSTC;
+                    let focusInputElement;
+                    let isFocusSTC;
+                    let currBathTempTbx;
+                    let currIrGunTempTbx;
+                    let nextBathTempTbx;
+                    let mextIrGunTempTbx;
+                    let textboxFromArg;
+
                     textboxArr = document.querySelectorAll('input[type="text"]');
                     for (const textbox of textboxArr) {
                         if (textbox.id.endsWith("_" + id)) {
-                            textbox.focus();
-                            textbox.setSelectionRange(textbox.value.length, textbox.value.length);
+                            textboxFromArg = textbox;
                         }
                     }
+
+                    currInputElement = getInputElement.call(textboxFromArg);
+                    focusInputElement = currInputElement;
+
+                    if (isSTC.call(currInputElement)) {
+                        do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
+                            let nextInputElement = focusInputElement.nextElementSibling;
+
+                            if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
+                                for (const child of focusInputElement.parentElement.children) {
+                                    if (isSTC.call(child)) {
+                                        nextInputElement = child;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            focusInputElement = getInputElement.call(nextInputElement);
+                            isFocusSTC = isSTC.call(focusInputElement);
+                        }
+                        while (!isFocusSTC)
+
+                        currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
+                        currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
+                        nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
+                        mextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
+
+                        //determine where to place cursor
+                        debugger;
+                    }
+
+                    textboxFromArg.focus();
+                    textboxFromArg.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
                 }
 
                 function showSpinner() {
@@ -226,73 +311,8 @@
                             value = this.value;
                     }
 
-                    function getInputElement() { //get parent Input element (Panel0, Panel1, etc)
-                        let element = this;
-
-                        while (!element.id.includes("Panel")) element = element.parentElement;
-
-                        return element;
-                    }
-
-                    function isSTC() {
-                        let element = this;
-
-                        if (this.getAttribute("stc")) return true;
-
-                        for (const child of element.children) {
-                            if (isSTC.call(child)) return true; //traverse through element
-                        }
-
-                        return false;
-                    }
-
-                    function getTempTbx(typeOf) {
-                        let element = this;
-
-                        if (this.id.includes(typeOf)) return this;
-
-                        for (const child of element.children) {
-                            let res = getTempTbx.call(child, typeOf);
-                            if (res) return res; //do NOT return res if it is null
-                        }
-
-                        return null;
-                    }
-
-
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
-                            let currInputElement = getInputElement.call(self);
-                            let isCurrSTC = isSTC.call(currInputElement);
-                            let focusInputElement = currInputElement;
-                            let isFocusSTC;
-                            let BathTempTbx;
-                            let IrGunTempTbx
-
-                            if (isCurrSTC) {
-                                do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
-                                    let nextInputElement = focusInputElement.nextElementSibling;
-
-                                    if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
-                                        for (const child of focusInputElement.parentElement.children) {
-                                            if (isSTC.call(child)) {
-                                                nextInputElement = child;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    focusInputElement = getInputElement.call(nextInputElement);
-                                    isFocusSTC = isSTC.call(focusInputElement);
-                                }
-                                while (!isFocusSTC)
-
-                                //determine whether cursor should be on 'BathTemp" or 'IrGunTemp' textbox element
-                                BathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
-                                IrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
-                                debugger;
-                            }
-
                             url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
                             window.location.href = url.toString();
                         }
