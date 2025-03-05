@@ -229,11 +229,19 @@
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
                             let element = self;
+                            let inputElement = self;
+
                             //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
                             while (element.nextElementSibling) {
                                 element = element.nextElementSibling;
 
-                                if (element.getAttribute("stc")) {
+                                if (element.getAttribute("stc")) { //is FieldType STC???
+                                    //get parent Input element (Panel0, Panel1, etc)
+
+                                    do {
+                                        inputElement = inputElement.parentElement
+                                    } while (!inputElement.id.includes("Panel"));
+
                                     debugger;
                                     return;
                                 }
@@ -309,7 +317,7 @@
                     </div>
 
                     <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
-                        <asp:Button Text="Wrong Form" BackColor="Red" runat="server" onClick="ResetLog_OnClick"/>
+                        <asp:Button Text="Wrong Form" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
 
                         <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                             <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>
