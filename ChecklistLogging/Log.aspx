@@ -214,6 +214,8 @@
                 function callCodeBehindEvent() {
                     let value;
                     let url = new URL(window.location.href);
+                    let id = this.id.split("ctl00_ContentPlaceHolder1_")[1];
+                    const self = this;
 
                     switch (this.type) {
                         case "checkbox":
@@ -224,8 +226,20 @@
                             value = this.value;
                     }
 
-                    PageMethods.DbWrite(this.id.split("ctl00_ContentPlaceHolder1_")[1], value, function (ChangeInValue) {
+                    PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
+                            let element = self;
+                            //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
+                            while (element.nextElementSibling) {
+                                element = element.nextElementSibling;
+
+                                if (element.getAttribute("stc")) {
+                                    debugger;
+                                    return;
+                                }
+                            }
+                            //cursor automation for STC TbxOverlay -> Bath Temp, Bath Temp, Bath Temp then IR Gun, IR Gun, IR Gun'
+
                             url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
                             window.location.href = url.toString();
                         }
