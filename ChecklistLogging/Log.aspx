@@ -156,63 +156,64 @@
 
                     textboxArr = document.querySelectorAll('input[type="text"]');
                     for (const textbox of textboxArr) {
-                        if (typeof id == "undefined") return;  //KeyOfLastLabel is NULL in db
                         if (textbox.id.endsWith("_" + id) && textbox.style.display !== "none") {
                             textboxFromArg = textbox;
                         }
                     }
 
-                    //currInputElement = getInputElement.call(textboxFromArg);
-                    //focusInputElement = currInputElement;
+                    if (typeof textboxFromArg == "undefined") return;
 
-                    //if (!isSTC.call(currInputElement)) focusTextbox = textboxFromArg;
-                    //else {
-                    //    do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
-                    //        let nextInputElement = focusInputElement.nextElementSibling;
+                    currInputElement = getInputElement.call(textboxFromArg);
+                    focusInputElement = currInputElement;
 
-                    //        if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
-                    //            for (const child of focusInputElement.parentElement.children) {
-                    //                if (isSTC.call(child)) {
-                    //                    nextInputElement = child;
-                    //                    break;
-                    //                }
-                    //            }
-                    //        }
+                    if (!isSTC.call(currInputElement)) focusTextbox = textboxFromArg;
+                    else {
+                        do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
+                            let nextInputElement = focusInputElement.nextElementSibling;
 
-                    //        focusInputElement = getInputElement.call(nextInputElement);
-                    //        isFocusSTC = isSTC.call(focusInputElement);
-                    //    }
-                    //    while (!isFocusSTC)
+                            if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
+                                for (const child of focusInputElement.parentElement.children) {
+                                    if (isSTC.call(child)) {
+                                        nextInputElement = child;
+                                        break;
+                                    }
+                                }
+                            }
 
-                    //    currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
-                    //    currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
-                    //    nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
-                    //    nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
+                            focusInputElement = getInputElement.call(nextInputElement);
+                            isFocusSTC = isSTC.call(focusInputElement);
+                        }
+                        while (!isFocusSTC)
 
-                    //    //determine where to place cursor
+                        currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
+                        currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
+                        nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
+                        nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
 
-                    //    /**
-                    //     * if curr bath tbx has value 
-                    //     *      if next bath tbx has no value
-                    //     *          next bath tbx focus
-                    //     *      else
-                    //     *          curr ir gun tbx focus
-                    //     * else
-                    //     *      curr bath tbx focus
-                    //     * 
-                    //     * */
+                        //determine where to place cursor
 
-                    //    if (currBathTempTbx.value) {
-                    //        if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
-                    //        else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
-                    //        else {
-                    //            focusTextbox = nextIrGunTempTbx; //edit here
-                    //        }
-                    //    }
-                    //    else focusTextbox = currBathTempTbx;
-                    //}
+                        /**
+                         * if curr bath tbx has value 
+                         *      if next bath tbx has no value
+                         *          next bath tbx focus
+                         *      else
+                         *          curr ir gun tbx focus
+                         * else
+                         *      curr bath tbx focus
+                         * 
+                         * */
 
-                    focusTextbox = textboxFromArg;
+                        if (currBathTempTbx.value) {
+                            if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
+                            else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
+                            else {
+                                debugger;
+                                focusTextbox = nextIrGunTempTbx; //edit here
+                            }
+                        }
+                        else focusTextbox = currBathTempTbx;
+                    }
+
                     if (focusTextbox.style.display !== "none") {
                         focusTextbox.focus();
                         focusTextbox.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
