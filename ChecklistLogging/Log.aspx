@@ -203,8 +203,10 @@
 
                         if (currBathTempTbx.value) {
                             if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
-                            else if (!nextIrGunTempTbx.value) focusTextbox = nextIrGunTempTbx;
-                            else focusTextbox = currIrGunTempTbx;
+                            else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
+                            else {
+                                focusTextbox = nextIrGunTempTbx; //edit here
+                            }
                         }
                         else focusTextbox = currBathTempTbx;
                     }

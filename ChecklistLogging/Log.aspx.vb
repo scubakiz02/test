@@ -27,8 +27,13 @@ Partial Class MR_OpenTicketStatusBoard
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
-        Dim ModifyInput As ModifyInputDelegate = HttpContext.Current.Session("ModifyInput")
-        Return ModifyInput(SenderID, SenderValue)  'Return a response back to the JavaScript function
+        Try
+            Dim ModifyInput As ModifyInputDelegate = HttpContext.Current.Session("ModifyInput")
+            Return ModifyInput(SenderID, SenderValue)  'Return a response back to the JavaScript function
+        Catch ex As Exception
+        End Try
+
+        Return False
     End Function
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
