@@ -46,6 +46,12 @@
                 function showSpinner() {
                     document.getElementById("loadingSpinner").style.display = "block";
                 }
+
+                function OpenFileUpload() {
+                    let FileUploadControl = document.getElementById('<%=Uploader.ClientID%>');
+                    FileUploadControl.click();
+                    return false;
+                }
             </script>
 
             <style>
@@ -56,9 +62,10 @@
             </style>
 
             <asp:Panel runat="server" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-<%--                <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />--%>
+                <%--                <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />--%>
                 <asp:Panel runat="server" ID="UploadPanel">
-                    <asp:FileUpload ID="Uploader" runat="server" Height="25px" Width="306px" />
+                    <asp:ImageButton OnClientClick="OpenFileUpload()" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
+                    <asp:FileUpload ID="Uploader" runat="server" Style="display: none;" />
                     <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
                     <svg id="loadingSpinner" style="display: none;" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <style>
