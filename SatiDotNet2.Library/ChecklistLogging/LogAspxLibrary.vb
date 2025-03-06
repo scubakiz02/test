@@ -1,4 +1,4 @@
-﻿Public Class LogAspx
+﻿Public Class LogAspxLibrary
     'return value of: true is valid; false is invalid; null is out of range
     Public Function ValidateByBackColor(NumOfNotes As Integer, BackColor As String) As Boolean?
         Dim Res As Boolean = Nothing

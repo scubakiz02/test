@@ -3,7 +3,7 @@ Imports Xunit
 Imports SatiDotNet2.Library
 
 Public Class LogAspxTests
-    Dim LogAspx = New LogAspx()
+    Dim LogAspx = New LogAspxLibrary()
 
     <Fact>
     Public Sub ReturnTrueTest1()

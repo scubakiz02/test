@@ -25,6 +25,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim JsFunctionCalls As String
     Dim DBConnections As String
     Dim STC_TbxOverlays As String
+    Dim LogAspx As New LogAspxLibrary
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
@@ -774,20 +775,37 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub DoneButton_Click(sender As Object, e As EventArgs)
-        Dim All_InputsAreValid As Boolean = ValidateInputsAndUploadToDataTable()
+        'Dim All_InputsAreValid As Boolean = ValidateInputsAndUploadToDataTable()
+        'Dim NumOfNotes As Integer = SatiCode.GetMyDataSet("Select Count([Key]) As NumOfNotes FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")).Tables(0).Rows(0)("NumOfNotes")
+
+        ''ensure all inputs are filled with valid data
+        'For Each kvp As KeyValuePair(Of Integer, String) In Session("LabelInputMap")
+        '    Dim Value As String = kvp.Value
+
+        '    If NumOfNotes = 0 Then
+        '        If Value = "" OrElse Not All_InputsAreValid Then
+        '            MessageUserLabel.Text = "Error: Incomplete or invalid logs. Add a comment to proceed."
+        '            Exit Sub
+        '        End If
+        '    ElseIf Not All_InputsAreValid Then
+        '        'display verify interface
+        '        DoneButton.Enabled = False
+        '        MarkAsDoneCheckBox.Visible = True
+        '        Return
+        '    End If
+        'Next
+
         Dim NumOfNotes As Integer = SatiCode.GetMyDataSet("Select Count([Key]) As NumOfNotes FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")).Tables(0).Rows(0)("NumOfNotes")
 
-        'ensure all inputs are filled with valid data
-        For Each kvp As KeyValuePair(Of Integer, String) In Session("LabelInputMap")
-            Dim Value As String = kvp.Value
+        For Each InputPnl As Panel In ItemsPanel.Controls
+            Dim Valid As Boolean? = LogAspx.ValidateByBackColor(NumOfNotes, InputPnl.Style("background-color"))
 
-            If NumOfNotes = 0 Then
-                If Value = "" OrElse Not All_InputsAreValid Then
-                    MessageUserLabel.Text = "Error: Incomplete or invalid logs. Add a comment to proceed."
-                    Exit Sub
-                End If
-            ElseIf Not All_InputsAreValid Then
-                'display verify interface
+            If Valid Then
+                Continue For
+            ElseIf NumOfNotes = 0 AndAlso (Not Valid OrElse Valid Is Nothing) Then
+                MessageUserLabel.Text = "Error: Incomplete or invalid logs. Add a comment to proceed."
+                Exit Sub
+            Else
                 DoneButton.Enabled = False
                 MarkAsDoneCheckBox.Visible = True
                 Return
@@ -795,6 +813,7 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         'if here, all fields are valid, because 'Exit Sub' statement has NOT been run
+        UploadToDataTable(User.Identity.Name.ToString)
         MarkAsDone()
     End Sub
 
