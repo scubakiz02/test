@@ -156,61 +156,63 @@
 
                     textboxArr = document.querySelectorAll('input[type="text"]');
                     for (const textbox of textboxArr) {
-                        if (textbox.id.endsWith("_" + id)) {
+                        if (typeof id == "undefined") return;  //KeyOfLastLabel is NULL in db
+                        if (textbox.id.endsWith("_" + id) && textbox.style.display !== "none") {
                             textboxFromArg = textbox;
                         }
                     }
 
-                    currInputElement = getInputElement.call(textboxFromArg);
-                    focusInputElement = currInputElement;
+                    //currInputElement = getInputElement.call(textboxFromArg);
+                    //focusInputElement = currInputElement;
 
-                    if (!isSTC.call(currInputElement)) focusTextbox = textboxFromArg;
-                    else {
-                        do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
-                            let nextInputElement = focusInputElement.nextElementSibling;
+                    //if (!isSTC.call(currInputElement)) focusTextbox = textboxFromArg;
+                    //else {
+                    //    do { //get next STC Input element. If user happens to be on the last STC Input element, get the first one
+                    //        let nextInputElement = focusInputElement.nextElementSibling;
 
-                            if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
-                                for (const child of focusInputElement.parentElement.children) {
-                                    if (isSTC.call(child)) {
-                                        nextInputElement = child;
-                                        break;
-                                    }
-                                }
-                            }
+                    //        if (!focusInputElement.nextElementSibling) { //in case user is on last STC Input element. 
+                    //            for (const child of focusInputElement.parentElement.children) {
+                    //                if (isSTC.call(child)) {
+                    //                    nextInputElement = child;
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
 
-                            focusInputElement = getInputElement.call(nextInputElement);
-                            isFocusSTC = isSTC.call(focusInputElement);
-                        }
-                        while (!isFocusSTC)
+                    //        focusInputElement = getInputElement.call(nextInputElement);
+                    //        isFocusSTC = isSTC.call(focusInputElement);
+                    //    }
+                    //    while (!isFocusSTC)
 
-                        currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
-                        currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
-                        nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
-                        nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
+                    //    currBathTempTbx = getTempTbx.call(currInputElement, "BathTemp");
+                    //    currIrGunTempTbx = getTempTbx.call(currInputElement, "IrGunTemp");
+                    //    nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp");
+                    //    nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp");
 
-                        //determine where to place cursor
+                    //    //determine where to place cursor
 
-                        /**
-                         * if curr bath tbx has value 
-                         *      if next bath tbx has no value
-                         *          next bath tbx focus
-                         *      else
-                         *          curr ir gun tbx focus
-                         * else
-                         *      curr bath tbx focus
-                         * 
-                         * */
+                    //    /**
+                    //     * if curr bath tbx has value 
+                    //     *      if next bath tbx has no value
+                    //     *          next bath tbx focus
+                    //     *      else
+                    //     *          curr ir gun tbx focus
+                    //     * else
+                    //     *      curr bath tbx focus
+                    //     * 
+                    //     * */
 
-                        if (currBathTempTbx.value) {
-                            if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
-                            else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
-                            else {
-                                focusTextbox = nextIrGunTempTbx; //edit here
-                            }
-                        }
-                        else focusTextbox = currBathTempTbx;
-                    }
+                    //    if (currBathTempTbx.value) {
+                    //        if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
+                    //        else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
+                    //        else {
+                    //            focusTextbox = nextIrGunTempTbx; //edit here
+                    //        }
+                    //    }
+                    //    else focusTextbox = currBathTempTbx;
+                    //}
 
+                    focusTextbox = textboxFromArg;
                     if (focusTextbox.style.display !== "none") {
                         focusTextbox.focus();
                         focusTextbox.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
