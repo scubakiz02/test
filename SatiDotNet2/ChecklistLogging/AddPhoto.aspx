@@ -24,14 +24,12 @@
                     fileUpload.addEventListener("change", function (event) {
                         var file = event.target.files[0];
                         if (file && file.type.startsWith("image/")) {
+                            PageMethods.DbWrite(function (success) {
+                                debugger;
+                            }, function (error) {
+                            });
                         }
                     });
-
-                    PageMethods.DbWrite(function (success) {
-                        debugger;
-                    }, function (error) {
-                    });
-
                 })
 
                 function disableElement() {
