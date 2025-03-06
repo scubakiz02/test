@@ -29,18 +29,17 @@ Partial Class MR_OpenTicketStatusBoard
 
     <WebMethod()>
     Public Shared Function DbWrite() As String
+        Dim Success As Boolean
+
         Try
-            Dim ModifyInput As ModifyInputDelegate = HttpContext.Current.Session("ModifyInput")
-            Return ModifyInput()  'Return a response back to the JavaScript function
+            Dim UploadFile As UploadFileDelegate = HttpContext.Current.Session("UploadFile")
+            UploadFile(Nothing, EventArgs.Empty)
+            Success = True
         Catch ex As Exception
+            Success = False
         End Try
 
-        Return False
-    End Function
-
-    Public Delegate Function ModifyInputDelegate() As Boolean
-    Function ModifyInput() As Boolean
-        Return True
+        Return Success
     End Function
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -53,10 +52,11 @@ Partial Class MR_OpenTicketStatusBoard
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
 
-        Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
-        Session("ModifyInput") = ModifyInputDelegate
+        Dim UploadFileDelegate As UploadFileDelegate = AddressOf UploadFile
+        Session("UploadFile") = UploadFileDelegate
     End Sub
 
+    Public Delegate Sub UploadFileDelegate(sender As Object, e As EventArgs)
     Protected Sub UploadFile(sender As Object, e As EventArgs)
         Dim fileNameDelimited As String()
         Dim Format As String

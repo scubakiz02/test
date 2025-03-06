@@ -24,10 +24,7 @@
                     fileUpload.addEventListener("change", function (event) {
                         var file = event.target.files[0];
                         if (file && file.type.startsWith("image/")) {
-                            PageMethods.DbWrite(function (success) {
-                                debugger;
-                            }, function (error) {
-                            });
+                            document.getElementById("<%=CreateButton.ClientID%>").click();
                         }
                     });
                 })
@@ -62,7 +59,7 @@
                 <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />
                 <asp:Panel runat="server" ID="UploadPanel">
                     <asp:FileUpload ID="Uploader" runat="server" Height="25px" Width="306px" />
-                    <asp:Button ID="CreateButton" runat="server" Font-Bold="True" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
+                    <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
                     <svg id="loadingSpinner" style="display: none;" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <style>
                             .spinner_Wezc {
