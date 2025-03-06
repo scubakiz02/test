@@ -3,6 +3,7 @@ Imports System.Text.Json
 Imports System.Data
 Imports System.IO
 Imports System.Text.RegularExpressions
+Imports System.Web.Services
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -26,6 +27,21 @@ Partial Class MR_OpenTicketStatusBoard
         {"svg%2Bxml", "svg"}
      } '%2B is URL encoding for '+'
 
+    <WebMethod()>
+    Public Shared Function DbWrite() As String
+        Try
+            Dim ModifyInput As ModifyInputDelegate = HttpContext.Current.Session("ModifyInput")
+            Return ModifyInput()  'Return a response back to the JavaScript function
+        Catch ex As Exception
+        End Try
+
+        Return False
+    End Function
+
+    Public Delegate Function ModifyInputDelegate() As Boolean
+    Function ModifyInput() As Boolean
+        Return True
+    End Function
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
@@ -37,22 +53,8 @@ Partial Class MR_OpenTicketStatusBoard
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
 
-        If Not IsPostBack Then
-            'AreaLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
-            'DS = SatiCode.GetMyDataSet("SELECT Stamp.Title As Text, Stamp.[Key] As Value, Stamped.Active AS Selected FROM [ALTS].[dbo].[T_LogStampTitle] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampList] Stamped ON Stamp.[Key]=Stamped.TitleKey AND Stamped.AreaKey=" & AreaFromQueryString)
-            'RC = DS.Tables(0).Rows.Count
-
-            'For I = 0 To RC - 1
-            '    Dim listItem As New ListItem()
-            '    DR = DS.Tables(0).Rows(I)
-
-            '    listItem.Text = DR("Text")
-            '    listItem.Value = DR("Value") 'associated Key within [T_LogStampTitle]
-            '    listItem.Selected = DR("Selected")
-
-            '    StampCheckBoxList.Items.Add(listItem)
-            'Next
-        End If
+        Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
+        Session("ModifyInput") = ModifyInputDelegate
     End Sub
 
     Protected Sub UploadFile(sender As Object, e As EventArgs)

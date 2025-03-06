@@ -18,6 +18,20 @@
                     //modify styles placed on html body
                     document.body.style.background = "none";
                     document.body.style.margin = "0";
+
+                    var fileUpload = document.getElementById('<%= Uploader.ClientID %>');
+
+                    fileUpload.addEventListener("change", function (event) {
+                        var file = event.target.files[0];
+                        if (file && file.type.startsWith("image/")) {
+                        }
+                    });
+
+                    PageMethods.DbWrite(function (success) {
+                        debugger;
+                    }, function (error) {
+                    });
+
                 })
 
                 function disableElement() {
