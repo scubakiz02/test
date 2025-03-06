@@ -1,18 +1,6 @@
 ﻿Public Class LogAspx
     'return value of: true is valid; false is invalid; null is out of range
     Public Function ValidateByBackColor(NumOfNotes As Integer, BackColor As String) As Boolean?
-        'If NumOfNotes = 0 Then
-        '    If Value = "" OrElse Not All_InputsAreValid Then
-        '        MessageUserLabel.Text = "Error: Incomplete or invalid logs. Add a comment to proceed."
-        '        Exit Sub
-        '    End If
-        'ElseIf Not All_InputsAreValid Then
-        '    'display verify interface
-        '    DoneButton.Enabled = False
-        '    MarkAsDoneCheckBox.Visible = True
-        '    Return
-        'End If
-
         Dim Res As Boolean = Nothing
 
         If NumOfNotes > 0 OrElse BackColor = "#F5F5F5" Then
