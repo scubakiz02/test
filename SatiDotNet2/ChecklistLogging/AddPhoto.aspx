@@ -56,7 +56,7 @@
             </style>
 
             <asp:Panel runat="server" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />
+<%--                <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />--%>
                 <asp:Panel runat="server" ID="UploadPanel">
                     <asp:FileUpload ID="Uploader" runat="server" Height="25px" Width="306px" />
                     <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
