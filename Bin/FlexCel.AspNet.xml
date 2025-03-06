@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?><doc><assembly><name>FlexCel.AspNet</name></assembly><members><member name="T:FlexCel.AspNet.FlexCelAspViewer"><summary>
+    An ASP.NET component that can be used to embed an Excel file as HTML in a WebForm.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.HtmlExport"><summary>
+    Component that will do the actual conversion from an Excel file to HTML. Most of the export settings should be changed in this component.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.SheetExport"><summary>
+    Defines how many sheets will be exported.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.SheetSeparator"><summary>
+    Defines a separator between multiple sheets when exporting all visible sheets. You can use for example &lt;hr&gt; here to write an
+    horizontal ruler between sheets.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.RelativeImagePath"><summary>
+    Path where the images will be stored, relative to the path where the page is in.
+    Try to use a different folder for the images, so it is easier to delete them later.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.ImageExportMode"><summary>
+    How the images will be served to the browser. See t<see href="@HtmlExportingGuide#creating-a-file-using-flexcelaspviewer-component" /> for more information.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.ImageTimeout"><summary>
+    Time in minutes that temporary images will live in the server before being deleted. 
+    Temporary images older than "current date - imageTimeOut" will be removed each time a new call to this component is made.
+    Set this property to 0 or a negative value to not delete any image, if you wish to do the cleanup yourself using a server script.
+    See also <see cref="P:FlexCel.AspNet.FlexCelAspViewer.MaxTemporaryImages" /></summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.MaxTemporaryImages"><summary>
+    Maximum number of temporary images in the images folder. Set it to 0 or a negative value if you want unlimited images.
+    Use this variable to avoid Denial of Service conditions. For example, a malicious user could keep continuously refreshing the webpage,
+    without waiting for the page to load. As all images are created each time he refreshes, but they are never deleted (because they are never requested
+    back) the disk could fill very fast, not giving time to the <see cref="P:FlexCel.AspNet.FlexCelAspViewer.ImageTimeout" /> timespan to happen, and crashing the server.
+    <para>Note that this number is approximate, if for example the maximum is 5000, you could get 5200 images in a peak time. It is not guaranteed that the
+    maximum images will be 5000, just that it will not grow much more than that.</para></summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.ImageHandlerName"><summary>
+    Name for the ImageHandler used to return images when <see cref="P:FlexCel.AspNet.FlexCelAspViewer.ImageExportMode" /> is not <see cref="F:FlexCel.AspNet.TImageExportMode.TemporaryFiles" />.
+    You need to add this name in web.config in your app.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelAspViewer.ImageParameterName"><summary>
+    Name for the parameter used to return the image in the URL. name when <see cref="P:FlexCel.AspNet.FlexCelAspViewer.ImageExportMode" /> is <see cref="F:FlexCel.AspNet.TImageExportMode.UniqueTemporaryFiles" />.
+    This parameter will appear in the url as: http://server/.../flexcelviewer.ashx?IMAGEPARAMETERNAME=Imagename
+    </summary></member><member name="E:FlexCel.AspNet.FlexCelAspViewer.ImageLink"><summary>
+    Use this event to customize the links in the HTML file when using <see cref="F:FlexCel.AspNet.TImageExportMode.CustomStorage" />.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.OnImageLink(FlexCel.AspNet.ImageLinkEventArgs)"><summary>
+    Replace this event when creating a custom descendant of FlexCelAspViewer.
+    </summary><param name="e"></param></member><member name="E:FlexCel.AspNet.FlexCelAspViewer.SaveImage"><summary>
+    Use this event to save the images into other place. You will normally need to use this event when implementing your own Http Handler to
+    return the images.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.OnSaveImage(FlexCel.Render.SaveImageEventArgs)"><summary>
+    Replace this event when creating a custom descendant of FlexCelAspViewer.
+    </summary><param name="e"></param></member><member name="E:FlexCel.AspNet.FlexCelAspViewer.NamedRangeExport"><summary>
+    Use this event to customize how a named range if exported to the HTML file. Note that for this event to be called,
+    you first need to set <see cref="P:FlexCel.AspNet.FlexCelAspViewer.HtmlExport" />.ExportNamedRanges = true. If you want to change the id that will be exported or
+    exclude certain named from being exported, you can do so here.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.OnNamedRangeExport(FlexCel.Render.NamedRangeExportEventArgs)"><summary>
+    Replace this event when creating a custom descendant of FlexCelAspViewer.
+    </summary><param name="e"></param></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.#ctor"><summary>
+    Creates a new instance of FlexCelAspViewer.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.OnPreRender(System.EventArgs)"><summary>
+    This prerender method is overriden so it saves the CSS rules to the head part of the html file.
+    </summary><param name="e"></param></member><member name="M:FlexCel.AspNet.FlexCelAspViewer.RenderContents(System.Web.UI.HtmlTextWriter)"><summary>
+    Method overriden to return the exported xls file as HTML.
+    </summary><param name="writer"></param></member><member name="T:FlexCel.AspNet.THtmlSheetExport"><summary>
+    Defines how many sheets will be exported.
+    </summary></member><member name="F:FlexCel.AspNet.THtmlSheetExport.ActiveSheet"><summary>
+    Only ActiveSheet on the workbook will be exported.
+    </summary></member><member name="F:FlexCel.AspNet.THtmlSheetExport.AllVisibleSheets"><summary>
+    All visible sheets in the workbook will be exported, one after the other.
+    </summary></member><member name="T:FlexCel.AspNet.TImageExportMode"><summary>
+    How images on the Excel file will be stored in order to be served to the browser.
+    </summary></member><member name="F:FlexCel.AspNet.TImageExportMode.TemporaryFiles"><summary>
+    When this option is selected, images will be saved in a temporary directory (defined in <see cref="P:FlexCel.AspNet.FlexCelAspViewer.RelativeImagePath" /> )
+    You can configure a timeout period with <see cref="P:FlexCel.AspNet.FlexCelAspViewer.ImageTimeout" /> after which the images will be deleted.
+    </summary></member><member name="F:FlexCel.AspNet.TImageExportMode.UniqueTemporaryFiles"><summary>
+    When this option is selected, images will be saved in a temporary directory (defined in <see cref="P:FlexCel.AspNet.FlexCelAspViewer.RelativeImagePath" /> )
+    You can configure a timeout period with <see cref="P:FlexCel.AspNet.FlexCelAspViewer.ImageTimeout" /> after which the images will be deleted.
+    Different from <see cref="F:FlexCel.AspNet.TImageExportMode.TemporaryFiles" />, this mode will delete the image once it is served. 
+    This is an advantage from the point of view that images are cleaned faster (without waiting for the timeout), but might be
+    a disadvantage if the user for example right clicks the image and selects "view image". As the image is deleted the first time it is served,
+    the second time (when the user does "view image") it will return image not found. Also some browsers might ask for the image more than once.<br /><b>Use this mode only in controlled environments, when you know the browsers being used and you can test them.</b> If you use this mode as for a public web server, some users might not see the images.
+    </summary></member><member name="F:FlexCel.AspNet.TImageExportMode.CustomStorage"><summary>
+    This is an advanced option that allows you to store the images somewhere else, for example a database. Links on the image will point to
+    an HttpHandler that you need to implement. See <see href="@HtmlExportingGuide#timageexportmodecustomstorage" /> for more information.
+    </summary></member><member name="T:FlexCel.AspNet.ImageLinkEventArgs"><summary>
+    Arguments passed on <see cref="E:FlexCel.AspNet.FlexCelAspViewer.ImageLink" />, 
+    </summary></member><member name="M:FlexCel.AspNet.ImageLinkEventArgs.#ctor(FlexCel.Core.ExcelFile,System.Int32,FlexCel.Core.TShapeProperties,System.String,System.String,FlexCel.Render.THtmlImageFormat)"><summary>
+    Creates a new Argument.
+    </summary><param name="aWorkbook">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.Workbook" /></param><param name="aObjectIndex">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.ObjectIndex" /></param><param name="aShapeProps">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.ShapeProps" /></param><param name="aImageLink">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.ImageLink" /></param><param name="aAlternateText">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.AlternateText" /></param><param name="aSavedImageFormat">See <see cref="P:FlexCel.AspNet.ImageLinkEventArgs.SavedImageFormat" /></param></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.Workbook"><summary>
+    ExcelFile with the image, positioned in the sheet that we are rendering. 
+    Make sure if you modify ActiveSheet of this instance to restore it back to the original value before exiting the event.
+    </summary></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.ObjectIndex"><summary>
+    Object index of the object being rendered. You can use xls.GetObject(objectIndex) to get the object properties. 
+    If the image is not an object (for example it is a rotated text)
+    this property will be -1.
+    </summary></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.ShapeProps"><summary>
+    Shape properties of the object being rendered. You can use them to get the name of the object, its size, etc.
+     If the image is not an object (for example it is a rotated text)
+    this property will be null. 
+    </summary></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.AlternateText"><summary>
+    Alternate text for the image, to show in the "ALT" tag when a browser can not display images.
+    By default this is set to the text in the box "Alternative Text" in the web tab on the image properties.
+    If no Alternative text is supplied in the file, the image name will be used here.
+    </summary></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.SavedImageFormat"><summary>
+    File format in which the image is. 
+    </summary></member><member name="P:FlexCel.AspNet.ImageLinkEventArgs.ImageLink"><summary>
+    The link that will be inserted in the html file. Modify it to create your won link to the HttpHandler.
+    </summary></member><member name="T:FlexCel.AspNet.ImageLinkEventHandler"><summary>
+    Delegate used to specify where to store the images on a page.
+    </summary></member><member name="T:FlexCel.AspNet.FlexCelAspExport"><summary>
+    A FlexCelHtmlExport specialized to export pages with FlexCelAspViewer.
+    This class is mainly for internal use, there is no need to use it directly.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspExport.#ctor(FlexCel.AspNet.FlexCelAspViewer)"><summary>
+    Constructs a new instance of FlexCelHtmlExport.
+    </summary><param name="aViewer">Viewer that this exporter will be serving.</param></member><member name="M:FlexCel.AspNet.FlexCelAspExport.OnGetImageInformation(FlexCel.Render.ImageInformationEventArgs)"><summary>
+    Intercepts the original OnGetImageInformation event to provide the parameters for FlexCelAspExport.
+    </summary><param name="e"></param></member><member name="M:FlexCel.AspNet.FlexCelAspExport.OnSaveImage(FlexCel.Render.SaveImageEventArgs)"><summary>
+    Intercepts the original OnGetSaveImage event to provide the parameters for FlexCelAspExport.
+    </summary><param name="e"></param></member><member name="P:FlexCel.AspNet.FlexCelAspExport.HasSaveImageEvent"><summary>
+    Returns true if the viewer has a SaveImage event assigned.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelAspExport.OnNamedRangeExport(FlexCel.Render.NamedRangeExportEventArgs)"><summary>
+    Intercepts the original OnNamedRangeExport event to provide the parameters for FlexCelAspExport.
+    </summary><param name="e"></param></member><member name="T:FlexCel.AspNet.FlexCelHtmlImageHandler"><summary>
+    This is a base image handler you can use to create your own.
+    This code is adapted from here: http://www.hanselman.com/blog/PermaLink,guid,5c59d662-b250-4eb2-96e4-f274295bd52e.aspx
+    We would like to thank Scott Hanselman for the  insightful article.
+    </summary></member><member name="P:FlexCel.AspNet.FlexCelHtmlImageHandler.IsReusable"><summary>
+    This instance can be reused.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelHtmlImageHandler.ProcessRequest(System.Web.HttpContext)"><summary>
+    This method will validate the parameters, and then call <see cref="M:FlexCel.AspNet.FlexCelHtmlImageHandler.GetImage(System.Web.HttpContext)" /> to get the real data.
+    When inheriting from this class, you normally only have to override <see cref="M:FlexCel.AspNet.FlexCelHtmlImageHandler.ValidateParameters(System.Web.HttpContext)" /><see cref="M:FlexCel.AspNet.FlexCelHtmlImageHandler.GetImage(System.Web.HttpContext)" /></summary><param name="context"></param></member><member name="M:FlexCel.AspNet.FlexCelHtmlImageHandler.ValidateParameters(System.Web.HttpContext)"><summary>
+    Override this method to check the parameters are valid.
+    </summary><param name="context"></param><returns></returns></member><member name="P:FlexCel.AspNet.FlexCelHtmlImageHandler.RequiresAuthentication"><summary>
+    Override this property in a descendant class if you do not want to ask for authentication for this image handler.
+    </summary></member><member name="M:FlexCel.AspNet.FlexCelHtmlImageHandler.ImageExists(System.Web.HttpContext)"><summary>
+    Override this method to provide a 404 error if the image has been deleted or doesn't exists.
+    </summary><param name="context"></param><returns></returns></member><member name="M:FlexCel.AspNet.FlexCelHtmlImageHandler.GetImage(System.Web.HttpContext)"><summary>
+    Override this method to return the image. <br /><b>WARNING:</b> Whatever you do here, make <b>really</b> sure you return only the indented image.
+    A NAIVE IMPLEMENTATION OF THIS METHOD MIGHT RESULT IN A HUGE SECURITY HOLE. An attacker could use an implementation
+    that just returns a file to retrieve any file in the server.
+    </summary><param name="context"></param><returns>True if the image was correctly served.</returns></member><member name="T:FlexCel.AspNet.UniqueTemporaryFilesImageHandler"><summary>
+    The image handler used when you select <see cref="F:FlexCel.AspNet.TImageExportMode.UniqueTemporaryFiles" /></summary></member><member name="M:FlexCel.AspNet.UniqueTemporaryFilesImageHandler.ValidateParameters(System.Web.HttpContext)"><summary>
+    This method will validate the image passed is a valid GUID.
+    </summary><param name="context"></param><returns></returns></member><member name="M:FlexCel.AspNet.UniqueTemporaryFilesImageHandler.ImageExists(System.Web.HttpContext)"><summary>
+    This method checks if the image still exists, and return false if it doesn't.
+    </summary><param name="context"></param><returns></returns></member><member name="M:FlexCel.AspNet.UniqueTemporaryFilesImageHandler.GetImage(System.Web.HttpContext)"><summary>
+    This method returns the image from the file.
+    </summary><param name="context"></param></member></members></doc>
