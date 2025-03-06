@@ -204,17 +204,25 @@
                          * */
 
                         if (currBathTempTbx.value) {
-                            if (!nextBathTempTbx.value) focusTextbox = nextBathTempTbx;
+                            if (!nextBathTempTbx.value && !currIrGunTempTbx.value) focusTextbox = null; //do NOT call cursor focus, b/c tech will not necessarily check temp for next solution
                             else if (!currIrGunTempTbx.value) focusTextbox = currIrGunTempTbx;
                             else {
-                                debugger;
-                                focusTextbox = nextIrGunTempTbx; //edit here
+                                while (!nextBathTempTbx.value) { //write subroutine so focusTextbox is the element of the next Input that HAS a curr bath temp
+                                    focusInputElement = focusInputElement.nextElementSibling;
+
+                                    if (!focusInputElement) return; //in case user is on last STC Input element
+
+                                    nextBathTempTbx = getTempTbx.call(focusInputElement, "BathTemp")
+                                    nextIrGunTempTbx = getTempTbx.call(focusInputElement, "IrGunTemp")
+                                }
+
+                                focusTextbox = nextIrGunTempTbx
                             }
                         }
                         else focusTextbox = currBathTempTbx;
                     }
 
-                    if (focusTextbox.style.display !== "none") {
+                    if (focusTextbox && focusTextbox.style.display !== "none") {
                         focusTextbox.focus();
                         focusTextbox.setSelectionRange(textboxFromArg.value.length, textboxFromArg.value.length); //set cursor after any existing characters in textbox
                     }
