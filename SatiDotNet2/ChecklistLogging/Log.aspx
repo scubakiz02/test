@@ -345,7 +345,9 @@
                             callCodeBehindEvent.call(this);
                         });
                     }
-                    else elem.addEventListener("change", callCodeBehindEvent.bind(elem));
+                    else {
+                        elem.addEventListener("change", callCodeBehindEvent.bind(elem));
+                    }
                 }
 
                 function callCodeBehindEvent() {
@@ -408,7 +410,7 @@
                     display: flex;
                     align-items: center;
                     font-size: calc(var(--UFontSize));
-                    margin-top: var(--UWhitespace);
+                    margin: var(--UWhitespace);
                 }
 
                 .LogCheckBox {
@@ -417,7 +419,7 @@
                 }
 
                     .LogCheckBox input { /*input to hit asp CheckBox control*/
-                        transform: scale(1.25);
+                        transform: scale(2);
                         margin: var(--UWhitespace);
                     }
 
@@ -486,7 +488,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel0" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -500,11 +502,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -527,7 +529,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel1" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -541,11 +543,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -568,7 +570,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel2" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -582,11 +584,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -609,7 +611,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel3" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -623,11 +625,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -650,7 +652,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel4" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -664,11 +666,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -691,7 +693,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel5" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -705,11 +707,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -732,7 +734,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel6" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -746,11 +748,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -773,7 +775,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel7" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -787,11 +789,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -814,7 +816,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel8" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -828,11 +830,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -855,7 +857,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel9" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -869,11 +871,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -896,7 +898,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel10" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -910,11 +912,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -937,7 +939,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel11" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -951,11 +953,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -978,7 +980,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel12" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -992,11 +994,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1019,7 +1021,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel13" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1033,11 +1035,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1060,7 +1062,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel14" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1074,11 +1076,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1101,7 +1103,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel15" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1115,11 +1117,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1142,7 +1144,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel16" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1156,11 +1158,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1183,7 +1185,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel17" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1197,11 +1199,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1224,7 +1226,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel18" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1238,11 +1240,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1265,7 +1267,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel19" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1279,11 +1281,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1306,7 +1308,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel20" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1320,11 +1322,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1347,7 +1349,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel21" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1361,11 +1363,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1388,7 +1390,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel22" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1402,11 +1404,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1429,7 +1431,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel23" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1443,11 +1445,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1470,7 +1472,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel24" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1484,11 +1486,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1511,7 +1513,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel25" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1525,11 +1527,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1552,7 +1554,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel26" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1566,11 +1568,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1593,7 +1595,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel27" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1607,11 +1609,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1634,7 +1636,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel28" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1648,11 +1650,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1675,7 +1677,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel29" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1689,11 +1691,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1716,7 +1718,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel30" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1730,11 +1732,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1757,7 +1759,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel31" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1771,11 +1773,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1798,7 +1800,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel32" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1812,11 +1814,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1839,7 +1841,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel33" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1853,11 +1855,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1880,7 +1882,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel34" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1894,11 +1896,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1921,7 +1923,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel35" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1935,11 +1937,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1962,7 +1964,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel36" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1976,11 +1978,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2003,7 +2005,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel37" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2017,11 +2019,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2044,7 +2046,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel38" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2058,11 +2060,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2085,7 +2087,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel39" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2099,11 +2101,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2126,7 +2128,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel40" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2140,11 +2142,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2167,7 +2169,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel41" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2181,11 +2183,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2208,7 +2210,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel42" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2222,11 +2224,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2249,7 +2251,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel43" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2263,11 +2265,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2290,7 +2292,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel44" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2304,11 +2306,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2331,7 +2333,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel45" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2345,11 +2347,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2372,7 +2374,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel46" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2386,11 +2388,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2413,7 +2415,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel47" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2427,11 +2429,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2454,7 +2456,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel48" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2468,11 +2470,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2495,7 +2497,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel49" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2509,11 +2511,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2536,7 +2538,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel50" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2550,11 +2552,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2577,7 +2579,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel51" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2591,11 +2593,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2618,7 +2620,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel52" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2632,11 +2634,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2668,7 +2670,7 @@
                     <asp:Panel ID="ImageHoverLinkPanel" Style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--UWhitespace); max-width: 100vw;" runat="server">
                         <%--<asp:ImageButton OnClick="AddPhotoButton_OnClick" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />--%>
 
-                        <asp:Panel runat="server" ID="UploadPanel" style="display: flex;">
+                        <asp:Panel runat="server" ID="UploadPanel" Style="display: flex;">
                             <asp:ImageButton OnClientClick="OpenFileUpload(); return false;" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
                             <asp:FileUpload ID="Uploader" Style="display: none;" runat="server" />
                             <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
