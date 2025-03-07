@@ -153,6 +153,10 @@ Partial Class MR_OpenTicketStatusBoard
                 JsFunctionCalls += "SetHoverEffect('" & LinkButton.ID & "', '" & ImageUrl.Replace("\", "\\") & "'); "
             Next
 
+            DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString).Tables(0).Rows(0)
+            Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
+            uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
+            VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
             DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
             RC = DS.Tables(0).Rows.Count
@@ -333,12 +337,6 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         BuildDynamicAsp()
-
-
-        DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString).Tables(0).Rows(0)
-        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
-        uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
-        VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
     End Sub
 
 

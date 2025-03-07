@@ -493,7 +493,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel0" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -534,7 +534,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel1" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -575,7 +575,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel2" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -616,7 +616,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel3" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -657,7 +657,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel4" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -698,7 +698,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel5" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -739,7 +739,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel6" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -780,7 +780,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel7" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -821,7 +821,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel8" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -862,7 +862,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel9" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -903,7 +903,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel10" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -944,7 +944,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel11" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -985,7 +985,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel12" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1026,7 +1026,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel13" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1067,7 +1067,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel14" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1108,7 +1108,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel15" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1149,7 +1149,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel16" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1190,7 +1190,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel17" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1231,7 +1231,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel18" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1272,7 +1272,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel19" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1313,7 +1313,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel20" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1354,7 +1354,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel21" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1395,7 +1395,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel22" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1436,7 +1436,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel23" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1477,7 +1477,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel24" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1518,7 +1518,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel25" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1559,7 +1559,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel26" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1600,7 +1600,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel27" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1641,7 +1641,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel28" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1682,7 +1682,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel29" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1723,7 +1723,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel30" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1764,7 +1764,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel31" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1805,7 +1805,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel32" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1846,7 +1846,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel33" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1887,7 +1887,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel34" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1928,7 +1928,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel35" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -1969,7 +1969,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel36" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2010,7 +2010,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel37" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2051,7 +2051,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel38" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2092,7 +2092,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel39" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2133,7 +2133,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel40" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2174,7 +2174,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel41" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2215,7 +2215,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel42" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2256,7 +2256,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel43" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2297,7 +2297,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel44" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2338,7 +2338,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel45" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2379,7 +2379,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel46" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2420,7 +2420,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel47" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2461,7 +2461,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel48" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2502,7 +2502,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel49" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2543,7 +2543,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel50" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2584,7 +2584,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel51" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
@@ -2625,7 +2625,7 @@
 
                     <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel52" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
                         <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
-                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize));">
+                        <div class="EverythingExceptTitle" style="display: flex; font-size: calc(var(--UFontSize)); gap: var(--UWhitespace);">
 
                             <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
 
