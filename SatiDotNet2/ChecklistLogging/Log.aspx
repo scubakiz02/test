@@ -333,7 +333,14 @@
 
                 function SetDBConnection(id) {
                     let elem = getAspControl(id);
+                    let InputElement = getInputElement.call(elem);
                     if (!elem) return; //if elem is undefined
+
+                    //checkbox & stc fieldtype controls do NOT have a colored background. Change this
+                    if (isSTC.call(InputElement)) {
+                        getTempTbx.call(InputElement, "BathTemp").style.backgroundColor = InputElement.style.backgroundColor;
+                        getTempTbx.call(InputElement, "IrGunTemp").style.backgroundColor = InputElement.style.backgroundColor;
+                    }
 
                     if (elem.id.includes("TextBox")) {
                         elem.addEventListener("keydown", function (e) {
@@ -345,9 +352,7 @@
                             callCodeBehindEvent.call(this);
                         });
                     }
-                    else {
-                        elem.addEventListener("change", callCodeBehindEvent.bind(elem));
-                    }
+                    else elem.addEventListener("change", callCodeBehindEvent.bind(elem));
                 }
 
                 function callCodeBehindEvent() {
