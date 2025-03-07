@@ -1020,8 +1020,8 @@ Partial Class MR_OpenTicketStatusBoard
             System.IO.Directory.CreateDirectory(uploadDirectory)
         End If
 
-        ViewState("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
-        Uploader.PostedFile.SaveAs(ViewState("FileUploadDirectory"))
+        Session("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
+        Uploader.PostedFile.SaveAs(Session("FileUploadDirectory"))
 
         'variables declared in UploadFile do NOT hold their value, so I tied them to the session
         Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
