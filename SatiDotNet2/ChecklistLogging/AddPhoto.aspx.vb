@@ -94,8 +94,8 @@ Partial Class MR_OpenTicketStatusBoard
             System.IO.Directory.CreateDirectory(uploadDirectory)
         End If
 
-        ViewState("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
-        Uploader.PostedFile.SaveAs(ViewState("FileUploadDirectory"))
+        Session("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
+        Uploader.PostedFile.SaveAs(Session("FileUploadDirectory"))
 
         'variables declared in UploadFile do NOT hold their value, so I tied them to the session
         Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
@@ -141,7 +141,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Function
 
     Protected Sub CancelImage_OnClick(sender As Object, e As EventArgs)
-        System.IO.File.Delete(ViewState("FileUploadDirectory"))
+        System.IO.File.Delete(Session("FileUploadDirectory"))
         Response.Redirect(Request.Url.ToString())
     End Sub
 
@@ -176,12 +176,12 @@ Partial Class MR_OpenTicketStatusBoard
                     Next
 
                     'ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath) VALUES (" & DataKeyFromQueryString & ", '" & Title & "', '" & Path.Combine(uploadDirectory, NewFileName) & "')")
-                    System.IO.File.Move(ViewState("FileUploadDirectory"), Path.Combine(uploadDirectory, NewFileName))
+                    System.IO.File.Move(Session("FileUploadDirectory"), Path.Combine(uploadDirectory, NewFileName))
                     ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath, ContentType, FileName) VALUES (" & DataKeyFromQueryString & ", '" & SqlProofSingleQuotes(UserInput) & "', '" & Path.Combine(VirtualDirectory, NewFileName) & "', '" & Session("ContentType") & "', '" & NewFileName & "')")
                 End If
             Else 'Cancel
                 If uploadDirectory IsNot Nothing Then
-                    System.IO.File.Delete(ViewState("FileUploadDirectory"))
+                    System.IO.File.Delete(Session("FileUploadDirectory"))
                 End If
             End If
         Catch ex As Exception
