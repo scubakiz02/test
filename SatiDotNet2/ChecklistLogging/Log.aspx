@@ -39,7 +39,7 @@
                 let EditPreviewPanel;
 
                 window.addEventListener("load", function () {
-                    var fileUpload = document.getElementById('<%= Uploader2.ClientID %>');
+                    var fileUpload = document.getElementById('<%= Uploader.ClientID %>');
                     window.iframeEnabled = iframeEnabled;
 
                     fileUpload.addEventListener("change", function (event) {
@@ -63,7 +63,8 @@
                         window.location.href = window.location.href; //redirect to current url, to prevent 'Confirm Form Resubmission' alert window
                     }
                     else {
-                        PreviewPanel_iframe.style.height = ItemsPanel.style.maxHeight; //only works if I do NOT call getAspControl function on ItemsPanel
+                        setItemsPanel();
+                        PreviewPanel_iframe.style.height = document.getElementById("<%=ItemsPanel.ClientID%>").style.maxHeight;
                         PreviewPanel_iframe.style.display = "block";
                         getAspControl("ItemsPanel").style.display = "none"; //only works if I call getAspControl function on ItemsPanel
                         disableElement.call(getAspControl("HeaderPanel"));
@@ -83,18 +84,24 @@
                 }
 
                 function setFooterAtBottom() {
-                    //doing lots of initializing here b/c this js function is called from asp code-behind in the page PreRender Sequence 
+                    setItemsPanel();
+                    for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
+                }
+
+                function setItemsPanel() { //workaround to asp.net architecture
                     HeaderPanel = getAspControl("HeaderPanel");
                     FooterPanel = getAspControl("FooterPanel");
                     ItemsPanel = getAspControl("ItemsPanel");
                     UpdatePanel = getAspControl("UpdatePanel");
                     let UWhitespaceInPx = emToPx(parseFloat(getComputedStyle(UpdatePanel).getPropertyValue('--UWhitespace')));
 
+                    UpdatePanel = getAspControl("UpdatePanel");
+                    UpdatePanel.style.height = window.innerHeight + "px";
+
                     document.getElementById("ctl00_MasterPagePanelTop").style.display = "none"; //hide header
                     document.getElementById("ctl00_MasterPagePanelBottom").style.display = "none"; //hide footer
                     document.getElementById("ctl00_MasterPagePanel").style.minWidth = "unset"; //prevent min-width on div with id of 'ctl00_MasterPagePanel'
                     document.getElementById("ctl00_MasterPagePanelMain").style.padding = "0 10px"; //previously padding: 10px;
-                    UpdatePanel.style.height = window.innerHeight + "px";
 
                     //modify styles placed on html body
                     document.body.style.background = "none";
@@ -104,8 +111,6 @@
                     if (ItemsPanel.style.maxHeight) ItemsPanel.style.maxHeight = "none";
 
                     ItemsPanel.style.maxHeight = (window.innerHeight - (UWhitespaceInPx * 2)) - (FooterPanel.offsetHeight + HeaderPanel.offsetHeight) + "px";
-
-                    for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
                 }
 
                 function getAspControl(id) {
@@ -369,7 +374,7 @@
                 }
 
                 function OpenFileUpload() {
-                    let FileUploadControl = document.getElementById('<%=Uploader2.ClientID%>');
+                    let FileUploadControl = document.getElementById('<%=Uploader.ClientID%>');
                     FileUploadControl.click();
                 }
 
@@ -2541,7 +2546,7 @@
 
                         <asp:Panel runat="server" ID="UploadPanel">
                             <asp:ImageButton OnClientClick="OpenFileUpload(); return false;" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
-                            <asp:FileUpload ID="Uploader2" Style="display: none;" runat="server" />
+                            <asp:FileUpload ID="Uploader" Style="display: none;" runat="server" />
                             <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
                             <svg id="loadingSpinner" style="display: none;" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <style>

@@ -54,6 +54,11 @@ Partial Class MR_OpenTicketStatusBoard
 
         Dim UploadFileDelegate As UploadFileDelegate = AddressOf UploadFile
         Session("UploadFile") = UploadFileDelegate
+
+        UploadPanel.Visible = False
+        CancelSetPanel.Visible = True
+        SnapshotImageButton.Visible = True
+        SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, Request.QueryString("fileName"))
     End Sub
 
     Public Delegate Sub UploadFileDelegate(sender As Object, e As EventArgs)

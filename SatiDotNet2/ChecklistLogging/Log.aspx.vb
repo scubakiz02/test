@@ -991,12 +991,12 @@ Partial Class MR_OpenTicketStatusBoard
         Dim FileFormat As String
         Dim fileName As String
 
-        If Not Uploader2.HasFile Then
+        If Not Uploader.HasFile Then
             '    ErrorMessage.Text = "CHOOSE A FILE BEFORE UPLOADING"
             Exit Sub
         End If
 
-        fileName = IO.Path.GetFileName(Uploader2.FileName) 'using session state variable because global variables do NOT retain values assinged within this function
+        fileName = IO.Path.GetFileName(Uploader.FileName) 'using session state variable because global variables do NOT retain values assinged within this function
         TestFile = fileName
         fileNameDelimited = fileName.Split(".")
         Format = fileNameDelimited(fileNameDelimited.Count - 1)
@@ -1021,15 +1021,14 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
         Session("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
-        Uploader2.PostedFile.SaveAs(Session("FileUploadDirectory"))
+        Uploader.PostedFile.SaveAs(Session("FileUploadDirectory"))
 
         'variables declared in UploadFile do NOT hold their value, so I tied them to the session
         Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
 
-        'UploadPanel.Visible = False
-        'CancelSetPanel.Visible = True
-        'SnapshotImageButton.Visible = True
-        'SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, fileName)
+        PreviewPanel_iframe.Visible = True
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
+        PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/AddPhoto.aspx" & "?" & Request.RawUrl.Split("?")(1) & "&DataKey=" & KeyFromQueryString & "&fileName=" & fileName)
     End Sub
 
 
