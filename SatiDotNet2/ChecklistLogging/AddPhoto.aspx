@@ -3,10 +3,6 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-        <Triggers>
-            <asp:PostBackTrigger ControlID="CreateButton" />
-        </Triggers>
-
         <ContentTemplate>
 
             <script type="text/javascript">
@@ -18,15 +14,6 @@
                     //modify styles placed on html body
                     document.body.style.background = "none";
                     document.body.style.margin = "0";
-
-                    var fileUpload = document.getElementById('<%= Uploader.ClientID %>');
-
-                    fileUpload.addEventListener("change", function (event) {
-                        var file = event.target.files[0];
-                        if (file && file.type.startsWith("image/")) {
-                            document.getElementById("<%=CreateButton.ClientID%>").click();
-                        }
-                    });
 
                     var titleTbx = document.getElementById('<%= ImgNameTextBox.ClientID %>');
 
@@ -55,10 +42,6 @@
                     document.getElementById("fileUploadLoadingSpinner").style.display = "block";
                 }
 
-                function OpenFileUpload() {
-                    let FileUploadControl = document.getElementById('<%=Uploader.ClientID%>');
-                    FileUploadControl.click();
-                }
             </script>
 
             <style>
@@ -69,73 +52,7 @@
             </style>
 
             <asp:Panel runat="server" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                <%--                <asp:Button OnClick="ExitIframeButton_onClick" Text="&#x58;" runat="server" Style="position: absolute; right: 0; top: 0; margin: var(--UWhitespace); font-weight: bold; background: white; border: none; font-size: calc(var(--UFontSize)* 2);" />--%>
-                <asp:Panel runat="server" ID="UploadPanel">
-                    <asp:ImageButton OnClientClick="OpenFileUpload(); return false;" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
-                    <asp:FileUpload ID="Uploader" style="display: none;" runat="server"  />
-                    <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
-                    <svg id="loadingSpinner" style="display: none;" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <style>
-                            .spinner_Wezc {
-                                transform-origin: center;
-                                animation: spinner_Oiah .75s step-end infinite
-                            }
-
-                            @keyframes spinner_Oiah {
-                                8.3% {
-                                    transform: rotate(30deg)
-                                }
-
-                                16.6% {
-                                    transform: rotate(60deg)
-                                }
-
-                                25% {
-                                    transform: rotate(90deg)
-                                }
-
-                                33.3% {
-                                    transform: rotate(120deg)
-                                }
-
-                                41.6% {
-                                    transform: rotate(150deg)
-                                }
-
-                                50% {
-                                    transform: rotate(180deg)
-                                }
-
-                                58.3% {
-                                    transform: rotate(210deg)
-                                }
-
-                                66.6% {
-                                    transform: rotate(240deg)
-                                }
-
-                                75% {
-                                    transform: rotate(270deg)
-                                }
-
-                                83.3% {
-                                    transform: rotate(300deg)
-                                }
-
-                                91.6% {
-                                    transform: rotate(330deg)
-                                }
-
-                                100% {
-                                    transform: rotate(360deg)
-                                }
-                            }
-                        </style><g class="spinner_Wezc"><circle cx="12" cy="2.5" r="1.5" opacity=".14" /><circle cx="16.75" cy="3.77" r="1.5" opacity=".29" /><circle cx="20.23" cy="7.25" r="1.5" opacity=".43" /><circle cx="21.50" cy="12.00" r="1.5" opacity=".57" /><circle cx="20.23" cy="16.75" r="1.5" opacity=".71" /><circle cx="16.75" cy="20.23" r="1.5" opacity=".86" /><circle cx="12" cy="21.5" r="1.5" /></g>
-                    </svg>
-                    <%--                    <asp:Label ID="ErrorMessage" runat="server" Font-Bold="True" ForeColor="Red" Style="margin-left: 0px" Width="465px"></asp:Label>--%>
-                </asp:Panel>
-
-                <asp:Panel Visible="False" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server" ID="CancelSetPanel">
+                <asp:Panel Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server" ID="CancelSetPanel">
                     <div style="position: relative; width: fit-content;">
                         <asp:ImageButton ID="SnapshotImageButton" runat="server" Style="max-width: 50vw; max-height: 50vh; object-fit: contain;" />
                         <asp:Button OnClick="CancelImage_OnClick" Style="position: absolute; top: 0; right: 0; background: black; color: white; opacity: .5; border-radius: 50%;" Text="&#x58;" runat="server" />

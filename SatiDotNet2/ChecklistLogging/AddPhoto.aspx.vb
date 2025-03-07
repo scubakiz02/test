@@ -27,20 +27,6 @@ Partial Class MR_OpenTicketStatusBoard
         {"svg%2Bxml", "svg"}
      } '%2B is URL encoding for '+'
 
-    <WebMethod()>
-    Public Shared Function DbWrite() As String
-        Dim Success As Boolean
-
-        Try
-            Dim UploadFile As UploadFileDelegate = HttpContext.Current.Session("UploadFile")
-            UploadFile(Nothing, EventArgs.Empty)
-            Success = True
-        Catch ex As Exception
-            Success = False
-        End Try
-
-        Return Success
-    End Function
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
@@ -51,65 +37,9 @@ Partial Class MR_OpenTicketStatusBoard
         Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
-
-        Dim UploadFileDelegate As UploadFileDelegate = AddressOf UploadFile
-        Session("UploadFile") = UploadFileDelegate
-
-        UploadPanel.Visible = False
-        CancelSetPanel.Visible = True
-        SnapshotImageButton.Visible = True
         SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, Request.QueryString("fileName"))
     End Sub
 
-    Public Delegate Sub UploadFileDelegate(sender As Object, e As EventArgs)
-    Protected Sub UploadFile(sender As Object, e As EventArgs)
-        Dim fileNameDelimited As String()
-        Dim Format As String
-        Dim TestFile As String
-        Dim match As Match
-        Dim FileFormat As String
-        Dim fileName As String
-
-        If Not Uploader.HasFile Then
-            '    ErrorMessage.Text = "CHOOSE A FILE BEFORE UPLOADING"
-            Exit Sub
-        End If
-
-        fileName = IO.Path.GetFileName(Uploader.FileName) 'using session state variable because global variables do NOT retain values assinged within this function
-        TestFile = fileName
-        fileNameDelimited = fileName.Split(".")
-        Format = fileNameDelimited(fileNameDelimited.Count - 1)
-        match = Regex.Match(fileName, "[% < > : / \ | ? *]")
-        FileFormat = fileName.Split(".")(1)
-
-        'Check for format other than an image
-        If Not AcceptedFormats.Contains(FileFormat) Then
-            'AcceptedFormat = False
-        End If
-
-        'REMOVES CHARACTERS THAT ARENT ALLOWED IN FILE NAMES
-        Do While match.Success
-            Dim key As String = match.Value
-            TestFile = TestFile.Replace(key, String.Empty)
-            match = match.NextMatch()
-        Loop
-        fileName = TestFile
-
-        If Not System.IO.File.Exists(uploadDirectory) Then
-            System.IO.Directory.CreateDirectory(uploadDirectory)
-        End If
-
-        Session("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
-        Uploader.PostedFile.SaveAs(Session("FileUploadDirectory"))
-
-        'variables declared in UploadFile do NOT hold their value, so I tied them to the session
-        Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
-
-        UploadPanel.Visible = False
-        CancelSetPanel.Visible = True
-        SnapshotImageButton.Visible = True
-        SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, fileName)
-    End Sub
 
     Function GetSingleDbField(SqlQuery As String, Field As String) As String
         Dim Res As String
