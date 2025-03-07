@@ -27,6 +27,14 @@
                             document.getElementById("<%=CreateButton.ClientID%>").click();
                         }
                     });
+
+                    var titleTbx = document.getElementById('<%= ImgNameTextBox.ClientID %>');
+
+                    titleTbx.addEventListener("blur", function () { //in case user click 'Go' on soft keyboard
+                        debugger;
+                        document.getElementById('<%= SetTitleButton.ClientID %>').click();
+                    });
+                    
                 })
 
                 function disableElement() {
@@ -136,7 +144,7 @@
                     <asp:Panel Style="display: flex; gap: var(--UWhitespace);" runat="server">
                         <asp:Label Text="Title: " Style="font-size: calc(var(--UFontSize) * 2);" runat="server" />
                         <asp:TextBox runat="server" ID="ImgNameTextBox" Style="border: 2px solid black; width: 300px;" />
-                        <asp:Button OnClick="ExitIframeButton_onClick" Text="Set" runat="server" />
+                        <asp:Button ID="SetTitleButton" OnClick="ExitIframeButton_onClick" Text="Set" runat="server" />
                     </asp:Panel>
 
                     <asp:Label Text="" Style="color: red;" runat="server" ID="UserErrorLabel" />
