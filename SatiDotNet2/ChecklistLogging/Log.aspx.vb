@@ -569,12 +569,6 @@ Partial Class MR_OpenTicketStatusBoard
                             Dim Temp1 As Decimal
                             Dim Temp2 As Decimal
 
-                            If String.IsNullOrEmpty(UserInput) OrElse UserInput = "/" Then 'user has NOT interacted with this input yet
-                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
-                                SetPanelBackColor(BackPanelColor, "", Pnl)
-                                Continue For
-                            End If
-
                             Try 'in case user types in invlaid characters
                                 Temp1 = Decimal.Parse(Temps(0))
                                 Temp2 = Decimal.Parse(Temps(1))
