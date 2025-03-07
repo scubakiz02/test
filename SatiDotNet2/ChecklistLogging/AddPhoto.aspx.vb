@@ -147,7 +147,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub CancelImage_OnClick(sender As Object, e As EventArgs)
         System.IO.File.Delete(Session("FileUploadDirectory"))
-        Response.Redirect(Request.Url.ToString())
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "disableIframe", "disableIframe();", True)
     End Sub
 
     Protected Sub ExitIframeButton_onClick(sender As Object, e As EventArgs)
