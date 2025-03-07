@@ -1,6 +1,9 @@
 ﻿Imports System.Text.Json
 Imports System.Web.Services
 Imports SatiDotNet2.Library
+Imports System.Data
+Imports System.IO
+Imports System.Text.RegularExpressions
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -26,6 +29,19 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DBConnections As String
     Dim STC_TbxOverlays As String
     Dim LogAspx As New LogAspxLibrary
+    Dim AcceptedFormats As String() = {"tif", "tiff", "jpg", "jpeg", "png", "gif", "bmp"}
+    Dim FormatToContentType As New Dictionary(Of String, String) From
+     {
+        {"jpg", "jpeg"},
+        {"svg", "svg%2Bxml"}
+     } '%2B is URL encoding for '+'
+    Dim ContentTypeToFormat As New Dictionary(Of String, String) From
+     {
+        {"svg%2Bxml", "svg"}
+     } '%2B is URL encoding for '+'
+    Dim uploadDirectory As String
+    Dim VirtualDirectory As String
+    Dim Directory As String
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
@@ -317,6 +333,12 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         BuildDynamicAsp()
+
+
+        DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString).Tables(0).Rows(0)
+        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
+        uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
+        VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
     End Sub
 
 
@@ -960,6 +982,56 @@ Partial Class MR_OpenTicketStatusBoard
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
         PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/AddPhoto.aspx" & "?" & Request.RawUrl.Split("?")(1) & "&DataKey=" & KeyFromQueryString)
     End Sub
+
+    Protected Sub UploadFile(sender As Object, e As EventArgs)
+        Dim fileNameDelimited As String()
+        Dim Format As String
+        Dim TestFile As String
+        Dim match As Match
+        Dim FileFormat As String
+        Dim fileName As String
+
+        If Not Uploader.HasFile Then
+            '    ErrorMessage.Text = "CHOOSE A FILE BEFORE UPLOADING"
+            Exit Sub
+        End If
+
+        fileName = IO.Path.GetFileName(Uploader.FileName) 'using session state variable because global variables do NOT retain values assinged within this function
+        TestFile = fileName
+        fileNameDelimited = fileName.Split(".")
+        Format = fileNameDelimited(fileNameDelimited.Count - 1)
+        match = Regex.Match(fileName, "[% < > : / \ | ? *]")
+        FileFormat = fileName.Split(".")(1)
+
+        'Check for format other than an image
+        If Not AcceptedFormats.Contains(FileFormat) Then
+            'AcceptedFormat = False
+        End If
+
+        'REMOVES CHARACTERS THAT ARENT ALLOWED IN FILE NAMES
+        Do While match.Success
+            Dim key As String = match.Value
+            TestFile = TestFile.Replace(key, String.Empty)
+            match = match.NextMatch()
+        Loop
+        fileName = TestFile
+
+        If Not System.IO.File.Exists(uploadDirectory) Then
+            System.IO.Directory.CreateDirectory(uploadDirectory)
+        End If
+
+        ViewState("FileUploadDirectory") = Path.Combine(uploadDirectory, fileName)
+        Uploader.PostedFile.SaveAs(ViewState("FileUploadDirectory"))
+
+        'variables declared in UploadFile do NOT hold their value, so I tied them to the session
+        Session("ContentType") = If(FormatToContentType.ContainsKey(Format), FormatToContentType(Format), Format)
+
+        'UploadPanel.Visible = False
+        'CancelSetPanel.Visible = True
+        'SnapshotImageButton.Visible = True
+        'SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, fileName)
+    End Sub
+
 
     Protected Sub ResetLog_OnClick(sender As Object, e As EventArgs)
         Dim LabelKeys As List(Of Integer) = LabelOutOfRangeMap.Keys.ToList()

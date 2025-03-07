@@ -44,7 +44,7 @@
                 }
 
                 function showSpinner() {
-                    document.getElementById("loadingSpinner").style.display = "block";
+                    document.getElementById("fileUploadLoadingSpinner").style.display = "block";
                 }
 
                 function OpenFileUpload() {
