@@ -385,13 +385,13 @@
             <style>
                 :root {
                     --UWhitespace: 0.5em;
-                    --UFontSize: (calc(var(--UWhitespace) * 2));
+                    --UFontSize: (calc(var(--UWhitespace) * 3.25));
                     --AddButtonWidth: 50px;
                 }
 
                 .LogTextBox {
                     width: calc(var(--UWhitespace) * 6);
-                    padding: var(--UWhitespace);
+                    padding: calc(var(--UWhitespace) / 2);
                     font-size: var(--UFontSize);
                     text-align: center;
                 }
@@ -500,11 +500,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -518,7 +518,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -541,11 +541,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -559,7 +559,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -582,11 +582,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -600,7 +600,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -623,11 +623,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -641,7 +641,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -664,11 +664,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -682,7 +682,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -705,11 +705,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -723,7 +723,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -746,11 +746,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -764,7 +764,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -787,11 +787,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -805,7 +805,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -828,11 +828,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -846,7 +846,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -869,11 +869,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -887,7 +887,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -910,11 +910,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -928,7 +928,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -951,11 +951,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -969,7 +969,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -992,11 +992,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1010,7 +1010,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1033,11 +1033,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1051,7 +1051,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1074,11 +1074,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1092,7 +1092,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1115,11 +1115,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1133,7 +1133,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1156,11 +1156,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1174,7 +1174,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1197,11 +1197,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1215,7 +1215,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1238,11 +1238,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1256,7 +1256,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1279,11 +1279,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1297,7 +1297,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1320,11 +1320,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1338,7 +1338,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1361,11 +1361,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1379,7 +1379,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1402,11 +1402,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1420,7 +1420,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1443,11 +1443,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1461,7 +1461,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1484,11 +1484,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1502,7 +1502,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1525,11 +1525,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1543,7 +1543,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1566,11 +1566,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1584,7 +1584,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1607,11 +1607,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1625,7 +1625,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1648,11 +1648,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1666,7 +1666,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1689,11 +1689,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1707,7 +1707,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1730,11 +1730,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1748,7 +1748,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1771,11 +1771,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1789,7 +1789,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1812,11 +1812,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1830,7 +1830,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1853,11 +1853,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1871,7 +1871,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1894,11 +1894,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1912,7 +1912,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1935,11 +1935,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1953,7 +1953,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -1976,11 +1976,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -1994,7 +1994,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2017,11 +2017,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2035,7 +2035,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2058,11 +2058,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2076,7 +2076,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2099,11 +2099,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2117,7 +2117,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2140,11 +2140,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2158,7 +2158,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2181,11 +2181,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2199,7 +2199,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2222,11 +2222,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2240,7 +2240,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2263,11 +2263,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2281,7 +2281,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2304,11 +2304,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2322,7 +2322,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2345,11 +2345,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2363,7 +2363,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2386,11 +2386,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2404,7 +2404,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2427,11 +2427,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2445,7 +2445,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2468,11 +2468,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2486,7 +2486,7 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
@@ -2509,11 +2509,11 @@
 
                             <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" runat="server" />
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" runat="server" />
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
                                     <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
                                 </div>
                             </asp:Panel>
@@ -2527,12 +2527,136 @@
                                 </asp:DropDownList>
                             </asp:Panel>
 
-                            <div style="display: block">
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
                                 <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
                                 <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
                             </div>
                         </div>
                     </asp:Panel>
+
+                    <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel50" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
+                        <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
+                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+
+                            <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+
+                            <asp:Panel Visible="False" Checkbox="False" runat="server">
+                                <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace); width: 100%;">
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" HOA="False" runat="server">
+                                <asp:DropDownList runat="server">
+                                    <asp:ListItem Selected="True" Text="Switch Select..." />
+                                    <asp:ListItem Text="Hand" Value="Hand" />
+                                    <asp:ListItem Text="Off" Value="Off" />
+                                    <asp:ListItem Text="Auto" Value="Auto" />
+                                </asp:DropDownList>
+                            </asp:Panel>
+
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
+                                <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                            </div>
+                        </div>
+                    </asp:Panel>
+
+                    <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel51" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
+                        <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
+                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+
+                            <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+
+                            <asp:Panel Visible="False" Checkbox="False" runat="server">
+                                <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace); width: 100%;">
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" HOA="False" runat="server">
+                                <asp:DropDownList runat="server">
+                                    <asp:ListItem Selected="True" Text="Switch Select..." />
+                                    <asp:ListItem Text="Hand" Value="Hand" />
+                                    <asp:ListItem Text="Off" Value="Off" />
+                                    <asp:ListItem Text="Auto" Value="Auto" />
+                                </asp:DropDownList>
+                            </asp:Panel>
+
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
+                                <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                            </div>
+                        </div>
+                    </asp:Panel>
+
+                    <asp:Panel BackColor="#F5F5F5" CssClass="LogPanel" ID="Panel52" Visible="False" runat="server" Style="padding: var(--UWhitespace) 0; border: 1px solid black;">
+                        <asp:Button BackColor="#F5F5F5" runat="server" Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); font-size: var(--UFontSize); text-align: left; pointer-events: none; text-wrap: auto;"></asp:Button>
+                        <div class="EverythingExceptTitle" style="margin: 0 var(--UWhitespace); display: flex; font-size: calc(var(--UFontSize));">
+
+                            <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server"></asp:TextBox>
+
+                            <asp:Panel Visible="False" Checkbox="False" runat="server">
+                                <asp:CheckBox CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" Text="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace); width: 100%;">
+                                <asp:TextBox class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="width: 100%; text-align: left;"></asp:TextBox>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" STC="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="Bath Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Text="IR Gun Temp" style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                </div>
+                            </asp:Panel>
+
+                            <asp:Panel Visible="False" HOA="False" runat="server">
+                                <asp:DropDownList runat="server">
+                                    <asp:ListItem Selected="True" Text="Switch Select..." />
+                                    <asp:ListItem Text="Hand" Value="Hand" />
+                                    <asp:ListItem Text="Off" Value="Off" />
+                                    <asp:ListItem Text="Auto" Value="Auto" />
+                                </asp:DropDownList>
+                            </asp:Panel>
+
+                            <div style="display: flex; flex-direction: column; font-size: 40%;">
+                                <asp:Label runat="server" ColorBlindMessage="True" Style="text-wrap: nowrap; margin: 0 var(--UWhitespace);"></asp:Label>
+                                <asp:CheckBox Visible="False" OnCheckedChanged="VerifyValue_Check" CssClass="LogCheckBox" Text=" ← Check if correct" runat="server" AutoPostBack="True" />
+                            </div>
+                        </div>
+                    </asp:Panel>
+
 
                 </asp:Panel>
 
