@@ -110,7 +110,7 @@
 
                     if (ItemsPanel.style.maxHeight) ItemsPanel.style.maxHeight = "none";
 
-                    ItemsPanel.style.maxHeight = (window.innerHeight - (UWhitespaceInPx * 2)) - (FooterPanel.offsetHeight + HeaderPanel.offsetHeight) + "px";
+                    ItemsPanel.style.maxHeight = (window.innerHeight - (UWhitespaceInPx * 2)) - (FooterPanel.offsetHeight + HeaderPanel.offsetHeight + UWhitespaceInPx) + "px";
                 }
 
                 function getAspControl(id) {
