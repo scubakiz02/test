@@ -17,6 +17,10 @@
 
     <%--subtracted 20px from height of control below to leave room for a little bit of padding at top and bottom of webpage--%>
     <asp:UpdatePanel ID="UpdatePanel" class="SymmetricalGapping" runat="server">
+        <Triggers>
+            <asp:PostBackTrigger ControlID="CreateButton" />
+        </Triggers>
+
         <ContentTemplate>
             <script type="text/javascript">
                 let labels;
@@ -35,7 +39,7 @@
                 let EditPreviewPanel;
 
                 window.addEventListener("load", function () {
-                    var fileUpload = document.getElementById('<%= Uploader.ClientID %>');
+                    var fileUpload = document.getElementById('<%= Uploader2.ClientID %>');
                     window.iframeEnabled = iframeEnabled;
 
                     fileUpload.addEventListener("change", function (event) {
@@ -365,7 +369,7 @@
                 }
 
                 function OpenFileUpload() {
-                    let FileUploadControl = document.getElementById('<%=Uploader.ClientID%>');
+                    let FileUploadControl = document.getElementById('<%=Uploader2.ClientID%>');
                     FileUploadControl.click();
                 }
 
@@ -2534,10 +2538,10 @@
                     <%-- max-width of 100vw b/c setFooterAtBottom is called AFTER SetHoverEffect function--%>
                     <asp:Panel ID="ImageHoverLinkPanel" Style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--UWhitespace); max-width: 100vw;" runat="server">
                         <asp:ImageButton OnClick="AddPhotoButton_OnClick" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
-                        
+
                         <asp:Panel runat="server" ID="UploadPanel">
                             <asp:ImageButton OnClientClick="OpenFileUpload(); return false;" Style="border: 2px solid black; border-radius: 50%; padding: var(--UWhitespace); width: 18px;" ImageUrl="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgZmlsbD0iIzAwMDAwMCIgdmlld0JveD0iMCAwIDI1NiAyNTYiPjxwYXRoIGQ9Ik0xNjgsMTM2YTgsOCwwLDAsMS04LDhIMTM2djI0YTgsOCwwLDAsMS0xNiwwVjE0NEg5NmE4LDgsMCwwLDEsMC0xNmgyNFYxMDRhOCw4LDAsMCwxLDE2LDB2MjRoMjRBOCw4LDAsMCwxLDE2OCwxMzZabTY0LTU2VjE5MmEyNCwyNCwwLDAsMS0yNCwyNEg0OGEyNCwyNCwwLDAsMS0yNC0yNFY4MEEyNCwyNCwwLDAsMSw0OCw1Nkg3NS43Mkw4NywzOS4xMkExNiwxNiwwLDAsMSwxMDAuMjgsMzJoNTUuNDRBMTYsMTYsMCwwLDEsMTY5LDM5LjEyTDE4MC4yOCw1NkgyMDhBMjQsMjQsMCwwLDEsMjMyLDgwWm0tMTYsMGE4LDgsMCwwLDAtOC04SDE3NmE4LDgsMCwwLDEtNi42Ni0zLjU2TDE1NS43Miw0OEgxMDAuMjhMODYuNjYsNjguNDRBOCw4LDAsMCwxLDgwLDcySDQ4YTgsOCwwLDAsMC04LDhWMTkyYTgsOCwwLDAsMCw4LDhIMjA4YTgsOCwwLDAsMCw4LThaIj48L3BhdGg+PC9zdmc+" runat="server" />
-                            <asp:FileUpload ID="Uploader" Style="display: none;" runat="server" />
+                            <asp:FileUpload ID="Uploader2" Style="display: none;" runat="server" />
                             <asp:Button ID="CreateButton" runat="server" Font-Bold="True" Style="display: none;" OnClick="UploadFile" OnClientClick="showSpinner(); return true;" Text="Upload" />
                             <svg id="loadingSpinner" style="display: none;" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <style>
