@@ -215,6 +215,17 @@ Partial Class MR_OpenTicketStatusBoard
                     myButton.Text = DR("Label") & If(String.IsNullOrEmpty(Range), String.Empty, " | " & Range & If(String.IsNullOrEmpty(Unit), String.Empty, " " & Unit))
                 End If
 
+                If TypeOf ctrl Is Label AndAlso Request.QueryString("Area") IsNot Nothing Then 'this means user is in ChecklistBuilder.aspx
+                    Dim CtrlAsLabel As Label = DirectCast(ctrl, Label)
+
+                    If CtrlAsLabel.Attributes("ColorBlindMessage") Then
+                        'to simulate correct width for textbox control in iframe
+                        CtrlAsLabel.Text = "*Error: Not a number*"
+                        CtrlAsLabel.Style("visibility") = "hidden"
+                    End If
+                End If
+
+
                 If TypeOf ctrl Is TextBox Then
                     myTextBox = CType(ctrl, TextBox)
 
