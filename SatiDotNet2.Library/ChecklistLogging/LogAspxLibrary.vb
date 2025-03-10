@@ -20,4 +20,14 @@ Public Class LogAspxLibrary
         Return True
     End Function
 
+    Public Function GetStatusBoardRole(Department As String, View As String, Where As Date) As String
+        Dim Res As String = Nothing
+
+        If Where <> Today.Date Then
+            Res = "admin"
+        End If
+
+        Return Res
+    End Function
+
 End Class

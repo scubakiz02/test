@@ -42,4 +42,16 @@ Public Class LogAspxTests
     End Sub
 
 
+
+
+
+
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest1()
+        'if Where does not match today, return should be 'admin'
+        Assert.Equal("admin", LogAspx.GetStatusBoardRole("Full", "Production", "03/09/2025"))
+    End Sub
+
+
 End Class
