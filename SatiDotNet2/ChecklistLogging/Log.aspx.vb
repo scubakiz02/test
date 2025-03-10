@@ -57,6 +57,10 @@ Partial Class MR_OpenTicketStatusBoard
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
         ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays, True)
+
+        If Session("DisplayError") Then
+            MessageUserLabel.Text = "Error: red or yellow logs present. Add a comment to proceed."
+        End If
     End Sub
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -710,6 +714,7 @@ Partial Class MR_OpenTicketStatusBoard
         LabelOutOfRangeMap(Tbx.ID.Split("_")(1)) = CheckedStatus
         Cbx.Checked = CheckedStatus
         UploadToDataTable(User.Identity.Name.ToString)
+        Session("DisplayError") = False
         SetScrollPos()
     End Sub
 
@@ -747,6 +752,8 @@ Partial Class MR_OpenTicketStatusBoard
     Function ModifyInput(ID As String, Value As String) As Boolean
         Dim LabelKey As String = ID.Split("_")(1)
         Dim PrevValue As String = Session("LabelInputMap")(LabelKey)
+
+        Session("DisplayError") = False
 
         If Value = PrevValue Then Return False 'value has NOT changed, so do NOT modify input
 
@@ -804,7 +811,8 @@ Partial Class MR_OpenTicketStatusBoard
             If Valid Then
                 Continue For
             ElseIf NumOfNotes = 0 AndAlso (Not Valid OrElse Valid Is Nothing) Then
-                MessageUserLabel.Text = "Error: red or yellow logs present. Add a comment to proceed."
+                Session("DisplayError") = True
+                Response.Redirect(Request.Url.ToString())
                 Exit Sub
             End If
         Next
@@ -846,7 +854,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Function SqlProofSingleQuotes(Text As String) As String
         Return Text.Replace("'", "''") 'escape single quotes (') by doubling them ('')
-        End Function
+    End Function
 
     Protected Sub AddCommentButton_Click(sender As Object, e As EventArgs)
         Dim TextBoxText As String = SqlProofSingleQuotes(CommentTextBox.Text)
