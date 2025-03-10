@@ -123,7 +123,6 @@ Partial Class MR_OpenTicketStatusBoard
             If LogDR("CompleteLog") Then 'disable controls if log is complete
                 SetControlsEnabledProp(ItemsPanel, False)
                 HeaderPanel.Enabled = True
-                AddCommentPanel.Enabled = False
                 DoneButton.Enabled = False
             End If
 
