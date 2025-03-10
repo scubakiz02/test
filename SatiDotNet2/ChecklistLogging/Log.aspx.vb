@@ -828,7 +828,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Ranges='" & JsonSerializer.Serialize(LabelRangeMap) & "', CompleteLog=1, Date='" & System.DateTime.Now.ToString() & "' WHERE [Key]=" & KeyFromQueryString) 'record to 'Ranges' field in T_LogData
         Update_All_InputsValid_Field()
-        Response.Redirect(Request.Url.ToString(), False) 'trigger postback AFTER this code has ran, to make the form readonly and dynamically create stamps
+        Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
     End Sub
 
     Sub ExecuteSqlQuery(SqlQuery As String)
@@ -846,7 +846,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Function SqlProofSingleQuotes(Text As String) As String
         Return Text.Replace("'", "''") 'escape single quotes (') by doubling them ('')
-    End Function
+        End Function
 
     Protected Sub AddCommentButton_Click(sender As Object, e As EventArgs)
         Dim TextBoxText As String = SqlProofSingleQuotes(CommentTextBox.Text)
