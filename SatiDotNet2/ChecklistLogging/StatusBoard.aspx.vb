@@ -1,8 +1,11 @@
 ﻿
 Imports System.Text.Json
+Imports SatiDotNet2.Library
+
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
+    Dim LogAspx As New LogAspxLibrary
     Dim TimeForNewLog As Boolean
     Dim LogStatus As String
     Dim StripeColor As String
@@ -39,6 +42,10 @@ Partial Class MR_OpenTicketStatusBoard
 
             Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
         Else
+            'MenuAuthentication hierarchy based on querystrings user loaded the page with
+            'MenuAuthenication.CheckGroupAuthenication("EditRoles", Server)
+            MenuAuthenication.CheckGroupAuthenication(LogAspx.GetStatusBoardRole(Session("DepartmentFromQueryString"), Session("ViewFromQueryString"), Date.Parse(Session("WhereFromQueryString"))), Server)
+
             WhereLabel.Text = Session("WhereFromQueryString")
 
             If Session("ViewFromQueryString") = "Full" Then
