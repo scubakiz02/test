@@ -434,7 +434,7 @@
                 }
 
                     .LogCheckBox input { /*input to hit asp CheckBox control*/
-                        transform: scale(2);
+                        transform: scale(1.5);
                         margin: var(--UWhitespace);
                     }
 
