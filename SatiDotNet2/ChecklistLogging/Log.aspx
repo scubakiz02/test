@@ -407,7 +407,7 @@
                 }
 
                 .LogTextBox {
-                    width: calc(var(--UWhitespace) * 6);
+                    width: 100%; /*textbox control takes as much space as it can WITHOUT causing weird css behavior*/
                     padding: calc(var(--UWhitespace) / 2);
                     font-size: var(--UFontSize);
                     text-align: center;
