@@ -37,10 +37,21 @@
                 let X_onHover = 0;
                 let PreviewPanel_iframe;
                 let EditPreviewPanel;
+                let windowBeforeUnloadCounter;
 
                 window.addEventListener("load", function () {
-                    var fileUpload = document.getElementById('<%= Uploader.ClientID %>');
+                    let fileUpload = document.getElementById('<%= Uploader.ClientID %>');
+                    windowBeforeUnloadCounter = 0;
+
                     window.iframeEnabled = iframeEnabled;
+
+                    //in case user click 'Go' on soft keyboard
+                    window.addEventListener("beforeunload", function () {
+                        if (document.getElementById('<%= CommentTextBox.ClientID %>').value && windowBeforeUnloadCounter == 0) {
+                            windowBeforeUnloadCounter++;
+                            document.getElementById('<%= AddCommentButton.ClientID %>').click();
+                        }
+                    })
 
                     fileUpload.addEventListener("change", function (event) {
                         var file = event.target.files[0];
@@ -48,7 +59,6 @@
                             document.getElementById("<%=CreateButton.ClientID%>").click();
                         }
                     });
-
                 })
 
                 window.addEventListener("orientationchange", function () {
