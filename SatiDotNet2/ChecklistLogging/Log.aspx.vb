@@ -800,7 +800,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Continue For
             End Try
 
-            Valid = LogAspx.ValidateByBackColor(NumOfNotes, InputPnl.Style("background-color"))
+            Valid = LogAspx.ValidateByBackColor(NumOfNotes, InputPnl.BackColor)
             If Valid Then
                 Continue For
             ElseIf NumOfNotes = 0 AndAlso (Not Valid OrElse Valid Is Nothing) Then
