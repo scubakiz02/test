@@ -20,11 +20,17 @@ Public Class LogAspxLibrary
         Return True
     End Function
 
-    Public Function GetStatusBoardRole(Department As String, View As String, Where As Date) As String
+    Public Function GetStatusBoardRole(View As String, Department As String, Where As Date) As String
         Dim Res As String = Nothing
 
         If Where <> Today.Date Then
             Res = "admin"
+        ElseIf View = "Full" Then
+            If Department <> "Production" Then 'view would then be either maintenance or all
+                Res = "FMManagerApproval"
+            Else
+                Res = "PC"
+            End If
         End If
 
         Return Res

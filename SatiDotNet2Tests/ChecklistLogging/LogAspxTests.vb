@@ -53,5 +53,17 @@ Public Class LogAspxTests
         Assert.Equal("admin", LogAspx.GetStatusBoardRole("Full", "Production", "03/09/2025"))
     End Sub
 
+    <Fact>
+    Public Sub GetStatusBoardRoleTest2()
+        'if view is full & department is maintenance, return should be 'FMManagerApproval'
+        Assert.Equal("FMManagerApproval", LogAspx.GetStatusBoardRole("Full", "Maintenance", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest3()
+        'if view is full & department is production, return should be 'PC'
+        Assert.Equal("PC", LogAspx.GetStatusBoardRole("Full", "Production", Today.Date))
+    End Sub
+
 
 End Class
