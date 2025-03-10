@@ -31,8 +31,8 @@ Public Class LogAspxTests
 
     <Fact>
     Public Sub ValidateBackColorTest4()
-        'if backcolor is gray, return true
-        Assert.True(LogAspx.ValidateByBackColor(0, "#F5F5F5"))
+        'if backcolor is nothing (gray), return true
+        Assert.True(LogAspx.ValidateByBackColor(0, Nothing))
     End Sub
 
 

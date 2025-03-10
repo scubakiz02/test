@@ -3,7 +3,7 @@
     Public Function ValidateByBackColor(NumOfNotes As Integer, BackColor As String) As Boolean?
         Dim Res As Boolean = Nothing
 
-        If NumOfNotes > 0 OrElse BackColor = "#F5F5F5" Then
+        If NumOfNotes > 0 OrElse BackColor Is Nothing Then
             Res = True
         ElseIf BackColor = "red" Then
             Res = False
