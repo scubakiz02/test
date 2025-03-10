@@ -77,11 +77,11 @@ Public Class LogAspxTests
         Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "All", Today.Date))
     End Sub
 
-    '<Fact>
-    'Public Sub GetStatusBoardRoleTest6()
-    '    'if view is focus & department is Maintenance, return should be 'Maintenance'
-    '    Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
-    'End Sub
+    <Fact>
+    Public Sub GetStatusBoardRoleTest6()
+        'if view is focus & department is Maintenance, return should be 'Maintenance'
+        Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
+    End Sub
 
 
 End Class

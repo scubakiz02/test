@@ -31,8 +31,8 @@ Public Class LogAspxLibrary
             Else
                 Res = "PC"
             End If
-            'Else 'user will need to at minimum have 'Maintenance' role to view 'All' or 'Maintenance' department logs
-            '    If Department <> "Production" Then Res = "Maintenence"
+        Else 'user will need to at minimum have 'Maintenance' role to view 'All' or 'Maintenance' department logs
+            If Department <> "Production" Then Res = "Maintenance"
         End If
 
         Return Res
