@@ -65,5 +65,23 @@ Public Class LogAspxTests
         Assert.Equal("PC", LogAspx.GetStatusBoardRole("Full", "Production", Today.Date))
     End Sub
 
+    <Fact>
+    Public Sub GetStatusBoardRoleTest4()
+        'if view is focus & department is production, return should be nothing
+        Assert.Equal(Nothing, LogAspx.GetStatusBoardRole("Focus", "Production", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest5()
+        'if view is focus & department is all, return should be 'Maintenance'
+        Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "All", Today.Date))
+    End Sub
+
+    '<Fact>
+    'Public Sub GetStatusBoardRoleTest6()
+    '    'if view is focus & department is Maintenance, return should be 'Maintenance'
+    '    Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
+    'End Sub
+
 
 End Class
