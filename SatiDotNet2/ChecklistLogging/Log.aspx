@@ -2765,7 +2765,6 @@
                     <asp:GridView ID="CommentGridView" Visible="False" runat="server" AllowSorting="True" AutoGenerateColumns="False" DataSourceID="CommentSqlDataSource" BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical">
                         <AlternatingRowStyle BackColor="#CCCCCC" />
                         <Columns>
-                            <asp:BoundField DataField="Key" HeaderText="Key" ReadOnly="True" SortExpression="[Key]" />
                             <asp:BoundField DataField="Comment" HeaderText="Notes" SortExpression="Comment" />
                         </Columns>
                         <FooterStyle BackColor="#CCCCCC" />
