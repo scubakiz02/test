@@ -309,7 +309,6 @@ Partial Class MR_OpenTicketStatusBoard
                                     myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                     DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                                 Case "STC"
-                                Case "DP"
                                     Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                     Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
                                     Dim BathTextBoxID As String = "BathTemp_" & LabelKey
@@ -325,12 +324,26 @@ Partial Class MR_OpenTicketStatusBoard
                                     BathTextBox.Text = Temps(0)
                                     IRGunTextBox.Text = If(Temps.Count > 1, Temps(1), String.Empty)
 
-                                    ' DBConnections += "SetDBConnection('" & BathTextBoxID & "'); SetDBConnection('" & BathTextBoxID & "'); "
-
-                                    'AddHandler BathTextBox.TextChanged, AddressOf StcTextBox_onTextChanged
-                                    'AddHandler IRGunTextBox.TextChanged, AddressOf StcTextBox_onTextChanged
-
                                     STC_TbxOverlays += "STC_TbxOverlay('" & BathTextBoxID & "'); STC_TbxOverlay('" & IRGunTextBoxID & "'); "
+
+                                    Continue For 'to avoid SetDBConnection being called on InputCtrl control
+                                Case "DP"
+                                    Dim Dp1Box As CheckBox = DirectCast(ctrl.Controls(3), CheckBox)
+                                    Dim Dp2Box As CheckBox = DirectCast(ctrl.Controls(7), CheckBox)
+                                    Dim Dp1BoxID As String = "Dp1_" & LabelKey
+                                    Dim Dp2BoxID As String = "Dp2_" & LabelKey
+                                    Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                    Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+
+                                    Dp1Box.ID = Dp1BoxID
+                                    Dp2Box.ID = Dp2BoxID
+
+                                    myTextBox.Text = UnderlyingTextBoxText
+
+                                    Dp1Box.Checked = If(String.IsNullOrEmpty(Temps(0)) OrElse Temps(0) = 0, False, True)
+                                    Dp2Box.Checked = If(Temps.Count > 1 AndAlso Not String.IsNullOrEmpty(Temps(1)) AndAlso Temps(1) = 1, True, False)
+
+                                    ' STC_TbxOverlays += "STC_TbxOverlay('" & Dp1BoxID & "'); STC_TbxOverlay('" & Dp2BoxID & "'); "
 
                                     Continue For 'to avoid SetDBConnection being called on InputCtrl control
                             End Select

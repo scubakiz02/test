@@ -1786,12 +1786,12 @@
 
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="Bath Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                    <asp:Label Text="361" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:CheckBox AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
-                                    <asp:Label Text="IR Gun Temp" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:TextBox AutoPostBack="True" class="LogTextBox" BackColor="#F5F5F5" runat="server" Style="w"></asp:TextBox>
+                                    <asp:Label Text="362" Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:CheckBox AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
