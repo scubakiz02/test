@@ -309,6 +309,7 @@ Partial Class MR_OpenTicketStatusBoard
                                     myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                     DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                                 Case "STC"
+                                Case "DP"
                                     Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                     Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
                                     Dim BathTextBoxID As String = "BathTemp_" & LabelKey
@@ -576,6 +577,7 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "Text"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "STC"
+                        Case "DP"
                             Dim Temps As String() = UserInput.Split("/")
                             Dim BackPanelColor As System.Drawing.Color
                             Dim Temp1 As Decimal
