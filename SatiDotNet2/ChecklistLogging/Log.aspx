@@ -105,6 +105,8 @@
                     UpdatePanel = getAspControl("UpdatePanel");
                     let UWhitespaceInPx = emToPx(parseFloat(getComputedStyle(UpdatePanel).getPropertyValue('--UWhitespace')));
 
+                    window.scrollTo(0, 0); //to fix screen jumping bug
+
                     UpdatePanel = getAspControl("UpdatePanel");
                     UpdatePanel.style.height = window.innerHeight + "px";
 
