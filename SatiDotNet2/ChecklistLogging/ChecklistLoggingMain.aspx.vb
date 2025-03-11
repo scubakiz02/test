@@ -5,6 +5,6 @@ Partial Class DBMaintenance_DBMaintenanceMain
     Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
 
-        MenuAuthenication.CheckGroupAuthenication("DBMaintenance", Server)
+        MenuAuthenication.CheckGroupAuthenication("Maintenance", Server)
     End Sub
 End Class
