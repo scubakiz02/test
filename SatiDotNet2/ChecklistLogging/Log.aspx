@@ -37,18 +37,16 @@
                 let X_onHover = 0;
                 let PreviewPanel_iframe;
                 let EditPreviewPanel;
-                let windowBeforeUnloadCounter;
+                let AddNoteCounter;
 
                 window.addEventListener("load", function () {
                     let fileUpload = document.getElementById('<%= Uploader.ClientID %>');
-                    windowBeforeUnloadCounter = 0;
+                    AddNoteCounter = 0;
 
                     window.iframeEnabled = iframeEnabled;
 
-                    //in case user click 'Go' on soft keyboard
-                    window.addEventListener("beforeunload", function () {
-                        if (document.getElementById('<%= CommentTextBox.ClientID %>').value && windowBeforeUnloadCounter == 0) {
-                            windowBeforeUnloadCounter++;
+                    window.addEventListener("beforeunload", function () { //in case user click 'Go' on soft keyboard
+                        if (document.getElementById('<%= CommentTextBox.ClientID %>').value && addNoteToLog()) {
                             document.getElementById('<%= AddCommentButton.ClientID %>').click();
                         }
                     })
@@ -64,6 +62,16 @@
                 window.addEventListener("orientationchange", function () {
                     window.location.reload(); //cause a full postback
                 })
+
+                function addNoteToLog() {
+                    if (document.getElementById('<%= CommentTextBox.ClientID %>').value && AddNoteCounter == 0) {
+                        AddNoteCounter++;
+                        return true;
+                    }
+
+                    window.location.reload(); //hinder click, to prevent note from being added to DB
+
+                }
 
                 function iframeEnabled(bit) {
                     EditPreviewPanel = document.getElementById("<%=ItemsPanel.ClientID%>");
@@ -2760,7 +2768,7 @@
                         <br />
                         <div style="display: flex;">
                             <asp:TextBox ID="CommentTextBox" runat="server" Style="width: calc(100% - var(--AddButtonWidth));"></asp:TextBox>
-                            <asp:Button runat="server" ID="AddCommentButton" OnClick="AddCommentButton_Click" Text="Add" Style="width: var(--AddButtonWidth);"></asp:Button>
+                            <asp:Button runat="server" ID="AddCommentButton" OnClientClick="addNoteToLog();" OnClick="AddCommentButton_Click" Text="Add" Style="width: var(--AddButtonWidth);"></asp:Button>
                         </div>
                     </asp:Panel>
 
