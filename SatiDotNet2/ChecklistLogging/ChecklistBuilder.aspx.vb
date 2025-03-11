@@ -43,6 +43,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
         Dim AreaIntervalSelectedValue As String = AreaIntervalDropDownList.SelectedValue
+        Dim DbRange As String
 
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
@@ -78,6 +79,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                 If LabelFromQueryString IsNot Nothing Then
                     FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "FieldType")
+                    DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "Range")
 
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
@@ -105,7 +107,13 @@ Partial Class MR_OpenTicketStatusBoard
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
 
-                    SetRangeOrder()
+                    If FieldType = "STC" Then
+                        RangeOrderMenu.Enabled = False
+                        DiffPanel.Visible = True
+                        DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
+                    Else
+                        SetRangeOrder(DbRange)
+                    End If
                 End If
 
                 'comment interface
@@ -577,22 +585,13 @@ Partial Class MR_OpenTicketStatusBoard
         PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/Log.aspx?Area=" & AreaFromQueryString)
     End Sub
 
-    Sub SetRangeOrder()
-        Dim DbRange As String
+    Sub SetRangeOrder(DbRange As String)
         Dim DbRangeDelimited As String()
-        Dim FieldTypeIsSTC As Boolean = If(FieldType_DropDownList.SelectedValue = "STC", True, False)
 
         RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel)
 
-        DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelDropDownList.SelectedValue, "Range")
-
-        If DbRange IsNot Nothing OrElse FieldTypeIsSTC Then
-            If FieldTypeIsSTC Then
-                RangeOrderMenu.Enabled = False
-                DiffPanel.Visible = True
-                DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
-
-            ElseIf DbRange.Contains("-") Then
+        If DbRange IsNot Nothing Then
+            If DbRange.Contains("-") Then
                 DbRangeDelimited = DbRange.Split("-")
                 LowerBoundTextbox.Text = DbRangeDelimited(0)
                 UpperBoundTextbox.Text = DbRangeDelimited(1)

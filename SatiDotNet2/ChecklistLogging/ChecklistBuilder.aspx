@@ -371,7 +371,7 @@
                     </div>
                     <div style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
                         <asp:Panel runat="server" ID="RangeOrderInterfacePanel" Enabled="false" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                            <asp:Label runat="server" Text="Range Order:"></asp:Label>
+                            <asp:Label runat="server" ID="RangeOrderLabel" Text="Range Order:"></asp:Label>
                             <asp:Panel ID="RangeOrderMenu" runat="server" Style="display: flex; gap: var(--UWhitespace);">
                                 <asp:Button Text="? - ?" ID="RangePickButton" InterfacePanel="RangePanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                                 <asp:Button Text="+/- ?" ID="DiffButton" InterfacePanel="DiffPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
