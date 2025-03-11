@@ -24,8 +24,26 @@
 
             window.iframeEnabled = iframeEnabled;
 
-            if (iframeDoc) iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
+            try {
+                iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
+            }
+            catch { }
+            //    //want to confirm iframe ItemsPanel scrollbar positioning can be changed with hard coded value
+            //    const observer = new MutationObserver(mutations => {
+            //        mutations.forEach(mutation => {
+            //            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+            //                if (iframeDoc.src.includes("Log.aspx")) {
+            //                    iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
+            //                    iframeDoc.querySelector('[id$="ItemsPanel"]').scrollTo = 200;
+            //                }
+            //            }
+            //        });
+            //    });
+
+            //    observer.observe(iframeDoc, { attributes: true });
+            //    //want to confirm iframe ItemsPanel scrollbar positioning can be changed with hard coded value
         })
+
 
         function getAspControl(id) {
             return document.querySelector('[id$="' + id + '"]');
@@ -157,7 +175,7 @@
                                 <asp:Label Text="Interval:" runat="server" />
                                 <asp:DropDownList ID="AreaIntervalDropDownList" AppendDataBoundItems="True" AutoPostBack="True"
                                     DataTextField="Interval" DataValueField="Key" OnSelectedIndexChanged="AreaInterval_OnSelectedIndexChanged" runat="server" DataSourceID="IntervalDropDownList_SqlDataSource">
-                                    <asp:ListItem Text="All" Value="All" Selected="True"/>
+                                    <asp:ListItem Text="All" Value="All" Selected="True" />
                                 </asp:DropDownList>
                             </div>
                         </div>
