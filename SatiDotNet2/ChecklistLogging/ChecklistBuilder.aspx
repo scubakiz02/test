@@ -151,6 +151,12 @@
             overflow-x: hidden;
         }
 
+        .RangeOrderInterfacePanel_Label {
+            font-weight: bolder;
+            font-family: monospace;
+            font-size: var(--UFontSize);
+        }
+
         @media (min-width: 1920px) {
             .EditPreviewPanel {
                 display: flex;
@@ -375,27 +381,27 @@
                             <asp:Panel runat="server" ID="DynamicRangeBoxPanel" Style="position: relative; display: flex; justify-content: center; align-items: center; border: 2px solid black; padding: var(--UWhitespace); height: 100px;">
                                 <asp:Panel runat="server" ID="RangePanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
                                     <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LowerBoundTextbox" />
-                                    -
-                                <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="-" runat="server" />
+                                    <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
                                 </asp:Panel>
 
                                 <asp:Panel runat="server" ID="DiffPanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
-                                    +/-
-                                <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="+/-" runat="server" />
+                                    <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />
                                 </asp:Panel>
 
                                 <asp:Panel runat="server" ID="LessThanPanel" Visible="False">
-                                    <
-                                <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LessThanTextbox" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="<" runat="server" />
+                                    <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LessThanTextbox" />
                                 </asp:Panel>
 
                                 <asp:Panel runat="server" ID="GreaterThanPanel" Visible="False">
-                                    >
-                                <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="GreaterThanTextbox" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text=">" runat="server" />
+                                    <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="GreaterThanTextbox" />
                                 </asp:Panel>
 
                                 <div runat="server" style="position: absolute; bottom: var(--UWhitespace); right: var(--UWhitespace); display: flex; gap: var(--UWhitespace);">
-                                    <asp:Label ID="InvalidInputLabel" Text="Invalid Input(s)" Visible="False" runat="server" Style="color: red;" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" ID="InvalidInputLabel" Text="Invalid Input(s)" Visible="False" runat="server" Style="color: red;" />
                                     <asp:Button Text="Set" ID="SetRangeButton" OnClick="SetRangeButton_onClick" Enabled="False" runat="server" />
                                 </div>
 
