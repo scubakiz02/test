@@ -55,7 +55,10 @@ Partial Class MR_OpenTicketStatusBoard
 
                 If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
                     Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
-                    AreaDisableButton.Text = "Enable"
+
+                    If AreaDisableButton IsNot Nothing Then
+                        AreaDisableButton.Text = "Enable"
+                    End If
                 End If
 
                 'if here, area ddl has a selected value. Thus, remove static ListItem from AreaDropDownList
