@@ -28,6 +28,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim JsFunctionCalls As String
     Dim DBConnections As String
     Dim STC_TbxOverlays As String
+    Dim DP_TbxOverlay As String
     Dim LogAspx As New LogAspxLibrary
     Dim AcceptedFormats As String() = {"tif", "tiff", "jpg", "jpeg", "png", "gif", "bmp"}
     Dim FormatToContentType As New Dictionary(Of String, String) From
@@ -56,7 +57,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
-        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays, True)
+        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay, True)
 
         If Session("DisplayError") Then
             MessageUserLabel.Text = "Error: red or yellow logs present. Add a comment to proceed."
@@ -343,7 +344,7 @@ Partial Class MR_OpenTicketStatusBoard
                                     Dp1Box.Checked = If(String.IsNullOrEmpty(Temps(0)) OrElse Temps(0) = 0, False, True)
                                     Dp2Box.Checked = If(Temps.Count > 1 AndAlso Not String.IsNullOrEmpty(Temps(1)) AndAlso Temps(1) = 1, True, False)
 
-                                    ' STC_TbxOverlays += "STC_TbxOverlay('" & Dp1BoxID & "'); STC_TbxOverlay('" & Dp2BoxID & "'); "
+                                    DP_TbxOverlay += "DP_TbxOverlay('" & Dp1BoxID & "'); DP_TbxOverlay('" & Dp2BoxID & "'); "
 
                                     Continue For 'to avoid SetDBConnection being called on InputCtrl control
                             End Select
@@ -590,7 +591,6 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "Text"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "STC"
-                        Case "DP"
                             Dim Temps As String() = UserInput.Split("/")
                             Dim BackPanelColor As System.Drawing.Color
                             Dim Temp1 As Decimal
@@ -613,6 +613,26 @@ Partial Class MR_OpenTicketStatusBoard
 
                             DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = BackPanelColor
                             Continue For
+                        Case "DP"
+                            Dim DPs As String() = UserInput.Split("/")
+                            Dim BackPanelColor As System.Drawing.Color
+                            Dim DP1 As Decimal
+                            Dim DP2 As Decimal
+
+                            Try 'in case user types in invlaid characters
+                                DP1 = Decimal.Parse(DPs(0))
+                                DP2 = Decimal.Parse(DPs(1))
+                            Catch ex As Exception
+                                Exit Select
+                            End Try
+
+                            If DP1 = 1 OrElse DP2 = 1 Then
+                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
+                                SetPanelBackColor(BackPanelColor, "", Pnl)
+                                Continue For
+                            End If
+
+
                     End Select
 
                     'if here, input is NOT valid
