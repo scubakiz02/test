@@ -114,13 +114,13 @@ Partial Class MR_OpenTicketStatusBoard
                         DiffPanel.Visible = True
                         DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
                     ElseIf FieldType = "DP" Then
-                        Dim DpNums As String() = DbRange.Split("&")
+                        Dim DpNums As String() = If(DbRange Is Nothing, Nothing, DbRange.Split("&"))
                         RangeOrderLabel.Text = "Pump #'s"
                         RangeOrderMenu.Style("visibility") = "hidden"
                         RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
                         DpPanel.Visible = True
-                        Pump1TextBox.Text = If(DpNums(0) IsNot Nothing, Trim(DpNums(0)), String.Empty)
-                        Pump2TextBox.Text = If(DpNums(1) IsNot Nothing, Trim(DpNums(1)), String.Empty)
+                        Pump1TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(0)), String.Empty)
+                        Pump2TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(1)), String.Empty)
                     Else
                         SetRangeOrder(DbRange)
                     End If
@@ -1066,7 +1066,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         ElseIf DpPanel.Visible Then
             If Double.TryParse(Pump1TextBox.Text, UserInput) And Double.TryParse(Pump2TextBox.Text, UserInput2) Then
-                DbRange = UserInput & " & " & UserInput2
+                DbRange = Pump1TextBox.Text & " & " & Pump2TextBox.Text 'grabbing values from TextBox controls rather than UserInput variables to keep leading zeros user inputs
                 InvalidInputLabel.Visible = False 'hide error message from user
             Else
                 InvalidInputLabel.Visible = True
