@@ -277,89 +277,89 @@ Partial Class MR_OpenTicketStatusBoard
                     Dim MalleableCtrl As WebControl = DirectCast(ctrl, WebControl)
                     Dim FieldType As String = If(IsDBNull(DR("FieldType")), Nothing, DR("FieldType")) 'using ternary operator in case field value is NULL
 
+                    If Request.QueryString("Area") IsNot Nothing Then 'this means user is in ChecklistBuilder.aspx
+                        MalleableCtrl.Enabled = False
+                    End If
+
                     If FieldType IsNot Nothing AndAlso MalleableCtrl.Attributes(FieldType) IsNot Nothing Then 'if FieldType is null, it is a standard textbox
                         MalleableCtrl.Attributes(FieldType) = True
                         MalleableCtrl.Visible = True
                         myTextBox.Style("display") = "none"
 
-                        If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
-                            Dim InputCtrl As Control = ctrl.Controls(1)
-                            Dim InputCtrlID As String
+                        Dim InputCtrl As Control = ctrl.Controls(1)
+                        Dim InputCtrlID As String
 
-                            Select Case FieldType
-                                Case "Checkbox"
-                                    Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
-                                    InputCtrlID = "CheckBox_" & LabelKey
-                                    Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "") 'to prevent empty strings when checkbox is NOT checked
-                                    CheckBox.Checked = If(Checked = "1", True, False)
-                                    myTextBox.Text = Checked
-                                Case "HOA"
-                                    Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
-                                    InputCtrlID = "DDL_" & LabelKey
-                                    Dim HOAValue As String = myTextBox.Text
+                        Select Case FieldType
+                            Case "Checkbox"
+                                Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
+                                InputCtrlID = "CheckBox_" & LabelKey
+                                Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "") 'to prevent empty strings when checkbox is NOT checked
+                                CheckBox.Checked = If(Checked = "1", True, False)
+                                myTextBox.Text = Checked
+                            Case "HOA"
+                                Dim DDL As DropDownList = DirectCast(ctrl.Controls(1), DropDownList)
+                                InputCtrlID = "DDL_" & LabelKey
+                                Dim HOAValue As String = myTextBox.Text
 
-                                    If HOAValue.Contains("...") OrElse String.IsNullOrEmpty(HOAValue) Then 'if db write has NOT occured, then HOAValue will be an empty string
-                                        DDL.SelectedIndex = 0
-                                        myTextBox.Text = DDL.SelectedItem.Text
-                                    Else
-                                        DDL.SelectedValue = HOAValue
-                                        DDL.Items(0).Enabled = False
-                                    End If
-                                Case "Text"
-                                    InputCtrlID = "Text_" & LabelKey
-                                    myTextBox.Text = Session("LabelInputMap")(LabelKey)
-                                    DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
-                                Case "STC"
-                                    Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
-                                    Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
-                                    Dim BathTextBoxID As String = "BathTemp_" & LabelKey
-                                    Dim IRGunTextBoxID As String = "IrGunTemp_" & LabelKey
-                                    Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
-                                    Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+                                If HOAValue.Contains("...") OrElse String.IsNullOrEmpty(HOAValue) Then 'if db write has NOT occured, then HOAValue will be an empty string
+                                    DDL.SelectedIndex = 0
+                                    myTextBox.Text = DDL.SelectedItem.Text
+                                Else
+                                    DDL.SelectedValue = HOAValue
+                                    DDL.Items(0).Enabled = False
+                                End If
+                            Case "Text"
+                                InputCtrlID = "Text_" & LabelKey
+                                myTextBox.Text = Session("LabelInputMap")(LabelKey)
+                                DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                            Case "STC"
+                                Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
+                                Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
+                                Dim BathTextBoxID As String = "BathTemp_" & LabelKey
+                                Dim IRGunTextBoxID As String = "IrGunTemp_" & LabelKey
+                                Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                Dim Temps As String() = UnderlyingTextBoxText.Split("/")
 
-                                    BathTextBox.ID = BathTextBoxID
-                                    IRGunTextBox.ID = IRGunTextBoxID
+                                BathTextBox.ID = BathTextBoxID
+                                IRGunTextBox.ID = IRGunTextBoxID
 
-                                    myTextBox.Text = UnderlyingTextBoxText
+                                myTextBox.Text = UnderlyingTextBoxText
 
-                                    BathTextBox.Text = Temps(0)
-                                    IRGunTextBox.Text = If(Temps.Count > 1, Temps(1), String.Empty)
+                                BathTextBox.Text = Temps(0)
+                                IRGunTextBox.Text = If(Temps.Count > 1, Temps(1), String.Empty)
 
-                                    STC_TbxOverlays += "STC_TbxOverlay('" & BathTextBoxID & "'); STC_TbxOverlay('" & IRGunTextBoxID & "'); "
+                                STC_TbxOverlays += "STC_TbxOverlay('" & BathTextBoxID & "'); STC_TbxOverlay('" & IRGunTextBoxID & "'); "
 
-                                    Continue For 'to avoid SetDBConnection being called on InputCtrl control
-                                Case "DP"
-                                    Dim Dp1Box As CheckBox = DirectCast(ctrl.Controls(3), CheckBox)
-                                    Dim Dp2Box As CheckBox = DirectCast(ctrl.Controls(7), CheckBox)
-                                    Dim Dp1BoxID As String = "Dp1_" & LabelKey
-                                    Dim Dp2BoxID As String = "Dp2_" & LabelKey
-                                    Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
-                                    Dim Temps As String() = UnderlyingTextBoxText.Split("/")
-                                    Dim DpNums As String() = Range.Split("&")
+                                Continue For 'to avoid SetDBConnection being called on InputCtrl control
+                            Case "DP"
+                                Dim Dp1Box As CheckBox = DirectCast(ctrl.Controls(3), CheckBox)
+                                Dim Dp2Box As CheckBox = DirectCast(ctrl.Controls(7), CheckBox)
+                                Dim Dp1BoxID As String = "Dp1_" & LabelKey
+                                Dim Dp2BoxID As String = "Dp2_" & LabelKey
+                                Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+                                Dim DpNums As String() = Range.Split("&")
 
-                                    Dp1Box.ID = Dp1BoxID
-                                    Dp2Box.ID = Dp2BoxID
+                                Dp1Box.ID = Dp1BoxID
+                                Dp2Box.ID = Dp2BoxID
 
-                                    myTextBox.Text = UnderlyingTextBoxText
+                                myTextBox.Text = UnderlyingTextBoxText
 
-                                    Dp1Box.Checked = If(String.IsNullOrEmpty(Temps(0)) OrElse Temps(0) = 0, False, True)
-                                    Dp2Box.Checked = If(Temps.Count > 1 AndAlso Not String.IsNullOrEmpty(Temps(1)) AndAlso Temps(1) = 1, True, False)
+                                Dp1Box.Checked = If(String.IsNullOrEmpty(Temps(0)) OrElse Temps(0) = 0, False, True)
+                                Dp2Box.Checked = If(Temps.Count > 1 AndAlso Not String.IsNullOrEmpty(Temps(1)) AndAlso Temps(1) = 1, True, False)
 
-                                    Dp1Box.Text = Trim(DpNums(0))
-                                    Dp2Box.Text = Trim(DpNums(1))
+                                Dp1Box.Text = Trim(DpNums(0))
+                                Dp2Box.Text = Trim(DpNums(1))
 
-                                    DP_TbxOverlay += "DP_TbxOverlay('" & Dp1BoxID & "'); DP_TbxOverlay('" & Dp2BoxID & "'); "
+                                DP_TbxOverlay += "DP_TbxOverlay('" & Dp1BoxID & "'); DP_TbxOverlay('" & Dp2BoxID & "'); "
 
-                                    Continue For 'to avoid SetDBConnection being called on InputCtrl control
-                            End Select
+                                Continue For 'to avoid SetDBConnection being called on InputCtrl control
+                        End Select
 
-                            InputCtrl.ID = InputCtrlID
-                            DBConnections += "SetDBConnection('" & InputCtrlID & "'); "
-
-                        Else
-                            MalleableCtrl.Enabled = False
-                        End If
+                        InputCtrl.ID = InputCtrlID
+                        DBConnections += "SetDBConnection('" & InputCtrlID & "'); "
                     End If
+
                 End If
             Next
             VisiblePanels.Add(myPanel)
