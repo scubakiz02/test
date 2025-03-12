@@ -532,7 +532,6 @@ Partial Class MR_OpenTicketStatusBoard
         AreaFromQueryString = AreaDropDownList.SelectedValue
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
-
         RefreshPreview()
     End Sub
 
@@ -916,6 +915,9 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
+        AreaFromQueryString = AreaDropDownList.SelectedValue
+        LabelFromQueryString = SetLabelFromQueryString()
+        CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()
     End Sub
 

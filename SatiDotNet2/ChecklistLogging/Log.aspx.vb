@@ -165,6 +165,16 @@ Partial Class MR_OpenTicketStatusBoard
             DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
             RC = DS.Tables(0).Rows.Count
 
+            'reset session state LabelInputMap variable 
+            Session("LabelInputMap") = New Dictionary(Of Integer, String)
+            For J = 0 To RC - 1
+                DR = DS.Tables(0).Rows(J)
+                Session("LabelInputMap")(DR("LabelKey")) = String.Empty
+            Next
+
+
+
+
             TitleLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
 
             Try 'using a try catch block in case DS has no records, which mean the user is building a new checklist
