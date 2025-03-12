@@ -227,19 +227,22 @@ Partial Class MR_OpenTicketStatusBoard
         Dim DateDiffInterval As String = "Day"
         Dim SubSectionId As String
         Dim Assignee As String
+        Dim DuplicateRecord As Boolean = False
 
         'build controls for CurrentLogsPanel dynamically
         Try
             DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
-            RC = DS.Tables(0).Rows.Count
-        Catch ex As Exception
-            'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
-
-
-            Exit Sub
+        Catch ex As Exception 'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
+            'modified query to return 'problem child' records
+            DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
         End Try
 
+        RC = DS.Tables(0).Rows.Count
+        If RC > 1 Then DuplicateRecord = True
+
         For I = 0 To RC - 1
+            If I > 0 Then Exit For 'I will only be > 1 when double booking records of a checklist occurs in DB
+
             Dim CurrentLogsButton As New Button()
             DR = DS.Tables(0).Rows(I)
 
@@ -247,7 +250,7 @@ Partial Class MR_OpenTicketStatusBoard
 
             SetButtonBackground(DR)
             CurrentLogsButton.ID = DR("Key")
-            CurrentLogsButton.Text = DR("Area")
+            CurrentLogsButton.Text = If(DuplicateRecord, "Contact DB Admin: " & DR("Area"), DR("Area"))
 
             AddHandler CurrentLogsButton.Click, AddressOf RedirectToLogAspx
             CurrentLogsButton.Attributes.Add("style", "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px); ")
