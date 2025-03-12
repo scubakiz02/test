@@ -355,8 +355,8 @@
                     let idSplit = this.id.split("_")
                     let underlyingTbx = getAspControl("TextBox_" + idSplit[idSplit.length - 1]);
                     let DPs = underlyingTbx.value.split("/");
-                    let DP1 = DPs[0] && DPs[0] != "undefined" ? DPs[0] : "";
-                    let DP2 = DPs[1] && DPs[1] != "undefined" ? DPs[1] : "";
+                    let DP1 = DPs[0] && DPs[0] != "undefined" ? 1 : 0;
+                    let DP2 = DPs[1] && DPs[1] != "undefined" ? 1 : 0;
                     let DBvalue = this.checked ? 1 : 0;
                     
                     if (this.id.includes("Dp1")) underlyingTbx.value = DBvalue + "/" + DP2;
