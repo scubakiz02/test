@@ -891,7 +891,7 @@ Partial Class MR_OpenTicketStatusBoard
             LabelRangeMap.Add(DR("Key"), If(IsDBNull(DR("Range")), Nothing, DR("Range")))
         Next
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Ranges='" & JsonSerializer.Serialize(LabelRangeMap) & "', CompleteLog=1, Date='" & System.DateTime.Now.ToString() & "' WHERE [Key]=" & KeyFromQueryString) 'record to 'Ranges' field in T_LogData
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Ranges='" & JsonSerializer.Serialize(LabelRangeMap) & "', CompleteLog=1 WHERE [Key]=" & KeyFromQueryString) 'record to 'Ranges' field in T_LogData
         Update_All_InputsValid_Field()
         Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
     End Sub
