@@ -47,8 +47,8 @@ Partial Class MR_OpenTicketStatusBoard
 
         If Not IsPostBack Then
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
-            'AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaInterval") Is Nothing OrElse Session("AreaInterval") = "All", String.Empty, " A.IntervalKey=" & Session("AreaInterval") & " AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
-            AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaInterval") Is Nothing OrElse Session("AreaInterval") = "All", String.Empty, " (A.IntervalKey=" & Session("AreaInterval") & " OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+            'AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaIntervalKey") Is Nothing OrElse Session("AreaIntervalKey") = "All", String.Empty, " A.IntervalKey=" & Session("AreaIntervalKey") & " AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+            AreaDropDownList_SqlDataSource.SelectCommand = GetAreaDdlSelectCommand()
 
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
@@ -229,7 +229,7 @@ Partial Class MR_OpenTicketStatusBoard
             End If
 
         Else
-            Session("AreaInterval") = AreaIntervalDropDownList.SelectedValue
+            Session("AreaIntervalKey") = AreaIntervalDropDownList.SelectedValue
         End If
     End Sub
 
@@ -240,7 +240,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim AreaListItem As ListItem
 
         ' setting AreaDropDownList & AreaIntervalDropDownList SelectedValue properties here, because ddl controls are not visible in Page_Load, but are in Page_PreRender
-        AreaIntervalDropDownList.SelectedValue = Session("AreaInterval")
+        AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
         AreaDropDownList.SelectedValue = AreaFromQueryString
 
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
@@ -267,6 +267,10 @@ Partial Class MR_OpenTicketStatusBoard
 
         FormViewInsert = Nothing
     End Sub
+
+    Function GetAreaDdlSelectCommand() As String 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
+        Return "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaIntervalKey") Is Nothing OrElse Session("AreaIntervalKey") = "All", String.Empty, " (A.IntervalKey=" & Session("AreaIntervalKey") & " OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+    End Function
 
     Sub CreateListItem(Config As Dictionary(Of String, String))
         Dim ListItem2 As New ListItem()
@@ -915,7 +919,8 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        AreaFromQueryString = AreaDropDownList.SelectedValue
+        'AreaFromQueryString = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey=" & Session("AreaIntervalKey") & " ORDER BY Area", "Key")
+        AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key")
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()

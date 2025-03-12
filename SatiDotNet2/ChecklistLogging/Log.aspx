@@ -358,7 +358,7 @@
                     let DP1 = DPs[0] && DPs[0] != "undefined" ? DPs[0] : 0;
                     let DP2 = DPs[1] && DPs[1] != "undefined" ? DPs[1] : 0;
                     let DBvalue = this.checked ? 1 : 0;
-                    
+
                     if (this.id.includes("Dp1")) underlyingTbx.value = DBvalue + "/" + DP2;
                     else underlyingTbx.value = DP1 + "/" + DBvalue;
 
@@ -483,6 +483,12 @@
                     padding-bottom: 0;
                 }
                 /*this css fixes bug causing height > screen height*/
+
+                .disabled {
+                    opacity: 0.5;
+                    pointer-events: none; /* Prevent interaction with the div */
+                    user-select: none; /*disable text selection of an element*/
+                }
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
@@ -562,11 +568,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -614,11 +620,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -666,11 +672,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -718,11 +724,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -770,11 +776,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -822,11 +828,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -874,11 +880,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -926,11 +932,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -978,11 +984,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1030,11 +1036,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1082,11 +1088,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1134,11 +1140,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1186,11 +1192,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1238,11 +1244,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1290,11 +1296,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1342,11 +1348,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1394,11 +1400,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1446,11 +1452,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1498,11 +1504,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1550,11 +1556,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1602,11 +1608,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1654,11 +1660,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1706,11 +1712,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1758,11 +1764,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1810,11 +1816,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1862,11 +1868,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1914,11 +1920,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -1966,11 +1972,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2018,11 +2024,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2070,11 +2076,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2122,11 +2128,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2174,11 +2180,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2226,11 +2232,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2278,11 +2284,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2330,11 +2336,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2382,11 +2388,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2434,11 +2440,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2486,11 +2492,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2538,11 +2544,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2590,11 +2596,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2642,11 +2648,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2694,11 +2700,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2746,11 +2752,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2798,11 +2804,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2850,11 +2856,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2902,11 +2908,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -2954,11 +2960,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3006,11 +3012,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3058,11 +3064,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3110,11 +3116,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3162,11 +3168,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3214,11 +3220,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
@@ -3266,11 +3272,11 @@
                             <asp:Panel Visible="False" DP="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                                 <div style="display: flex; flex-direction: column">
                                     <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
                                 </div>
                             </asp:Panel>
 
