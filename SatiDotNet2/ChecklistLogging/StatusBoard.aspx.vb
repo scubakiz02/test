@@ -229,8 +229,15 @@ Partial Class MR_OpenTicketStatusBoard
         Dim Assignee As String
 
         'build controls for CurrentLogsPanel dynamically
-        DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
-        RC = DS.Tables(0).Rows.Count
+        Try
+            DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
+            RC = DS.Tables(0).Rows.Count
+        Catch ex As Exception
+            'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
+
+
+            Exit Sub
+        End Try
 
         For I = 0 To RC - 1
             Dim CurrentLogsButton As New Button()
