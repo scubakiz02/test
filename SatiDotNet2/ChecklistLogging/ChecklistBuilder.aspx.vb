@@ -107,10 +107,18 @@ Partial Class MR_OpenTicketStatusBoard
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
 
+
+                    RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel, & enable 'Set' button in bottom right)
                     If FieldType = "STC" Then
                         RangeOrderMenu.Enabled = False
                         DiffPanel.Visible = True
                         DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
+                    ElseIf FieldType = "DP" Then
+                        RangeOrderLabel.Text = "Pump #'s"
+                        RangeOrderMenu.Style("visibility") = "hidden"
+                        RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
+                        DpPanel.Visible = True
+                        'DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
                     Else
                         SetRangeOrder(DbRange)
                     End If
@@ -588,8 +596,6 @@ Partial Class MR_OpenTicketStatusBoard
     Sub SetRangeOrder(DbRange As String)
         Dim DbRangeDelimited As String()
 
-        RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel)
-
         If DbRange IsNot Nothing Then
             If DbRange.Contains("-") Then
                 DbRangeDelimited = DbRange.Split("-")
@@ -1050,6 +1056,15 @@ Partial Class MR_OpenTicketStatusBoard
         ElseIf DiffPanel.Visible Then
             If Double.TryParse(DiffTextbox.Text, UserInput) Then
                 DbRange = "+/- " & UserInput
+                InvalidInputLabel.Visible = False 'hide error message from user
+            Else
+                InvalidInputLabel.Visible = True
+                Exit Sub
+            End If
+
+        ElseIf DpPanel.Visible Then
+            If Double.TryParse(Pump1TextBox.Text, UserInput) And Double.TryParse(Pump2TextBox.Text, UserInput2) Then
+                DbRange = UserInput & "&" & UserInput2
                 InvalidInputLabel.Visible = False 'hide error message from user
             Else
                 InvalidInputLabel.Visible = True

@@ -390,6 +390,20 @@
                                     <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="DiffTextbox" />
                                 </asp:Panel>
 
+                                <asp:Panel runat="server" ID="DpPanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
+                                    <div>
+                                        <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="Pump 1:" runat="server" />
+                                        <br />
+                                        <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="Pump1TextBox" />
+                                    </div>
+
+                                    <div>
+                                        <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="Pump 2:" runat="server" />
+                                        <br />
+                                        <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="Pump2TextBox" />
+                                    </div>
+                                </asp:Panel>
+
                                 <asp:Panel runat="server" ID="LessThanPanel" Visible="False">
                                     <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="<" runat="server" />
                                     <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LessThanTextbox" />
