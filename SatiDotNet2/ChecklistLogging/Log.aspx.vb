@@ -335,6 +335,7 @@ Partial Class MR_OpenTicketStatusBoard
                                     Dim Dp2BoxID As String = "Dp2_" & LabelKey
                                     Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
                                     Dim Temps As String() = UnderlyingTextBoxText.Split("/")
+                                    Dim DpNums As String() = Range.Split("&")
 
                                     Dp1Box.ID = Dp1BoxID
                                     Dp2Box.ID = Dp2BoxID
@@ -343,6 +344,9 @@ Partial Class MR_OpenTicketStatusBoard
 
                                     Dp1Box.Checked = If(String.IsNullOrEmpty(Temps(0)) OrElse Temps(0) = 0, False, True)
                                     Dp2Box.Checked = If(Temps.Count > 1 AndAlso Not String.IsNullOrEmpty(Temps(1)) AndAlso Temps(1) = 1, True, False)
+
+                                    Dp1Box.Text = Trim(DpNums(0))
+                                    Dp2Box.Text = Trim(DpNums(1))
 
                                     DP_TbxOverlay += "DP_TbxOverlay('" & Dp1BoxID & "'); DP_TbxOverlay('" & Dp2BoxID & "'); "
 
