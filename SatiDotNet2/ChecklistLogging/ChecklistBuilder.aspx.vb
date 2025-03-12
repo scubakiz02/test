@@ -107,18 +107,20 @@ Partial Class MR_OpenTicketStatusBoard
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
 
-
                     RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel, & enable 'Set' button in bottom right)
                     If FieldType = "STC" Then
-                        RangeOrderMenu.Enabled = False
+                        RangeOrderMenu.Style("visibility") = "hidden"
+                        RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
                         DiffPanel.Visible = True
                         DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
                     ElseIf FieldType = "DP" Then
+                        Dim DpNums As String() = DbRange.Split("&")
                         RangeOrderLabel.Text = "Pump #'s"
                         RangeOrderMenu.Style("visibility") = "hidden"
                         RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
                         DpPanel.Visible = True
-                        'DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
+                        Pump1TextBox.Text = If(DpNums(0) IsNot Nothing, Trim(DpNums(0)), String.Empty)
+                        Pump2TextBox.Text = If(DpNums(1) IsNot Nothing, Trim(DpNums(1)), String.Empty)
                     Else
                         SetRangeOrder(DbRange)
                     End If
@@ -1064,7 +1066,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         ElseIf DpPanel.Visible Then
             If Double.TryParse(Pump1TextBox.Text, UserInput) And Double.TryParse(Pump2TextBox.Text, UserInput2) Then
-                DbRange = UserInput & "&" & UserInput2
+                DbRange = UserInput & " & " & UserInput2
                 InvalidInputLabel.Visible = False 'hide error message from user
             Else
                 InvalidInputLabel.Visible = True
