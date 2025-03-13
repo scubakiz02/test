@@ -6,7 +6,8 @@
     <br />
     <br />
     This user is not apart of this group: 
-    <asp:Label ID="GroupAuthorized" runat="server" BackColor="#ff8282" Font-Bold="true" Width="150px"></asp:Label>
+    <%--<asp:Label ID="GroupAuthorized" runat="server" BackColor="#ff8282" Font-Bold="true" Width="150px"></asp:Label>--%>
+    <asp:Label ID="GroupAuthorized" runat="server" BackColor="#ff8282" Font-Bold="true"></asp:Label>
     <br />
     If you need access or you believe this is an error. Contact SATI.Net administrator.<br />
     <br />
