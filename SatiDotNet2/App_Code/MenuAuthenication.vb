@@ -53,11 +53,11 @@
     ''' </summary>
     ''' <param name="GroupAuthenication"></param>
     ''' <param name="Server"></param>
-    'Public Shared Sub CheckGroupAuthenication(GroupAuthenication As String, Server As HttpServerUtility)
-    '    If Roles.IsUserInRole(GroupAuthenication) = False Then
-    '        Server.Transfer("~/UnAuthorized.aspx?GroupName=" + GroupAuthenication)
-    '    End If
-    'End Sub
+    Public Shared Sub CheckGroupAuthenication(GroupAuthenication As String, Server As HttpServerUtility)
+        If Roles.IsUserInRole(GroupAuthenication) = False Then
+            Server.Transfer("~/UnAuthorized.aspx?GroupName=" + GroupAuthenication)
+        End If
+    End Sub
 
     ''' <summary>
     ''' This method is designed to work allong side the CheckPageAuthenication method, this method
@@ -67,9 +67,27 @@
     ''' </summary>
     ''' <param name="GroupAuthenication"></param>
     ''' <param name="Server"></param>
-    Public Shared Sub CheckGroupAuthenication(GroupAuthenication As String, Server As HttpServerUtility)
-        If Roles.IsUserInRole(GroupAuthenication) = False Then
-            Server.Transfer("~/UnAuthorized.aspx?GroupName=" + GroupAuthenication)
+    Public Shared Sub CheckGroupsAuthenication(GroupsAuthenication As String(), Server As HttpServerUtility)
+        Dim UserHas1Role As Boolean = False
+        Dim ConcatGroups As String
+        Dim LastGroupAuthIdx As Integer = GroupsAuthenication.Count - 1
+
+        For I As Integer = 0 To LastGroupAuthIdx
+            Dim GroupAuthenication As String = GroupsAuthenication(I)
+
+            If Roles.IsUserInRole(GroupAuthenication) = True Then
+                UserHas1Role = True
+            End If
+
+            If I < LastGroupAuthIdx Then
+                ConcatGroups += GroupAuthenication & "OR"
+            Else
+                ConcatGroups += GroupAuthenication
+            End If
+        Next
+
+        If UserHas1Role = False Then
+            Server.Transfer("~/UnAuthorized.aspx?GroupName=" + ConcatGroups)
         End If
     End Sub
 
