@@ -58,37 +58,37 @@ Public Class GetStatusBoardRole
     <Fact>
     Public Sub GetStatusBoardRoleTest1()
         'if Where does not match today, return should be 'admin'
-        Assert.Equal("admin", LogAspx.GetStatusBoardRole("Full", "Production", "03/09/2025"))
+        Assert.Equal(New String() {"admin"}, LogAspx.GetStatusBoardRole("Full", "Production", "03/09/2025"))
     End Sub
 
     <Fact>
     Public Sub GetStatusBoardRoleTest2()
         'if view is full & department is maintenance, return should be 'FMManagerApproval'
-        Assert.Equal("FMManagerApproval", LogAspx.GetStatusBoardRole("Full", "Maintenance", Today.Date))
+        Assert.Equal(New String() {"FMManagerApproval", "QSHEManagerApproval"}, LogAspx.GetStatusBoardRole("Full", "Maintenance", Today.Date))
     End Sub
 
     <Fact>
     Public Sub GetStatusBoardRoleTest3()
         'if view is full & department is production, return should be 'PC'
-        Assert.Equal("PC", LogAspx.GetStatusBoardRole("Full", "Production", Today.Date))
+        Assert.Equal(New String() {"PC"}, LogAspx.GetStatusBoardRole("Full", "Production", Today.Date))
     End Sub
 
     <Fact>
     Public Sub GetStatusBoardRoleTest4()
         'if view is focus & department is production, return should be nothing
-        Assert.Equal(Nothing, LogAspx.GetStatusBoardRole("Focus", "Production", Today.Date))
+        Assert.Equal(New String() {Nothing}, LogAspx.GetStatusBoardRole("Focus", "Production", Today.Date))
     End Sub
 
     <Fact>
     Public Sub GetStatusBoardRoleTest5()
         'if view is focus & department is all, return should be 'Maintenance'
-        Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "All", Today.Date))
+        Assert.Equal(New String() {"Maintenance"}, LogAspx.GetStatusBoardRole("Focus", "All", Today.Date))
     End Sub
 
     <Fact>
     Public Sub GetStatusBoardRoleTest6()
         'if view is focus & department is Maintenance, return should be 'Maintenance'
-        Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
+        Assert.Equal(New String() {"Maintenance"}, LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
     End Sub
 
 End Class
