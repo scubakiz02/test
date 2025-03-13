@@ -80,7 +80,7 @@
             End If
 
             If I < LastGroupAuthIdx Then
-                ConcatGroups += GroupAuthenication & " Or "
+                ConcatGroups += GroupAuthenication & " or "
             Else
                 ConcatGroups += GroupAuthenication
             End If
