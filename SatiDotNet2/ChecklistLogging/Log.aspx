@@ -491,6 +491,11 @@
                     pointer-events: none; /* Prevent interaction with the div */
                     user-select: none; /*disable text selection of an element*/
                 }
+
+                .HeaderPanelButtons {
+                    padding: var(--UWhitespace);
+                    font-size: var(--UFontSize);
+                }
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
@@ -500,7 +505,7 @@
                     </div>
 
                     <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
-                        <asp:Button ID="WrongFormButton" Text="Wrong Form" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
+                        <asp:Button ID="WrongFormButton" Text="Wrong Form" CssClass="HeaderPanelButtons" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
 
                         <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                             <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>
@@ -527,9 +532,10 @@
                                     <p style="margin: 0">= out of range value</p>
                                 </div>
                             </div>
-                            <div style="display: flex; align-items: center">
+                            <div style="display: flex; align-items: center; gap: var(--UWhitespace);" >
                                 <asp:CheckBox Visible="False" AutoPostBack="True" ID="MarkAsDoneCheckBox" OnCheckedChanged="MarkAsDoneCheckBox_OnCheckedChanged" runat="server" Text="← Some logs are invalid. Mark as done." CssClass="LogCheckBox" Style="color: red; margin: 0 10px"></asp:CheckBox>
-                                <asp:Button ID="DoneButton" OnClick="DoneButton_Click" Text="Done" runat="server"></asp:Button>
+                                <asp:Button ID="UndoDoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Undo Done" Enabled="False" runat="server"></asp:Button>
+                                <asp:Button ID="DoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Done" runat="server"></asp:Button>
                             </div>
                         </asp:Panel>
                     </div>

@@ -130,6 +130,7 @@ Partial Class MR_OpenTicketStatusBoard
                 HeaderPanel.Enabled = True
                 WrongFormButton.Enabled = False
                 DoneButton.Enabled = False
+                UndoDoneButton.Enabled = True
             End If
 
             PhotoDS = SatiCode.GetMyDataSet("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=" & KeyFromQueryString)
