@@ -854,29 +854,29 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub DoneButton_Click(sender As Object, e As EventArgs)
-        Dim NumOfNotes As Integer = SatiCode.GetMyDataSet("Select Count([Key]) As NumOfNotes FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")).Tables(0).Rows(0)("NumOfNotes")
+        'Dim NumOfNotes As Integer = SatiCode.GetMyDataSet("Select Count([Key]) As NumOfNotes FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")).Tables(0).Rows(0)("NumOfNotes")
 
-        For Each Ctrl As Control In ItemsPanel.Controls
-            Dim InputPnl As Panel
-            Dim Valid As Boolean?
+        'For Each Ctrl As Control In ItemsPanel.Controls
+        '    Dim InputPnl As Panel
+        '    Dim Valid As Boolean?
 
-            Try
-                InputPnl = DirectCast(Ctrl, Panel)
-            Catch ex As Exception
-                Continue For
-            End Try
+        '    Try
+        '        InputPnl = DirectCast(Ctrl, Panel)
+        '    Catch ex As Exception
+        '        Continue For
+        '    End Try
 
-            Valid = LogAspx.ValidateByBackColor(NumOfNotes, InputPnl.BackColor.Name)
-            If Valid Then
-                Continue For
-            ElseIf NumOfNotes = 0 AndAlso (Not Valid OrElse Valid Is Nothing) Then
-                Session("DisplayError") = True
-                Response.Redirect(Request.Url.ToString())
-                Exit Sub
-            End If
-        Next
+        '    Valid = LogAspx.ValidateByBackColor(NumOfNotes, InputPnl.BackColor.Name)
+        '    If Valid Then
+        '        Continue For
+        '    ElseIf NumOfNotes = 0 AndAlso (Not Valid OrElse Valid Is Nothing) Then
+        '        Session("DisplayError") = True
+        '        Response.Redirect(Request.Url.ToString())
+        '        Exit Sub
+        '    End If
+        'Next
 
-        'if here, all fields are valid, because 'Exit Sub' statement has NOT been run
+        ''if here, all fields are valid, because 'Exit Sub' statement has NOT been run
         UploadToDataTable(User.Identity.Name.ToString)
         MarkAsDone()
     End Sub
