@@ -43,12 +43,18 @@ Public Class LogAspxLibrary
         Return Res.ToArray()
     End Function
 
-    Function ValidDate(UserInput As String) As Boolean
-        Dim DateObject As Date
-        Dim Res As Boolean
+    Function ValidDate(UserInput As String) As Boolean 'valid date must be MM/YY format
+        Dim DateParseInput As Date
+        Dim Res As Boolean = True
+        Dim DateDelimited As String()
 
         Try
-            DateObject = Date.Parse(UserInput)
+            DateParseInput = Date.Parse(UserInput)
+            DateDelimited = UserInput.Split("/")
+
+            If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 OrElse DateParseInput.Date < Today.Date Then
+                Throw New Exception("")
+            End If
         Catch ex As Exception
             Res = False
         End Try

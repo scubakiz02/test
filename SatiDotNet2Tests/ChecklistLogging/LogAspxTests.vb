@@ -7,7 +7,44 @@ Public Class DateValidation
 
     <Fact>
     Public Sub ValidDateTest1()
+        'ensure empty input is false
         Assert.False(LogAspx.ValidDate(""))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest2()
+        'if letters are included, result is false
+        Assert.False(LogAspx.ValidDate("1d/23"))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest3()
+        '5 characters with a '/' as the 3rd, or else false
+        Assert.False(LogAspx.ValidDate("08"))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest4()
+        '5 characters with a '/' as the 3rd, or else false
+        Assert.False(LogAspx.ValidDate("08/0"))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest5()
+        '5 characters with a '/' as the 3rd, or else false
+        Assert.False(LogAspx.ValidDate("08/09/2002"))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest6()
+        'should return true. this is the format the function is looking for (MM/YY)
+        Assert.True(LogAspx.ValidDate("08/29"))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest7()
+        'if the date is in the past, return false
+        Assert.False(LogAspx.ValidDate("08/24"))
     End Sub
 End Class
 
