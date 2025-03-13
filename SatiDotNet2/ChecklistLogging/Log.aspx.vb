@@ -385,6 +385,7 @@ Partial Class MR_OpenTicketStatusBoard
         ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (StampKey, DataRecordKey, StampedBy, Date) VALUES (" & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
         sender.Text = User.Identity.Name.ToString
         sender.Enabled = False
+        SetScrollPos()
     End Sub
 
     Protected Sub StcTextBox_onTextChanged(ByVal sender As Object, ByVal e As EventArgs)
