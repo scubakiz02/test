@@ -279,12 +279,6 @@ Partial Class MR_OpenTicketStatusBoard
         CType(EditPreviewPanel.FindControl(Config("Parent")), DropDownList).Items.Add(ListItem2)
     End Sub
 
-    Protected Sub Stamp_OnClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (StampKey, DataRecordKey, StampedBy, Date) VALUES (" & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
-        sender.Text = User.Identity.Name.ToString
-        sender.Enabled = False
-    End Sub
-
     Protected Sub DynamicButton_Click(ByVal sender As Object, ByVal e As EventArgs)
     End Sub
 

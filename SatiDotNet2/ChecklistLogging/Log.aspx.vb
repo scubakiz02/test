@@ -383,7 +383,7 @@ Partial Class MR_OpenTicketStatusBoard
 
 
     Protected Sub Stamp_OnClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (StampKey, DataRecordKey, StampedBy, Date) VALUES (" & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
+        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (Active, StampKey, DataRecordKey, StampedBy, Date) VALUES (1, " & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
         sender.Text = User.Identity.Name.ToString
         sender.Enabled = False
         SetScrollPos()
@@ -958,7 +958,8 @@ Partial Class MR_OpenTicketStatusBoard
 
     Sub BuildDynamicAsp()
         If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
-            DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey And DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] WHERE AreaKey=" & AreaFromQueryString & " AND Active=1")
+            'DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey And DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] WHERE AreaKey=" & AreaFromQueryString & " AND Active=1")
+            DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey AND S.Active=1 AND DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] AND S.Active=1 WHERE AreaKey=" & AreaFromQueryString & " AND L.Active=1")
         Else 'user is in ChecklistBuilder.aspx editing or creating a checklist
             DS = SatiCode.GetMyDataSet("SELECT Stamped.Title, Stamp.[Key] As ID FROM [ALTS].[dbo].[T_LogStampList] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampTitle] Stamped ON Stamp.TitleKey=Stamped.[Key] WHERE Active=1 AND AreaKey=" & AreaFromQueryString)
         End If
