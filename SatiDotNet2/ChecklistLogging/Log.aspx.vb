@@ -321,6 +321,10 @@ Partial Class MR_OpenTicketStatusBoard
                                 InputCtrlID = "Text_" & LabelKey
                                 myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                 DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                            Case "Date"
+                                InputCtrlID = "Date_" & LabelKey
+                                myTextBox.Text = Session("LabelInputMap")(LabelKey)
+                                DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
@@ -603,6 +607,7 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "HOA"
                             If Not UserInput.Contains("...") Then Exit For
                         Case "Text"
+                        Case "Date"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "STC"
                             Dim Temps As String() = UserInput.Split("/")
@@ -645,8 +650,6 @@ Partial Class MR_OpenTicketStatusBoard
                                 SetPanelBackColor(BackPanelColor, "", Pnl)
                                 Continue For
                             End If
-
-
                     End Select
 
                     'if here, input is NOT valid
