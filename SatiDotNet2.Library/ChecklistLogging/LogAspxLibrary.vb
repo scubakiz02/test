@@ -20,22 +20,27 @@ Public Class LogAspxLibrary
         Return True
     End Function
 
-    Public Function GetStatusBoardRole(View As String, Department As String, Where As Date) As String
-        Dim Res As String = Nothing
+    Public Function GetStatusBoardRole(View As String, Department As String, Where As Date) As String()
+        Dim Res As New List(Of String)
 
         If Where <> Today.Date Then
-            Res = "admin"
+            Res.Add("admin")
+        ElseIf View = "Focus" AndAlso Department = "Production" Then 'if view is focus & department is production, return should be nothing
+            Res.Add(Nothing)
         ElseIf View = "Full" Then 'if user wnats to see past issues column, they will need the associated supervisor role
             If Department <> "Production" Then
-                Res = "FMManagerApproval"
+                Res.Add("FMManagerApproval")
+                Res.Add("QSHEManagerApproval")
             Else
-                Res = "PC"
+                Res.Add("PC")
             End If
         Else 'user will need to at minimum have 'Maintenance' role to view 'All' or 'Maintenance' department logs
-            If Department <> "Production" Then Res = "Maintenance"
+            If Department <> "Production" Then
+                Res.Add("Maintenance")
+            End If
         End If
 
-        Return Res
+        Return Res.ToArray()
     End Function
 
 End Class

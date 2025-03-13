@@ -45,8 +45,10 @@ Partial Class MR_OpenTicketStatusBoard
             'MenuAuthentication hierarchy based on querystrings user loaded the page with
             'MenuAuthenication.CheckGroupAuthenication("EditRoles", Server)
 
-            Dim RequiredRole As String = LogAspx.GetStatusBoardRole(Session("ViewFromQueryString"), Session("DepartmentFromQueryString"), Date.Parse(Session("WhereFromQueryString")))
-            If RequiredRole IsNot Nothing Then MenuAuthenication.CheckGroupAuthenication(RequiredRole, Server)
+            Dim RequiredRoles As String() = LogAspx.GetStatusBoardRole(Session("ViewFromQueryString"), Session("DepartmentFromQueryString"), Date.Parse(Session("WhereFromQueryString")))
+            If RequiredRoles.Contains(Nothing) = False Then
+                MenuAuthenication.CheckGroupsAuthenication(RequiredRoles, Server)
+            End If
 
             WhereLabel.Text = Session("WhereFromQueryString")
 
