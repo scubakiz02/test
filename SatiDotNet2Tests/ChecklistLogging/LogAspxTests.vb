@@ -2,7 +2,16 @@
 Imports Xunit
 Imports SatiDotNet2.Library
 
-Public Class LogAspxTests
+Public Class Authentication
+    Dim LogAspx = New LogAspxLibrary()
+
+    <Fact>
+    Public Sub ReturnTrueTest1()
+        Assert.True(LogAspx.ReturnTrue())
+    End Sub
+End Class
+
+Public Class ValidateBackColor
     Dim LogAspx = New LogAspxLibrary()
 
     <Fact>
@@ -41,11 +50,10 @@ Public Class LogAspxTests
         Assert.True(LogAspx.ValidateByBackColor(0, "WhiteSmoke"))
     End Sub
 
+End Class
 
-
-
-
-
+Public Class GetStatusBoardRole
+    Dim LogAspx = New LogAspxLibrary()
 
     <Fact>
     Public Sub GetStatusBoardRoleTest1()
@@ -82,6 +90,5 @@ Public Class LogAspxTests
         'if view is focus & department is Maintenance, return should be 'Maintenance'
         Assert.Equal("Maintenance", LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
     End Sub
-
 
 End Class

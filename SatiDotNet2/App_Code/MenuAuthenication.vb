@@ -53,11 +53,27 @@
     ''' </summary>
     ''' <param name="GroupAuthenication"></param>
     ''' <param name="Server"></param>
+    'Public Shared Sub CheckGroupAuthenication(GroupAuthenication As String, Server As HttpServerUtility)
+    '    If Roles.IsUserInRole(GroupAuthenication) = False Then
+    '        Server.Transfer("~/UnAuthorized.aspx?GroupName=" + GroupAuthenication)
+    '    End If
+    'End Sub
+
+    ''' <summary>
+    ''' This method is designed to work allong side the CheckPageAuthenication method, this method
+    ''' does not check if a user is logged in, hence why it needs the other method with it. However,
+    ''' this method is designed to check if a user belongs to a list of specified groups (PLURAL).
+    ''' You will pass specified groups as a list to this class and then the Server object.
+    ''' </summary>
+    ''' <param name="GroupAuthenication"></param>
+    ''' <param name="Server"></param>
     Public Shared Sub CheckGroupAuthenication(GroupAuthenication As String, Server As HttpServerUtility)
         If Roles.IsUserInRole(GroupAuthenication) = False Then
             Server.Transfer("~/UnAuthorized.aspx?GroupName=" + GroupAuthenication)
         End If
     End Sub
+
+
 
     ''' <summary>
     ''' This method is designed to take in the current webpage information and uses it to build the 
