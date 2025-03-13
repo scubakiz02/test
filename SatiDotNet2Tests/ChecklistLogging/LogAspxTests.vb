@@ -2,12 +2,12 @@
 Imports Xunit
 Imports SatiDotNet2.Library
 
-Public Class Authentication
+Public Class DateValidation
     Dim LogAspx = New LogAspxLibrary()
 
     <Fact>
-    Public Sub ReturnTrueTest1()
-        Assert.True(LogAspx.ReturnTrue())
+    Public Sub ValidDateTest1()
+        Assert.False(LogAspx.ValidDate(""))
     End Sub
 End Class
 

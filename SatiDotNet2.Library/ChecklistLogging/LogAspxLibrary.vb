@@ -43,4 +43,16 @@ Public Class LogAspxLibrary
         Return Res.ToArray()
     End Function
 
+    Function ValidDate(UserInput As String) As Boolean
+        Dim DateObject As Date
+        Dim Res As Boolean
+
+        Try
+            DateObject = Date.Parse(UserInput)
+        Catch ex As Exception
+            Res = False
+        End Try
+
+        Return Res
+    End Function
 End Class
