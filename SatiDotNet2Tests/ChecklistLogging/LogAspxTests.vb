@@ -46,6 +46,20 @@ Public Class DateValidation
         'if the date is in the past, return false
         Assert.False(LogAspx.ValidDate("08/24"))
     End Sub
+
+    <Fact>
+    Public Sub ValidDateTest8()
+        'testing today's date in MM/DD/YYYY format should return false
+        Assert.False(LogAspx.ValidDate(Today.Date.ToString()))
+    End Sub
+
+    <Fact>
+    Public Sub ValidDateTest9()
+        'if the date is the current month and year in valid format (MM/YY), it should be true
+        Dim CurrYearAs2 As String = Microsoft.VisualBasic.Right(Today.Year.ToString(), 2)
+        Dim CurrMonth As String = If(Today.Month < 10, "0" & Today.Month.ToString(), Today.Month.ToString())
+        Assert.True(LogAspx.ValidDate(CurrMonth & "/" & CurrYearAs2))
+    End Sub
 End Class
 
 Public Class ValidateBackColor
