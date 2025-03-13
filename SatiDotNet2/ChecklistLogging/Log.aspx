@@ -415,7 +415,9 @@
 
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
-                            url.searchParams.set("IP_ScrollPos", getAspControl("ItemsPanel").scrollTop);
+                            let IP_ScrollPos = getAspControl("ItemsPanel").scrollTop;
+                            if (IP_ScrollPos == 0) IP_ScrollPos = url.searchParams.get("IP_ScrollPos"); //safeguarding in case ItemsPanel.scrollTop is 0 (happens with 'DP' fieldtype in certain cases)
+                            url.searchParams.set("IP_ScrollPos", IP_ScrollPos);
                             window.location.href = url.toString();
                         }
                     }, function (error) {
