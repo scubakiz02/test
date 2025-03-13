@@ -500,7 +500,7 @@
                     </div>
 
                     <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
-                        <asp:Button Text="Wrong Form" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
+                        <asp:Button ID="WrongFormButton" Text="Wrong Form" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
 
                         <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                             <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>
