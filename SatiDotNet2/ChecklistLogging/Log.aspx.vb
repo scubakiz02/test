@@ -607,6 +607,7 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "HOA"
                             If Not UserInput.Contains("...") Then Exit For
                         Case "Text"
+                            If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "Date"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "STC"
