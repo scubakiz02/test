@@ -47,10 +47,14 @@ Public Class LogAspxLibrary
         Dim DateParseInput As Date
         Dim Res As Boolean = True
         Dim DateDelimited As String()
+        Dim InputMonth As Integer
+        Dim InputYear As Integer
 
         Try
-            DateParseInput = Date.Parse(UserInput)
             DateDelimited = UserInput.Split("/")
+            InputMonth = Integer.Parse(DateDelimited(0))
+            InputYear = Integer.Parse(DateDelimited(1))
+            DateParseInput = Date.Parse(InputMonth & "/" & Today.Day & "/" & InputYear)
 
             If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 OrElse DateParseInput.Date < Today.Date Then
                 Throw New Exception("")
