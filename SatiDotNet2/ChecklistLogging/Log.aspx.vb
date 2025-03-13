@@ -882,6 +882,13 @@ Partial Class MR_OpenTicketStatusBoard
         MarkAsDone()
     End Sub
 
+    Protected Sub UndoDoneButton_Click(sender As Object, e As EventArgs)
+        'undo done & inactivate stamps on log
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=" & KeyFromQueryString & " And Active=1")
+        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0 WHERE [Key]=" & KeyFromQueryString)
+        SetScrollPos()
+    End Sub
+
     Sub MarkAsDone()
         Dim LabelRangeMap As New Dictionary(Of Integer, String)
 

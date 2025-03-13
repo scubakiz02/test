@@ -534,7 +534,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: var(--UWhitespace);" >
                                 <asp:CheckBox Visible="False" AutoPostBack="True" ID="MarkAsDoneCheckBox" OnCheckedChanged="MarkAsDoneCheckBox_OnCheckedChanged" runat="server" Text="← Some logs are invalid. Mark as done." CssClass="LogCheckBox" Style="color: red; margin: 0 10px"></asp:CheckBox>
-                                <asp:Button ID="UndoDoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Undo Done" Enabled="False" runat="server"></asp:Button>
+                                <asp:Button ID="UndoDoneButton" CssClass="HeaderPanelButtons" OnClick="UndoDoneButton_Click" Text="Undo Done" Enabled="False" runat="server"></asp:Button>
                                 <asp:Button ID="DoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Done" runat="server"></asp:Button>
                             </div>
                         </asp:Panel>
