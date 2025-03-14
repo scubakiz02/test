@@ -8,7 +8,7 @@ Public Class DateValidation
     <Fact>
     Public Sub ValidDateTest1()
         'ensure empty input is false
-        Assert.False(LogAspx.ValidDate(""))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate(""))
     End Sub
 
     <Fact>
@@ -20,43 +20,43 @@ Public Class DateValidation
     <Fact>
     Public Sub ValidDateTest3()
         '5 characters with a '/' as the 3rd, or else false
-        Assert.False(LogAspx.ValidDate("08"))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate("08"))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest4()
         '5 characters with a '/' as the 3rd, or else false
-        Assert.False(LogAspx.ValidDate("08/0"))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate("08/0"))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest5()
         '5 characters with a '/' as the 3rd, or else false
-        Assert.False(LogAspx.ValidDate("08/09/2002"))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate("08/09/2002"))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest6()
         'should return true. this is the format the function is looking for (MM/YY)
-        Assert.True(LogAspx.ValidDate("08/" & Microsoft.VisualBasic.Right((Today.Year + 10).ToString(), 2)))
+        Assert.Equal("", LogAspx.ValidDate("08/" & Microsoft.VisualBasic.Right((Today.Year + 10).ToString(), 2)))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest7()
         'if the date is in the past, return false
-        Assert.False(LogAspx.ValidDate("08/24"))
+        Assert.Equal("*Error: Date is in the past*", LogAspx.ValidDate("08/24"))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest8()
         'testing today's date in MM/DD/YYYY format should return false
-        Assert.False(LogAspx.ValidDate(Today.Date.ToString()))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate(Today.Date.ToString()))
     End Sub
 
     <Fact>
     Public Sub ValidDateTest10()
         'testing april of 2054, which should return true. In a previous iteration of ValidDate(), it interpreted this as april of 1954
-        Assert.True(LogAspx.ValidDate("04/54"))
+        Assert.Equal("", LogAspx.ValidDate("04/54"))
     End Sub
 
     <Fact>
@@ -64,7 +64,7 @@ Public Class DateValidation
         'if the date is the current month and year in valid format (MM/YY), it should be true
         Dim CurrYearAs2 As String = Microsoft.VisualBasic.Right(Today.Year.ToString(), 2)
         Dim CurrMonth As String = If(Today.Month < 10, "0" & Today.Month.ToString(), Today.Month.ToString())
-        Assert.True(LogAspx.ValidDate(CurrMonth & "/" & CurrYearAs2))
+        Assert.Equal("", LogAspx.ValidDate(CurrMonth & "/" & CurrYearAs2))
     End Sub
 End Class
 

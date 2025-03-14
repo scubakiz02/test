@@ -43,12 +43,12 @@ Public Class LogAspxLibrary
         Return Res.ToArray()
     End Function
 
-    Function ValidDate(UserInput As String) As Boolean 'valid date must be MM/YY format
+    Function ValidDate(UserInput As String) As String 'valid date must be MM/YY format
         Dim DateParseInput As Date
-        Dim Res As Boolean = True
         Dim DateDelimited As String()
         Dim InputMonth As Integer
         Dim InputYear As Integer
+        Dim Message As String = ""
 
         Try
             DateDelimited = UserInput.Split("/")
@@ -56,13 +56,17 @@ Public Class LogAspxLibrary
             InputYear = Integer.Parse(DateDelimited(1))
             DateParseInput = Date.Parse(InputMonth & "/" & Today.Day & "/" & "20" & InputYear.ToString())
 
-            If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 OrElse DateParseInput.Date < Today.Date Then
-                Throw New Exception("")
+            If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 Then
+                Throw New FormatException("")
+            ElseIf DateParseInput.Date < Today.Date Then
+                Throw New Exception("*Error: Date is in the past*")
             End If
+        Catch ex As FormatException
+            Message = "*Format Error: MM/YY*"
         Catch ex As Exception
-            Res = False
+            Message = ex.Message.ToString()
         End Try
 
-        Return Res
+        Return Message
     End Function
 End Class
