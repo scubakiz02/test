@@ -379,12 +379,15 @@
                     if (!elem) return; //if elem is undefined
                     elem.config = config;
 
-                    elem.addEventListener("input", function (e) {
+                    elem.addEventListener("keyup", function (e) {
                         const self = this;
                         const value = this.value;
 
-                        if (value.length > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
-                            this.value = this.value.slice(0, -1);
+                        if (value.length == 2 && e.key !== "Backspace") {
+                            this.value = value + "/";
+                        }
+                        else if (value.length > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
+                            this.value = value.slice(0, -1);
                         }
                         else {
                             PageMethods.ValidDate(value, function (success) {
