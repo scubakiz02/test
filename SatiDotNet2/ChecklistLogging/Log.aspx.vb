@@ -56,6 +56,13 @@ Partial Class MR_OpenTicketStatusBoard
         Return False
     End Function
 
+    Public Delegate Function ValidDateDelegate(UserInput As String) As Boolean
+    <WebMethod()>
+    Public Shared Function ValidDate(UserInput As String) As Boolean
+        Dim Valid_Date As ValidDateDelegate = HttpContext.Current.Session("ValidDate")
+        Return Valid_Date(UserInput)  'Return a response back to the JavaScript function
+    End Function
+
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
         ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay + DateFieldType, True)
@@ -94,7 +101,10 @@ Partial Class MR_OpenTicketStatusBoard
 
         If KeyFromQueryString IsNot Nothing Then 'if this is true, displaying Log.aspx for operator to fill out
             Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
+            Dim ValidDateDelegate As ValidDateDelegate = AddressOf LogAspx.ValidDate
+
             Session("ModifyInput") = ModifyInputDelegate
+            Session("ValidDate") = ValidDateDelegate
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
 
@@ -323,9 +333,14 @@ Partial Class MR_OpenTicketStatusBoard
                                 myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                 DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
                             Case "Date"
+                                Dim jsConfig As New Dictionary(Of String, String)
+
                                 InputCtrlID = "Date_" & LabelKey
                                 myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                 DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+
+                                'jsConfig("id") = InputCtrlID
+                                'DateFieldType += "DateFieldType('" & InputCtrlID & "');"
                                 DateFieldType += "DateFieldType('" & InputCtrlID & "');"
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)

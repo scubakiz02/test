@@ -379,7 +379,9 @@
                     if (!elem) return; //if elem is undefined
 
                     elem.addEventListener("input", function (e) {
-                        debugger;
+                        PageMethods.ValidDate(this.value, function (success) {
+                            debugger;
+                        });
                     });
                 }
 
