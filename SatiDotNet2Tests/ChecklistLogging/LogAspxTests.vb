@@ -38,7 +38,7 @@ Public Class DateValidation
     <Fact>
     Public Sub ValidDateTest6()
         'should return true. this is the format the function is looking for (MM/YY)
-        Assert.True(LogAspx.ValidDate("08/29"))
+        Assert.True(LogAspx.ValidDate("08/" & Microsoft.VisualBasic.Right((Today.Year + 10).ToString(), 2)))
     End Sub
 
     <Fact>
