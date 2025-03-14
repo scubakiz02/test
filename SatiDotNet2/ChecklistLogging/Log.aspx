@@ -381,12 +381,18 @@
 
                     elem.addEventListener("input", function (e) {
                         const self = this;
+                        const value = this.value;
 
-                        PageMethods.ValidDate(this.value, function (success) {
-                            let inputElement = getInputElement.call(self);
-                            if (success) backColor(inputElement, config.validBackColor);
-                            else backColor(inputElement, config.invalidBackColor);
-                        });
+                        if (value.length > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
+                            this.value = this.value.slice(0, -1);
+                        }
+                        else {
+                            PageMethods.ValidDate(value, function (success) {
+                                let inputElement = getInputElement.call(self);
+                                if (success) backColor(inputElement, config.validBackColor);
+                                else backColor(inputElement, config.invalidBackColor);
+                            });
+                        }
                     });
                 }
 
@@ -553,7 +559,7 @@
                                     <p style="margin: 0">= out of range value</p>
                                 </div>
                             </div>
-                            <div style="display: flex; align-items: center; gap: var(--UWhitespace);" >
+                            <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
                                 <asp:CheckBox Visible="False" AutoPostBack="True" ID="MarkAsDoneCheckBox" OnCheckedChanged="MarkAsDoneCheckBox_OnCheckedChanged" runat="server" Text="← Some logs are invalid. Mark as done." CssClass="LogCheckBox" Style="color: red; margin: 0 10px"></asp:CheckBox>
                                 <asp:Button ID="UndoDoneButton" CssClass="HeaderPanelButtons" OnClick="UndoDoneButton_Click" Text="Undo Done" Enabled="False" runat="server"></asp:Button>
                                 <asp:Button ID="DoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Done" runat="server"></asp:Button>
