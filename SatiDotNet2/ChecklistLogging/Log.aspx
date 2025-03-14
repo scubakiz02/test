@@ -406,7 +406,7 @@
                         getTempTbx.call(InputElement, "IrGunTemp").style.backgroundColor = InputElement.style.backgroundColor;
                     }
 
-                    if (elem.id.includes("TextBox")) {
+                    if (elem.id.includes("TextBox") || elem.id.includes("Date")) {
                         elem.addEventListener("keydown", function (e) {
                             if (event.key !== "Enter" && event.key !== "Tab") return;
                             callCodeBehindEvent.call(this);

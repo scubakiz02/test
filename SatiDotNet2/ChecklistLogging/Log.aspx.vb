@@ -346,7 +346,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                                 jsConfig("id") = InputCtrlID
                                 jsConfig("validBackColor") = "#F5F5F5"
-                                jsConfig("invalidBackColor") = "red"
+                                jsConfig("invalidBackColor") = "Red"
 
                                 'DateFieldType += "DateFieldType('" & InputCtrlID & "');"
                                 DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
@@ -851,7 +851,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
             'If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0)) Then ' field value went from not empty to empty OR STC FieldType 'Bath Temp' TextBox control has been modified
-            If String.IsNullOrEmpty(Value) OrElse Value.Contains("/") Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
+            If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso ID.Contains("Date") = False) Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
             Else
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
