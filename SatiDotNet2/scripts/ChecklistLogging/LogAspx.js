@@ -2,16 +2,16 @@
     return true;
 }
 
-function haultDateInput(dateInput, latestChar) {
+function removeLastChar(dateInput, latestChar) {
     let res;
     const dateInputLength = dateInput.length;
 
     if (latestChar === "Backspace") return false;
 
-    if (dateInputLength === 5) {
+    if (dateInputLength === 6) {
         res = true;
     }
-    else if (dateInputLength === 3 && latestChar === "/") {
+    else if (dateInputLength === 4 && latestChar === "/") {
         res = true;
     }
     else {
@@ -21,4 +21,4 @@ function haultDateInput(dateInput, latestChar) {
     return res;
 }
 
-module.exports = { returnTrue, haultDateInput };
+module.exports = { returnTrue, removeLastChar };

@@ -405,7 +405,7 @@
                     });
 
                     elem.addEventListener("keydown", function (e) {
-                        if (haultDateInput(this.value, e.key)) {
+                        if (removeLastChar(this.value, e.key)) {
                             e.preventDefault();
                         }
                     });
