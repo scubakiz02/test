@@ -374,15 +374,25 @@
                     });
                 }
 
-                function DateFieldType(id) {
-                    let elem = getAspControl(id);
+                function DateFieldType(config) {
+                    let elem = getAspControl(config.id);
                     if (!elem) return; //if elem is undefined
+                    elem.config = config;
 
                     elem.addEventListener("input", function (e) {
+                        const self = this;
+
                         PageMethods.ValidDate(this.value, function (success) {
-                            debugger;
+                            let inputElement = getInputElement.call(self);
+                            if (success) backColor(inputElement, config.validBackColor);
+                            else backColor(inputElement, config.invalidBackColor);
                         });
                     });
+                }
+
+                function backColor(elem, color) { //traverse through all child elements and set background-color css property
+                    elem.style.backgroundColor = color;
+                    for (const child of elem.children) backColor(child, color);
                 }
 
                 function SetDBConnection(id) {

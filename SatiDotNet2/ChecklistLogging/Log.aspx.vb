@@ -47,7 +47,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
-        Try
+        Try 'in case code-behind throws an error
             Dim ModifyInput As ModifyInputDelegate = HttpContext.Current.Session("ModifyInput")
             Return ModifyInput(SenderID, SenderValue)  'Return a response back to the JavaScript function
         Catch ex As Exception
@@ -59,8 +59,13 @@ Partial Class MR_OpenTicketStatusBoard
     Public Delegate Function ValidDateDelegate(UserInput As String) As Boolean
     <WebMethod()>
     Public Shared Function ValidDate(UserInput As String) As Boolean
-        Dim Valid_Date As ValidDateDelegate = HttpContext.Current.Session("ValidDate")
-        Return Valid_Date(UserInput)  'Return a response back to the JavaScript function
+        Try 'in case code-behind throws an error
+            Dim Valid_Date As ValidDateDelegate = HttpContext.Current.Session("ValidDate")
+            Return Valid_Date(UserInput)  'Return a response back to the JavaScript function
+        Catch ex As Exception
+        End Try
+
+        Return False
     End Function
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
@@ -339,9 +344,12 @@ Partial Class MR_OpenTicketStatusBoard
                                 myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                 DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
 
-                                'jsConfig("id") = InputCtrlID
+                                jsConfig("id") = InputCtrlID
+                                jsConfig("validBackColor") = "#F5F5F5"
+                                jsConfig("invalidBackColor") = "red"
+
                                 'DateFieldType += "DateFieldType('" & InputCtrlID & "');"
-                                DateFieldType += "DateFieldType('" & InputCtrlID & "');"
+                                DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
