@@ -609,7 +609,7 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "Text"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "Date"
-                            If Not String.IsNullOrEmpty(UserInput) Then Exit For
+                            If LogAspx.ValidDate(UserInput) Then Exit For
                         Case "STC"
                             Dim Temps As String() = UserInput.Split("/")
                             Dim BackPanelColor As System.Drawing.Color
