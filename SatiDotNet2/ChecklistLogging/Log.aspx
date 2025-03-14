@@ -398,13 +398,13 @@
                     });
 
                     elem.addEventListener("keydown", function (e) {
-                        const value = this.value;
-                        const valueLength = value.length;
+                    //    const value = this.value;
+                    //    const valueLength = value.length;
 
-                        //if user is typing after 5 characters OR manually typing in '/' character after month, prevent user input
-                        if ((valueLength === 5 || (valueLength === 3 && e.key === "/")) && e.key !== "Backspace") {
-                            e.preventDefault();
-                        }
+                    //    //if user is typing after 5 characters OR manually typing in '/' character after month, prevent user input
+                    //    if ((valueLength === 5 || (valueLength === 3 && e.key === "/")) && e.key !== "Backspace") {
+                    //        e.preventDefault();
+                    //    }
                     });
                 }
 
