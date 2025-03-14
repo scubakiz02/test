@@ -8,7 +8,7 @@ function removeLastChar(dateInput, latestChar) {
 
     if (latestChar === "Backspace") return false;
 
-    if (dateInputLength === 6) {
+    if (dateInputLength >= 6) {
         res = true;
     }
     else if (dateInputLength === 4 && latestChar === "/") {

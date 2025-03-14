@@ -385,7 +385,10 @@
                         const value = this.value;
                         const valueLength = value.length;
 
-                        if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
+                        if (removeLastChar(value, e.key)) {
+                            this.value = value.slice(0, -1); //remove any characters past 5 count
+                        }
+                        else if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
                             this.value = value + "/";
                         }
                         else {
@@ -401,12 +404,6 @@
                                     if (this.hasAttribute("colorblindmessage")) this.innerText = message;
                                 }, inputElement);
                             });
-                        }
-                    });
-
-                    elem.addEventListener("keydown", function (e) {
-                        if (removeLastChar(this.value, e.key)) {
-                            e.preventDefault();
                         }
                     });
                 }

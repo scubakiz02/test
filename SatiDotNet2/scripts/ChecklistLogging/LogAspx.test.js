@@ -31,3 +31,7 @@ test("typing in 2nd character", () => {
 test("typing in last character", () => {
     expect(removeLastChar("05/24", "4")).toBeFalsy();
 });
+
+test("typing in characters faster than removeLastChar can be called", () => {
+    expect(removeLastChar("05/24234234", "4")).toBeTruthy();
+});
