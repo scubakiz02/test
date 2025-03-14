@@ -5,6 +5,7 @@ SatiDotNet2/vwd.webinfo
 SatiDotNet2/Bin/
 SatiDotNet2/packages/
 SatiDotNet2/node_modules/
+SatiDotNet2/.vscode/
 SatiDotNet2.Library/Bin/
 SatiDotNet2.Library/obj/
 SatiDotNet2.Library/packages/

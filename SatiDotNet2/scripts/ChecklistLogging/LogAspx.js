@@ -18,12 +18,6 @@ function haultDateInput(dateInput, latestChar) {
         res = false;
     }
 
-
-    //if ((valueLength === 5 || (valueLength === 3 && e.key === "/")) ) {
-    //    e.preventDefault();
-    //}
-
-
     return res;
 }
 
