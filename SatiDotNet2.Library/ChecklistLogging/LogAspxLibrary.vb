@@ -51,14 +51,16 @@ Public Class LogAspxLibrary
         Dim Message As String = ""
 
         Try
+            If UserInput.Contains("/") = False OrElse UserInput.Length <> 5 Then
+                Throw New FormatException("")
+            End If
+
             DateDelimited = UserInput.Split("/")
             InputMonth = Integer.Parse(DateDelimited(0))
             InputYear = Integer.Parse(DateDelimited(1))
             DateParseInput = Date.Parse(InputMonth & "/" & Today.Day & "/" & "20" & InputYear.ToString())
 
-            If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 Then
-                Throw New FormatException("")
-            ElseIf DateParseInput.Date < Today.Date Then
+            If DateParseInput.Date < Today.Date Then
                 Throw New Exception("*Error: Date is in the past*")
             End If
         Catch ex As FormatException

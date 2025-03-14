@@ -14,7 +14,7 @@ Public Class DateValidation
     <Fact>
     Public Sub ValidDateTest2()
         'if letters are included, result is false
-        Assert.False(LogAspx.ValidDate("1d/23"))
+        Assert.Equal("*Format Error: MM/YY*", LogAspx.ValidDate("1d/23"))
     End Sub
 
     <Fact>
