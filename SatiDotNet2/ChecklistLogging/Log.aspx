@@ -382,12 +382,13 @@
                     elem.addEventListener("keyup", function (e) {
                         const self = this;
                         const value = this.value;
+                        const valueLength = value.length;
 
-                        if (value.length == 2 && e.key !== "Backspace") {
-                            this.value = value + "/";
+                        if (valueLength > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
+                            this.value = value.slice(0, -(valueLength - 5));
                         }
-                        else if (value.length > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
-                            this.value = value.slice(0, -1);
+                        else if (valueLength === 2 && e.key !== "Backspace") {
+                            this.value = value + "/";
                         }
                         else {
                             PageMethods.ValidDate(value, function (success) {
