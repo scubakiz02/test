@@ -27,6 +27,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DRC As Data.DataRowCollection
     Dim JsFunctionCalls As String
     Dim DBConnections As String
+    Dim DateFieldType As String
     Dim STC_TbxOverlays As String
     Dim DP_TbxOverlay As String
     Dim LogAspx As New LogAspxLibrary
@@ -57,7 +58,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
-        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay, True)
+        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay + DateFieldType, True)
 
         If Session("DisplayError") Then
             MessageUserLabel.Text = "Error: red or yellow logs present. Add a comment to proceed."
@@ -325,6 +326,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 InputCtrlID = "Date_" & LabelKey
                                 myTextBox.Text = Session("LabelInputMap")(LabelKey)
                                 DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                                DateFieldType += "DateFieldType('" & InputCtrlID & "');"
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)

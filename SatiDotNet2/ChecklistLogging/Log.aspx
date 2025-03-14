@@ -374,6 +374,15 @@
                     });
                 }
 
+                function DateFieldType(id) {
+                    let elem = getAspControl(id);
+                    if (!elem) return; //if elem is undefined
+
+                    elem.addEventListener("input", function (e) {
+                        debugger;
+                    });
+                }
+
                 function SetDBConnection(id) {
                     let elem = getAspControl(id);
                     let InputElement = getInputElement.call(elem);
