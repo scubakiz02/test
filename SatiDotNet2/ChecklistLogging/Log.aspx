@@ -387,8 +387,11 @@
                         if (valueLength > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
                             this.value = value.slice(0, -(valueLength - 5));
                         }
-                        else if (valueLength === 2 && e.key !== "Backspace") {
+                        else if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
                             this.value = value + "/";
+                        }
+                        else if (valueLength === 4 && e.key === "/") { //manual '/' entry overrides programmatic '/' entry
+                            this.value = value.slice(0, -1);
                         }
                         else {
                             PageMethods.ValidDate(value, function (success) {
