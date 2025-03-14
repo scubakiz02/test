@@ -54,6 +54,12 @@ Public Class DateValidation
     End Sub
 
     <Fact>
+    Public Sub ValidDateTest10()
+        'testing april of 2054, which should return true. In a previous iteration of ValidDate(), it interpreted this as april of 1954
+        Assert.True(LogAspx.ValidDate("04/54"))
+    End Sub
+
+    <Fact>
     Public Sub ValidDateTest9()
         'if the date is the current month and year in valid format (MM/YY), it should be true
         Dim CurrYearAs2 As String = Microsoft.VisualBasic.Right(Today.Year.ToString(), 2)

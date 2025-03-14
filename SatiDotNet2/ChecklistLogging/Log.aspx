@@ -384,14 +384,8 @@
                         const value = this.value;
                         const valueLength = value.length;
 
-                        if (valueLength > 5) { //MM/YY format, 5 characters. Eliminate characters from textbox after 5 count
-                            this.value = value.slice(0, -(valueLength - 5));
-                        }
-                        else if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
+                        if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
                             this.value = value + "/";
-                        }
-                        else if (valueLength === 4 && e.key === "/") { //manual '/' entry overrides programmatic '/' entry
-                            this.value = value.slice(0, -1);
                         }
                         else {
                             PageMethods.ValidDate(value, function (success) {
@@ -399,6 +393,16 @@
                                 if (success) backColor(inputElement, config.validBackColor);
                                 else backColor(inputElement, config.invalidBackColor);
                             });
+                        }
+                    });
+
+                    elem.addEventListener("keydown", function (e) {
+                        const value = this.value;
+                        const valueLength = value.length;
+
+                        //if user is typing after 5 characters OR manually typing in '/' character after month, prevent user input
+                        if ((valueLength === 5 || (valueLength === 3 && e.key === "/")) && e.key !== "Backspace") { 
+                            e.preventDefault();
                         }
                     });
                 }

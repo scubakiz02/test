@@ -54,7 +54,7 @@ Public Class LogAspxLibrary
             DateDelimited = UserInput.Split("/")
             InputMonth = Integer.Parse(DateDelimited(0))
             InputYear = Integer.Parse(DateDelimited(1))
-            DateParseInput = Date.Parse(InputMonth & "/" & Today.Day & "/" & InputYear)
+            DateParseInput = Date.Parse(InputMonth & "/" & Today.Day & "/" & "20" & InputYear.ToString())
 
             If DateDelimited.Count <> 2 OrElse UserInput.Length <> 5 OrElse DateParseInput.Date < Today.Date Then
                 Throw New Exception("")
