@@ -9,11 +9,11 @@ test("typing in first character", () => {
 });
 
 test("5 characters exist, adding another", () => {
-    expect(removeLastChar("08/243", "3")).toBeTruthy();
+    expect(removeLastChar("08/243", "3")).toBe("08/24");
 });
 
 test("4 characters exist, 4th character is '/'. Adding '/' character", () => {
-    expect(removeLastChar("08//", "/")).toBeTruthy();
+    expect(removeLastChar("08//", "/")).toBe("08/");
 });
 
 test("5 characters exist, deleting one", () => {
@@ -33,5 +33,5 @@ test("typing in last character", () => {
 });
 
 test("typing in characters faster than removeLastChar can be called", () => {
-    expect(removeLastChar("05/24234234", "4")).toBeTruthy();
+    expect(removeLastChar("05/24234234", "4")).toBe("05/24");
 });
