@@ -2,14 +2,17 @@
     return true;
 }
 
-function removeLastChar(dateInput, latestChar) {
+function dateOutput(dateInput, latestChar) {
     let res = "";
     const dateInputLength = dateInput.length;
 
-    if (latestChar === "Backspace" || dateInputLength >= 6 || (dateInputLength === 4 && latestChar === "/")){
+    if (dateInputLength >= 6 || (dateInputLength === 4 && (latestChar.includes("/") || latestChar == "Unidentified"))){
         //remove all characters past 5 count
         let charsToRemove = dateInput.length > 5 ? - (dateInput.length - 5) : -1;
         res = dateInput.slice(0, charsToRemove); 
+    }
+    else if (dateInputLength === 2 && latestChar !== "Backspace") {
+        res = dateInput += "/";
     }
     else {
         res = dateInput;
@@ -18,4 +21,4 @@ function removeLastChar(dateInput, latestChar) {
     return res;
 }
 
-module.exports = { returnTrue, removeLastChar };
+module.exports = { returnTrue, dateOutput };

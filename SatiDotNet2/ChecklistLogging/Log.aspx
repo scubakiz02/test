@@ -385,26 +385,21 @@
                         const value = this.value;
                         const valueLength = value.length;
 
-                        if (removeLastChar(value, e.key)) {
-                            this.value = value.slice(0, -1); //remove any characters past 5 count
-                        }
-                        else if (valueLength === 2 && e.key !== "Backspace") { //programmatically enter '/' with js.
-                            this.value = value + "/";
-                        }
-                        else {
-                            PageMethods.ValidDate(value, function (message) {
-                                let inputElement = getInputElement.call(self);
-                                let backColor;
+                        this.value = dateOutput(value, e.key == "Unidentified" ? e.target.value : e.key); //sometimes virtual keyboard input is returned as 'Unidentified'
 
-                                if (message === "") backColor = config.validBackColor;
-                                else backColor = config.invalidBackColor;
+                        PageMethods.ValidDate(this.value, function (message) {
+                            let inputElement = getInputElement.call(self);
+                            let backColor;
 
-                                iterateChildren(function () {
-                                    this.style.backgroundColor = backColor;
-                                    if (this.hasAttribute("colorblindmessage")) this.innerText = message;
-                                }, inputElement);
-                            });
-                        }
+                            if (message === "") backColor = config.validBackColor;
+                            else backColor = config.invalidBackColor;
+
+                            iterateChildren(function () {
+                                this.style.backgroundColor = backColor;
+                                if (this.hasAttribute("colorblindmessage")) this.innerText = message;
+                            }, inputElement);
+                        });
+
                     });
                 }
 
