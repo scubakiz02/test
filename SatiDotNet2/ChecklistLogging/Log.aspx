@@ -389,10 +389,17 @@
                             this.value = value + "/";
                         }
                         else {
-                            PageMethods.ValidDate(value, function (success) {
+                            PageMethods.ValidDate(value, function (message) {
                                 let inputElement = getInputElement.call(self);
-                                if (success) backColor(inputElement, config.validBackColor);
-                                else backColor(inputElement, config.invalidBackColor);
+                                let backColor;
+
+                                if (message === "") backColor = config.validBackColor;
+                                else backColor = config.invalidBackColor;
+
+                                iterateChildren(function () {
+                                    this.style.backgroundColor = backColor;
+                                    if (this.hasAttribute("colorblindmessage")) this.innerText = message;
+                                }, inputElement);
                             });
                         }
                     });
@@ -402,6 +409,11 @@
                             e.preventDefault();
                         }
                     });
+                }
+
+                function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
+                    callback.call(elem);
+                    for (const child of elem.children) iterateChildren(callback, child);
                 }
 
                 function backColor(elem, color) { //traverse through all child elements and set background-color css property

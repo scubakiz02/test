@@ -56,16 +56,16 @@ Partial Class MR_OpenTicketStatusBoard
         Return False
     End Function
 
-    Public Delegate Function ValidDateDelegate(UserInput As String) As Boolean
+    Public Delegate Function ValidDateDelegate(UserInput As String) As String
     <WebMethod()>
-    Public Shared Function ValidDate(UserInput As String) As Boolean
+    Public Shared Function ValidDate(UserInput As String) As String
         Try 'in case code-behind throws an error
             Dim Valid_Date As ValidDateDelegate = HttpContext.Current.Session("ValidDate")
             Return Valid_Date(UserInput)  'Return a response back to the JavaScript function
         Catch ex As Exception
         End Try
 
-        Return False
+        Return "*Format Error: MM/YY*"
     End Function
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
@@ -634,7 +634,16 @@ Partial Class MR_OpenTicketStatusBoard
                         Case "Text"
                             If Not String.IsNullOrEmpty(UserInput) Then Exit For
                         Case "Date"
-                            If LogAspx.ValidDate(UserInput) Then Exit For
+                            Dim Res As String = LogAspx.ValidDate(UserInput)
+
+                            If String.IsNullOrEmpty(Res) = False Then
+                                SetPanelBackColor(System.Drawing.Color.Red, Res, Pnl)
+                                DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
+                                Valid = False
+                                Continue For
+                            Else
+                                Exit For
+                            End If
                         Case "STC"
                             Dim Temps As String() = UserInput.Split("/")
                             Dim BackPanelColor As System.Drawing.Color
