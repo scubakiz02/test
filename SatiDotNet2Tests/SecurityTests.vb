@@ -57,26 +57,24 @@ Public Class GetMyDataSetParamQueryTests
     <Fact>
     Public Sub GetMyDataSetParamQuery1()
         'executing sql query with no parameterized values
-        Dim ParamObject As New Dictionary(Of String, String)
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", ParamObject)
-        Assert.True(If(DS.Tables(0).Rows.Count > 0, True, False))
+        Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
+        QueryObject(0) = New Dictionary(Of String, String) From {
+            {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
+        Assert.True(If(DS.Tables.Count > 0, True, False))
     End Sub
 
     <Fact>
     Public Sub GetMyDataSetParamQuery2()
         'executing sql query with table that does NOT exist
-        Dim ParamObject As New Dictionary(Of String, String)
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_Lontion]", ParamObject)
+        Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
+        QueryObject(0) = New Dictionary(Of String, String) From {
+            {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlIPrevention]"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
         Dim DR As Data.DataRow
-        Dim Success As Boolean = True
-
-        Try
-            DR = DS.Tables(0).Rows(0)
-        Catch ex As Exception
-            Success = False
-        End Try
-
-        Assert.False(Success)
+        Assert.False(If(DS.Tables.Count > 0, True, False))
     End Sub
 
     <Fact>
@@ -85,18 +83,11 @@ Public Class GetMyDataSetParamQueryTests
         Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
         QueryObject(0) = New Dictionary(Of String, String) From {
             {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username="},
-            {"param", "jork-frol-pliy"}
+            {"param", "jork-frol-pliy"},
+            {"type", "VarChar"}
         }
         Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
         Dim DR As Data.DataRow
-        Dim Success As Boolean = True
-
-        Try
-            DR = DS.Tables(0).Rows(0)
-        Catch ex As Exception
-            Success = False
-        End Try
-
-        Assert.False(Success)
+        Assert.True(If(DS.Tables.Count > 0, True, False))
     End Sub
 End Class

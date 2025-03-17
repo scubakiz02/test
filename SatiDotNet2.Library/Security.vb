@@ -37,15 +37,22 @@ Public Class Security
 
 
     'using parameterized queries to prevent SQL injection and improve security
-    Function GetMyDataSetParamQuery(SqlQuery As String, ParamConfig As Dictionary(Of String, String)) As Data.DataSet
-        'Dim query As String = "SELECT Username, Age FROM Users WHERE Age > @MinAge"
-        Dim query As String = SqlQuery
+    Function GetMyDataSetParamQuery(QueryConfig As SortedDictionary(Of Integer, Dictionary(Of String, String))) As Data.DataSet
+        Dim query As String
+
+        For Each QueryPortion As KeyValuePair(Of Integer, Dictionary(Of String, String)) In QueryConfig
+            Dim id As Integer = QueryPortion.Key
+            Dim idConfig As Dictionary(Of String, String) = QueryPortion.Value
+
+            query += idConfig("query")
+        Next
+
         Dim ds As New DataSet()
 
         Try
             Using conn As New SqlConnection(connectionString)
                 Using cmd As New SqlCommand(query, conn)
-                    cmd.Parameters.Add("@password", SqlDbType.VarChar).Value = "jxCv7$LEM!nuWcUb"
+                    'cmd.Parameters.Add("@password", SqlDbType.VarChar).Value = "jxCv7$LEM!nuWcUb"
 
                     Using adapter As New SqlDataAdapter(cmd)
                         conn.Open()
