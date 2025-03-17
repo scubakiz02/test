@@ -385,7 +385,8 @@
                         const value = this.value;
                         const valueLength = value.length;
 
-                        this.value = dateOutput(value, e.key == "Unidentified" ? e.target.value : e.key); //sometimes virtual keyboard input is returned as 'Unidentified'
+                        //this.value = dateOutput(value, e.key == "Unidentified" ?  : e.key); //sometimes virtual keyboard input is returned as 'Unidentified'
+                        this.value = dateOutput(value, e); //sometimes virtual keyboard input is returned as 'Unidentified'
 
                         PageMethods.ValidDate(this.value, function (message) {
                             let inputElement = getInputElement.call(self);

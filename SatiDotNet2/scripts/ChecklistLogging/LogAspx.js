@@ -2,16 +2,19 @@
     return true;
 }
 
-function dateOutput(dateInput, latestChar) {
+function dateOutput(dateInput, e) {
     let res = "";
     const dateInputLength = dateInput.length;
 
-    if (dateInputLength >= 6 || (dateInputLength === 4 && (latestChar.includes("/") || latestChar == "Unidentified"))){
+    if (dateInputLength === 4 && (e.key === '/' || e.key === 'Unidentified')) {
+        res = dateInput.slice(0, -1); 
+    }
+    else if (dateInputLength >= 6){
         //remove all characters past 5 count
         let charsToRemove = dateInput.length > 5 ? - (dateInput.length - 5) : -1;
         res = dateInput.slice(0, charsToRemove); 
     }
-    else if (dateInputLength === 2 && latestChar !== "Backspace") {
+    else if (dateInputLength === 2 && e.key !== "Backspace") {
         res = dateInput += "/";
     }
     else {
