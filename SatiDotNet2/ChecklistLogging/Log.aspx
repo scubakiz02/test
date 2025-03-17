@@ -590,6 +590,7 @@
                     background-color: white;
                     width: 500px;
                     max-width: 80%;
+                    font-size: var(--UFontSize);
                 }
 
                     .modal.active {
@@ -597,7 +598,7 @@
                     }
 
                 .modal-header {
-                    padding: 10px 15px;
+                    padding: var(--UWhitespace);
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -605,7 +606,6 @@
                 }
 
                     .modal-header .title {
-                        font-size: 1.25rem;
                         font-weight: bold;
                     }
 
@@ -614,12 +614,11 @@
                         border: none;
                         outline: none;
                         background: none;
-                        font-size: 1.25rem;
                         font-weight: bold;
                     }
 
                 .modal-body {
-                    padding: 10px 15px;
+                    padding: var(--UWhitespace);
                 }
 
                 #overlay {
@@ -641,13 +640,19 @@
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
-                    <div class="modal" id="modal">
+                    <div class="modal active" id="modal">
                         <div class="modal-header">
-                            <div class="title">Example Modal</div>
+                            <div class="title">*WARNING*</div>
                             <button data-close-button onclick="return false;" class="close-button">&times;</button>
                         </div>
                         <div class="modal-body">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse quod alias ut illo doloremque eum ipsum obcaecati distinctio debitis reiciendis quae quia soluta totam doloribus quos nesciunt necessitatibus, consectetur quisquam accusamus ex, dolorum, dicta vel? Nostrum voluptatem totam, molestiae rem at ad autem dolor ex aperiam. Amet assumenda eos architecto, dolor placeat deserunt voluptatibus tenetur sint officiis perferendis atque! Voluptatem maxime eius eum dolorem dolor exercitationem quis iusto totam! Repudiandae nobis nesciunt sequi iure! Eligendi, eius libero. Ex, repellat sapiente!
+                            This is a destructive action. If you proceed, all data entered for this log instance will be wiped, and you will be redirected back
+                            to the status board. Do you wish to continue?
+
+                            <div style="padding: var(--UWhitespace) 0;">
+                                <button>No</button>
+                                <asp:Button Text="Yes" runat="server" />
+                            </div>
                         </div>
                     </div>
                     <div id="overlay"></div>
