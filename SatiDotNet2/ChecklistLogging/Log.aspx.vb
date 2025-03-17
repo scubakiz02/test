@@ -197,7 +197,8 @@ Partial Class MR_OpenTicketStatusBoard
             Catch ex As Exception
                 DateLabel.Text = "Date"
                 HeaderPanel.Enabled = False
-                AddCommentPanel.Enabled = False
+                FooterPanel.Enabled = False
+                FooterPanel.Attributes.Add("class", "disabled")
                 BuildDynamicAsp()
                 Exit Sub
             End Try
@@ -213,8 +214,8 @@ Partial Class MR_OpenTicketStatusBoard
 
             DateLabel.Text = "Date"
             HeaderPanel.Enabled = False
-            AddCommentPanel.Enabled = False
-            UploadPanel.Attributes.Add("class", "disabled")
+            FooterPanel.Enabled = False
+            FooterPanel.Attributes.Add("class", "disabled")
         End If
 
         For I = 0 To RC - 1
