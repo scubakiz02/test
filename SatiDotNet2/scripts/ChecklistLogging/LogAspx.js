@@ -14,8 +14,8 @@ function dateOutput(dateInput, e) {
         let charsToRemove = dateInput.length > 5 ? - (dateInput.length - 5) : -1;
         res = dateInput.slice(0, charsToRemove); 
     }
-    else if (dateInputLength === 2 && e.key !== "Backspace") {
-        res = dateInput += "/";
+    else if ((dateInputLength === 2 || dateInputLength === 3) && e.key !== "Backspace") {
+        res = dateInput.slice(0, 2) + "/" + dateInput.slice(2); //add '/' char at index 2 when it is needed
     }
     else {
         res = dateInput;

@@ -83,4 +83,10 @@ describe("add '/' programmatically", () => {
         e.target.value = "04";
         expect(dateOutput("04", e)).toBe("04/");
     });
+    
+    test("typing in character, but '/' is needed before", () => {
+        e.key = "4";
+        e.target.value = "040";
+        expect(dateOutput("040", e)).toBe("04/0");
+    });
 })
