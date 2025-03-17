@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChecklistLogging\LogAspxTests.vb" />
+    <Compile Include="SecurityTests.vb" />
     <Compile Include="SampleTests.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

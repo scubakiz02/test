@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChecklistLogging\LogAspxLibrary.vb" />
+    <Compile Include="Security.vb" />
     <Compile Include="SampleClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
