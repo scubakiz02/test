@@ -641,8 +641,6 @@
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
-
-                    <button data-modal-target="#modal" onclick="return false;">Open Modal</button>
                     <div class="modal" id="modal">
                         <div class="modal-header">
                             <div class="title">Example Modal</div>
@@ -660,7 +658,7 @@
                     </div>
 
                     <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
-                        <asp:Button ID="WrongFormButton" Text="Wrong Form" CssClass="HeaderPanelButtons" BackColor="Red" runat="server" OnClick="ResetLog_OnClick" />
+                        <asp:Button ID="WrongFormButton" Text="Wrong Form" CssClass="HeaderPanelButtons" BackColor="Red" runat="server" data-modal-target="#modal" OnClientClick="return false;" />
 
                         <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                             <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>
