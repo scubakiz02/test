@@ -56,8 +56,26 @@ Public Class GetMyDataSetParamQueryTests
 
     <Fact>
     Public Sub GetMyDataSetParamQuery1()
-        'executing sql query "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE password=@password" with hard coded parameterized values
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery()
+        'executing sql query with no parameterized values
+        Dim ParamObject As New Dictionary(Of String, String)
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", ParamObject)
         Assert.True(If(DS.Tables(0).Rows.Count > 0, True, False))
+    End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery2()
+        'executing sql query with table that does NOT exist
+        Dim ParamObject As New Dictionary(Of String, String)
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_Lontion]", ParamObject)
+        Dim DR As Data.DataRow
+        Dim Success As Boolean = True
+
+        Try
+            DR = DS.Tables(0).Rows(0)
+        Catch ex As Exception
+            Success = False
+        End Try
+
+        Assert.False(Success)
     End Sub
 End Class

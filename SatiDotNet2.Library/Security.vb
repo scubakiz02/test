@@ -37,9 +37,9 @@ Public Class Security
 
 
     'using parameterized queries to prevent SQL injection and improve security
-    Function GetMyDataSetParamQuery() As Data.DataSet
+    Function GetMyDataSetParamQuery(SqlQuery As String, ParamConfig As Dictionary(Of String, String)) As Data.DataSet
         'Dim query As String = "SELECT Username, Age FROM Users WHERE Age > @MinAge"
-        Dim query As String = "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE password=@password"
+        Dim query As String = SqlQuery
         Dim ds As New DataSet()
 
         Try
