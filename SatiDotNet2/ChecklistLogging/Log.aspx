@@ -640,18 +640,17 @@
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
-                    <div class="modal active" id="modal">
+                    <div class="modal" id="modal">
                         <div class="modal-header">
                             <div class="title">*WARNING*</div>
-                            <button data-close-button onclick="return false;" class="close-button">&times;</button>
                         </div>
                         <div class="modal-body">
                             This is a destructive action. If you proceed, all data entered for this log instance will be wiped, and you will be redirected back
                             to the status board. Do you wish to continue?
 
-                            <div style="padding: var(--UWhitespace) 0;">
-                                <button>No</button>
-                                <asp:Button Text="Yes" runat="server" />
+                            <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
+                                <button data-close-button onclick="return false;" class="HeaderPanelButtons">No</button>
+                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick"/>
                             </div>
                         </div>
                     </div>
