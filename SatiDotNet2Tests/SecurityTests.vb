@@ -78,4 +78,25 @@ Public Class GetMyDataSetParamQueryTests
 
         Assert.False(Success)
     End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery3()
+        'executing sql query with 1 condition at end
+        Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
+        QueryObject(0) = New Dictionary(Of String, String) From {
+            {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username="},
+            {"param", "jork-frol-pliy"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
+        Dim DR As Data.DataRow
+        Dim Success As Boolean = True
+
+        Try
+            DR = DS.Tables(0).Rows(0)
+        Catch ex As Exception
+            Success = False
+        End Try
+
+        Assert.False(Success)
+    End Sub
 End Class
