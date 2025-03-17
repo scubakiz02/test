@@ -214,6 +214,7 @@ Partial Class MR_OpenTicketStatusBoard
             DateLabel.Text = "Date"
             HeaderPanel.Enabled = False
             AddCommentPanel.Enabled = False
+            UploadPanel.Attributes.Add("class", "disabled")
         End If
 
         For I = 0 To RC - 1
