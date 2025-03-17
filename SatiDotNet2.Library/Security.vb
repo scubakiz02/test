@@ -1,4 +1,10 @@
-﻿Public Class Security
+﻿Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Web
+
+Public Class Security
+    Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
+
     Public Function NoSqlInjection(str As String) As Boolean
         'SELECT -extracts data from a database       
         'UPDATE -updates data In a database
@@ -27,6 +33,31 @@
 
     Public Function ReturnTrue() As Boolean
         Return True
+    End Function
+
+
+    'using parameterized queries to prevent SQL injection and improve security
+    Function GetMyDataSetParamQuery() As Data.DataSet
+        'Dim query As String = "SELECT Username, Age FROM Users WHERE Age > @MinAge"
+        Dim query As String = "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE password=@password"
+        Dim ds As New DataSet()
+
+        Try
+            Using conn As New SqlConnection(connectionString)
+                Using cmd As New SqlCommand(query, conn)
+                    cmd.Parameters.Add("@password", SqlDbType.VarChar).Value = "jxCv7$LEM!nuWcUb"
+
+                    Using adapter As New SqlDataAdapter(cmd)
+                        conn.Open()
+                        adapter.Fill(ds) ' Fill the DataSet with the query result
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            Console.WriteLine("Error: " & ex.Message)
+        End Try
+
+        Return ds
     End Function
 
 End Class

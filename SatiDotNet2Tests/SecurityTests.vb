@@ -46,3 +46,18 @@ Public Class SecurityTests
     'End Sub
     'testing against SQL Injection based on int=int
 End Class
+Public Class GetMyDataSetParamQueryTests
+    Dim Security2 = New Security()
+
+    <Fact>
+    Public Sub ReturnTrueTest1()
+        Assert.True(Security2.ReturnTrue())
+    End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery1()
+        'executing sql query "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE password=@password" with hard coded parameterized values
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery()
+        Assert.True(If(DS.Tables(0).Rows.Count > 0, True, False))
+    End Sub
+End Class
