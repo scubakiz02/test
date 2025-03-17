@@ -15,4 +15,19 @@ Public Class SecurityTests
         Assert.True(Security.NoSqlInjection(""))
     End Sub
 
+    <Fact>
+    Public Sub NoSqlInjectionTest2()
+        Assert.False(Security.NoSqlInjection("DROP TABLE DummyTable"))
+    End Sub
+
+    <Fact>
+    Public Sub NoSqlInjectionTest3()
+        Assert.False(Security.NoSqlInjection("drop table DummyTable"))
+    End Sub
+
+    <Fact>
+    Public Sub NoSqlInjectionTest4()
+        Assert.False(Security.NoSqlInjection("select * from DummyTable"))
+    End Sub
+
 End Class
