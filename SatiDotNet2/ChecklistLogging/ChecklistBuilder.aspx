@@ -36,7 +36,14 @@
                         inputPanel = this;
                         return;
                     }
+
+                    if (this.id && this.id.includes("ItemsPanel")) {
+                        ItemsPanel = this;
+                        return;
+                    }
                 }, iframeDoc);
+
+                ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
                 debugger;
                 iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
             }
