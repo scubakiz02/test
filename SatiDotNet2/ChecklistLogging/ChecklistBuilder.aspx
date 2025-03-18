@@ -28,40 +28,19 @@
 
             window.iframeEnabled = iframeEnabled;
 
-            try {
-                labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
-                labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text;
-                iterateChildren(function () {
-                    if (this.value === labelDdlValue) {
-                        inputPanel = this;
-                        return;
-                    }
-
-                    if (this.id && this.id.includes("ItemsPanel")) {
-                        ItemsPanel = this;
-                        return;
-                    }
-                }, iframeDoc);
-
-                ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
-                debugger;
-                iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
-            }
-            catch { }
-            //    //want to confirm iframe ItemsPanel scrollbar positioning can be changed with hard coded value
-            //    const observer = new MutationObserver(mutations => {
-            //        mutations.forEach(mutation => {
-            //            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-            //                if (iframeDoc.src.includes("Log.aspx")) {
-            //                    iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
-            //                    iframeDoc.querySelector('[id$="ItemsPanel"]').scrollTo = 200;
-            //                }
-            //            }
-            //        });
-            //    });
-
-            //    observer.observe(iframeDoc, { attributes: true });
-            //    //want to confirm iframe ItemsPanel scrollbar positioning can be changed with hard coded value
+            labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
+            labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text;
+            iterateChildren(function () {
+                if (this.id && this.id.includes("ItemsPanel")) {
+                    ItemsPanel = this;
+                    return;
+                }
+                else if (this.value && this.value.includes(labelDdlValue)) {
+                    inputPanel = this;
+                    return;
+                }
+            }, iframeDoc);
+            ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
         })
 
         function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
