@@ -149,3 +149,20 @@ Public Class GetStatusBoardRole
     End Sub
 
 End Class
+
+Public Class ModifyLabelOrderTests
+    Dim LogAspx = New LogAspxLibrary()
+
+    <Fact>
+    Public Sub ModifyLabelOrder1()
+        'moving label 1 up on Nitrogen Daily checklist
+        Assert.Equal("", LogAspx.ModifyLabelOrder("388", "up"))
+    End Sub
+
+    '<Fact>
+    'Public Sub ModifyLabelOrder2()
+    '    'moving label 1 down on Nitrogen Daily checklist
+    '    Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=388; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=389", LogAspx.ModifyLabelOrder("", "down"))
+    'End Sub
+
+End Class

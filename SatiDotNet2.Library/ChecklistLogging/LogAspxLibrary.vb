@@ -1,6 +1,9 @@
 ﻿Imports System.Drawing
+Imports SatiDotNet2.Library
 
 Public Class LogAspxLibrary
+    Dim SqlInjectPrevent As New Security
+
     'return value of: true is valid; false is invalid; null is out of range
     Public Function ValidateByBackColor(NumOfNotes As Integer, BackColor As String) As Boolean?
         Dim Res As Boolean = Nothing
@@ -70,5 +73,11 @@ Public Class LogAspxLibrary
         End Try
 
         Return Message
+    End Function
+
+    Function ModifyLabelOrder(LabelKey As Integer, Action As String) As String
+        Dim Res As String
+
+        ' SqlInjectPrevent.NoSqlInjection()
     End Function
 End Class
