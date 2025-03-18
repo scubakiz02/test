@@ -91,6 +91,7 @@ Public Class LogAspxLibrary
 
 
     Function ModifyLabelOrder(LabelKey As Integer, Action As String) As String
+        Dim UpdateQueryTemplate As String = "UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder="
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         QueryConfig("@Key") = New Dictionary(Of String, String) From {
             {"value", LabelKey},
@@ -114,10 +115,14 @@ Public Class LogAspxLibrary
         QueryConfig("@Key")("value") = PrevLabelKey
         PrevLabelOrder = GetSingleDbField("SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@Key", QueryConfig, "LabelOrder")
 
+        QueryConfig("@Key")("value") = LabelKey
+        LabelOrder = GetSingleDbField("SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@Key", QueryConfig, "LabelOrder")
+
         If Action = "up" Then
-            If PrevLabelKey <> LabelKey Then
+            If PrevLabelKey = -1 Then 'if true, this means the label is already the top/up most label
                 Return ""
             Else
+                Return UpdateQueryTemplate & PrevLabelOrder & " WHERE [Key]=" & LabelKey & "; " & UpdateQueryTemplate & LabelOrder & " WHERE [Key]=" & PrevLabelKey
             End If
         Else
 

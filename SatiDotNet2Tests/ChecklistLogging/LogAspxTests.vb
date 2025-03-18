@@ -160,10 +160,10 @@ Public Class ModifyLabelOrderTests
         Assert.Equal("", LogAspx.ModifyLabelOrder("388", "up"))
     End Sub
 
-    '<Fact>
-    'Public Sub ModifyLabelOrder2()
-    '    'moving label 1 down on Nitrogen Daily checklist
-    '    Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=388; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=389", LogAspx.ModifyLabelOrder("", "down"))
-    'End Sub
+    <Fact>
+    Public Sub ModifyLabelOrder2()
+        'moving label 2 up on Nitrogen Daily checklist
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=388", LogAspx.ModifyLabelOrder("389", "up"))
+    End Sub
 
 End Class
