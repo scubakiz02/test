@@ -57,29 +57,27 @@ Public Class GetMyDataSetParamQueryTests
     <Fact>
     Public Sub GetMyDataSetParamQuery1()
         'executing sql query with no parameterized values
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", New Dictionary(Of String, String))
-        Assert.True(If(DS.Tables.Count > 0, True, False))
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", New Dictionary(Of String, Dictionary(Of String, String)))
+        Assert.True(If(DS.Tables(0).Rows.Count = 4, True, False))
     End Sub
 
     <Fact>
     Public Sub GetMyDataSetParamQuery2()
         'executing sql query with table that does NOT exist
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogjectionPrevention]", New Dictionary(Of String, String))
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogjectionPrevention]", New Dictionary(Of String, Dictionary(Of String, String)))
         Assert.Equal(Nothing, DS)
     End Sub
 
-    '<Fact>
-    'Public Sub GetMyDataSetParamQuery3()
-    '    'executing sql query with 1 condition at end
-    '    Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
-    '    QueryObject(0) = New Dictionary(Of String, String) From {
-    '        {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username"},
-    '        {"paramVar", "@username"},
-    '        {"param", "jork-frol-pliy"},
-    '        {"type", "VarChar"}
-    '    }
-    '    Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
-    '    Dim DR As Data.DataRow
-    '    Assert.True(If(DS.Tables.Count > 0, True, False))
-    'End Sub
+    <Fact>
+    Public Sub GetMyDataSetParamQuery3()
+        'executing sql query with 1 parameterized value at end of query
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@username") = New Dictionary(Of String, String) From {
+            {"value", "jork-frol-pliy"},
+            {"typeOf", "string"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username", QueryObject)
+        Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
+        Assert.True(If(DR("username") = "jork-frol-pliy" AndAlso DR("password") = "jxCv7$LEM!nuWcUb" AndAlso DR("fullname") = "john doe", True, False))
+    End Sub
 End Class
