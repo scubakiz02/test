@@ -86,12 +86,12 @@ Public Class GetMyDataSetParamQueryTests
         'executing sql query with 1 parameterized value at end of query
         Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
         QueryObject("@id") = New Dictionary(Of String, String) From {
-            {"value", "1"},
+            {"value", "4"},
             {"typeOf", "int"}
         }
         Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE id=@id", QueryObject)
         Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
-        Assert.True(If(DR("username") = "jork-frol-pliy" AndAlso DR("password") = "jxCv7$LEM!nuWcUb" AndAlso DR("fullname") = "john doe", True, False))
+        Assert.True(If(DR("username") = "benk-sef-rhid" AndAlso DR("password") = "R)y+j%Lg28petjgN" AndAlso DR("fullname") = "tim hughes", True, False))
     End Sub
 
     <Fact>
