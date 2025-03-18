@@ -54,6 +54,10 @@ Partial Class MR_OpenTicketStatusBoard
                 RefreshIframe()
                 DepartmentInterfacePanel.Enabled = True
 
+                AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
+                AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
+                AreaDropDownList.SelectedValue = AreaFromQueryString
+
                 If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
                     Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
 
@@ -238,10 +242,6 @@ Partial Class MR_OpenTicketStatusBoard
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
-
-        ' setting AreaDropDownList & AreaIntervalDropDownList SelectedValue properties here, because ddl controls are not visible in Page_Load, but are in Page_PreRender
-        AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
-        AreaDropDownList.SelectedValue = AreaFromQueryString
 
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
         For I = 0 To ListItemStylesRC
