@@ -19,12 +19,25 @@
             CommentPanel = getAspControl("CommentPanel");
             StampPanel = getAspControl("StampPanel");
             iframeDoc = getAspControl("PreviewPanel_iframe").contentDocument || getAspControl("PreviewPanel_iframe").contentWindow.document; //get window within iframe
+            let labelDdl;
+            let labelDdlValue;
+            let inputPanel;
+            let inputPos;
 
             for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
 
             window.iframeEnabled = iframeEnabled;
 
             try {
+                labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
+                labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text;
+                iterateChildren(function () {
+                    if (this.value === labelDdlValue) {
+                        inputPanel = this;
+                        return;
+                    }
+                }, iframeDoc);
+                debugger;
                 iframeDoc.getElementById("ctl00_ContentPlaceHolder1_StatusBoardAnchor").style.cssText += "pointer-events: none; user-select: none; color: gray;" //disable iframe 'status board' anchor tag
             }
             catch { }
@@ -44,6 +57,10 @@
             //    //want to confirm iframe ItemsPanel scrollbar positioning can be changed with hard coded value
         })
 
+        function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
+            callback.call(elem);
+            for (const child of elem.children) iterateChildren(callback, child);
+        }
 
         function getAspControl(id) {
             return document.querySelector('[id$="' + id + '"]');
