@@ -923,6 +923,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub CommentOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String
+        Dim UpdateQuery As String
 
         Select Case sender.ID
             Case "UpInOrderCommentButton"
@@ -931,8 +932,11 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ExecuteSqlQuery("EXEC [ALTS].[dbo].[UpdateCommentOrder] @CommentKey=" & CommentFromQueryString & ", @Action='" & Action & "'")
-        RefreshPreview()
+        UpdateQuery = ChecklistBuilder.ModifyCommentOrder(CommentFromQueryString, Action)
+        If String.IsNullOrEmpty(UpdateQuery) = False Then
+            ExecuteSqlQuery(UpdateQuery)
+            RefreshPreview()
+        End If
     End Sub
     Protected Sub LabelOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String
