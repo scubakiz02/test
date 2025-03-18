@@ -640,7 +640,6 @@
                                     <asp:ListItem Text="N1" Value="N1" />
                                     <asp:ListItem Text="D2" Value="D2" />
                                     <asp:ListItem Text="N2" Value="N2" />
-                                    <asp:ListItem Text="Days(M-F)" Value="Days (M-F)" />
                                 </asp:DropDownList>
                             </asp:Panel>
 
