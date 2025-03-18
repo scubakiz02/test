@@ -152,6 +152,7 @@ End Class
 
 Public Class ModifyLabelOrderTests
     Dim LogAspx = New LogAspxLibrary()
+    Dim Security = New Security()
 
     <Fact>
     Public Sub ModifyLabelOrder1()
