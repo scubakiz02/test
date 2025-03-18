@@ -80,4 +80,59 @@ Public Class GetMyDataSetParamQueryTests
         Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
         Assert.True(If(DR("username") = "jork-frol-pliy" AndAlso DR("password") = "jxCv7$LEM!nuWcUb" AndAlso DR("fullname") = "john doe", True, False))
     End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery4()
+        'executing sql query with 1 parameterized value at end of query
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@id") = New Dictionary(Of String, String) From {
+            {"value", "1"},
+            {"typeOf", "int"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE id=@id", QueryObject)
+        Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
+        Assert.True(If(DR("username") = "jork-frol-pliy" AndAlso DR("password") = "jxCv7$LEM!nuWcUb" AndAlso DR("fullname") = "john doe", True, False))
+    End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery5()
+        'executing sql query with several parameterized values
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@username") = New Dictionary(Of String, String) From {
+            {"value", "seck-hor-zup"},
+            {"typeOf", "string"}
+        }
+        QueryObject("@fullname") = New Dictionary(Of String, String) From {
+            {"value", "karen smith"},
+            {"typeOf", "string"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT password FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username AND fullname=@fullname", QueryObject)
+        Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
+        Assert.True(If(DR("password") = "zcKbRwe+5Nk9k&gY", True, False))
+    End Sub
+
+    <Fact>
+    Public Sub GetMyDataSetParamQuery6()
+        'executing sql query that returns several rows
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@id") = New Dictionary(Of String, String) From {
+            {"value", "2"},
+            {"typeOf", "int"}
+        }
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE id > @id", QueryObject)
+        Dim DR As Data.DataRow
+        Dim Res As New List(Of String)
+
+        For I As Integer = 0 To DS.Tables(0).Rows.Count - 1
+            DR = DS.Tables(0).Rows(I)
+
+            Res.Add(DR("id"))
+            Res.Add(DR("username"))
+            Res.Add(DR("password"))
+            Res.Add(DR("fullname"))
+        Next
+
+        'jork-frol-pliy is the 'username' field value for id 1, which should NOT be in the result. R)y+j%Lg28petjgN is the password field value for record with id of 4, which should be in the result
+        Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("R)y+j%Lg28petjgN"), True, False))
+    End Sub
 End Class

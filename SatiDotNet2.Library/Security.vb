@@ -61,7 +61,6 @@ Public Class Security
         Try
             Using conn As New SqlConnection(connectionString)
                 Using cmd As New SqlCommand(SqlQuery, conn)
-                    'cmd.Parameters.Add("@password", SqlDbType.VarChar).Value = "jxCv7$LEM!nuWcUb"
 
                     For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In QueryConfig
                         Dim paramValue As String = kvp.Key
@@ -72,7 +71,7 @@ Public Class Security
 
                     Using adapter As New SqlDataAdapter(cmd)
                         conn.Open()
-                        adapter.Fill(ds) ' Fill the DataSet with the query result
+                        adapter.Fill(ds)
                     End Using
                 End Using
             End Using
