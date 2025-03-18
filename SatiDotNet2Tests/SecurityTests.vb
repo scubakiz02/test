@@ -57,24 +57,15 @@ Public Class GetMyDataSetParamQueryTests
     <Fact>
     Public Sub GetMyDataSetParamQuery1()
         'executing sql query with no parameterized values
-        Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
-        QueryObject(0) = New Dictionary(Of String, String) From {
-            {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]"}
-        }
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", New Dictionary(Of String, String))
         Assert.True(If(DS.Tables.Count > 0, True, False))
     End Sub
 
     <Fact>
     Public Sub GetMyDataSetParamQuery2()
         'executing sql query with table that does NOT exist
-        Dim QueryObject As New SortedDictionary(Of Integer, Dictionary(Of String, String))
-        QueryObject(0) = New Dictionary(Of String, String) From {
-            {"query", "SELECT * FROM [SatiTest].[dbo].[T_LogSqlIPrevention]"}
-        }
-        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery(QueryObject)
-        Dim DR As Data.DataRow
-        Assert.False(If(DS.Tables.Count > 0, True, False))
+        Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogjectionPrevention]", New Dictionary(Of String, String))
+        Assert.Equal(Nothing, DS)
     End Sub
 
     '<Fact>
