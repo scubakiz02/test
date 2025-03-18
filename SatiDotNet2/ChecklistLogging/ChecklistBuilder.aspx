@@ -160,9 +160,17 @@
             font-size: var(--UFontSize);
         }
 
+        .iframePanel {
+            width: 600px;
+        }
+
         @media (min-width: 1920px) {
             .EditPreviewPanel {
                 display: flex;
+            }
+
+            .iframePanel {
+                width: 800px;
             }
         }
     </style>
@@ -644,8 +652,8 @@
 
         </asp:Panel>
 
-        <asp:Panel runat="server" Style="width: 800px; border: 2px solid black;">
-            <iframe id="PreviewPanel_iframe" runat="server" style="width: 100%; height: 100%; border: none;"></iframe>
+        <asp:Panel runat="server" CssClass="iframePanel" Style="border: 2px solid black; overflow: hidden;">
+            <iframe id="PreviewPanel_iframe" runat="server" style="border: none; width: 166%; height: 166%; margin: 0; max-width: none; transform: scale(.6); transform-origin: left top;"></iframe>
         </asp:Panel>
     </asp:Panel>
 </asp:Content>
