@@ -4,7 +4,7 @@ Imports SatiDotNet2.Library
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
-    'Dim Sql As New ChecklistBuilderAspxLibrary
+    Dim ChecklistBuilder As New ChecklistBuilderAspxLibrary
     Dim VisiblePanels As New List(Of Panel)
     Dim ValidTextBoxes As New List(Of TextBox)
     Dim VisibleCheckBoxes As New List(Of CheckBox)
@@ -936,6 +936,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
     Protected Sub LabelOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String
+        Dim UpdateQuery As String
 
         Select Case sender.ID
             Case "UpInOrderLabelButton"
@@ -944,8 +945,11 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ExecuteSqlQuery("EXEC [ALTS].[dbo].[UpdateLabelOrder] @LabelKey=" & LabelFromQueryString & ", @Action='" & Action & "'")
-        RefreshPreview()
+        UpdateQuery = ChecklistBuilder.ModifyLabelOrder(LabelFromQueryString, Action)
+        If String.IsNullOrEmpty(UpdateQuery) = False Then
+            ExecuteSqlQuery(UpdateQuery)
+            RefreshPreview()
+        End If
     End Sub
 
     Protected Sub RangeOrderMenu_onClick(sender As Object, e As EventArgs)

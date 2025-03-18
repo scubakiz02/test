@@ -376,8 +376,8 @@
                             </asp:SqlDataSource>
 
                             <asp:Panel ID="LabelOrderInterfacePanel" Enabled="false" runat="server" Style="display: flex; flex-direction: column; align-items: normal; gap: var(--UWhitespace);">
-                                <asp:Button ID="UpInOrderLabelButton" Enabled="False" OnClick="LabelOrderInterface_onClick" Text="up" runat="server" />
-                                <asp:Button ID="DownInOrderLabelButton" Enabled="False" OnClick="LabelOrderInterface_onClick" Text="down" runat="server" />
+                                <asp:Button ID="UpInOrderLabelButton" OnClick="LabelOrderInterface_onClick" Text="up" runat="server" />
+                                <asp:Button ID="DownInOrderLabelButton" OnClick="LabelOrderInterface_onClick" Text="down" runat="server" />
                             </asp:Panel>
                         </div>
                     </div>
