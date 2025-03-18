@@ -1,9 +1,10 @@
 ﻿Imports System.Text.Json
-
+Imports SatiDotNet2.Library
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
+    'Dim Sql As New ChecklistBuilderAspxLibrary
     Dim VisiblePanels As New List(Of Panel)
     Dim ValidTextBoxes As New List(Of TextBox)
     Dim VisibleCheckBoxes As New List(Of CheckBox)

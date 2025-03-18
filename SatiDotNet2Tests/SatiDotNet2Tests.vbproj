@@ -111,6 +111,7 @@
     <Import Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChecklistLogging\ChecklistBuilderAspxLibraryTests.vb" />
     <Compile Include="ChecklistLogging\LogAspxTests.vb" />
     <Compile Include="SecurityTests.vb" />
     <Compile Include="SampleTests.vb" />
