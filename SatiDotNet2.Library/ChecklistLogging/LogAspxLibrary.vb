@@ -118,6 +118,12 @@ Public Class LogAspxLibrary
         QueryConfig("@Key")("value") = LabelKey
         LabelOrder = GetSingleDbField("SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@Key", QueryConfig, "LabelOrder")
 
+        QueryConfig("@Key")("value") = NextLabelKey
+        NextLabelOrder = GetSingleDbField("SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@Key", QueryConfig, "LabelOrder")
+
+        QueryConfig("@Key")("value") = LastLabelKey
+        LastLabelOrder = GetSingleDbField("SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@Key", QueryConfig, "LabelOrder")
+
         If Action = "up" Then
             If PrevLabelKey = -1 Then 'if true, this means the label is already the top/up most label
                 Return ""
@@ -125,7 +131,11 @@ Public Class LogAspxLibrary
                 Return UpdateQueryTemplate & PrevLabelOrder & " WHERE [Key]=" & LabelKey & "; " & UpdateQueryTemplate & LabelOrder & " WHERE [Key]=" & PrevLabelKey
             End If
         Else
-
+            If NextLabelKey = -1 Then 'if true, this means the label is already the bottom/down most label
+                Return ""
+            Else
+                Return UpdateQueryTemplate & NextLabelOrder & " WHERE [Key]=" & LabelKey & "; " & UpdateQueryTemplate & LabelOrder & " WHERE [Key]=" & NextLabelKey
+            End If
         End If
     End Function
 End Class
