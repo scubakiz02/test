@@ -590,7 +590,7 @@
                     background-color: white;
                     width: 500px;
                     max-width: 80%;
-                    font-size: var(--UFontSize);
+                    font-size: calc(var(--UFontSize));
                 }
 
                     .modal.active {
@@ -636,6 +636,7 @@
                     #overlay.active {
                         opacity: 1;
                         pointer-events: all;
+                        z-index: 1;
                     }
             </style>
             <div style="display: flex; flex-direction: column;">
@@ -650,7 +651,7 @@
 
                             <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
                                 <button data-close-button onclick="return false;" class="HeaderPanelButtons">No</button>
-                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick"/>
+                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick" BackColor="Red"/>
                             </div>
                         </div>
                     </div>
