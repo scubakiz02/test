@@ -136,3 +136,12 @@ Public Class GetMyDataSetParamQueryTests
         Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("R)y+j%Lg28petjgN"), True, False))
     End Sub
 End Class
+
+Public Class ExecuteSqlParamQueryTests
+    Dim Security = New Security()
+
+    <Fact>
+    Public Sub ExecuteSqlParamQuery1()
+        Assert.False(Security.ExecuteSqlParamQuery("", New Dictionary(Of String, Dictionary(Of String, String))))
+    End Sub
+End Class

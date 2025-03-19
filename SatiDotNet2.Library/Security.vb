@@ -54,7 +54,7 @@ Public Class Security
         End Select
     End Function
 
-    'using parameterized queries to prevent SQL injection and improve security
+    'using parameterized queries with select sql statement to prevent SQL injection and improve security
     Function GetMyDataSetParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Data.DataSet
         Dim ds As New DataSet()
 
@@ -82,4 +82,8 @@ Public Class Security
         Return ds
     End Function
 
+    'using parameterized queries to execute non returning sql statements (insert into, update, etc.) to prevent SQL injection and improve security
+    Function ExecuteSqlParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Boolean
+        Return False
+    End Function
 End Class
