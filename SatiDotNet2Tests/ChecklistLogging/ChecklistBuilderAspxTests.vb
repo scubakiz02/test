@@ -53,7 +53,7 @@ Public Class CommentOrderTests
     <Fact>
     Public Sub CommentOrder3()
         'moving comment 3 down on Nitrogen Daily checklist
-        Assert.Equal("", ChecklistBuilderAspx.ModifyCommentOrder("55", "down"))
+        Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("55", "down", "Comment"))
     End Sub
 
     <Fact>

@@ -932,7 +932,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        UpdateQuery = ChecklistBuilder.ModifyCommentOrder(CommentFromQueryString, Action)
+        UpdateQuery = ChecklistBuilder.ModifyOrder(CommentFromQueryString, Action, "Comment")
         If String.IsNullOrEmpty(UpdateQuery) = False Then
             ExecuteSqlQuery(UpdateQuery)
             RefreshPreview()
@@ -949,7 +949,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        UpdateQuery = ChecklistBuilder.ModifyLabelOrder(LabelFromQueryString, Action)
+        UpdateQuery = ChecklistBuilder.ModifyOrder(LabelFromQueryString, Action, "Label")
         If String.IsNullOrEmpty(UpdateQuery) = False Then
             ExecuteSqlQuery(UpdateQuery)
             RefreshPreview()
