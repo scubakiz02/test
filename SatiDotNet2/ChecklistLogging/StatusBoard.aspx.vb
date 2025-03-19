@@ -6,6 +6,7 @@ Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
     Dim LogAspx As New LogAspxLibrary
+    Dim Security As New Security
     Dim TimeForNewLog As Boolean
     Dim LogStatus As String
     Dim StripeColor As String
@@ -22,6 +23,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim AreaRC As Integer
         Dim SqlFuncDR As Data.DataRow
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMain.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
@@ -61,8 +63,15 @@ Partial Class MR_OpenTicketStatusBoard
             AreaRC = AreaDS.Tables(0).Rows.Count
 
             For I = 0 To AreaRC - 1
+                QueryConfig.Clear()
                 AreaKey = AreaDS.Tables(0).Rows(I)("Key")
-                SqlFuncDR = SatiCode.GetMyDataSet("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaKey).Tables(0).Rows(0)
+
+                'SqlFuncDR = SatiCode.GetMyDataSet("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaKey).Tables(0).Rows(0)
+                QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaKey},
+                    {"typeOf", "int"}
+                }
+                SqlFuncDR = Security.GetMyDataSetParamQuery("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=@AreaKey", QueryConfig).Tables(0).Rows(0)
                 SqlFunc = SqlFuncDR("SqlFunc")
                 Dim DailyOrWeeklyChecklist As Boolean = If(SqlFunc = "[ALTS].[dbo].[T_Log_DailyChecklistInfo]" OrElse SqlFunc = "[ALTS].[dbo].[T_Log_WeeklyChecklistInfo]", True, False)
 
@@ -71,7 +80,17 @@ Partial Class MR_OpenTicketStatusBoard
                 '    Continue For
                 'End If
 
-                LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
+                'LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
+                QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
+                    {"value", SqlFuncDR("SqlFunc2ndArg")},
+                    {"typeOf", "int"}
+                }
+                QueryConfig("@Where") = New Dictionary(Of String, String) From {
+                    {"value", Session("WhereFromQueryString")},
+                    {"typeOf", "string"}
+                }
+                LogDS = Security.GetMyDataSetParamQuery("Select  * FROM " & SqlFunc & "(@AreaKey, @SqlFunc2ndArg, @Where)", QueryConfig)
+
                 LogDR = LogDS.Tables(0).Rows(0)
                 TimeForNewLog = LogDR("TimeForNewLog")
                 CurrLogDate = LogDR("CurrLogDate")
