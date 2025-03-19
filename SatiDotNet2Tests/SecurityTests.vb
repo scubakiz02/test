@@ -61,7 +61,7 @@ Public Class ExecuteSqlParamQueryTests
         'update query should return true upon successful execution
         Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
         QueryObject("@id") = New Dictionary(Of String, String) From {
-            {"value", "3"},
+            {"value", "4"},
             {"typeOf", "int"}
         }
         QueryObject("@password") = New Dictionary(Of String, String) From {
@@ -72,21 +72,22 @@ Public Class ExecuteSqlParamQueryTests
         Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
     End Sub
 
-    '<Fact>
-    'Public Sub ExecuteSqlParamQuery3()
-    '    'update query to return to reverse update done via ExecuteSqlParamQuery2. should return true upon successful execution
-    '    Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
-    '    QueryObject("@id") = New Dictionary(Of String, String) From {
-    '        {"value", "3"},
-    '        {"typeOf", "int"}
-    '    }
-    '    QueryObject("@password") = New Dictionary(Of String, String) From {
-    '        {"value", "SxhNFEsp$A!m7Bx4"},
-    '        {"typeOf", "string"}
-    '    }
+    <Fact>
+    Public Sub ExecuteSqlParamQuery3()
+        'update query to return to reverse update done via ExecuteSqlParamQuery2. should return true upon successful execution.
+        'IF THIS TEST FAILS, TESTS IN GetMyDataSetParamQueryTests CLASS WILL FAIL AS WELL, B/C THEY TEST THE RECORD WITH id VALUE OF 4, WHICH IS THE RECORD BEING REVERTED BACK TO ITS ORIGINAL VALUE HERE AFTER MODIFICATION IN ExecuteSqlParamQuery2
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@id") = New Dictionary(Of String, String) From {
+            {"value", "4"},
+            {"typeOf", "int"}
+        }
+        QueryObject("@password") = New Dictionary(Of String, String) From {
+            {"value", "R)y+j%Lg28petjgN"},
+            {"typeOf", "string"}
+        }
 
-    '    Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
-    'End Sub
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
+    End Sub
 End Class
 
 Public Class GetMyDataSetParamQueryTests
