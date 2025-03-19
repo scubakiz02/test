@@ -706,11 +706,22 @@ Partial Class MR_OpenTicketStatusBoard
                 FormViewInsert = LabelFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
                 Exit Sub
             End If
-            NewLabelOrder = GetSingleDbField("SELECT TOP(1) LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY [Key] DESC", "LabelOrder") + 1
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
+            NewLabelOrder = Security.GetSingleDbField("SELECT TOP(1) LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey ORDER BY [Key] DESC", QueryConfig, "LabelOrder") + 1
 
-            LabelFormView_SqlDataSource.InsertCommand = "INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, Label, LabelOrder) VALUES (" & AreaFromQueryString & ", '" & UserInput & "', " & NewLabelOrder & ");"
-            LabelFormView_SqlDataSource.Insert()
-            LabelFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " And Label ='" & UserInput & "' And LabelOrder=" & NewLabelOrder & " ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+            QueryConfig("@UserInput") = New Dictionary(Of String, String) From {
+                {"value", UserInput},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@LabelOrder") = New Dictionary(Of String, String) From {
+                {"value", NewLabelOrder},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, Label, LabelOrder) VALUES (@AreaKey, @UserInput, @LabelOrder);", QueryConfig)
+            LabelFromQueryString = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey And Label=@UserInput And LabelOrder=@LabelOrder ORDER BY [Key] DESC", QueryConfig, "Key")
 
         ElseIf sender.ID.Contains("Comment") Then
             UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text)
