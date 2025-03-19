@@ -62,33 +62,6 @@ Partial Class MR_OpenTicketStatusBoard
         SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, Request.QueryString("fileName"))
     End Sub
 
-
-    Function GetSingleDbField(SqlQuery As String, Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
-    Sub ExecuteSqlQuery(SqlQuery As String)
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-        With MySQLCommand
-            .CommandText = SqlQuery
-            .Connection = Connection
-        End With
-        MySQLCommand.ExecuteNonQuery()
-        Connection.Close()
-    End Sub
-
     Function StripString(ByVal input As String) As String
         Return Regex.Replace(input, "[^a-zA-Z0-9]", "").ToLower()
     End Function
@@ -132,9 +105,30 @@ Partial Class MR_OpenTicketStatusBoard
                         End If
                     Next
 
-                    'ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath) VALUES (" & DataKeyFromQueryString & ", '" & Title & "', '" & Path.Combine(uploadDirectory, NewFileName) & "')")
                     System.IO.File.Move(Session("FileUploadDirectory"), Path.Combine(uploadDirectory, NewFileName))
-                    ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath, ContentType, FileName) VALUES (" & DataKeyFromQueryString & ", '" & SqlProofSingleQuotes(UserInput) & "', '" & Path.Combine(VirtualDirectory, NewFileName) & "', '" & Session("ContentType") & "', '" & NewFileName & "')")
+
+                    QueryConfig.Clear()
+                    QueryConfig("@DataKey") = New Dictionary(Of String, String) From {
+                        {"value", DataKeyFromQueryString},
+                        {"typeOf", "int"}
+                    }
+                    QueryConfig("@UserInput") = New Dictionary(Of String, String) From {
+                        {"value", SqlProofSingleQuotes(UserInput)},
+                        {"typeOf", "string"}
+                    }
+                    QueryConfig("@ImagePath") = New Dictionary(Of String, String) From {
+                        {"value", Path.Combine(VirtualDirectory, NewFileName)},
+                        {"typeOf", "string"}
+                    }
+                    QueryConfig("@ContentType") = New Dictionary(Of String, String) From {
+                        {"value", Session("ContentType")},
+                        {"typeOf", "string"}
+                    }
+                    QueryConfig("@FileName") = New Dictionary(Of String, String) From {
+                        {"value", NewFileName},
+                        {"typeOf", "string"}
+                    }
+                    Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogDataPhotos] (DataKey, PhotoTitle, PhotoFilePath, ContentType, FileName) VALUES (@DataKey, @UserInput, @ImagePath, @ContentType, @FileName)", QueryConfig)
                 End If
             Else 'Cancel
                 If uploadDirectory IsNot Nothing Then
