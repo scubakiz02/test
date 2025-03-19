@@ -729,23 +729,23 @@ Partial Class MR_OpenTicketStatusBoard
                 FormViewInsert = CommentFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
                 Exit Sub
             End If
-            NewCommentOrder = GetSingleDbField("SELECT TOP(1) CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY [Key] DESC", "CommentOrder") + 1
 
-            CommentFormView_SqlDataSource.InsertCommand = "INSERT INTO [ALTS].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) VALUES (" & AreaFromQueryString & ", '" & UserInput & "', " & NewCommentOrder & ");"
-            CommentFormView_SqlDataSource.Insert()
-            CommentFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " And Comment ='" & UserInput & "' And CommentOrder=" & NewCommentOrder & " ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
+            NewCommentOrder = Security.GetSingleDbField("SELECT TOP(1) CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey ORDER BY [Key] DESC", QueryConfig, "CommentOrder") + 1
 
-            'ElseIf sender.ID.Contains("Stamp") Then
-            '    UserInput = sender.Parent.FindControl("StampTextBox").Text
-            '    If String.IsNullOrEmpty(UserInput) Then
-            '        FormViewInsert = StampFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
-            '        BuildDynamicAsp()
-            '        Exit Sub
-            '    End If
-
-            '    StampFormView_SqlDataSource.InsertCommand = "INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, Title) VALUES (" & AreaFromQueryString & ", '" & UserInput & "');"
-            '    StampFormView_SqlDataSource.Insert()
-            '    StampFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogStampList] WHERE AreaKey=" & AreaFromQueryString & " AND Title='" & UserInput & "' ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+            QueryConfig("@UserInput") = New Dictionary(Of String, String) From {
+                {"value", UserInput},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@CommentOrder") = New Dictionary(Of String, String) From {
+                {"value", NewCommentOrder},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) VALUES (@AreaKey, @UserInput, @CommentOrder);", QueryConfig)
+            CommentFromQueryString = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey And Comment=@UserInput And CommentOrder=@CommentOrder ORDER BY [Key] DESC", QueryConfig, "Key")
         End If
 
         RefreshPreview()
