@@ -59,7 +59,6 @@ Partial Class MR_OpenTicketStatusBoard
             End If
 
             'build button controls for checklists that have a department, interval, assignee, & at least 1 input
-            ' AreaDS = SatiCode.GetMyDataSet("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department='" & Session("DepartmentFromQueryString") & "' AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area")
             QueryConfig("@Department") = New Dictionary(Of String, String) From {
                 {"value", Session("DepartmentFromQueryString")},
                 {"typeOf", "string"}
@@ -71,7 +70,6 @@ Partial Class MR_OpenTicketStatusBoard
                 QueryConfig.Clear()
                 AreaKey = AreaDS.Tables(0).Rows(I)("Key")
 
-                'SqlFuncDR = SatiCode.GetMyDataSet("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaKey).Tables(0).Rows(0)
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                     {"value", AreaKey},
                     {"typeOf", "int"}
@@ -85,7 +83,6 @@ Partial Class MR_OpenTicketStatusBoard
                 '    Continue For
                 'End If
 
-                'LogDS = SatiCode.GetMyDataSet("Select  * FROM " & SqlFunc & "(" & AreaKey & ", " & SqlFuncDR("SqlFunc2ndArg") & ", '" & Session("WhereFromQueryString") & "')")
                 QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
                     {"value", SqlFuncDR("SqlFunc2ndArg")},
                     {"typeOf", "int"}
