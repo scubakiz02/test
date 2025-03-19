@@ -1,23 +1,30 @@
 ﻿
 Imports System.Text.Json
+Imports SatiDotNet2.Library
+
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
+    Dim Security As New Security
     Dim AreaFromQueryString As String
     Dim DS As New Data.DataSet
     Dim DR As Data.DataRow
     Dim RC As Integer
 
-
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
         AreaFromQueryString = Request.QueryString("Area")
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
 
         If AreaFromQueryString IsNot Nothing Then
             If Not IsPostBack Then
-                AreaLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
-                DS = SatiCode.GetMyDataSet("SELECT Stamp.Title As Text, Stamp.[Key] As Value, Stamped.Active AS Selected FROM [ALTS].[dbo].[T_LogStampTitle] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampList] Stamped ON Stamp.[Key]=Stamped.TitleKey AND Stamped.AreaKey=" & AreaFromQueryString)
+                AreaLabel.Text = Security.GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryObject, "Area")
+                DS = Security.GetMyDataSetParamQuery("SELECT Stamp.Title As Text, Stamp.[Key] As Value, Stamped.Active AS Selected FROM [ALTS].[dbo].[T_LogStampTitle] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampList] Stamped ON Stamp.[Key]=Stamped.TitleKey AND Stamped.AreaKey=@AreaKey", QueryObject)
                 RC = DS.Tables(0).Rows.Count
 
                 For I = 0 To RC - 1
