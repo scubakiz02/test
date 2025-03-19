@@ -14,6 +14,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim SqlFunc As String
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
+    Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
     Private Sub PageInit(sender As Object, e As EventArgs) Handles Me.Init
         Dim DS As New Data.DataSet
@@ -23,7 +24,6 @@ Partial Class MR_OpenTicketStatusBoard
         Dim AreaRC As Integer
         Dim SqlFuncDR As Data.DataRow
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMain.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
@@ -185,7 +185,12 @@ Partial Class MR_OpenTicketStatusBoard
             My_DR = My_DS.Tables("T_LogData").NewRow
             My_DR("AreaKey") = AreaKey
 
-            My_DS2 = SatiCode.GetMyDataSet("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaKey)
+            QueryConfig.Clear()
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaKey},
+                    {"typeOf", "int"}
+                }
+            My_DS2 = Security.GetMyDataSetParamQuery("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey", QueryConfig)
             RC = My_DS2.Tables(0).Rows.Count
 
             For I = 0 To RC - 1
@@ -197,11 +202,10 @@ Partial Class MR_OpenTicketStatusBoard
 
             My_DR("Inputs") = JsonSerializer.Serialize(InputsMap)
             My_DR("OutOfRange") = JsonSerializer.Serialize(OutOfRangeMap)
-
             My_DR("Date") = CurrLogDate
             My_DR("Operator") = Nothing
             My_DR("CompleteLog") = False
-            My_DR("Shift") = SatiCode.GetMyDataSet("SELECT Shift FROM [ALTS].[dbo].[T_Log_GetShift]()").Tables(0).Rows(0)("Shift")
+            My_DR("Shift") = Security.GetSingleDbField("SELECT Shift FROM [ALTS].[dbo].[T_Log_GetShift]()", New Dictionary(Of String, Dictionary(Of String, String)), "Shift")
             My_DS.Tables("T_LogData").Rows.Add(My_DR)
             My_DA.Update(My_DS, "T_LogData")
         Catch ex As Exception
