@@ -84,6 +84,27 @@ Public Class Security
 
     'using parameterized queries to execute non returning sql statements (insert into, update, etc.) to prevent SQL injection and improve security
     Function ExecuteSqlParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Boolean
-        Return False
+        Dim Success As Boolean = True
+
+        Try
+            Using conn As New SqlConnection(connectionString)
+                Using cmd As New SqlCommand(SqlQuery, conn)
+                    ' Add parameters
+                    For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In QueryConfig
+                        Dim paramValue As String = kvp.Key
+                        Dim paramConfig As Dictionary(Of String, String) = kvp.Value
+
+                        cmd.Parameters.Add(paramValue, GetSqlDbType(paramConfig("typeOf"))).Value = paramConfig("value")
+                    Next
+
+                    conn.Open()
+                    cmd.ExecuteNonQuery()
+                End Using
+            End Using
+        Catch ex As Exception
+            Success = False
+        End Try
+
+        Return Success
     End Function
 End Class

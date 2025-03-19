@@ -46,6 +46,49 @@ Public Class SecurityTests
     'End Sub
     'testing against SQL Injection based on int=int
 End Class
+
+Public Class ExecuteSqlParamQueryTests
+    Dim Security = New Security()
+
+    <Fact>
+    Public Sub ExecuteSqlParamQuery1()
+        'blank sql statement, should return false
+        Assert.False(Security.ExecuteSqlParamQuery("", New Dictionary(Of String, Dictionary(Of String, String))))
+    End Sub
+
+    <Fact>
+    Public Sub ExecuteSqlParamQuery2()
+        'update query should return true upon successful execution
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@id") = New Dictionary(Of String, String) From {
+            {"value", "3"},
+            {"typeOf", "int"}
+        }
+        QueryObject("@password") = New Dictionary(Of String, String) From {
+            {"value", "p9u3&o58W9LDa-efUdrL"},
+            {"typeOf", "string"}
+        }
+
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
+    End Sub
+
+    '<Fact>
+    'Public Sub ExecuteSqlParamQuery3()
+    '    'update query to return to reverse update done via ExecuteSqlParamQuery2. should return true upon successful execution
+    '    Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+    '    QueryObject("@id") = New Dictionary(Of String, String) From {
+    '        {"value", "3"},
+    '        {"typeOf", "int"}
+    '    }
+    '    QueryObject("@password") = New Dictionary(Of String, String) From {
+    '        {"value", "SxhNFEsp$A!m7Bx4"},
+    '        {"typeOf", "string"}
+    '    }
+
+    '    Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
+    'End Sub
+End Class
+
 Public Class GetMyDataSetParamQueryTests
     Dim Security2 = New Security()
 
@@ -58,7 +101,7 @@ Public Class GetMyDataSetParamQueryTests
     Public Sub GetMyDataSetParamQuery1()
         'executing sql query with no parameterized values
         Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", New Dictionary(Of String, Dictionary(Of String, String)))
-        Assert.True(If(DS.Tables(0).Rows.Count = 4, True, False))
+        Assert.True(If(DS.Tables(0).Rows.Count >= 4, True, False)) '4 records in table, will grow as time goes on, hence the condition '>='
     End Sub
 
     <Fact>
@@ -134,14 +177,5 @@ Public Class GetMyDataSetParamQueryTests
 
         'jork-frol-pliy is the 'username' field value for id 1, which should NOT be in the result. R)y+j%Lg28petjgN is the password field value for record with id of 4, which should be in the result
         Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("R)y+j%Lg28petjgN"), True, False))
-    End Sub
-End Class
-
-Public Class ExecuteSqlParamQueryTests
-    Dim Security = New Security()
-
-    <Fact>
-    Public Sub ExecuteSqlParamQuery1()
-        Assert.False(Security.ExecuteSqlParamQuery("", New Dictionary(Of String, Dictionary(Of String, String))))
     End Sub
 End Class
