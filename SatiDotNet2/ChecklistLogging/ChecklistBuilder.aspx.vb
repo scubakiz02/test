@@ -401,24 +401,18 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Function SetCommentFromQueryString() As String
-        Try
-            'in case no comments exist for the checklist (Sql will say "System.IndexOutOfRangeException: 'There is no row at position 0.'")
-            Return SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY CommentOrder").Tables(0).Rows(0)("Key")
-        Catch ex As Exception
-            Return Nothing
-        End Try
+        Return Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey ORDER BY CommentOrder", QueryConfig, "Key")
     End Function
 
     Function SetLabelFromQueryString() As String
-        Try
-            'in case no comments exist for the checklist (Sql will say "System.IndexOutOfRangeException: 'There is no row at position 0.'")
-            Return SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString & " ORDER BY LabelOrder").Tables(0).Rows(0)("Key")
-        Catch ex As Exception
-            Return Nothing
-        End Try
+        Return Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey ORDER BY LabelOrder", QueryConfig, "Key")
     End Function
 
     Protected Sub AreaDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
         AreaFromQueryString = AreaDropDownList.SelectedValue
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
@@ -426,6 +420,10 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub LabelDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
         LabelFromQueryString = sender.SelectedValue
         CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()
@@ -744,6 +742,10 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
         'AreaFromQueryString = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey=" & Session("AreaIntervalKey") & " ORDER BY Area", "Key")
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
         AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key")
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
