@@ -216,19 +216,6 @@ Partial Class MR_OpenTicketStatusBoard
         Connection.Close()
     End Sub
 
-    Function GetSingleDbField(SqlQuery As String, Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
     Sub SetButtonBackground(DR As Data.DataRow)
         If Not IsDBNull(DR("Operator")) Then
             LogStatus = DR("LogStatus")
@@ -257,13 +244,22 @@ Partial Class MR_OpenTicketStatusBoard
         Dim DuplicateRecord As Boolean = False
 
         'build controls for CurrentLogsPanel dynamically
-        Try
-            DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
-        Catch ex As Exception 'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
-            'modified query to return 'problem child' records
+        QueryConfig.Clear()
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaKey},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@CurrLogDate") = New Dictionary(Of String, String) From {
+            {"value", CurrLogDate},
+            {"typeOf", "string"}
+        }
+
+        DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+        If DS Is Nothing Then 'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
             DuplicateRecord = True
-            DS = SatiCode.GetMyDataSet("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(Date As Date) = '" & CurrLogDate & "'), 1, '" & CurrLogDate & "') Sql WHERE CAST(D.Date As Date) = '" & CurrLogDate & "' AND AreaKey=" & AreaKey & " GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor")
-        End Try
+            'modified query to return 'problem child' records
+            DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+        End If
 
         RC = DS.Tables(0).Rows.Count
 
@@ -352,8 +348,11 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         'build controls for PastIssuesPanel dynamically
-        'DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Operator, A.Area, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE (D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) AND D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " ORDER BY DATE DESC) AND D.Date < '" & Session("WhereFromQueryString") & "' AND AreaKey=" & AreaKey & " ORDER BY Date ASC")
-        DS = SatiCode.GetMyDataSet("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=" & AreaKey & " AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaKey & " AND CAST(D.Date As Date) < '" & CurrLogDate & "' ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND '" & Session("WhereFromQueryString") & "' > D.Date)) AND ((D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC")
+        QueryConfig("@Where") = New Dictionary(Of String, String) From {
+            {"value", Session("WhereFromQueryString")},
+            {"typeOf", "string"}
+        }
+        DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND ((D.[All_InputsValid] <> 1 OR D.CompleteLog <> 1) OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
         RC = DS.Tables(0).Rows.Count
 
         For I = 0 To RC - 1
