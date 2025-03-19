@@ -5,6 +5,7 @@ Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
     Dim ChecklistBuilder As New ChecklistBuilderAspxLibrary
+    Dim Security As New Security
     Dim VisiblePanels As New List(Of Panel)
     Dim ValidTextBoxes As New List(Of TextBox)
     Dim VisibleCheckBoxes As New List(Of CheckBox)
@@ -29,6 +30,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim EditPreviewPanel_ScrollPos As String
     Dim FormViewInsert As FormView = Nothing
     Dim Department As String
+    Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
@@ -54,7 +56,10 @@ Partial Class MR_OpenTicketStatusBoard
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
                 DepartmentInterfacePanel.Enabled = True
-
+                QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaFromQueryString},
+                    {"typeOf", "int"}
+                }
                 AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
                 AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
                 AreaDropDownList.SelectedValue = AreaFromQueryString
@@ -163,7 +168,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                 'interval interface
                 Try 'in case selected checklist does NOT have a set interval
-                    IntervalDR = SatiCode.GetMyDataSet("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=" & AreaFromQueryString).Tables(0).Rows(0)
+                    IntervalDR = Security.GetMyDataSetParamQuery("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=@AreaKey", QueryConfig).Tables(0).Rows(0)
                     IntervalKey = IntervalDR("Key")
                     Interval = IntervalDR("Interval")
                     IntervalDropDownList.SelectedValue = IntervalKey
@@ -239,12 +244,12 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
-        Dim ListItemStylesDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: gray;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: red; color: black;' ELSE 'color: black;' END AS ListItemStyles FROM [ALTS].[dbo].[T_LogArea] A")
+        Dim ListItemStylesDS As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT A.[Key], CASE WHEN Active=0 THEN 'background-color: lightgray; color: gray;' WHEN IntervalKey IS NULL OR DepartmentKey IS NULL OR Assignee IS NULL OR (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0 THEN 'background-color: red; color: black;' ELSE 'color: black;' END AS ListItemStyles FROM [ALTS].[dbo].[T_LogArea] A", New Dictionary(Of String, Dictionary(Of String, String)))
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
 
-        'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem red
+        'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem control red
         For I = 0 To ListItemStylesRC
             ListItemStylesDR = ListItemStylesDS.Tables(0).Rows(I)
             AreaListItem = AreaDropDownList.Items.FindByValue(ListItemStylesDR("Key"))
