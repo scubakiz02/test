@@ -641,7 +641,7 @@ Partial Class MR_OpenTicketStatusBoard
             Dim DS As Data.DataSet = SatiCode.GetMyDataSet("SELECT [Key] FROM [ALTS].[dbo].[T_LogStampTitle]")
             Dim RC As Integer = DS.Tables(0).Rows.Count
             Dim DR As Data.DataRow
-            Dim DuplicateDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT Area FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE I.Interval <> 'ONE TIME ONLY'")
+            Dim DuplicateDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT Area FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE I.Interval <> 'ONE TIME ONLY' OR A.IntervalKey IS NULL")
             Dim DuplicateRC As Integer = DuplicateDS.Tables(0).Rows.Count
             Dim DuplicateDR As Data.DataRow
             UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("AreaTextBox").Text)
@@ -663,14 +663,34 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
             Next
 
-            AreaFormView_SqlDataSource.InsertCommand = "INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, Active) OUTPUT INSERTED.[Key] VALUES ('" & UserInput & "', '" & Today & "', 1);"
-            AreaFormView_SqlDataSource.Insert()
-            AreaFromQueryString = SatiCode.GetMyDataSet("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey IS NULL AND Area='" & UserInput & "' ORDER BY [Key] DESC").Tables(0).Rows(0)("Key")
+            QueryConfig("@UserInput") = New Dictionary(Of String, String) From {
+                {"value", UserInput},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@Date") = New Dictionary(Of String, String) From {
+                {"value", Today},
+                {"typeOf", "string"}
+            }
+            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, Active) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, 1);", QueryConfig)
+
+            QueryConfig.Remove("@Date")
+            AreaFromQueryString = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey IS NULL AND Area=@UserInput ORDER BY [Key] DESC", QueryConfig, "Key") 'get unique key value of checklist that was just created
 
             'add record to FROM [ALTS].[dbo].[T_LogStampList] for each stamp that exists in [ALTS].[dbo].[T_LogStampTitle]
             For I = 0 To RC - 1
                 DR = DS.Tables(0).Rows(I)
-                ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, TitleKey, Active) VALUES (" & AreaFromQueryString & ", " & DR("Key") & ", 0);")
+                QueryConfig.Clear()
+
+                QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaFromQueryString},
+                    {"typeOf", "int"}
+                }
+                QueryConfig("@StampKey") = New Dictionary(Of String, String) From {
+                    {"value", DR("Key")},
+                    {"typeOf", "int"}
+                }
+
+                Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, TitleKey, Active) VALUES (@AreaKey, @StampKey, 0);", QueryConfig)
             Next
 
             'b/c a new checklist has been created, there are ZERO associated Labels, Comments, or Stamps
@@ -742,11 +762,11 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
         'AreaFromQueryString = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey=" & Session("AreaIntervalKey") & " ORDER BY Area", "Key")
+        AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key")
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
         }
-        AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key")
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()
