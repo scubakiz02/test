@@ -1,6 +1,7 @@
 ﻿Imports System.Text
 Imports Xunit
 Imports SatiDotNet2.Library
+Imports System.Threading
 
 Public Class SecurityTests
     Dim Security = New Security()
@@ -88,6 +89,33 @@ Public Class ExecuteSqlParamQueryTests
 
         Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
     End Sub
+
+    <Fact>
+    Public Sub ExecuteSqlParamQuery4()
+        Dim InsertIntoQuerySuccess As Boolean
+        Dim DeleteQuerySuccess As Boolean
+
+        'insert into and delete query. should return true upon successful execution of both
+        'IF THIS UNIT TEST FAILS, GetMyDataSetParamQuery1 WILL ALSO FAIL, B/C IT TESTS THE TABLE FOR 4 TOTAL RECORDS, AND THE # OF RECORDS IN THE TABLE WILL NOT BE 4 IF THE DELETE QUERY FAILS
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@username") = New Dictionary(Of String, String) From {
+            {"value", "cbacon"},
+            {"typeOf", "string"}
+        }
+        QueryObject("@password") = New Dictionary(Of String, String) From {
+            {"value", "0iJUN+*ini@et+YoF8yI"},
+            {"typeOf", "string"}
+        }
+        QueryObject("@fullname") = New Dictionary(Of String, String) From {
+            {"value", "Chris P. Bacon"},
+            {"typeOf", "string"}
+        }
+
+        InsertIntoQuerySuccess = Security.ExecuteSqlParamQuery("INSERT INTO [SatiTest].[dbo].[T_LogSqlInjectionPrevention] VALUES (@username, @password, @fullname)", QueryObject)
+        DeleteQuerySuccess = Security.ExecuteSqlParamQuery("DELETE FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username AND password=@password AND fullname=@fullname", QueryObject)
+
+        Assert.True(If(InsertIntoQuerySuccess AndAlso DeleteQuerySuccess, True, False))
+    End Sub
 End Class
 
 Public Class GetMyDataSetParamQueryTests
@@ -102,7 +130,7 @@ Public Class GetMyDataSetParamQueryTests
     Public Sub GetMyDataSetParamQuery1()
         'executing sql query with no parameterized values
         Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention]", New Dictionary(Of String, Dictionary(Of String, String)))
-        Assert.True(If(DS.Tables(0).Rows.Count >= 4, True, False)) '4 records in table, will grow as time goes on, hence the condition '>='
+        Assert.True(If(DS.Tables(0).Rows.Count = 4, True, False))
     End Sub
 
     <Fact>

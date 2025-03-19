@@ -82,7 +82,7 @@ Public Class Security
         Return ds
     End Function
 
-    'using parameterized queries to execute non returning sql statements (insert into, update, etc.) to prevent SQL injection and improve security
+    'using parameterized queries to execute non returning sql statements (insert into, update, delete, etc.) to prevent SQL injection and improve security
     Function ExecuteSqlParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Boolean
         Dim Success As Boolean = True
 
