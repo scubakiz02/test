@@ -4,11 +4,12 @@ Imports System.Data
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Web.Services
+Imports SatiDotNet2.Library
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
-    Dim AreaFromQueryString As String
+    Dim Security As New Security
     Dim DS As New Data.DataSet
     Dim DR As Data.DataRow
     Dim RC As Integer
@@ -26,15 +27,36 @@ Partial Class MR_OpenTicketStatusBoard
      {
         {"svg%2Bxml", "svg"}
      } '%2B is URL encoding for '+'
-
+    Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
-        AreaFromQueryString = Request.QueryString("Area")
         DataKeyFromQueryString = Request.QueryString("DataKey")
-        DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & DataKeyFromQueryString).Tables(0).Rows(0)
-        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
+        QueryConfig("@DataKey") = New Dictionary(Of String, String) From {
+            {"value", DataKeyFromQueryString},
+            {"typeOf", "int"}
+        }
+        DR = Security.GetMyDataSetParamQuery("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@DataKey", QueryConfig).Tables(0).Rows(0)
+
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", DR("Key")},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
+            {"value", DR("SqlFunc2ndArg")},
+            {"typeOf", "float"}
+        }
+        QueryConfig("@Date") = New Dictionary(Of String, String) From {
+            {"value", DR("Date")},
+            {"typeOf", "string"}
+        }
+        QueryConfig("@SqlFunc") = New Dictionary(Of String, String) From {
+            {"value", DR("SqlFunc")},
+            {"typeOf", "string"}
+        }
+        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), Security.GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod").Replace("/", "-"))
+
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         SnapshotImageButton.ImageUrl = Path.Combine(VirtualDirectory, Request.QueryString("fileName"))
