@@ -10,12 +10,12 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DS As New Data.DataSet
     Dim DR As Data.DataRow
     Dim RC As Integer
+    Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
         AreaFromQueryString = Request.QueryString("Area")
-        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
         QueryObject("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
@@ -41,37 +41,19 @@ Partial Class MR_OpenTicketStatusBoard
         End If
     End Sub
 
-    Function GetSingleDbField(SqlQuery As String, Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
-    Sub ExecuteSqlQuery(SqlQuery As String)
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-        With MySQLCommand
-            .CommandText = SqlQuery
-            .Connection = Connection
-        End With
-        MySQLCommand.ExecuteNonQuery()
-        Connection.Close()
-    End Sub
-
-
     Protected Sub ExitIframeButton_onClick(sender As Object, e As EventArgs)
         If sender.Text = "Update" Then
             For Each ListItem As ListItem In StampCheckBoxList.Items
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogStampList] SET Active=" & If(ListItem.Selected, 1, 0) & " WHERE TitleKey=" & ListItem.Value & " AND AreaKey=" & AreaFromQueryString)
+                QueryObject("@Active") = New Dictionary(Of String, String) From {
+                    {"value", If(ListItem.Selected, True, False)},
+                    {"typeOf", "bit"}
+                }
+                QueryObject("@TitleKey") = New Dictionary(Of String, String) From {
+                    {"value", ListItem.Value},
+                    {"typeOf", "int"}
+                }
+
+                Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStampList] SET Active=@Active WHERE TitleKey=@TitleKey AND AreaKey=@AreaKey", QueryObject)
             Next
         End If
 
