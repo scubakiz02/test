@@ -4,20 +4,6 @@ Imports SatiDotNet2.Library
 Public Class ChecklistBuilderAspxLibrary
     Dim Sql As New Security
 
-    Function GetSingleDbField(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String)), Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = Sql.GetMyDataSetParamQuery(SqlQuery, QueryConfig).Tables(0).Rows(0)(Field)
-            Res = If(IsDBNull(Res), Nothing, Res) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
     Function ModifyOrder(Key As Integer, Action As String, Marker As String) As String
         Dim Table As String = "[ALTS].[dbo]."
         Dim FieldOfInterest As String
@@ -51,19 +37,19 @@ Public Class ChecklistBuilderAspxLibrary
         Dim LastOrder As Integer
 
         QueryConfig("@Key")("value") = FirstKey
-        FirstOrder = GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
+        FirstOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
 
         QueryConfig("@Key")("value") = PrevKey
-        PrevOrder = GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
+        PrevOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
 
         QueryConfig("@Key")("value") = Key
-        Order = GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
+        Order = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
 
         QueryConfig("@Key")("value") = NextKey
-        NextOrder = GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
+        NextOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
 
         QueryConfig("@Key")("value") = LastKey
-        LastOrder = GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
+        LastOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
 
         If Action = "up" Then
             If PrevKey = -1 Then 'if true, this means the label is already the top/up most label

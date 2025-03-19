@@ -31,6 +31,20 @@ Public Class Security
         Return Res
     End Function
 
+    Function GetSingleDbField(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String)), Field As String) As String
+        Dim Res As String
+
+        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
+        Try
+            Res = GetMyDataSetParamQuery(SqlQuery, QueryConfig).Tables(0).Rows(0)(Field)
+            Res = If(IsDBNull(Res), Nothing, Res) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
+        Catch ex As Exception
+            Res = Nothing
+        End Try
+
+        Return Res
+    End Function
+
     Public Function ReturnTrue() As Boolean
         Return True
     End Function
