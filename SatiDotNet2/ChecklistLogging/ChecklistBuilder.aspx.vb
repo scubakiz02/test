@@ -463,7 +463,7 @@ Partial Class MR_OpenTicketStatusBoard
             }
             UpdateQuery += "=@Assignee"
         Else
-            UpdateQuery += "=NULL"
+            UpdateQuery += "=NULL" 'not using a parameterized value in this case, b/c the value in the DB will not a true 'NULL', but rather a string that equals 'NULL'
         End If
         UpdateQuery += " WHERE [Key]=@AreaKey"
 
