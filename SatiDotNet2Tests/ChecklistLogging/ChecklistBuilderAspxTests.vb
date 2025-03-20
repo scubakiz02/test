@@ -1,6 +1,7 @@
 ﻿Imports System.Text
 Imports Xunit
 Imports SatiDotNet2.Library
+Imports System.Text.Json
 
 Public Class LabelOrderTests
     Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
@@ -17,7 +18,12 @@ Public Class LabelOrderTests
     <Fact>
     Public Sub LabelOrder2()
         'moving label 2 up on Nitrogen Daily checklist
-        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=388", ChecklistBuilderAspx.ModifyOrder("389", "up", "Label"))
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("389", "up", "Label")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, String) = JsonSerializer.Deserialize(Of Dictionary(Of String, String))(Res("ParameterizedValues"))
+
+        ' Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=388", ChecklistBuilderAspx.ModifyOrder("389", "up", "Label"))
+        Assert.True(If(ParameterizedValuesConfig("LabelOrder1") = "1" AndAlso ParameterizedValuesConfig("Key1") = "389" AndAlso ParameterizedValuesConfig("LabelOrder2") = "2" AndAlso ParameterizedValuesConfig("Key2") = "388", True, False))
     End Sub
 
     <Fact>
