@@ -19,11 +19,33 @@ Public Class LabelOrderTests
     Public Sub LabelOrder2()
         'moving label 2 up on Nitrogen Daily checklist
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("389", "up", "Label")
-        Dim ParameterizedValuesConfig As Dictionary(Of String, String) = JsonSerializer.Deserialize(Of Dictionary(Of String, String))(Res("ParameterizedValues"))
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("389", "up", "Label")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+        Dim UnitTestRes As Boolean
+
+        'validate proper values in ParameterizedValuesConfig
+        If ParameterizedValuesConfig("@LabelOrder1")("value") = "1" AndAlso ParameterizedValuesConfig("@LabelOrder1")("typeOf") = "int" Then
+
+            If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+
+                If ParameterizedValuesConfig("@LabelOrder2")("value") = "2" AndAlso ParameterizedValuesConfig("@LabelOrder2")("typeOf") = "int" Then
+
+                    If ParameterizedValuesConfig("@Key2")("value") = "388" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
+
+                        UnitTestRes = True
+
+                    End If
+
+                End If
+
+            End If
+
+        Else
+            UnitTestRes = False
+        End If
 
         ' Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=1 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=388", ChecklistBuilderAspx.ModifyOrder("389", "up", "Label"))
-        Assert.True(If(ParameterizedValuesConfig("LabelOrder1") = "1" AndAlso ParameterizedValuesConfig("Key1") = "389" AndAlso ParameterizedValuesConfig("LabelOrder2") = "2" AndAlso ParameterizedValuesConfig("Key2") = "388", True, False))
+        Assert.True(UnitTestRes)
     End Sub
 
     <Fact>

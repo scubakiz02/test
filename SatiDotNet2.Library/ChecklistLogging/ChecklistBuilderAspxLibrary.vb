@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing
 Imports SatiDotNet2.Library
+Imports System.Text.Json
 
 Public Class ChecklistBuilderAspxLibrary
     Dim Sql As New Security
@@ -68,6 +69,7 @@ Public Class ChecklistBuilderAspxLibrary
 
     Function ModifyOrderv2(Key As Integer, Action As String, Marker As String) As Dictionary(Of String, String)
         Dim Res As New Dictionary(Of String, String)
+        Dim ParameterizedValuesConfig As New Dictionary(Of String, Dictionary(Of String, String))
         Dim Table As String = "[ALTS].[dbo]."
         Dim FieldOfInterest As String
         Dim SqlQuery As String
@@ -129,11 +131,24 @@ Public Class ChecklistBuilderAspxLibrary
             End If
         End If
 
+        ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
+            {"value", PrevOrder},
+            {"typeOf", "int"}
+        }
+        ParameterizedValuesConfig("@Key1") = New Dictionary(Of String, String) From {
+            {"value", Key},
+            {"typeOf", "int"}
+        }
+        ParameterizedValuesConfig("@LabelOrder2") = New Dictionary(Of String, String) From {
+            {"value", Order},
+            {"typeOf", "int"}
+        }
+        ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
+            {"value", PrevKey},
+            {"typeOf", "int"}
+        }
         Res("SqlQuery") = SqlQuery
-        'Res("@LabelKey") = New Dictionary(Of String, String) From {
-        '    {"value", LabelDropDownList.SelectedValue},
-        '    {"typeOf", "int"}
-        '}
+        Res("ParameterizedValues") = JsonSerializer.Serialize(ParameterizedValuesConfig)
 
         Return Res
     End Function
