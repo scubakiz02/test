@@ -860,6 +860,7 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub LabelOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String
         Dim UpdateQuery As String
+        Dim ModifyOrderConfig As New Dictionary(Of String, String)
 
         Select Case sender.ID
             Case "UpInOrderLabelButton"
@@ -868,9 +869,10 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        UpdateQuery = ChecklistBuilder.ModifyOrder(LabelFromQueryString, Action, "Label")
+        ModifyOrderConfig = ChecklistBuilder.ModifyOrderv2(LabelFromQueryString, Action, "Label")
+        UpdateQuery = ModifyOrderConfig("SqlQuery")
         If String.IsNullOrEmpty(UpdateQuery) = False Then
-            ExecuteSqlQuery(UpdateQuery)
+            Security.ExecuteSqlParamQuery(UpdateQuery, JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderConfig("ParameterizedValues")))
             RefreshPreview()
         End If
     End Sub

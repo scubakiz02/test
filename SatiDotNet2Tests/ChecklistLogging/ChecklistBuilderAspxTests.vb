@@ -51,13 +51,43 @@ Public Class LabelOrderTests
     <Fact>
     Public Sub LabelOrder3()
         'moving label 3 down on Nitrogen Daily checklist
-        Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("390", "down", "Label"))
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("390", "down", "Label")
+        Assert.Equal("", Res("SqlQuery"))
+        'Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("390", "down", "Label"))
     End Sub
 
     <Fact>
     Public Sub LabelOrder4()
         'moving label 2 down on Nitrogen Daily checklist
-        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=3 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=390", ChecklistBuilderAspx.ModifyOrder("389", "down", "Label"))
+
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("389", "down", "Label")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+        Dim UnitTestRes As Boolean
+
+        'validate proper values in ParameterizedValuesConfig
+        If ParameterizedValuesConfig("@LabelOrder1")("value") = "3" AndAlso ParameterizedValuesConfig("@LabelOrder1")("typeOf") = "int" Then
+
+            If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+
+                If ParameterizedValuesConfig("@LabelOrder2")("value") = "2" AndAlso ParameterizedValuesConfig("@LabelOrder2")("typeOf") = "int" Then
+
+                    If ParameterizedValuesConfig("@Key2")("value") = "390" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
+
+                        UnitTestRes = True
+
+                    End If
+
+                End If
+
+            End If
+
+        Else
+            UnitTestRes = False
+        End If
+
+        ' Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=3 WHERE [Key]=389; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=2 WHERE [Key]=390", ChecklistBuilderAspx.ModifyOrder("389", "down", "Label"))
+        Assert.True(UnitTestRes)
     End Sub
     'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
 End Class
