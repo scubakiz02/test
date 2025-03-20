@@ -477,12 +477,28 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub DepartmentDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET DepartmentKey='" & DepartmentDropDownList.SelectedValue & "' WHERE [Key]=" & AreaFromQueryString)
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@Department") = New Dictionary(Of String, String) From {
+            {"value", DepartmentDropDownList.SelectedValue},
+            {"typeOf", "string"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET DepartmentKey=@Department WHERE [Key]=@AreaKey", QueryConfig)
         RefreshPreview()
     End Sub
 
     Protected Sub UnitDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET UnitKey=" & UnitDropDownList.SelectedValue & " WHERE [Key]=" & LabelFromQueryString)
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+            {"value", LabelFromQueryString},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@UnitKey") = New Dictionary(Of String, String) From {
+            {"value", UnitDropDownList.SelectedValue},
+            {"typeOf", "string"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET UnitKey=@UnitKey WHERE [Key]=@LabelKey", QueryConfig)
         RefreshPreview()
     End Sub
 
