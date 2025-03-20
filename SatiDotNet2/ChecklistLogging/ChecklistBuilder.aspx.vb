@@ -422,11 +422,11 @@ Partial Class MR_OpenTicketStatusBoard
     End Function
 
     Protected Sub AreaDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        AreaFromQueryString = AreaDropDownList.SelectedValue
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
         }
-        AreaFromQueryString = AreaDropDownList.SelectedValue
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()
