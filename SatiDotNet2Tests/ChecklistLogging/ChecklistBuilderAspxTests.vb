@@ -10,7 +10,8 @@ Public Class LabelOrderTests
     <Fact>
     Public Sub LabelOrder1()
         'moving label 1 up on Nitrogen Daily checklist
-        Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("388", "up", "Label"))
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("388", "up", "Label")
+        Assert.Equal("", Res("SqlQuery"))
     End Sub
 
     <Fact>
