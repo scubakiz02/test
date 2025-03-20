@@ -1031,22 +1031,9 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Sub ExecuteSqlQuery(SqlQuery As String)
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-        With MySQLCommand
-            .CommandText = SqlQuery
-            .Connection = Connection
-        End With
-        MySQLCommand.ExecuteNonQuery()
-        Connection.Close()
-    End Sub
-
     Protected Sub DatepickCalendar_OnSelectionChanged(sender As Object, e As EventArgs)
         DatepickTextBox.Text = sender.SelectedDate.Date
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET OneTimeDate='" & DatepickTextBox.Text & "' WHERE [Key]=" & AreaFromQueryString & "; UPDATE [ALTS].[dbo].[T_LogData] SET Date='" & DatepickTextBox.Text & "' WHERE AreaKey=" & AreaFromQueryString) 'update smalldatetime fields in T_LogArea & T_LogData
+        'ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET OneTimeDate='" & DatepickTextBox.Text & "' WHERE [Key]=" & AreaFromQueryString & "; UPDATE [ALTS].[dbo].[T_LogData] SET Date='" & DatepickTextBox.Text & "' WHERE AreaKey=" & AreaFromQueryString) 'update smalldatetime fields in T_LogArea & T_LogData
         EditDatepickButton.Enabled = True
         DatepickCalendar.Visible = False
     End Sub
@@ -1061,10 +1048,6 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub EditDatepickButton_OnClick(sender As Object, e As EventArgs)
         EditDatepickButton.Enabled = False
         DatepickCalendar.Visible = True
-    End Sub
-
-    Protected Sub UsersDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Assignee='" & sender.SelectedValue & "' WHERE [Key]=" & AreaFromQueryString)
     End Sub
 End Class
 
