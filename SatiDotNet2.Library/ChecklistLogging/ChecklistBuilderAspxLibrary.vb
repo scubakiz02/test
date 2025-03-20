@@ -72,7 +72,6 @@ Public Class ChecklistBuilderAspxLibrary
         Dim ParameterizedValuesConfig As New Dictionary(Of String, Dictionary(Of String, String))
         Dim Table As String = "[ALTS].[dbo]."
         Dim FieldOfInterest As String
-        Dim SqlQuery As String
 
         Select Case Marker
             Case "Label"
@@ -84,6 +83,7 @@ Public Class ChecklistBuilderAspxLibrary
         End Select
 
         Dim UpdateQueryTemplate As String = "UPDATE " & Table & " SET " & FieldOfInterest & "="
+        Dim SqlQuery As String = UpdateQueryTemplate & "@LabelOrder1 WHERE [Key]=@Key1; " & UpdateQueryTemplate & "@LabelOrder2 WHERE [Key]=@Key2"
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         QueryConfig("@Key") = New Dictionary(Of String, String) From {
             {"value", Key},
