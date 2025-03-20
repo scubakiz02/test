@@ -120,7 +120,6 @@ Public Class ChecklistBuilderAspxLibrary
             If PrevKey = -1 Then 'if true, this means the label is already the top/up most label
                 SqlQuery = ""
             Else
-                SqlQuery = UpdateQueryTemplate & PrevOrder & " WHERE [Key]=" & Key & "; " & UpdateQueryTemplate & Order & " WHERE [Key]=" & PrevKey
                 ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
                     {"value", PrevOrder},
                     {"typeOf", "int"}
@@ -134,7 +133,6 @@ Public Class ChecklistBuilderAspxLibrary
             If NextKey = -1 Then 'if true, this means the label is already the bottom/down most label
                 SqlQuery = ""
             Else
-                SqlQuery = UpdateQueryTemplate & NextOrder & " WHERE [Key]=" & Key & "; " & UpdateQueryTemplate & Order & " WHERE [Key]=" & NextKey
                 ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
                     {"value", NextOrder},
                     {"typeOf", "int"}
@@ -146,7 +144,7 @@ Public Class ChecklistBuilderAspxLibrary
             End If
         End If
 
-        If String.IsNullOrEmpty(SqlQuery) = False Then
+        If String.IsNullOrEmpty(SqlQuery) = False Then 'these 2 key value pairs always keep the same value, hence why they're not in the if statement above
             ParameterizedValuesConfig("@Key1") = New Dictionary(Of String, String) From {
                 {"value", Key},
                 {"typeOf", "int"}
