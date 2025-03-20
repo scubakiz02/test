@@ -83,7 +83,7 @@ Public Class ChecklistBuilderAspxLibrary
         End Select
 
         Dim UpdateQueryTemplate As String = "UPDATE " & Table & " SET " & FieldOfInterest & "="
-        Dim SqlQuery As String = UpdateQueryTemplate & "@LabelOrder1 WHERE [Key]=@Key1; " & UpdateQueryTemplate & "@LabelOrder2 WHERE [Key]=@Key2"
+        Dim SqlQuery As String = UpdateQueryTemplate & "@Order1 WHERE [Key]=@Key1; " & UpdateQueryTemplate & "@Order2 WHERE [Key]=@Key2"
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         QueryConfig("@Key") = New Dictionary(Of String, String) From {
             {"value", Key},
@@ -120,7 +120,7 @@ Public Class ChecklistBuilderAspxLibrary
             If PrevKey = -1 Then 'if true, this means the label is already the top/up most label
                 SqlQuery = ""
             Else
-                ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
+                ParameterizedValuesConfig("@Order1") = New Dictionary(Of String, String) From {
                     {"value", PrevOrder},
                     {"typeOf", "int"}
                 }
@@ -133,7 +133,7 @@ Public Class ChecklistBuilderAspxLibrary
             If NextKey = -1 Then 'if true, this means the label is already the bottom/down most label
                 SqlQuery = ""
             Else
-                ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
+                ParameterizedValuesConfig("@Order1") = New Dictionary(Of String, String) From {
                     {"value", NextOrder},
                     {"typeOf", "int"}
                 }
@@ -149,7 +149,7 @@ Public Class ChecklistBuilderAspxLibrary
                 {"value", Key},
                 {"typeOf", "int"}
             }
-            ParameterizedValuesConfig("@LabelOrder2") = New Dictionary(Of String, String) From {
+            ParameterizedValuesConfig("@Order2") = New Dictionary(Of String, String) From {
                 {"value", Order},
                 {"typeOf", "int"}
             }

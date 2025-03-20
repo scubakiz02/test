@@ -24,11 +24,11 @@ Public Class LabelOrderTests
         Dim UnitTestRes As Boolean
 
         'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@LabelOrder1")("value") = "1" AndAlso ParameterizedValuesConfig("@LabelOrder1")("typeOf") = "int" Then
+        If ParameterizedValuesConfig("@Order1")("value") = "1" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
 
             If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
 
-                If ParameterizedValuesConfig("@LabelOrder2")("value") = "2" AndAlso ParameterizedValuesConfig("@LabelOrder2")("typeOf") = "int" Then
+                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
 
                     If ParameterizedValuesConfig("@Key2")("value") = "388" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
 
@@ -66,11 +66,11 @@ Public Class LabelOrderTests
         Dim UnitTestRes As Boolean
 
         'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@LabelOrder1")("value") = "3" AndAlso ParameterizedValuesConfig("@LabelOrder1")("typeOf") = "int" Then
+        If ParameterizedValuesConfig("@Order1")("value") = "3" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
 
             If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
 
-                If ParameterizedValuesConfig("@LabelOrder2")("value") = "2" AndAlso ParameterizedValuesConfig("@LabelOrder2")("typeOf") = "int" Then
+                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
 
                     If ParameterizedValuesConfig("@Key2")("value") = "390" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
 
