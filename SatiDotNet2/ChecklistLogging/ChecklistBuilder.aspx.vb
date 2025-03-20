@@ -64,7 +64,7 @@ Partial Class MR_OpenTicketStatusBoard
                 AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
                 AreaDropDownList.SelectedValue = AreaFromQueryString
 
-                If Not Boolean.Parse(GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Active")) Then
+                If Not Boolean.Parse(Security.GetSingleDbField("SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryConfig, "Active")) Then
                     Dim AreaDisableButton As LinkButton = AreaFormView.FindControl("AreaDisableButton")
 
                     If AreaDisableButton IsNot Nothing Then
@@ -88,8 +88,14 @@ Partial Class MR_OpenTicketStatusBoard
                 LabelDropDownList.DataBind()
 
                 If LabelFromQueryString IsNot Nothing Then
-                    FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "FieldType")
-                    DbRange = GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelFromQueryString, "Range")
+                    QueryConfig.Clear()
+                    QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                        {"value", LabelFromQueryString},
+                        {"typeOf", "int"}
+                    }
+                    FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
+                    DbRange = Security.GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Range")
+                    Unit = Security.GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=@LabelKey", QueryConfig, "Key")
 
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
@@ -98,16 +104,6 @@ Partial Class MR_OpenTicketStatusBoard
                     FieldType_DropDownList.Enabled = True
                     RangeOrderInterfacePanel.Enabled = True
 
-                    'If FieldType Is Nothing Then ' If field type Is anything other than Default Option (Number), Then RangeOrderInterface Is disabled
-                    '    RangeOrderInterfacePanel.Enabled = True
-                    'Else
-                    '    RangeOrderInterfacePanel.Enabled = False
-                    '    DynamicRangeBoxPanel.Style("border") = "2px solid lightgray" 'to further enhance disabled effect
-                    '    ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
-                    'End If
-
-                    'prep functionalities that were enabled
-                    Unit = GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=" & LabelFromQueryString, "Key")
                     UnitDropDownList.SelectedValue = Unit
 
                     LabelDropDownList.SelectedValue = LabelFromQueryString
@@ -157,7 +153,12 @@ Partial Class MR_OpenTicketStatusBoard
                 StampInterfacePanel.Enabled = True
 
                 'Department interface
-                Department = GetSingleDbField("SELECT D.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] WHERE A.[Key]=" & AreaFromQueryString, "Key")
+                QueryConfig.Clear()
+                QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaFromQueryString},
+                    {"typeOf", "int"}
+                }
+                Department = Security.GetSingleDbField("SELECT D.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] WHERE A.[Key]=@AreaKey", QueryConfig, "Key")
                 DepartmentDropDownList.SelectedValue = Department
 
                 'remove static ListItem for DepartmentDropDownList once user has selected an Department
@@ -206,10 +207,17 @@ Partial Class MR_OpenTicketStatusBoard
                     ElseIf ShiftDropDownList.Items.FindByText(Assignee) IsNot Nothing Then
                         ShiftDropDownList.SelectedValue = Assignee
                         AssignToMenu_onClick(ShiftAssigneeButton, EventArgs.Empty)
-                    ElseIf GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString & " AND Assignee='" & Assignee & "'", "Assignee") = "1" Then
-                        UsersDropDownList.DataBind()
-                        UsersDropDownList.SelectedValue = Assignee
-                        AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
+                    Else 'REFACTOR!!! Find a more efficient solution to determine if User DropDownList should be shown
+                        QueryConfig("@Assignee") = New Dictionary(Of String, String) From {
+                            {"value", Assignee},
+                            {"typeOf", "string"}
+                        }
+                        If Security.GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey AND Assignee=@Assignee", QueryConfig, "Assignee") = "1" Then
+                            UsersDropDownList.DataBind()
+                            UsersDropDownList.SelectedValue = Assignee
+                            AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
+                        End If
+                        QueryConfig.Remove("@Assignee")
                     End If
 
                     If Interval = "ONE TIME ONLY" Then
@@ -225,7 +233,7 @@ Partial Class MR_OpenTicketStatusBoard
                     End If
 
                     'if 1 or more associated records exist in T_LogData, disable interval ddl
-                    If GetSingleDbField("SELECT COUNT([Key]) As NumOfLogs FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=" & AreaFromQueryString, "NumOfLogs") >= 1 Then
+                    If Security.GetSingleDbField("SELECT COUNT([Key]) As NumOfLogs FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey", QueryConfig, "NumOfLogs") >= 1 Then
                         IntervalDropDownList.Enabled = False
                     End If
                 End If
@@ -772,8 +780,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        'AreaFromQueryString = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey=" & Session("AreaIntervalKey") & " ORDER BY Area", "Key")
-        AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key")
+        AreaFromQueryString = GetSingleDbField(GetAreaDdlSelectCommand().Insert(6, " TOP(1)"), "Key") 'not using Security class GetSingleDbField function, b/c of the use of GetAreaDdlSelectCommand() function in Page_Load
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
