@@ -1019,7 +1019,15 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         End If
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range='" & DbRange & "' WHERE [Key]=" & LabelFromQueryString)
+        QueryConfig("@Range") = New Dictionary(Of String, String) From {
+            {"value", DbRange},
+            {"typeOf", "string"}
+        }
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+            {"value", LabelFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=@Range WHERE [Key]=@LabelKey", QueryConfig)
         RefreshPreview()
     End Sub
 
