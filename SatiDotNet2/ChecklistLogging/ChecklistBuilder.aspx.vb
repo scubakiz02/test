@@ -450,23 +450,29 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub IntervalDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim IntervalDdlValue As Integer = IntervalDropDownList.SelectedValue
         Dim IntervalDdlText As String = IntervalDropDownList.SelectedItem.Text
-        Dim UpdateQuery As String = "UPDATE [ALTS].[dbo].[T_LogArea] SET IntervalKey='" & IntervalDdlValue & "'"
+        Dim UpdateQuery As String = "UPDATE [ALTS].[dbo].[T_LogArea] SET IntervalKey=@IntervalKey, OneTimeDate=NULL, Assignee"
 
-        If IntervalDdlText <> "ONE TIME ONLY" Then 'in case user is going from ONE TIME ONLY interval to another interval
-            UpdateQuery += ", OneTimeDate = NULL"
-        End If
-
-        If GetSingleDbField("SELECT DisplayOrder FROM [ALTS].[dbo].[T_LogAreaInterval] WHERE [Key]=" & IntervalDdlValue, "DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be bi-annual, 1 year, 2 year, etc.
-            UpdateQuery += ", Assignee='" & IntervalDdlText & "'"
+        QueryConfig("@IntervalKey") = New Dictionary(Of String, String) From {
+            {"value", IntervalDdlValue},
+            {"typeOf", "int"}
+        }
+        If Security.GetSingleDbField("Select DisplayOrder FROM [ALTS].[dbo].[T_LogAreaInterval] WHERE [Key]=@IntervalKey", QueryConfig, "DisplayOrder") > 5 Then 'DisplayOrder 5 is MONTHLY. Examples would be bi-annual, 1 year, 2 year, etc.
+            QueryConfig("@Assignee") = New Dictionary(Of String, String) From {
+                {"value", IntervalDdlText},
+                {"typeOf", "string"}
+            }
+            UpdateQuery += "=@Assignee"
         Else
-            UpdateQuery += ", Assignee = NULL"
+            UpdateQuery += "=NULL"
         End If
+        UpdateQuery += " WHERE [Key]=@AreaKey"
 
-        UpdateQuery += " WHERE [Key]=" & AreaFromQueryString
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
 
-        ExecuteSqlQuery(UpdateQuery)
-
-        'ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET IntervalKey='" & IntervalDdlValue & "'" & If(IntervalDdlText <> "ONE TIME ONLY", ", OneTimeDate = NULL", String.Empty) & If(GetSingleDbField("SELECT DisplayOrder FROM [ALTS].[dbo].[T_LogAreaInterval] WHERE [Key]=" & IntervalDdlValue, "DisplayOrder") > 5, ", Assignee='" & IntervalDdlText & "'", String.Empty) & " WHERE [Key]=" & AreaFromQueryString) 'IntervalKey 5 is MONTHLY. Examples would be bi-annual, 1 year, 2 year, etc.
+        Security.ExecuteSqlParamQuery(UpdateQuery, QueryConfig)
         RefreshPreview()
     End Sub
 
