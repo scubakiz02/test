@@ -463,7 +463,7 @@ Partial Class MR_OpenTicketStatusBoard
             }
             UpdateQuery += "=@Assignee"
         Else
-            UpdateQuery += "=NULL" 'not using a parameterized value in this case, b/c the value in the DB will not a true 'NULL', but rather a string that equals 'NULL'
+            UpdateQuery += "=NULL" 'not using a parameterized value in this case, b/c the value in the DB will not be a true 'NULL', but rather a string that equals 'NULL'
         End If
         UpdateQuery += " WHERE [Key]=@AreaKey"
 
@@ -795,14 +795,37 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Active=" & If(sender.Text = "Disable", 0, 1) & " WHERE [Key]=" & AreaFromQueryString)
+        QueryConfig("@Active") = New Dictionary(Of String, String) From {
+            {"value", If(sender.Text = "Disable", False, True)},
+            {"typeOf", "bit"}
+        }
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Active=@Active WHERE [Key]=@AreaKey", QueryConfig)
         RefreshPreview()
     End Sub
 
     Protected Sub FieldType_OnSelectedIndexChanged(sender As Object, e As EventArgs)
         Dim FieldType As String = sender.SelectedValue
+        Dim UpdateQuery As String = "UPDATE [ALTS].[dbo].[T_LogLabel] Set FieldType="
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] Set FieldType=" & If(String.IsNullOrEmpty(FieldType), "NULL", "'" & FieldType & "'") & " WHERE [Key]=" & LabelDropDownList.SelectedValue)
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+            {"value", LabelDropDownList.SelectedValue},
+            {"typeOf", "int"}
+        }
+        If String.IsNullOrEmpty(FieldType) = False Then
+            QueryConfig("@FieldType") = New Dictionary(Of String, String) From {
+                {"value", FieldType},
+                {"typeOf", "string"}
+            }
+            UpdateQuery += "@FieldType"
+        Else
+            UpdateQuery += "NULL" 'not using a parameterized value in this case, b/c the value in the DB will not be a true 'NULL', but rather a string that equals 'NULL'
+        End If
+
+        Security.ExecuteSqlParamQuery(UpdateQuery & " WHERE [Key]=@LabelKey", QueryConfig)
         RefreshPreview()
     End Sub
 
