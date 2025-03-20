@@ -852,7 +852,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ModifyOrderConfig = ChecklistBuilder.ModifyOrderv2(CommentFromQueryString, Action, "Comment")
+        ModifyOrderConfig = ChecklistBuilder.ModifyOrder(CommentFromQueryString, Action, "Comment")
         UpdateQuery = ModifyOrderConfig("SqlQuery")
         If String.IsNullOrEmpty(UpdateQuery) = False Then
             Security.ExecuteSqlParamQuery(UpdateQuery, JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderConfig("ParameterizedValues")))
@@ -871,7 +871,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ModifyOrderConfig = ChecklistBuilder.ModifyOrderv2(LabelFromQueryString, Action, "Label")
+        ModifyOrderConfig = ChecklistBuilder.ModifyOrder(LabelFromQueryString, Action, "Label")
         UpdateQuery = ModifyOrderConfig("SqlQuery")
         If String.IsNullOrEmpty(UpdateQuery) = False Then
             Security.ExecuteSqlParamQuery(UpdateQuery, JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderConfig("ParameterizedValues")))
