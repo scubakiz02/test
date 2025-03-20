@@ -32,7 +32,11 @@ Public Class LabelOrderTests
 
                     If ParameterizedValuesConfig("@Key2")("value") = "388" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
 
-                        UnitTestRes = True
+                        If ModifyOrderRes("SqlQuery").Contains("T_LogLabel") AndAlso ModifyOrderRes("SqlQuery").Contains("LabelOrder") Then
+
+                            UnitTestRes = True
+
+                        End If
 
                     End If
 
@@ -74,7 +78,11 @@ Public Class LabelOrderTests
 
                     If ParameterizedValuesConfig("@Key2")("value") = "390" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
 
-                        UnitTestRes = True
+                        If ModifyOrderRes("SqlQuery").Contains("T_LogLabel") AndAlso ModifyOrderRes("SqlQuery").Contains("LabelOrder") Then
+
+                            UnitTestRes = True
+
+                        End If
 
                     End If
 
@@ -100,13 +108,47 @@ Public Class CommentOrderTests
     <Fact>
     Public Sub CommentOrder1()
         'moving comment 1 up on Nitrogen Daily checklist
-        Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("53", "up", "Comment"))
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("53", "up", "Comment")
+        Assert.Equal("", Res("SqlQuery"))
+
+        'Assert.Equal("", ChecklistBuilderAspx.ModifyOrder("53", "up", "Comment"))
     End Sub
 
     <Fact>
     Public Sub CommentOrder2()
         'moving comment 2 up on Nitrogen Daily checklist
-        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=1 WHERE [Key]=54; UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=2 WHERE [Key]=53", ChecklistBuilderAspx.ModifyOrder("54", "up", "Comment"))
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("54", "up", "Comment")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+        Dim UnitTestRes As Boolean
+
+        'validate proper values in ParameterizedValuesConfig
+        If ParameterizedValuesConfig("@Order1")("value") = "1" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+
+            If ParameterizedValuesConfig("@Key1")("value") = "54" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+
+                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
+
+                    If ParameterizedValuesConfig("@Key2")("value") = "53" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
+
+                        If ModifyOrderRes("SqlQuery").Contains("T_LogCommentList") AndAlso ModifyOrderRes("SqlQuery").Contains("CommentOrder") Then
+
+                            UnitTestRes = True
+
+                        End If
+
+                    End If
+
+                End If
+
+            End If
+
+        Else
+            UnitTestRes = False
+        End If
+
+        'Assert.Equal("UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=1 WHERE [Key]=54; UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=2 WHERE [Key]=53", ChecklistBuilderAspx.ModifyOrder("54", "up", "Comment"))
+        Assert.True(UnitTestRes)
     End Sub
 
     <Fact>
@@ -118,7 +160,38 @@ Public Class CommentOrderTests
     <Fact>
     Public Sub CommentOrder4()
         'moving comment 2 down on Nitrogen Daily checklist
-        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=3 WHERE [Key]=54; UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=2 WHERE [Key]=55", ChecklistBuilderAspx.ModifyOrder("54", "down", "Comment"))
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrderv2("54", "down", "Comment")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+        Dim UnitTestRes As Boolean
+
+        'validate proper values in ParameterizedValuesConfig
+        If ParameterizedValuesConfig("@Order1")("value") = "3" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+
+            If ParameterizedValuesConfig("@Key1")("value") = "54" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+
+                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
+
+                    If ParameterizedValuesConfig("@Key2")("value") = "55" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
+
+                        If ModifyOrderRes("SqlQuery").Contains("T_LogCommentList") AndAlso ModifyOrderRes("SqlQuery").Contains("CommentOrder") Then
+
+                            UnitTestRes = True
+
+                        End If
+
+                    End If
+
+                End If
+
+            End If
+
+        Else
+            UnitTestRes = False
+        End If
+
+        'Assert.Equal("UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=3 WHERE [Key]=54; UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=2 WHERE [Key]=55", ChecklistBuilderAspx.ModifyOrder("54", "down", "Comment"))
+        Assert.True(UnitTestRes)
     End Sub
     'USING R.O Daily AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
 End Class
