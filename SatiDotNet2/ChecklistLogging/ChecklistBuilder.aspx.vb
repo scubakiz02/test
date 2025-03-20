@@ -240,9 +240,14 @@ Partial Class MR_OpenTicketStatusBoard
 
             Else 'if here, user has just opened the webpage
                 'delete topmost dead record (dead = no records In T_LogData, And has been more 30 days since creation Of record In T_LogArea And (has a NULL Interval, Department, Or no associated Labels))
-                Dim TopmostDeadRecordKey As String = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] A WHERE (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogData] D WHERE A.[Key]= D.AreaKey) = 0  And ABS(DATEDIFF(Day, GETDATE(), A.DateCreated)) > 30 And (A.IntervalKey Is NULL Or A.DepartmentKey Is NULL Or (Select COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0)", "Key")
+                Dim TopmostDeadRecordKey As String = Security.GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] A WHERE (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogData] D WHERE A.[Key]= D.AreaKey) = 0  And ABS(DATEDIFF(Day, GETDATE(), A.DateCreated)) > 30 And (A.IntervalKey Is NULL Or A.DepartmentKey Is NULL Or (Select COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0)", New Dictionary(Of String, Dictionary(Of String, String)), "Key")
                 If TopmostDeadRecordKey IsNot Nothing Then
-                    ExecuteSqlQuery("DELETE FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & TopmostDeadRecordKey)
+                    QueryConfig("@TopDeadRecord") = New Dictionary(Of String, String) From {
+                        {"value", TopmostDeadRecordKey},
+                        {"typeOf", "string"}
+                    }
+                    Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@TopDeadRecord", QueryConfig)
+                    QueryConfig.Remove("@TopDeadRecord")
                 End If
             End If
 
