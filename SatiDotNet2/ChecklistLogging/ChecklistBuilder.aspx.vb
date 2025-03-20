@@ -945,13 +945,25 @@ Partial Class MR_OpenTicketStatusBoard
     'End Sub
 
     Protected Sub Assignee_SelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim Assignee As String = sender.SelectedValue
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Assignee=" & If(Assignee = "NULL", "NULL", "'" & Assignee & "'") & " WHERE [Key]=" & AreaFromQueryString)
+        QueryConfig("@Assignee") = New Dictionary(Of String, String) From {
+            {"value", sender.SelectedValue},
+            {"typeOf", "string"}
+        }
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
+
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Assignee=@Assignee WHERE [Key]=@AreaKey", QueryConfig)
         RefreshPreview()
     End Sub
 
     Protected Sub ResetRangeButton_onClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=" & LabelFromQueryString)
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+            {"value", LabelFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET Range=NULL WHERE [Key]=@LabelKey", QueryConfig)
         RefreshPreview()
     End Sub
 
