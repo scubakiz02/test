@@ -60,7 +60,11 @@ Partial Class MR_OpenTicketStatusBoard
                     {"value", AreaFromQueryString},
                     {"typeOf", "int"}
                 }
-                AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
+                'AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
+                AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=@AreaKey"
+                AreaFormView_SqlDataSource.SelectParameters.Clear()
+                AreaFormView_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
+
                 AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
                 AreaDropDownList.SelectedValue = AreaFromQueryString
 
@@ -82,8 +86,11 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFromQueryString = SetLabelFromQueryString()
                 End If
 
-                LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString
-                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY LabelOrder"
+                'LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY LabelOrder"
+                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=@AreaKey ORDER BY LabelOrder"
+                LabelDropDownList_SqlDataSource.SelectParameters.Clear()
+                LabelDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
+
                 LabelDropDownList.Items.Clear()
                 LabelDropDownList.DataBind()
 
@@ -107,7 +114,11 @@ Partial Class MR_OpenTicketStatusBoard
                     UnitDropDownList.SelectedValue = Unit
 
                     LabelDropDownList.SelectedValue = LabelFromQueryString
-                    LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
+
+                    'LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
+                    LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=@LabelKey"
+                    LabelFormView_SqlDataSource.SelectParameters.Clear()
+                    LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
                     LabelFormView_SqlDataSource.DataBind()
 
                     'set field type
@@ -133,8 +144,10 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
 
                 'comment interface
-                CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString
-                CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY CommentOrder"
+                'CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY CommentOrder"
+                CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=@AreaKey ORDER BY CommentOrder"
+                CommentDropDownList_SqlDataSource.SelectParameters.Clear()
+                CommentDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
                 CommentDropDownList.Items.Clear()
                 CommentDropDownList.DataBind()
 
@@ -145,7 +158,10 @@ Partial Class MR_OpenTicketStatusBoard
 
                     'prep functionalities that were enabled
                     CommentDropDownList.SelectedValue = CommentFromQueryString
-                    CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [Key]=" & CommentFromQueryString
+                    'CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [Key]=" & CommentFromQueryString
+                    CommentFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [Key]=@CommentKey"
+                    CommentFormView_SqlDataSource.SelectParameters.Clear()
+                    CommentFormView_SqlDataSource.SelectParameters.Add("CommentKey", CommentFromQueryString)
                     CommentFormView_SqlDataSource.DataBind()
                 End If
 
