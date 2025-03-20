@@ -83,7 +83,6 @@ Public Class ChecklistBuilderAspxLibrary
                 FieldOfInterest = "CommentOrder"
         End Select
 
-
         Dim UpdateQueryTemplate As String = "UPDATE " & Table & " SET " & FieldOfInterest & "="
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         QueryConfig("@Key") = New Dictionary(Of String, String) From {
@@ -122,33 +121,44 @@ Public Class ChecklistBuilderAspxLibrary
                 SqlQuery = ""
             Else
                 SqlQuery = UpdateQueryTemplate & PrevOrder & " WHERE [Key]=" & Key & "; " & UpdateQueryTemplate & Order & " WHERE [Key]=" & PrevKey
+                ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
+                    {"value", PrevOrder},
+                    {"typeOf", "int"}
+                }
+                ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
+                    {"value", PrevKey},
+                    {"typeOf", "int"}
+                }
             End If
         Else
             If NextKey = -1 Then 'if true, this means the label is already the bottom/down most label
                 SqlQuery = ""
             Else
                 SqlQuery = UpdateQueryTemplate & NextOrder & " WHERE [Key]=" & Key & "; " & UpdateQueryTemplate & Order & " WHERE [Key]=" & NextKey
+                ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
+                    {"value", NextOrder},
+                    {"typeOf", "int"}
+                }
+                ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
+                    {"value", NextKey},
+                    {"typeOf", "int"}
+                }
             End If
         End If
 
-        ParameterizedValuesConfig("@LabelOrder1") = New Dictionary(Of String, String) From {
-            {"value", PrevOrder},
-            {"typeOf", "int"}
-        }
-        ParameterizedValuesConfig("@Key1") = New Dictionary(Of String, String) From {
-            {"value", Key},
-            {"typeOf", "int"}
-        }
-        ParameterizedValuesConfig("@LabelOrder2") = New Dictionary(Of String, String) From {
-            {"value", Order},
-            {"typeOf", "int"}
-        }
-        ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
-            {"value", PrevKey},
-            {"typeOf", "int"}
-        }
-        Res("SqlQuery") = SqlQuery
+        If String.IsNullOrEmpty(SqlQuery) = False Then
+            ParameterizedValuesConfig("@Key1") = New Dictionary(Of String, String) From {
+                {"value", Key},
+                {"typeOf", "int"}
+            }
+            ParameterizedValuesConfig("@LabelOrder2") = New Dictionary(Of String, String) From {
+                {"value", Order},
+                {"typeOf", "int"}
+            }
+        End If
+
         Res("ParameterizedValues") = JsonSerializer.Serialize(ParameterizedValuesConfig)
+        Res("SqlQuery") = SqlQuery
 
         Return Res
     End Function
