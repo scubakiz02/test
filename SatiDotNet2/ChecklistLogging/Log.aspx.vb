@@ -968,10 +968,14 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         Try 'in case There is no row at position 0
+            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                {"value", MostRecentRecKey},
+                {"typeOf", "int"}
+            }
             If Not All_InputsValid Then
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=0 WHERE [Key]=" & MostRecentRecKey)
+                Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=0 WHERE [Key]=@T_LogDataKey", QueryConfig)
             Else
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=1 WHERE [Key]=" & MostRecentRecKey)
+                Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=1 WHERE [Key]=@T_LogDataKey", QueryConfig)
             End If
         Catch ex As Exception
 
