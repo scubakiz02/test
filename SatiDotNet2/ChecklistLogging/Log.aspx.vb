@@ -120,8 +120,8 @@ Partial Class MR_OpenTicketStatusBoard
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
 
-            'DS = SatiCode.GetMyDataSet("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString & " ORDER BY L.LabelOrder")
-            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
+            'get info needed to build checklist (labels, ranges, units, checklist name, etc.)
+            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
             MostRecentRec = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC"
@@ -139,13 +139,21 @@ Partial Class MR_OpenTicketStatusBoard
             AreaFromQueryString = DR1("AreaKey")
             TitleLabel.Text = DR1("Area")
 
-            'LogDS = SatiCode.GetMyDataSet("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(" & AreaFromQueryString & ", " & DR1("SqlFunc2ndArg") & ", '" & GetSingleDbField("SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString, "Date") & "')) DA WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC")
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
+            QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
+                {"value", DR1("SqlFunc2ndArg")},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@Date") = New Dictionary(Of String, String) From {
+                {"value", DR1("Date")},
+                {"typeOf", "string"}
+            }
 
-            'QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-            '    {"value", AreaFromQueryString},
-            '    {"typeOf", "int"}
-            '}
-            LogDS = SatiCode.GetMyDataSet("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(" & AreaFromQueryString & ", " & DR1("SqlFunc2ndArg") & ", '" & GetSingleDbField("SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString, "Date") & "')) DA WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC")
+            'get data related to log instance (derived from querystring 'Key' and its value)
+            LogDS = Security.GetMyDataSetParamQuery("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)) DA WHERE [Key]=@T_LogDataKey ORDER BY Date DESC", QueryConfig)
             LogDR = LogDS.Tables(0).Rows(0)
             TimeForNewLog = LogDR("TimeForNewLog")
 
