@@ -990,8 +990,11 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub UndoDoneButton_Click(sender As Object, e As EventArgs)
         'undo done & inactivate stamps on log
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=" & KeyFromQueryString & " And Active=1")
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0 WHERE [Key]=" & KeyFromQueryString)
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", KeyFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=@T_LogDataKey And Active=1; UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0 WHERE [Key]=@T_LogDataKey;", QueryConfig)
         SetScrollPos()
     End Sub
 
