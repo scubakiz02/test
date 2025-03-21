@@ -211,7 +211,7 @@ Partial Class MR_OpenTicketStatusBoard
                 {"typeOf", "int"}
             }
 
-            'DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
+            'get info needed to build the checklist (name, labels, units, ranges, etc.)
             DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=@AreaKey ORDER BY L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
@@ -249,6 +249,8 @@ Partial Class MR_OpenTicketStatusBoard
             FooterPanel.Enabled = False
             FooterPanel.Attributes.Add("class", "disabled")
         End If
+
+        QueryConfig.Clear()
 
         For I = 0 To RC - 1
             Dim myPanel As Panel = CType(UpdatePanel.FindControl("Panel" & I), Panel)
@@ -303,7 +305,11 @@ Partial Class MR_OpenTicketStatusBoard
                             Dim My_DR2 As Data.DataRow
                             Dim MapKey As Integer
 
-                            My_DS2 = SatiCode.GetMyDataSet("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & AreaFromQueryString)
+                            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                                {"value", AreaFromQueryString},
+                                {"typeOf", "int"}
+                            }
+                            My_DS2 = Security.GetMyDataSetParamQuery("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey", QueryConfig)
                             RC2 = My_DS2.Tables(0).Rows.Count
 
                             For J = 0 To RC2 - 1
