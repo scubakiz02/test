@@ -169,7 +169,13 @@ Partial Class MR_OpenTicketStatusBoard
                 UndoDoneButton.Enabled = True
             End If
 
-            PhotoDS = SatiCode.GetMyDataSet("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=" & KeyFromQueryString)
+            QueryConfig.Clear()
+            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                {"value", KeyFromQueryString},
+                {"typeOf", "int"}
+            }
+            'PhotoDS = SatiCode.GetMyDataSet("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=" & KeyFromQueryString)
+            PhotoDS = Security.GetMyDataSetParamQuery("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=@T_LogDataKey", QueryConfig)
             PhotoRC = PhotoDS.Tables(0).Rows.Count
 
             For I = 0 To PhotoRC - 1
