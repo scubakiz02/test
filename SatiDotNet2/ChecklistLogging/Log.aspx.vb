@@ -1059,11 +1059,20 @@ Partial Class MR_OpenTicketStatusBoard
     End Function
 
     Sub BuildDynamicAsp()
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
+
         If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
-            'DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey And DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] WHERE AreaKey=" & AreaFromQueryString & " AND Active=1")
-            DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey AND S.Active=1 AND DataRecordKey=" & MostRecentRecKey & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] AND S.Active=1 WHERE AreaKey=" & AreaFromQueryString & " AND L.Active=1")
+            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                {"value", MostRecentRecKey},
+                {"typeOf", "int"}
+            }
+            DS = Security.GetMyDataSetParamQuery("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey AND S.Active=1 AND DataRecordKey=@T_LogDataKey INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] AND S.Active=1 WHERE AreaKey=@AreaKey AND L.Active=1", QueryConfig)
+            QueryConfig.Remove("@T_LogDataKey")
         Else 'user is in ChecklistBuilder.aspx editing or creating a checklist
-            DS = SatiCode.GetMyDataSet("SELECT Stamped.Title, Stamp.[Key] As ID FROM [ALTS].[dbo].[T_LogStampList] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampTitle] Stamped ON Stamp.TitleKey=Stamped.[Key] WHERE Active=1 AND AreaKey=" & AreaFromQueryString)
+            DS = Security.GetMyDataSetParamQuery("SELECT Stamped.Title, Stamp.[Key] As ID FROM [ALTS].[dbo].[T_LogStampList] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampTitle] Stamped ON Stamp.TitleKey=Stamped.[Key] WHERE Active=1 AND AreaKey=@AreaKey", QueryConfig)
         End If
 
         DRC = DS.Tables(0).Rows
@@ -1110,7 +1119,7 @@ Partial Class MR_OpenTicketStatusBoard
         Next
 
         'dynamically create Comment related controls
-        DS = SatiCode.GetMyDataSet("SELECT Comment FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=" & AreaFromQueryString & "ORDER BY CommentOrder")
+        DS = Security.GetMyDataSetParamQuery("SELECT Comment FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey ORDER BY CommentOrder", QueryConfig)
         DRC = DS.Tables(0).Rows
 
         For I = 0 To DRC.Count - 1
