@@ -57,9 +57,10 @@ Partial Class MR_OpenTicketStatusBoard
         }
 
         'Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]'\""", ""), Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod").Replace("/", "-"))
-        Dim AreaRegexed As String = Regex.Replace(DR("Area"), "[:#]'\""", "")
-        Dim DatePeriod As String = Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod")
-        Directory = Path.Combine(AreaRegexed, DatePeriod).Replace("/", "-")
+        'Dim AreaRegexed As String = Regex.Replace(DR("Area"), "[:#]'\""", "")
+        'Dim DatePeriod As String = Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod")
+        'Directory = Path.Combine(AreaRegexed, DatePeriod).Replace("/", "-")
+        Directory = Security.StripIllegalFileSysChars(DR("Area"), Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod"))
 
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
