@@ -202,7 +202,19 @@ Partial Class MR_OpenTicketStatusBoard
 
             DR = Security.GetMyDataSetParamQuery("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey", QueryConfig).Tables(0).Rows(0)
 
-            Directory = Security.StripIllegalFileSysChars(DR("Area"), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod"))
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", DR("Key")},
+                {"typeOf", "int"}
+            }
+            QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
+                {"value", DR("SqlFunc2ndArg")},
+                {"typeOf", "float"}
+            }
+            QueryConfig("@Date") = New Dictionary(Of String, String) From {
+                {"value", DR("Date")},
+                {"typeOf", "string"}
+            }
+            Directory = Security.StripIllegalFileSysChars(DR("Area"), Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod"))
             uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
             VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
@@ -222,7 +234,7 @@ Partial Class MR_OpenTicketStatusBoard
                 Session("LabelInputMap")(DR("LabelKey")) = String.Empty
             Next
 
-            TitleLabel.Text = GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=" & AreaFromQueryString, "Area")
+            TitleLabel.Text = Security.GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryConfig, "Area")
 
             Try 'using a try catch block in case DS has no records, which mean the user is building a new checklist
                 DR1 = DS.Tables(0).Rows(0)
