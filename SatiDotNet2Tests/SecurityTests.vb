@@ -214,6 +214,13 @@ Public Class StripIllegalFileSysCharsTests
 
     <Fact>
     Public Sub StripIllegalFileSysChars1()
+        'baseline test
         Assert.Equal("", Security.StripIllegalFileSysChars(""))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars2()
+        'ensure ' char is stripped
+        Assert.Equal("", Security.StripIllegalFileSysChars("'"))
     End Sub
 End Class

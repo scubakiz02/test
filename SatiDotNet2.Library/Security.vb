@@ -1,6 +1,7 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
 Imports System.Web
+Imports System.Text.RegularExpressions
 
 Public Class Security
     Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
@@ -123,6 +124,6 @@ Public Class Security
     End Function
 
     Function StripIllegalFileSysChars(Path As String) As String
-        Return ""
+        Return Regex.Replace(Path, "[:#'/""]", "")
     End Function
 End Class
