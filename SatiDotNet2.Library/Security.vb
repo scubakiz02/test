@@ -2,6 +2,7 @@
 Imports System.Data.SqlClient
 Imports System.Web
 Imports System.Text.RegularExpressions
+Imports System.IO
 
 Public Class Security
     Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
@@ -123,7 +124,7 @@ Public Class Security
         Return Success
     End Function
 
-    Function StripIllegalFileSysChars(Directory As String) As String
-        Return Regex.Replace(Directory, "[:#'""]", "")
+    Function StripIllegalFileSysChars(ChecklistFolder As String, DatePeriodFolder As String) As String
+        Return Path.Combine(Regex.Replace(ChecklistFolder, "[:#'""]", ""), DatePeriodFolder.Replace("/", "-"))
     End Function
 End Class

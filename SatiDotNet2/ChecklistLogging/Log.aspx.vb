@@ -201,11 +201,9 @@ Partial Class MR_OpenTicketStatusBoard
             Next
 
             DR = Security.GetMyDataSetParamQuery("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey", QueryConfig).Tables(0).Rows(0)
-
-            Dim AreaRegexed As String = Regex.Replace(DR("Area"), "[:#]'""", "")
-            Dim DatePeriod As String = GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod")
-            Directory = Path.Combine(Area, DatePeriod).Replace("/", "-")
-
+            Dim Area As String = Regex.Replace(DR("Area"), "[:#]", "")
+            Dim DatePeriod As 
+            Directory = Path.Combine(Area, GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
             uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
             VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
