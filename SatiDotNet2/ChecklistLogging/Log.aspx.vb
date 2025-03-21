@@ -930,17 +930,19 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable(User.Identity.Name.ToString)
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
-            'If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso Value.Split("/")(0) <> PrevValue.Split("/")(0)) Then ' field value went from not empty to empty OR STC FieldType 'Bath Temp' TextBox control has been modified
-            If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso ID.Contains("Date") = False) Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
-            Else
-                Dim NextLabelKey As Integer
+            QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                {"value", LabelKey},
+                {"typeOf", "int"}
+            }
 
-                QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                    {"value", LabelKey},
+            If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso ID.Contains("Date") = False) Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
+                QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                    {"value", KeyFromQueryString},
                     {"typeOf", "int"}
                 }
-                NextLabelKey = Security.GetSingleDbField("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) ORDER BY LabelOrder", QueryConfig, "Key")
+                Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=@LabelKey WHERE [Key]=@T_LogDataKey", QueryConfig)
+            Else
+                Dim NextLabelKey As Integer = Security.GetSingleDbField("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) ORDER BY LabelOrder", QueryConfig, "Key")
 
                 QueryConfig("@LabelKey")("value") = NextLabelKey
                 QueryConfig("@DataKey") = New Dictionary(Of String, String) From {
