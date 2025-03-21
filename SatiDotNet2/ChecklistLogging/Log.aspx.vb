@@ -325,7 +325,21 @@ Partial Class MR_OpenTicketStatusBoard
                                 End If
                             Next
 
-                            ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Inputs='" & JsonSerializer.Serialize(Session("LabelInputMap")) & "', OutOfRange='" & JsonSerializer.Serialize(LabelOutOfRangeMap) & "' WHERE [Key]=" & KeyFromQueryString)
+                            QueryConfig.Remove("@AreaKey")
+                            QueryConfig("@Inputs") = New Dictionary(Of String, String) From {
+                                {"value", JsonSerializer.Serialize(Session("LabelInputMap"))},
+                                {"typeOf", "string"}
+                            }
+                            QueryConfig("@OutOfRange") = New Dictionary(Of String, String) From {
+                                {"value", JsonSerializer.Serialize(LabelOutOfRangeMap)},
+                                {"typeOf", "string"}
+                            }
+                            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                                {"value", KeyFromQueryString},
+                                {"typeOf", "int"}
+                            }
+
+                            Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Inputs=@Inputs, OutOfRange=@OutOfRange WHERE [Key]=@T_LogDataKey", QueryConfig)
 
                             Response.Redirect(Request.Url.ToString())
                         End Try
@@ -389,7 +403,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 jsConfig("invalidBackColor") = "Red"
 
                                 'DateFieldType += "DateFieldType('" & InputCtrlID & "');"
-                                DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
+                            DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
