@@ -713,7 +713,7 @@ Partial Class MR_OpenTicketStatusBoard
             Dim DuplicateDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT Area FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE I.Interval <> 'ONE TIME ONLY' OR A.IntervalKey IS NULL")
             Dim DuplicateRC As Integer = DuplicateDS.Tables(0).Rows.Count
             Dim DuplicateDR As Data.DataRow
-            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("AreaTextBox").Text)
+            UserInput = sender.Parent.FindControl("AreaTextBox").Text
 
             If String.IsNullOrEmpty(UserInput) Then
                 FormViewInsert = AreaFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
@@ -770,7 +770,7 @@ Partial Class MR_OpenTicketStatusBoard
                 AreaErrorLabel.Text = ""
             End If
         ElseIf sender.ID.Contains("Label") Then
-            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("LabelTextBox").Text)
+            UserInput = sender.Parent.FindControl("LabelTextBox").Text
             If String.IsNullOrEmpty(UserInput) Then
                 FormViewInsert = LabelFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
                 Exit Sub
@@ -793,7 +793,7 @@ Partial Class MR_OpenTicketStatusBoard
             LabelFromQueryString = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey And Label=@UserInput And LabelOrder=@LabelOrder ORDER BY [Key] DESC", QueryConfig, "Key")
 
         ElseIf sender.ID.Contains("Comment") Then
-            UserInput = SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text)
+            UserInput = sender.Parent.FindControl("CommentTextBox").Text
             If String.IsNullOrEmpty(UserInput) Then
                 FormViewInsert = CommentFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
                 Exit Sub
