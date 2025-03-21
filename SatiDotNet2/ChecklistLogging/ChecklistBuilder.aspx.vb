@@ -697,10 +697,6 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Function SqlProofSingleQuotes(Text As String) As String
-        Return Text.Replace("'", "''") 'escape single quotes (') by doubling them ('')
-    End Function
-
     Protected Sub InsertButton_onClick(sender As Object, e As EventArgs)
         Dim UserInput As String
         Dim NewLabelOrder As Integer
