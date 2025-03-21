@@ -466,7 +466,23 @@ Partial Class MR_OpenTicketStatusBoard
 
 
     Protected Sub Stamp_OnClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (Active, StampKey, DataRecordKey, StampedBy, Date) VALUES (1, " & sender.ID.Split("_")(1) & ", " & MostRecentRecKey & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
+        QueryConfig("@StampKey") = New Dictionary(Of String, String) From {
+            {"value", sender.ID.Split("_")(1)},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", MostRecentRecKey},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@User") = New Dictionary(Of String, String) From {
+            {"value", User.Identity.Name.ToString},
+            {"typeOf", "string"}
+        }
+        QueryConfig("@Date") = New Dictionary(Of String, String) From {
+            {"value", System.DateTime.Now},
+            {"typeOf", "string"}
+        }
+        Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (Active, StampKey, DataRecordKey, StampedBy, Date) VALUES (1, @StampKey, @T_LogDataKey, @User, @Date)", QueryConfig)
         sender.Text = User.Identity.Name.ToString
         sender.Enabled = False
         SetScrollPos()
