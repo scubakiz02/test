@@ -994,7 +994,7 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", KeyFromQueryString},
             {"typeOf", "int"}
         }
-        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=@T_LogDataKey And Active=1; UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0 WHERE [Key]=@T_LogDataKey;", QueryConfig)
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=@T_LogDataKey And Active=1; UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0, Ranges=NULL WHERE [Key]=@T_LogDataKey;", QueryConfig)
         SetScrollPos()
     End Sub
 
@@ -1013,7 +1013,16 @@ Partial Class MR_OpenTicketStatusBoard
             LabelRangeMap.Add(DR("Key"), If(IsDBNull(DR("Range")), Nothing, DR("Range")))
         Next
 
-        ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Ranges='" & JsonSerializer.Serialize(LabelRangeMap) & "', CompleteLog=1 WHERE [Key]=" & KeyFromQueryString) 'record to 'Ranges' field in T_LogData
+        QueryConfig.Remove("@AreaKey")
+        QueryConfig("@Ranges") = New Dictionary(Of String, String) From {
+            {"value", JsonSerializer.Serialize(LabelRangeMap)},
+            {"typeOf", "string"}
+        }
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", KeyFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Ranges=@Ranges, CompleteLog=1 WHERE [Key]=@T_LogDataKey", QueryConfig) 'record to 'Ranges' field in T_LogData
         Update_All_InputsValid_Field()
         Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
     End Sub
