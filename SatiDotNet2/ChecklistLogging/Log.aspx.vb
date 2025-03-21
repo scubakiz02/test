@@ -1027,19 +1027,6 @@ Partial Class MR_OpenTicketStatusBoard
         Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
     End Sub
 
-    Sub ExecuteSqlQuery(SqlQuery As String)
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
-        Connection.Open()
-        With MySQLCommand
-            .CommandText = SqlQuery
-            .Connection = Connection
-        End With
-        MySQLCommand.ExecuteNonQuery()
-        Connection.Close()
-    End Sub
-
     Function SqlProofSingleQuotes(Text As String) As String
         Return Text.Replace("'", "''") 'escape single quotes (') by doubling them ('')
     End Function
