@@ -125,6 +125,6 @@ Public Class Security
     End Function
 
     Function StripIllegalFileSysChars(ChecklistFolder As String, DatePeriodFolder As String) As String
-        Return Path.Combine(Regex.Replace(ChecklistFolder, "[:#'""]", ""), DatePeriodFolder.Replace("/", "-"))
+        Return Path.Combine(Regex.Replace(ChecklistFolder, "[:#'""/\\]", ""), Regex.Replace(DatePeriodFolder, "[/\\]", "-"))
     End Function
 End Class

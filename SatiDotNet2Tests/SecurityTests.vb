@@ -215,43 +215,54 @@ Public Class StripIllegalFileSysCharsTests
     <Fact>
     Public Sub StripIllegalFileSysChars1()
         'baseline test
-        'Assert.Equal("", Security.StripIllegalFileSysChars(""))
         Assert.Equal("ADE P1 Presort Monthly\Month of 03-2025", Security.StripIllegalFileSysChars("ADE P1 Presort Monthly", "Month of 03-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars2()
-        'ensure single quote ' char is stripped
+        'ensure single quote ' char is stripped for arg 1
         Assert.Equal("DI WATER DAILY\03-12-2025", Security.StripIllegalFileSysChars("DI' WATER DAILY'", "03-12-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars3()
-        'ensure # char is stripped
-        Assert.Equal("", Security.StripIllegalFileSysChars("#"))
+        'ensure # char is stripped for arg 1
+        Assert.Equal("R.O. Daily\03-06-2025", Security.StripIllegalFileSysChars("R.O. #Daily", "03-06-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars4()
-        'ensure double quotes " char is stripped
-        Assert.Equal("", Security.StripIllegalFileSysChars(""""))
+        'ensure double quotes " char is stripped for arg 1
+        Assert.Equal("R.O. Daily\03-06-2025", Security.StripIllegalFileSysChars("R.O."" Daily""", "03-06-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars5()
-        'ensure slashes (backward & forward) are NOT stripped
-        Assert.Equal("/\", Security.StripIllegalFileSysChars("/\"))
+        'ensure slashes (backward & forward) are stripped for arg 1
+        Assert.Equal("R.O. Daily\03-06-2025", Security.StripIllegalFileSysChars("R.O.\ Daily/", "03-06-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars6()
-        'ensure colon char " is stripped
-        Assert.Equal("", Security.StripIllegalFileSysChars(":"))
+        'ensure colon char " is stripped for arg 1
+        Assert.Equal("R.O. Daily\03-06-2025", Security.StripIllegalFileSysChars("R.O.: Daily", "03-06-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars7()
-        'test with a string that has other chars
-        Assert.Equal("dummy checklist", Security.StripIllegalFileSysChars("dummy ""checklist"""))
+        'problem child testcase for arg 1
+        Assert.Equal("dummy checklist\Month of 03-2025", Security.StripIllegalFileSysChars("dummy ""checklist""", "Month of 03-2025"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars8()
+        'ensure slashes (/\) are replaced with '-' char in arg 2
+        Assert.Equal("dummy checklist\Month of 03-2025", Security.StripIllegalFileSysChars("dummy ""checklist""", "Month of 03/2025"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars9()
+        'ensure slashes (/\) are replaced with '-' char in arg 2
+        Assert.Equal("dummy checklist\Month of 03-2025", Security.StripIllegalFileSysChars("dummy ""checklist""", "Month of 03\2025"))
     End Sub
 End Class
