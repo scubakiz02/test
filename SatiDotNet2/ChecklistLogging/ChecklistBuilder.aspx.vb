@@ -668,11 +668,25 @@ Partial Class MR_OpenTicketStatusBoard
             }
             Security.ExecuteSqlParamQuery("UPDATE [T_LogArea] SET Area=@Area WHERE [Key]=@AreaKey", QueryConfig)
         ElseIf sender.ID.Contains("Label") Then
-            LabelFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogLabel] SET Label='" & SqlProofSingleQuotes(sender.Parent.FindControl("LabelTextBox").Text) & "' WHERE [Key]=" & LabelDropDownList.SelectedValue
-            LabelFormView_SqlDataSource.Update()
+            QueryConfig("@Label") = New Dictionary(Of String, String) From {
+                {"value", sender.Parent.FindControl("LabelTextBox").Text},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                {"value", LabelDropDownList.SelectedValue},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("UPDATE [T_LogLabel] SET Label=@Label WHERE [Key]=@LabelKey", QueryConfig)
         ElseIf sender.ID.Contains("Comment") Then
-            CommentFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogCommentList] SET Comment='" & SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text) & "' WHERE [Key]=" & CommentDropDownList.SelectedValue
-            CommentFormView_SqlDataSource.Update()
+            QueryConfig("@Comment") = New Dictionary(Of String, String) From {
+                {"value", sender.Parent.FindControl("CommentTextBox").Text},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@CommentKey") = New Dictionary(Of String, String) From {
+                {"value", CommentDropDownList.SelectedValue},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("UPDATE [T_LogCommentList] SET Comment=@Comment WHERE [Key]=@CommentKey", QueryConfig)
         End If
 
         RefreshPreview()
