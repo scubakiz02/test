@@ -174,7 +174,6 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", KeyFromQueryString},
                 {"typeOf", "int"}
             }
-            'PhotoDS = SatiCode.GetMyDataSet("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=" & KeyFromQueryString)
             PhotoDS = Security.GetMyDataSetParamQuery("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=@T_LogDataKey", QueryConfig)
             PhotoRC = PhotoDS.Tables(0).Rows.Count
 
@@ -201,7 +200,8 @@ Partial Class MR_OpenTicketStatusBoard
                 JsFunctionCalls += "SetHoverEffect('" & LinkButton.ID & "', '" & ImageUrl.Replace("\", "\\") & "'); "
             Next
 
-            DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString).Tables(0).Rows(0)
+            'DR = SatiCode.GetMyDataSet("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString).Tables(0).Rows(0)
+            DR = Security.GetMyDataSetParamQuery("SELECT A.[Key], I.SqlFunc2ndArg, D.Date, A.Area, I.SqlFunc FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey", QueryConfig).Tables(0).Rows(0)
             Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(" & DR("Key") & ", " & DR("SqlFunc2ndArg") & ", '" & DR("Date") & "')", "DatePeriod").Replace("/", "-"))
             uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
             VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
