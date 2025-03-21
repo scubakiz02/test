@@ -983,9 +983,12 @@ Partial Class MR_OpenTicketStatusBoard
 
     Sub MarkAsDone()
         Dim LabelRangeMap As New Dictionary(Of Integer, String)
-
         'update Ranges field (constuct & stringify Dictionary, then run update query)
-        DS = SatiCode.GetMyDataSet("SELECT [Key], Range FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=" & GetSingleDbField("SELECT AreaKey FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString, "AreaKey"))
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
+        DS = Security.GetMyDataSetParamQuery("SELECT [Key], Range FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey", QueryConfig)
         DRC = DS.Tables(0).Rows
 
         For I = 0 To DRC.Count - 1
