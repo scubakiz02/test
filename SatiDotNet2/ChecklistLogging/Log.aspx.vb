@@ -8,6 +8,7 @@ Imports System.Text.RegularExpressions
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
+    Dim Security As New Security
     Dim VisiblePanels As New List(Of Panel)
     Dim ValidTextBoxes As New List(Of TextBox)
     Dim VisibleCheckBoxes As New List(Of CheckBox)
@@ -44,6 +45,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim uploadDirectory As String
     Dim VirtualDirectory As String
     Dim Directory As String
+    Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
@@ -108,12 +110,18 @@ Partial Class MR_OpenTicketStatusBoard
             Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
             Dim ValidDateDelegate As ValidDateDelegate = AddressOf LogAspx.ValidDate
 
+            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                {"value", KeyFromQueryString},
+                {"typeOf", "int"}
+            }
+
             Session("ModifyInput") = ModifyInputDelegate
             Session("ValidDate") = ValidDateDelegate
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
 
-            DS = SatiCode.GetMyDataSet("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString & " ORDER BY L.LabelOrder")
+            'DS = SatiCode.GetMyDataSet("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=" & KeyFromQueryString & " ORDER BY L.LabelOrder")
+            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
             MostRecentRec = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC"
@@ -124,14 +132,19 @@ Partial Class MR_OpenTicketStatusBoard
                 CommentGridView.Visible = True
             End If
 
-            ClientScript.RegisterStartupScript(Me.GetType(), "callFunction", "textboxFocus(" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("KeyOfLastLabel") & ");", True) 'set focus on current textbox noted in DB
+            ClientScript.RegisterStartupScript(Me.GetType(), "callFunction", "textboxFocus(" & Security.GetSingleDbField("SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC", QueryConfig, "KeyOfLastLabel") & ");", True) 'set focus on current textbox noted in DB
 
             DR1 = DS.Tables(0).Rows(0)
 
             AreaFromQueryString = DR1("AreaKey")
             TitleLabel.Text = DR1("Area")
 
-            'LogDS = SatiCode.GetMyDataSet("SELECT  * FROM " & DR1("SqlFunc") & "(" & AreaFromQueryString & ", 1, '" & System.DateTime.Now.ToString() & "')")
+            'LogDS = SatiCode.GetMyDataSet("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(" & AreaFromQueryString & ", " & DR1("SqlFunc2ndArg") & ", '" & GetSingleDbField("SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString, "Date") & "')) DA WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC")
+
+            'QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            '    {"value", AreaFromQueryString},
+            '    {"typeOf", "int"}
+            '}
             LogDS = SatiCode.GetMyDataSet("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(" & AreaFromQueryString & ", " & DR1("SqlFunc2ndArg") & ", '" & GetSingleDbField("SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString, "Date") & "')) DA WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC")
             LogDR = LogDS.Tables(0).Rows(0)
             TimeForNewLog = LogDR("TimeForNewLog")
@@ -180,6 +193,11 @@ Partial Class MR_OpenTicketStatusBoard
             uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
             VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
+
             DS = SatiCode.GetMyDataSet("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=" & AreaFromQueryString & " ORDER BY L.LabelOrder")
             RC = DS.Tables(0).Rows.Count
 
