@@ -65,6 +65,8 @@ Public Class Security
                 Return SqlDbType.Bit
             Case "date", "datetime", "smalldatetime"
                 Return SqlDbType.DateTime
+            Case "unique", "identifier", "uniqueidentifier"
+                Return SqlDbType.UniqueIdentifier
             Case Else
                 Return Nothing
         End Select

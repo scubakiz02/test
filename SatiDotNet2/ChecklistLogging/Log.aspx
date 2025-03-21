@@ -3732,8 +3732,6 @@
 
                 </asp:Panel>
 
-                <%--<asp:Timer ID="DbUploadTimer" OnTick="DbUploadTimer_Tick" Interval="15000" runat="server"></asp:Timer>--%>
-
                 <asp:Panel runat="server" ID="FooterPanel" Style="position: fixed; bottom: 0; width: calc(100% - 20px); display: flex; flex-direction: column;">
 
                     <%-- max-width of 100vw b/c setFooterAtBottom is called AFTER SetHoverEffect function--%>

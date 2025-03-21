@@ -705,7 +705,11 @@ Partial Class MR_OpenTicketStatusBoard
                 TextBox = CType(ctrl, TextBox)
                 If UserInput Is Nothing Then UserInput = SqlProofSingleQuotes(TextBox.Text)
                 LabelKey = TextBox.ID.Split("_")(1)
-                FieldType = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=" & LabelKey, "FieldType")
+                QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                    {"value", LabelKey},
+                    {"typeOf", "int"}
+                }
+                FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
                 Range = TbxToRange(LabelKey)
 
                 If FieldType IsNot Nothing Then
@@ -854,18 +858,6 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable(User.Identity.Name.ToString)
         Return All_InputsAreValid
     End Function
-
-    Protected Sub DbUploadTimer_Tick(sender As Object, e As EventArgs)
-        If TimeForNewLog Then
-            SetControlsEnabledProp(UpdatePanel, False)
-            MessageUserLabel.Text = "Visit Status Board To Access Current Log"
-        Else
-            If Not IsDBNull(GetSingleDbField("SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & Request.QueryString("Key") & " ORDER BY Date DESC", "Operator")) Then 'only IF Operator is NOT null
-                Update_All_InputsValid_Field()
-            End If
-        End If
-
-    End Sub
 
     'Protected Sub LogAreasDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
     '    Response.Redirect(WebpageUrl & "?Area=" & LogAreasDropDownList.SelectedValue)
@@ -1076,19 +1068,6 @@ Partial Class MR_OpenTicketStatusBoard
         '<asp:Button ID="Button4" runat="server" Text="Button" OnClick="myclick" CommandArgument="themrnumber" />
     End Sub
 
-    Function GetSingleDbField(SqlQuery As String, Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
     Sub BuildDynamicAsp()
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
@@ -1135,19 +1114,41 @@ Partial Class MR_OpenTicketStatusBoard
             StampPanel.Controls.Add(Panel)
 
             If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
+                Dim ConditionsMetToStamp As Boolean
                 AddHandler Button.Click, AddressOf Stamp_OnClick
 
                 'if log is complete, stamp does NOT exist, AND user has the associated role to stamp, enable button
-                If Button.Text = "Stamp" AndAlso GetSingleDbField("SELECT COUNT(RoleName) As ContainsRole FROM [SatiUsers].[dbo].aspnet_UsersInRoles INNER JOIN [SatiUsers].[dbo].aspnet_Users On [SatiUsers].[dbo].aspnet_UsersInRoles.UserId = [SatiUsers].[dbo].aspnet_Users.UserId INNER JOIN [SatiUsers].[dbo].aspnet_Roles On [SatiUsers].[dbo].aspnet_UsersInRoles.RoleId = [SatiUsers].[dbo].aspnet_Roles.RoleId INNER JOIN [ALTS].[dbo].[T_LogStampList] On [SatiUsers].[dbo].aspnet_Roles.RoleId='" & DR("RoleID") & "' WHERE [ALTS].[dbo].[T_LogStampList].[Key]=" & Button.ID.Split("_")(1) & " And [SatiUsers].[dbo].aspnet_Users.UserName = '" & User.Identity.Name.ToString & "'", "ContainsRole") Then
-                    If LogDR("CompleteLog") Then
+                If Button.Text = "Stamp" Then
+                    QueryConfig.Clear()
+                    QueryConfig("@RoleId") = New Dictionary(Of String, String) From {
+                        {"value", DR("RoleID")},
+                        {"typeOf", "string"}
+                    }
+                    QueryConfig("@LogStampListKey") = New Dictionary(Of String, String) From {
+                        {"value", Button.ID.Split("_")(1)},
+                        {"typeOf", "int"}
+                    }
+                    QueryConfig("@User") = New Dictionary(Of String, String) From {
+                        {"value", User.Identity.Name.ToString},
+                        {"typeOf", "string"}
+                    }
+                    ConditionsMetToStamp = Security.GetSingleDbField("SELECT COUNT(RoleName) As ContainsRole FROM [SatiUsers].[dbo].aspnet_UsersInRoles INNER JOIN [SatiUsers].[dbo].aspnet_Users On [SatiUsers].[dbo].aspnet_UsersInRoles.UserId = [SatiUsers].[dbo].aspnet_Users.UserId INNER JOIN [SatiUsers].[dbo].aspnet_Roles On [SatiUsers].[dbo].aspnet_UsersInRoles.RoleId = [SatiUsers].[dbo].aspnet_Roles.RoleId INNER JOIN [ALTS].[dbo].[T_LogStampList] On [SatiUsers].[dbo].aspnet_Roles.RoleId=@RoleId WHERE [ALTS].[dbo].[T_LogStampList].[Key]=@LogStampListKey And [SatiUsers].[dbo].aspnet_Users.UserName=@User", QueryConfig, "ContainsRole")
+
+                    If ConditionsMetToStamp AndAlso LogDR("CompleteLog") Then
                         Button.Enabled = True
                     Else
                         'MessageUserLabel.Text = "Log must be complete before stamping"
                     End If
+
                 End If
             End If
-
         Next
+
+        QueryConfig.Clear()
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaFromQueryString},
+            {"typeOf", "int"}
+        }
 
         'dynamically create Comment related controls
         DS = Security.GetMyDataSetParamQuery("SELECT Comment FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey ORDER BY CommentOrder", QueryConfig)
