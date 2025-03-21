@@ -121,4 +121,8 @@ Public Class Security
 
         Return Success
     End Function
+
+    Function StripIllegalFileSysChars(Path As String) As String
+        Return ""
+    End Function
 End Class

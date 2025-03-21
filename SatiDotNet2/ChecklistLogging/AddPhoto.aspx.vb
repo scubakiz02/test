@@ -55,7 +55,11 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", DR("SqlFunc")},
             {"typeOf", "string"}
         }
-        Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]", ""), Security.GetSingleDbField("SELECT DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod").Replace("/", "-"))
+
+        'Directory = Path.Combine(Regex.Replace(DR("Area"), "[:#]'\""", ""), Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod").Replace("/", "-"))
+        Dim AreaRegexed As String = Regex.Replace(DR("Area"), "[:#]'\""", "")
+        Dim DatePeriod As String = Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod")
+        Directory = Path.Combine(AreaRegexed, DatePeriod).Replace("/", "-")
 
         uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
         VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")

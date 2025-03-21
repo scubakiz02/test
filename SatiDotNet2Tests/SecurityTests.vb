@@ -208,3 +208,12 @@ Public Class GetMyDataSetParamQueryTests
         Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("R)y+j%Lg28petjgN"), True, False))
     End Sub
 End Class
+
+Public Class StripIllegalFileSysCharsTests
+    Dim Security = New Security()
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars1()
+        Assert.Equal("", Security.StripIllegalFileSysChars(""))
+    End Sub
+End Class
