@@ -21,7 +21,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim LogDR As Data.DataRow
     Dim ReadOnlyMessage As String = "Read-Only Mode"
     Dim WebpageUrl As String = "/ChecklistLogging/Log.aspx"
-    Dim MostRecentRec As String
+    Dim MostRecentRecKey As Integer
     Dim ItemsPanel_ScrollPos As String
     Dim DS As Data.DataSet
     Dim DR As Data.DataRow
@@ -110,21 +110,21 @@ Partial Class MR_OpenTicketStatusBoard
             Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
             Dim ValidDateDelegate As ValidDateDelegate = AddressOf LogAspx.ValidDate
 
-            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
-                {"value", KeyFromQueryString},
-                {"typeOf", "int"}
-            }
-
             Session("ModifyInput") = ModifyInputDelegate
             Session("ValidDate") = ValidDateDelegate
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
 
+            QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+                {"value", KeyFromQueryString},
+                {"typeOf", "int"}
+            }
+
+            MostRecentRecKey = Security.GetSingleDbField("SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC", QueryConfig, "Key")
+
             'get info needed to build checklist (labels, ranges, units, checklist name, etc.)
             DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
-
-            MostRecentRec = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC"
 
             CommentSqlDataSource.SelectCommand = "SELECT OpComments.[Key], OpComments.Comment FROM [ALTS].[dbo].[T_LogOperatorComments] OpComments WHERE OpComments.CommentKey=(Select Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC)"
             CommentGridView.DataBind()
@@ -452,7 +452,7 @@ Partial Class MR_OpenTicketStatusBoard
 
 
     Protected Sub Stamp_OnClick(sender As Object, e As EventArgs)
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (Active, StampKey, DataRecordKey, StampedBy, Date) VALUES (1, " & sender.ID.Split("_")(1) & ", " & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
+        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogStamp] (Active, StampKey, DataRecordKey, StampedBy, Date) VALUES (1, " & sender.ID.Split("_")(1) & ", " & MostRecentRecKey & ", '" & User.Identity.Name.ToString & "', '" & System.DateTime.Now & "')")
         sender.Text = User.Identity.Name.ToString
         sender.Enabled = False
         SetScrollPos()
@@ -504,8 +504,9 @@ Partial Class MR_OpenTicketStatusBoard
         '*****************************************************************
         Dim MySelectCmd As New System.Data.SqlClient.SqlCommand
         With MySelectCmd
-            .CommandText = MostRecentRec
+            .CommandText = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC" 'same query used to get MostRecRecordKey
             .Connection = Connection
+            .Parameters.Add("@T_LogDataKey", SqlDbType.Int).Value = KeyFromQueryString
         End With
         My_DA.SelectCommand = MySelectCmd
 
@@ -903,7 +904,7 @@ Partial Class MR_OpenTicketStatusBoard
             If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso ID.Contains("Date") = False) Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
             Else
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key")) 'update KeyOfLastLabel field in DB
+                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & MostRecentRecKey) 'update KeyOfLastLabel field in DB
             End If
         Catch ex As Exception
 
@@ -923,9 +924,9 @@ Partial Class MR_OpenTicketStatusBoard
 
         Try 'in case There is no row at position 0
             If Not All_InputsValid Then
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=0 WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key"))
+                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=0 WHERE [Key]=" & MostRecentRecKey)
             Else
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=1 WHERE [Key]=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key"))
+                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] Set All_InputsValid=1 WHERE [Key]=" & MostRecentRecKey)
             End If
         Catch ex As Exception
 
@@ -1008,7 +1009,7 @@ Partial Class MR_OpenTicketStatusBoard
             Exit Sub
         End If
 
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogOperatorComments] VALUES (" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & ", '" & TextBoxText & "')")
+        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogOperatorComments] VALUES (" & MostRecentRecKey & ", '" & TextBoxText & "')")
         'CommentTextBox.Text = ""
         'CommentGridView.DataBind()
         SetScrollPos()
@@ -1044,7 +1045,7 @@ Partial Class MR_OpenTicketStatusBoard
     Sub BuildDynamicAsp()
         If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
             'DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey And DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] WHERE AreaKey=" & AreaFromQueryString & " AND Active=1")
-            DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey AND S.Active=1 AND DataRecordKey=" & SatiCode.GetMyDataSet(MostRecentRec).Tables(0).Rows(0)("Key") & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] AND S.Active=1 WHERE AreaKey=" & AreaFromQueryString & " AND L.Active=1")
+            DS = SatiCode.GetMyDataSet("Select T.Title, L.[Key] As ID, S.[Key] As StampedRecordKey, S2.StampedBy As StampedBy, T.RoleID FROM [ALTS].[dbo].[T_LogStamp] S RIGHT JOIN [ALTS].[dbo].[T_LogStampList] L On L.[Key]=S.StampKey AND S.Active=1 AND DataRecordKey=" & MostRecentRecKey & " INNER JOIN [ALTS].[dbo].[T_LogStampTitle] T On L.TitleKey=T.[Key] LEFT JOIN [ALTS].[dbo].[T_LogStamp] S2 On S.[Key]=S2.[Key] AND S.Active=1 WHERE AreaKey=" & AreaFromQueryString & " AND L.Active=1")
         Else 'user is in ChecklistBuilder.aspx editing or creating a checklist
             DS = SatiCode.GetMyDataSet("SELECT Stamped.Title, Stamp.[Key] As ID FROM [ALTS].[dbo].[T_LogStampList] Stamp INNER JOIN [ALTS].[dbo].[T_LogStampTitle] Stamped ON Stamp.TitleKey=Stamped.[Key] WHERE Active=1 AND AreaKey=" & AreaFromQueryString)
         End If
