@@ -658,17 +658,21 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub UpdateButton_onClick(sender As Object, e As EventArgs)
         If sender.ID.Contains("Area") Then
-            AreaFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogArea] SET Area='" & SqlProofSingleQuotes(sender.Parent.FindControl("AreaTextBox").Text) & "' WHERE [Key]=" & AreaDropDownList.SelectedValue
-            AreaFormView_SqlDataSource.Update()
+            QueryConfig("@Area") = New Dictionary(Of String, String) From {
+                {"value", sender.Parent.FindControl("AreaTextBox").Text},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaDropDownList.SelectedValue},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("UPDATE [T_LogArea] SET Area=@Area WHERE [Key]=@AreaKey", QueryConfig)
         ElseIf sender.ID.Contains("Label") Then
             LabelFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogLabel] SET Label='" & SqlProofSingleQuotes(sender.Parent.FindControl("LabelTextBox").Text) & "' WHERE [Key]=" & LabelDropDownList.SelectedValue
             LabelFormView_SqlDataSource.Update()
         ElseIf sender.ID.Contains("Comment") Then
             CommentFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogCommentList] SET Comment='" & SqlProofSingleQuotes(sender.Parent.FindControl("CommentTextBox").Text) & "' WHERE [Key]=" & CommentDropDownList.SelectedValue
             CommentFormView_SqlDataSource.Update()
-            'ElseIf sender.ID.Contains("Stamp") Then
-            '    StampFormView_SqlDataSource.UpdateCommand = "UPDATE [T_LogStampList] SET Title='" & sender.Parent.FindControl("StampTextBox").Text & "' WHERE [Key]=" & StampDropDownList.SelectedValue
-            '    StampFormView_SqlDataSource.Update()
         End If
 
         RefreshPreview()
