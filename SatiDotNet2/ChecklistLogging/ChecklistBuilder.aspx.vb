@@ -307,15 +307,6 @@ Partial Class MR_OpenTicketStatusBoard
         Return "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaIntervalKey") Is Nothing OrElse Session("AreaIntervalKey") = "All", String.Empty, " (A.IntervalKey=" & Session("AreaIntervalKey") & " OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
     End Function
 
-    Function GetAreaDdlSelectCommandv2(AreaIntervalKey As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
-        Dim Res As New Dictionary(Of String, String)
-
-        Res("AreaIntervalKey") = If(AreaIntervalKey Is Nothing OrElse AreaIntervalKey = "All", -1, AreaIntervalKey)
-        Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
-
-        Return Res
-    End Function
-
     Sub CreateListItem(Config As Dictionary(Of String, String))
         Dim ListItem2 As New ListItem()
         ListItem2.Text = Config("Text")
@@ -869,7 +860,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = GetAreaDdlSelectCommandv2(Session("AreaIntervalKey"))
+        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"))
 
         QueryConfig("@AreaIntervalKey") = New Dictionary(Of String, String) From {
             {"value", AreaDdlSelectConfig("AreaIntervalKey")},
