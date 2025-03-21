@@ -123,7 +123,7 @@ Public Class Security
         Return Success
     End Function
 
-    Function StripIllegalFileSysChars(Path As String) As String
-        Return Regex.Replace(Path, "[:#'/""]", "")
+    Function StripIllegalFileSysChars(Directory As String) As String
+        Return Regex.Replace(Directory, "[:#'""]", "")
     End Function
 End Class

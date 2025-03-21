@@ -212,15 +212,50 @@ End Class
 Public Class StripIllegalFileSysCharsTests
     Dim Security = New Security()
 
+    'Dim AreaRegexed As String = Regex.Replace(DR("Area"), "[:#]'\""", "")
+    'Dim DatePeriod As String = Security.GetSingleDbField("Select DatePeriod FROM " & DR("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)", QueryConfig, "DatePeriod")
+    '    Directory = Path.Combine(AreaRegexed, DatePeriod).Replace("/", "-")
+
     <Fact>
     Public Sub StripIllegalFileSysChars1()
         'baseline test
         Assert.Equal("", Security.StripIllegalFileSysChars(""))
+        'Assert.Equal("ADE P1 Presort Monthly/Month of 03-2025", Security.StripIllegalFileSysChars("ADE P1 Presort Monthly", "Month of 03-2025"))
     End Sub
 
     <Fact>
     Public Sub StripIllegalFileSysChars2()
-        'ensure ' char is stripped
+        'ensure single quote ' char is stripped
         Assert.Equal("", Security.StripIllegalFileSysChars("'"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars3()
+        'ensure # char is stripped
+        Assert.Equal("", Security.StripIllegalFileSysChars("#"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars4()
+        'ensure double quotes " char is stripped
+        Assert.Equal("", Security.StripIllegalFileSysChars(""""))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars5()
+        'ensure slashes (backward & forward) are NOT stripped
+        Assert.Equal("/\", Security.StripIllegalFileSysChars("/\"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars6()
+        'ensure colon char " is stripped
+        Assert.Equal("", Security.StripIllegalFileSysChars(":"))
+    End Sub
+
+    <Fact>
+    Public Sub StripIllegalFileSysChars7()
+        'test with a string that has other chars
+        Assert.Equal("dummy checklist", Security.StripIllegalFileSysChars("dummy ""checklist"""))
     End Sub
 End Class
