@@ -139,6 +139,7 @@ Partial Class MR_OpenTicketStatusBoard
             AreaFromQueryString = DR1("AreaKey")
             TitleLabel.Text = DR1("Area")
 
+            'get data related to log instance (derived from querystring 'Key' and its value)
             QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                 {"value", AreaFromQueryString},
                 {"typeOf", "int"}
@@ -151,8 +152,6 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", DR1("Date")},
                 {"typeOf", "string"}
             }
-
-            'get data related to log instance (derived from querystring 'Key' and its value)
             LogDS = Security.GetMyDataSetParamQuery("SELECT Top(1) * From [ALTS].[dbo].[T_LogData] D CROSS APPLY (SELECT * FROM " & DR1("SqlFunc") & "(@AreaKey, @SqlFunc2ndArg, @Date)) DA WHERE [Key]=@T_LogDataKey ORDER BY Date DESC", QueryConfig)
             LogDR = LogDS.Tables(0).Rows(0)
             TimeForNewLog = LogDR("TimeForNewLog")
