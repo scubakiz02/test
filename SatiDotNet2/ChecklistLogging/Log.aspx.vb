@@ -1051,9 +1051,15 @@ Partial Class MR_OpenTicketStatusBoard
             Exit Sub
         End If
 
-        ExecuteSqlQuery("INSERT INTO [ALTS].[dbo].[T_LogOperatorComments] VALUES (" & MostRecentRecKey & ", '" & TextBoxText & "')")
-        'CommentTextBox.Text = ""
-        'CommentGridView.DataBind()
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", MostRecentRecKey},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@Note") = New Dictionary(Of String, String) From {
+            {"value", TextBoxText},
+            {"typeOf", "string"}
+        }
+        Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogOperatorComments] VALUES (@T_LogDataKey, @Note)", QueryConfig)
         SetScrollPos()
     End Sub
 
