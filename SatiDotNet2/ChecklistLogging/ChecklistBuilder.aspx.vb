@@ -572,19 +572,6 @@ Partial Class MR_OpenTicketStatusBoard
         End If
     End Sub
 
-    Function GetSingleDbField(SqlQuery As String, Field As String) As String
-        Dim Res As String
-
-        'using try catch block in case 'There is no row at position 0.', which means there are no associated record in Table
-        Try
-            Res = If(IsDBNull(SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)), Nothing, SatiCode.GetMyDataSet(SqlQuery).Tables(0).Rows(0)(Field)) 'using ternary operator as a workaround to Null DB field values, which in that case the function will return Nothing
-        Catch ex As Exception
-            Res = Nothing
-        End Try
-
-        Return Res
-    End Function
-
     Protected Sub VerifyValue_Check(sender As Object, e As EventArgs)
         Dim Button As Button
         Dim Cbx As CheckBox
