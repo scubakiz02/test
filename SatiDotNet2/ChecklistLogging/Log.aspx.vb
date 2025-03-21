@@ -904,7 +904,20 @@ Partial Class MR_OpenTicketStatusBoard
             If String.IsNullOrEmpty(Value) OrElse (Value.Contains("/") AndAlso ID.Contains("Date") = False) Then ' field value went from not empty to empty OR STC fieldtype (js handles cursor focus)
                 ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & LabelKey & " WHERE [Key]=" & KeyFromQueryString)
             Else
-                ExecuteSqlQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=" & SatiCode.GetMyDataSet("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]= " & LabelKey & ") ORDER BY LabelOrder").Tables(0).Rows(0)("Key") & " WHERE [Key]=" & MostRecentRecKey) 'update KeyOfLastLabel field in DB
+                Dim NextLabelKey As Integer
+
+                QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                    {"value", LabelKey},
+                    {"typeOf", "int"}
+                }
+                NextLabelKey = Security.GetSingleDbField("SELECT TOP(1) [Key], AreaKey, Label, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) AND LabelOrder > (SELECT LabelOrder FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) ORDER BY LabelOrder", QueryConfig, "Key")
+
+                QueryConfig("@LabelKey")("value") = NextLabelKey
+                QueryConfig("@DataKey") = New Dictionary(Of String, String) From {
+                    {"value", MostRecentRecKey},
+                    {"typeOf", "int"}
+                }
+                Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] SET KeyOfLastLabel=@LabelKey WHERE [Key]=@DataKey", QueryConfig) 'update KeyOfLastLabel field in DB
             End If
         Catch ex As Exception
 
