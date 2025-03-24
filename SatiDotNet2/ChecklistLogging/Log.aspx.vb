@@ -1248,8 +1248,14 @@ Partial Class MR_OpenTicketStatusBoard
             LabelOutOfRangeMap(LabelKey) = Nothing
             Session("LabelInputMap")(LabelKey) = String.Empty
         Next
-
         UploadToDataTable(Nothing)
+
+        'delete associated photos & notes for the log instance
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", KeyFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=@T_LogDataKey; DELETE FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=@T_LogDataKey", QueryConfig)
 
         Response.Redirect("~/ChecklistLogging/StatusBoard.aspx")
     End Sub
