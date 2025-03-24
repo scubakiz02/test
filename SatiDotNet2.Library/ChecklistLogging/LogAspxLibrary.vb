@@ -1,5 +1,6 @@
 ﻿Imports System.Drawing
 Imports SatiDotNet2.Library
+Imports System.Text.Json
 
 Public Class LogAspxLibrary
     Dim Sql As New Security
@@ -73,5 +74,24 @@ Public Class LogAspxLibrary
         End Try
 
         Return Message
+    End Function
+
+    Function GetRange(T_LogDataKey As String, T_LogDataDR As Data.DataRow, T_LogLabelDR As Data.DataRow) As String
+        Dim Res As String
+        Dim T_LogLabelRange As String = If(IsDBNull(T_LogLabelDR("Range")), String.Empty, T_LogLabelDR("Range"))
+
+        If T_LogDataKey Is Nothing OrElse T_LogDataDR("CompleteLog") = False Then ' If T_LogDataKey Is Nothing, that means user is in ChecklistBuilder.aspx
+            Res = T_LogLabelRange
+        Else
+            Dim Ranges As Dictionary(Of String, String) = JsonSerializer.Deserialize(Of Dictionary(Of String, String))(T_LogDataDR("Ranges"))
+
+            If Ranges(T_LogLabelDR("LabelKey")) IsNot Nothing Then
+                Res = Ranges(T_LogLabelDR("LabelKey"))
+            Else
+                Res = String.Empty
+            End If
+        End If
+
+        Return Res
     End Function
 End Class

@@ -272,7 +272,8 @@ Partial Class MR_OpenTicketStatusBoard
             Dim Cbx As CheckBox
             DR = DS.Tables(0).Rows(I)
             LabelKey = DR("LabelKey")
-            Range = If(IsDBNull(DR("Range")), String.Empty, DR("Range"))
+            'Range = If(IsDBNull(DR("Range")), String.Empty, DR("Range"))
+            Range = LogAspx.GetRange(Request.QueryString("Key"), LogDR, DR)
             Unit = If(IsDBNull(DR("Unit")), String.Empty, DR("Unit"))
 
             myPanel.Visible = True
@@ -418,7 +419,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 jsConfig("invalidBackColor") = "Red"
 
                                 'DateFieldType += "DateFieldType('" & InputCtrlID & "');"
-                            DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
+                                DateFieldType += "DateFieldType(" & JsonSerializer.Serialize(jsConfig) & ");"
                             Case "STC"
                                 Dim BathTextBox As TextBox = DirectCast(ctrl.Controls(3), TextBox)
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
