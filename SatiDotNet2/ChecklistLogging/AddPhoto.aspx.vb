@@ -91,7 +91,11 @@ Partial Class MR_OpenTicketStatusBoard
                 ElseIf New Regex("[<>:""'/\\|?*]").IsMatch(UserInput) Then
                     Throw New ArgumentException("*ERROR: ILLEGAL CHARACTERS (<, >, :, ', "", /, \, |, ?, *) EXIST IN THE TITLE*")
                 Else
-                    DuplicateDS = SatiCode.GetMyDataSet("SELECT PhotoTitle FROM [ALTS].[dbo].[T_LogDataPhotos] P WHERE DataKey=" & DataKeyFromQueryString)
+                    QueryConfig("@DataKey") = New Dictionary(Of String, String) From {
+                        {"value", DataKeyFromQueryString},
+                        {"typeOf", "string"}
+                    }
+                    DuplicateDS = Security.GetMyDataSetParamQuery("SELECT PhotoTitle FROM [ALTS].[dbo].[T_LogDataPhotos] P WHERE DataKey=@DataKey", QueryConfig)
                     DuplicateRC = DuplicateDS.Tables(0).Rows.Count
                     NewFileName = UserInput.Replace(" ", "_") & "." & If(ContentTypeToFormat.ContainsKey(Session("ContentType")), ContentTypeToFormat(Session("ContentType")), Session("ContentType"))
                     StrippedUserInput = StripString(UserInput)
