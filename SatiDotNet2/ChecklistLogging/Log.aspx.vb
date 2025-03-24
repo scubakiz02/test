@@ -1106,7 +1106,20 @@ Partial Class MR_OpenTicketStatusBoard
             Button.ID = "StampList_" & DR("ID")
 
             If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
-                Button.Text = If(IsDBNull(DR("StampedBy")), "Stamp", DR("StampedBy"))
+                Dim StampBorderColor As String
+                Dim ButtonText As String
+                'Button.Text = If(IsDBNull(DR("StampedBy")), "Stamp", DR("StampedBy"))
+
+                If IsDBNull(DR("StampedBy")) Then
+                    ButtonText = "Stamp"
+                    StampBorderColor = "red"
+                Else
+                    ButtonText = DR("StampedBy")
+                    StampBorderColor = "#33CC33"
+                End If
+
+                Button.Text = ButtonText
+                Panel.Attributes.Add("style", "padding: var(--UWhitespace); border: 5px solid " & StampBorderColor) 'control in 'Panel' variable is the parent of the 'Button' control
             Else
                 Button.Text = "Stamp"
             End If
@@ -1118,7 +1131,7 @@ Partial Class MR_OpenTicketStatusBoard
             StampPanel.Controls.Add(Panel)
 
             If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
-                Dim ConditionsMetToStamp As Boolean
+                Dim UserContainsRole As Boolean
                 AddHandler Button.Click, AddressOf Stamp_OnClick
 
                 'if log is complete, stamp does NOT exist, AND user has the associated role to stamp, enable button
@@ -1136,14 +1149,11 @@ Partial Class MR_OpenTicketStatusBoard
                         {"value", User.Identity.Name.ToString},
                         {"typeOf", "string"}
                     }
-                    ConditionsMetToStamp = Security.GetSingleDbField("SELECT COUNT(RoleName) As ContainsRole FROM [SatiUsers].[dbo].aspnet_UsersInRoles INNER JOIN [SatiUsers].[dbo].aspnet_Users On [SatiUsers].[dbo].aspnet_UsersInRoles.UserId = [SatiUsers].[dbo].aspnet_Users.UserId INNER JOIN [SatiUsers].[dbo].aspnet_Roles On [SatiUsers].[dbo].aspnet_UsersInRoles.RoleId = [SatiUsers].[dbo].aspnet_Roles.RoleId INNER JOIN [ALTS].[dbo].[T_LogStampList] On [SatiUsers].[dbo].aspnet_Roles.RoleId=@RoleId WHERE [ALTS].[dbo].[T_LogStampList].[Key]=@LogStampListKey And [SatiUsers].[dbo].aspnet_Users.UserName=@User", QueryConfig, "ContainsRole")
+                    UserContainsRole = Security.GetSingleDbField("SELECT COUNT(RoleName) As ContainsRole FROM [SatiUsers].[dbo].aspnet_UsersInRoles INNER JOIN [SatiUsers].[dbo].aspnet_Users On [SatiUsers].[dbo].aspnet_UsersInRoles.UserId = [SatiUsers].[dbo].aspnet_Users.UserId INNER JOIN [SatiUsers].[dbo].aspnet_Roles On [SatiUsers].[dbo].aspnet_UsersInRoles.RoleId = [SatiUsers].[dbo].aspnet_Roles.RoleId INNER JOIN [ALTS].[dbo].[T_LogStampList] On [SatiUsers].[dbo].aspnet_Roles.RoleId=@RoleId WHERE [ALTS].[dbo].[T_LogStampList].[Key]=@LogStampListKey And [SatiUsers].[dbo].aspnet_Users.UserName=@User", QueryConfig, "ContainsRole")
 
-                    If ConditionsMetToStamp AndAlso LogDR("CompleteLog") Then
+                    If UserContainsRole AndAlso LogDR("CompleteLog") Then
                         Button.Enabled = True
-                    Else
-                        'MessageUserLabel.Text = "Log must be complete before stamping"
                     End If
-
                 End If
             End If
         Next
