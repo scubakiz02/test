@@ -126,7 +126,10 @@ Partial Class MR_OpenTicketStatusBoard
             DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
-            CommentSqlDataSource.SelectCommand = "SELECT OpComments.[Key], OpComments.Comment FROM [ALTS].[dbo].[T_LogOperatorComments] OpComments WHERE OpComments.CommentKey=(Select Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC)"
+            'CommentSqlDataSource.SelectCommand = "SELECT OpComments.[Key], OpComments.Comment FROM [ALTS].[dbo].[T_LogOperatorComments] OpComments WHERE OpComments.CommentKey=(Select Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC)"
+            CommentSqlDataSource.SelectCommand = "SELECT OpComments.[Key], OpComments.Comment FROM [ALTS].[dbo].[T_LogOperatorComments] OpComments WHERE OpComments.CommentKey=(Select Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC)"
+            CommentSqlDataSource.SelectParameters.Clear()
+            CommentSqlDataSource.SelectParameters.Add("T_LogDataKey", KeyFromQueryString)
             CommentGridView.DataBind()
             If CommentGridView.Rows.Count > 0 Then
                 CommentGridView.Visible = True
