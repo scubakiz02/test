@@ -204,8 +204,8 @@ Public Class GetMyDataSetParamQueryTests
             Res.Add(DR("fullname"))
         Next
 
-        'jork-frol-pliy is the 'username' field value for id 1, which should NOT be in the result. R)y+j%Lg28petjgN is the password field value for record with id of 4, which should be in the result
-        Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("R)y+j%Lg28petjgN"), True, False))
+        'jork-frol-pliy is the 'username' field value for id 1, which should NOT be in the result. SxhNFEsp$A!m7Bx4 is the password field value for record with id of 3, which should be in the result
+        Assert.True(If(Res.Contains("jork-frol-pliy") = False AndAlso Res.Contains("SxhNFEsp$A!m7Bx4"), True, False))
     End Sub
 End Class
 

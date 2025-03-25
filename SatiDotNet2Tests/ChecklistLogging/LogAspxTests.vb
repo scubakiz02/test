@@ -218,3 +218,99 @@ Public Class GetRange
         Assert.Equal(T_LogLabelRange, LogAspx.GetRange(Nothing, T_LogDataDR, T_LogLabelDR))
     End Sub
 End Class
+
+Public Class GetInputs
+    Dim LogAspx = New LogAspxLibrary()
+    Dim CorrectConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
+    Dim CorrectConfigStringified As String
+    Dim LogDT As New DataTable()
+    Dim LogDR As Data.DataRow
+
+    Public Sub New() 'constructor
+        'using live data from T_LogData record Key 280
+        'Date: "2025-03-16 00:00:00"
+        'Inputs: {"575":"A4124","576":"08/25","577":"A4124","578":"08/25","579":"170900000055"} 
+        Dim LogDate As String = Convert.ToDateTime("2025-03-16 00:00:00").ToString("yyyy-MM-dd HH:mm:ss")
+        Dim LogUser As String = "mark kiser"
+
+        LogDT.Columns.Add("Date", GetType(Date))
+        LogDT.Columns.Add("Inputs", GetType(String))
+        LogDT.Columns.Add("Operator", GetType(String))
+
+        LogDR = LogDT.NewRow()
+
+        LogDR("Date") = LogDate
+        LogDR("Operator") = LogUser
+
+        CorrectConfig(575) = New Dictionary(Of String, String) From {
+            {"Date", LogDate},
+            {"Operator", LogUser},
+            {"Value", "A4124"}
+        }
+        CorrectConfig(576) = New Dictionary(Of String, String) From {
+            {"Date", LogDate},
+            {"Operator", LogUser},
+            {"Value", "08/25"}
+        }
+        CorrectConfig(577) = New Dictionary(Of String, String) From {
+            {"Date", LogDate},
+            {"Operator", LogUser},
+            {"Value", "A4124"}
+        }
+        CorrectConfig(578) = New Dictionary(Of String, String) From {
+            {"Date", LogDate},
+            {"Operator", LogUser},
+            {"Value", "08/25"}
+        }
+        CorrectConfig(579) = New Dictionary(Of String, String) From {
+            {"Date", LogDate},
+            {"Operator", LogUser},
+            {"Value", "170900000055"}
+        }
+
+        CorrectConfigStringified = JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(CorrectConfig)
+        LogDR("Inputs") = CorrectConfigStringified
+    End Sub
+
+    Private Function WipeInputsOperators() As String
+        For Each kvp As KeyValuePair(Of Integer, Dictionary(Of String, String)) In CorrectConfig
+            Dim LabelKey As Integer = kvp.Key
+            Dim LabelKeyObject As Dictionary(Of String, String) = kvp.Value
+            LabelKeyObject("Operator") = String.Empty
+        Next
+
+        Return JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(CorrectConfig)
+    End Function
+
+    <Fact>
+    Public Sub GetInputs1()
+        'if arg 1 is the correct structure (Dictionary(Of Integer, Dictionary(Of String, String))) with the correct key value pairs (Time, User, Value), then return it
+        Assert.Equal(CorrectConfig, LogAspx.GetInputs(LogDR))
+    End Sub
+
+    <Fact>
+    Public Sub GetInputs3()
+        'if arg 1 follows the original structure (Dictionary(Of Integer, String))
+        '1) restructure it into the new structure (Dictionary(Of Integer, Dictionary(Of String, String)))
+        '2) map the extra key value pairs (operator & date) using data from arg 1
+        '3) return the restructured dictionary
+        'this test ALSO ensures Date holds the time
+        LogDR("Inputs") = "{""575"":""A4124"",""576"":""08/25"",""577"":""A4124"",""578"":""08/25"",""579"":""170900000055""}"
+        Assert.Equal(CorrectConfigStringified, JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(LogDR))) 'stringify return from GetInputs, to ensure the dictinaries are EXACTLY the same
+    End Sub
+
+    <Fact>
+    Public Sub GetInputs5()
+        'same as GetInputs3. except LogDR("Operator") is DBNull
+        LogDR("Inputs") = "{""575"":""A4124"",""576"":""08/25"",""577"":""A4124"",""578"":""08/25"",""579"":""170900000055""}"
+        LogDR("Operator") = DBNull.Value
+        Assert.Equal(WipeInputsOperators(), JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(LogDR))) 'stringify return from GetInputs, to ensure the dictinaries are EXACTLY the same
+    End Sub
+
+    <Fact>
+    Public Sub GetInputs4()
+        'baseline test for T_LogData Inputs field value with the new format (Dictionary(Of Integer, Dictionary(Of String, String)))
+        LogDR("Inputs") = "{""575"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""A4124""},""576"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""08/25""},""577"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""A4124""},""578"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""08/25""},""579"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""170900000055""}}"
+        Assert.Equal(CorrectConfigStringified, JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(LogDR))) 'stringify return from GetInputs, to ensure the dictinaries are EXACTLY the same
+    End Sub
+End Class

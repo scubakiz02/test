@@ -217,7 +217,21 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Sub SetButtonBackground(DR As Data.DataRow)
-        If Not IsDBNull(DR("Operator")) Then
+        Dim T_LogDataInputs As Dictionary(Of Integer, Dictionary(Of String, String)) = LogAspx.GetInputs(DR)
+        Dim AllEmptyInputs As Boolean = True
+
+        'check if T_LogDataInputs has any non-empty 'Value' fields
+        For Each kvp As KeyValuePair(Of Integer, Dictionary(Of String, String)) In T_LogDataInputs
+            Dim LabelKey As Integer = kvp.Key
+            Dim LabelKeyObject As Dictionary(Of String, String) = kvp.Value
+
+            If String.IsNullOrEmpty(LabelKeyObject("Value")) = False Then
+                AllEmptyInputs = False
+                Exit For
+            End If
+        Next
+
+        If AllEmptyInputs = False Then
             LogStatus = DR("LogStatus")
             StripeColor = DR("StripeColor")
         Else
@@ -254,11 +268,13 @@ Partial Class MR_OpenTicketStatusBoard
             {"typeOf", "string"}
         }
 
-        DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+        'DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+        DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor", QueryConfig)
         If DS Is Nothing Then 'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
             DuplicateRecord = True
             'modified query to return 'problem child' records
-            DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+            ' DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
+            DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor", QueryConfig)
         End If
 
         RC = DS.Tables(0).Rows.Count
@@ -352,7 +368,8 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", Session("WhereFromQueryString")},
             {"typeOf", "string"}
         }
-        DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
+        'DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
+        DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, D.Inputs, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
         RC = DS.Tables(0).Rows.Count
 
         For I = 0 To RC - 1

@@ -80,17 +80,51 @@ Public Class LogAspxLibrary
         Dim Res As String
         Dim T_LogLabelRange As String = If(IsDBNull(T_LogLabelDR("Range")), String.Empty, T_LogLabelDR("Range"))
 
-        If T_LogDataKey Is Nothing OrElse T_LogDataDR("CompleteLog") = False Then ' If T_LogDataKey Is Nothing, that means user is in ChecklistBuilder.aspx
-            Res = T_LogLabelRange
-        Else
-            Dim Ranges As Dictionary(Of String, String) = JsonSerializer.Deserialize(Of Dictionary(Of String, String))(T_LogDataDR("Ranges"))
-
-            If Ranges(T_LogLabelDR("LabelKey")) IsNot Nothing Then
-                Res = Ranges(T_LogLabelDR("LabelKey"))
+        Try
+            If T_LogDataKey Is Nothing OrElse T_LogDataDR("CompleteLog") = False Then ' If T_LogDataKey Is Nothing, that means user is in ChecklistBuilder.aspx
+                Res = T_LogLabelRange
             Else
-                Res = String.Empty
+                Dim Ranges As Dictionary(Of String, String) = JsonSerializer.Deserialize(Of Dictionary(Of String, String))(T_LogDataDR("Ranges"))
+
+                If Ranges(T_LogLabelDR("LabelKey")) IsNot Nothing Then
+                    Res = Ranges(T_LogLabelDR("LabelKey"))
+                Else
+                    Res = String.Empty
+                End If
             End If
-        End If
+        Catch ex As Exception
+            Res = String.Empty
+        End Try
+
+        Return Res
+    End Function
+
+    'T_LogData Inputs field value was originally a stringified Dictionary(Of Integer, String).
+    'As of 03/2025, it is a stringified Dictionary(Of Integer, Dictionary(Of String, String))
+    'This is so each user, time, & value of each input can be tracked, for reporting down the road
+    'this function exists in case a logsheet is following the original approach (stringified Dictionary(Of Integer, String))
+    'the function will restructure the field to Dictionary(Of Integer, Dictionary(Of String, String))
+    Function GetInputs(DR As Data.DataRow) As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim Res As New Dictionary(Of Integer, Dictionary(Of String, String))
+
+        Try
+            Res = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(DR("Inputs"))
+        Catch ex As Exception
+            Dim InputsFromDb As Dictionary(Of Integer, String) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, String))(DR("Inputs"))
+
+            For Each kvp As KeyValuePair(Of Integer, String) In InputsFromDb
+                Dim T_LogDataKey As Integer = kvp.Key
+                Dim UserInput As String = kvp.Value
+                Dim InputOperator As String = If(IsDBNull(DR("Operator")) = False, DR("Operator"), String.Empty)
+                Dim NewInputConfig As New Dictionary(Of String, String) From {
+                    {"Date", Convert.ToDateTime(DR("Date")).ToString("yyyy-MM-dd HH:mm:ss")}, 'must use Convert.ToDateTime() method to ensure Date holds the time
+                    {"Operator", InputOperator},
+                    {"Value", UserInput}
+                }
+
+                Res(T_LogDataKey) = NewInputConfig
+            Next
+        End Try
 
         Return Res
     End Function

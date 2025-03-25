@@ -161,10 +161,11 @@ Partial Class MR_OpenTicketStatusBoard
 
             DateLabel.Text = LogDR("DatePeriod")
 
-            Session("LabelInputMap") = JsonSerializer.Deserialize(Of Dictionary(Of Integer, String))(LogDR("Inputs")) 'LabelInputMap is a session state variable so WebMethod (static) function has access to it
+            Session("LabelInputMap") = LogAspx.GetInputs(LogDR) 'LabelInputMap is a session state variable so WebMethod (static) function has access to it
             LabelOutOfRangeMap = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Boolean?))(LogDR("OutOfRange"))
 
-            If LogDR("CompleteLog") Then 'disable controls if log is complete
+            'disable controls if log is complete
+            If LogDR("CompleteLog") Then
                 SetControlsEnabledProp(ItemsPanel, False)
                 HeaderPanel.Enabled = True
                 WrongFormButton.Enabled = False
@@ -172,11 +173,19 @@ Partial Class MR_OpenTicketStatusBoard
                 UndoDoneButton.Enabled = True
             End If
 
+            'update T_LogData Inputs field to the new format (Dictionary(Of Integer, Dictionary(Of String, String)) in case T_LogData Inputs field format is the old format (Dictionary(Of String, String))
             QueryConfig.Clear()
             QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
                 {"value", KeyFromQueryString},
                 {"typeOf", "int"}
             }
+            QueryConfig("@Inputs") = New Dictionary(Of String, String) From {
+                {"value", JsonSerializer.Serialize(Session("LabelInputMap"))},
+                {"typeOf", "string"}
+            }
+            Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogData] SET Inputs=@Inputs WHERE [Key]=@T_LogDataKey", QueryConfig)
+            QueryConfig.Remove("@Inputs") 'b/c QueryConfig uses @T_LogDataKey but NOT @Inputs for PhotoDS DataSet variable below
+
             PhotoDS = Security.GetMyDataSetParamQuery("SELECT * FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=@T_LogDataKey", QueryConfig)
             PhotoRC = PhotoDS.Tables(0).Rows.Count
 
@@ -231,10 +240,14 @@ Partial Class MR_OpenTicketStatusBoard
             RC = DS.Tables(0).Rows.Count
 
             'reset session state LabelInputMap variable to ensure logic surrounding FieldType case statement below still works
-            Session("LabelInputMap") = New Dictionary(Of Integer, String)
+            Session("LabelInputMap") = New Dictionary(Of Integer, Dictionary(Of String, String))
             For J = 0 To RC - 1
                 DR = DS.Tables(0).Rows(J)
-                Session("LabelInputMap")(DR("LabelKey")) = String.Empty
+                Session("LabelInputMap")(DR("LabelKey")) = New Dictionary(Of String, String) From {
+                    {"Date", String.Empty},
+                    {"Operator", String.Empty},
+                    {"Value", String.Empty}
+                }
             Next
 
             TitleLabel.Text = Security.GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryConfig, "Area")
@@ -309,12 +322,14 @@ Partial Class MR_OpenTicketStatusBoard
 
                     If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
                         Dim TbxId As String = "TextBox_" & LabelKey
+                        Dim LabelKeyInput As New Dictionary(Of String, String)
                         myTextBox.ID = TbxId
                         DBConnections += "SetDBConnection('" & TbxId & "'); "
                         TbxToRange(LabelKey) = Range
 
                         Try 'if error occurs, T_LogData Inputs & OutOfRange values are NOT up to date
-                            myTextBox.Text = Session("LabelInputMap")(LabelKey)
+                            LabelKeyInput = Session("LabelInputMap")(LabelKey)
+                            myTextBox.Text = LabelKeyInput("Value")
                         Catch ex As Exception
                             Dim My_DS2 As New Data.DataSet
                             Dim RC2 As Integer
@@ -333,7 +348,12 @@ Partial Class MR_OpenTicketStatusBoard
                                 MapKey = My_DR2("Key")
 
                                 If Not Session("LabelInputMap").ContainsKey(MapKey) Then
-                                    Session("LabelInputMap").Add(MapKey, "")
+                                    'Session("LabelInputMap").Add(MapKey, "")
+                                    Session("LabelInputMap").Add(MapKey, New Dictionary(Of String, String) From {
+                                        {"Date", String.Empty},
+                                        {"Operator", String.Empty},
+                                        {"Value", String.Empty}
+                                    })
                                 End If
 
                                 If Not LabelOutOfRangeMap.ContainsKey(MapKey) Then
@@ -383,12 +403,13 @@ Partial Class MR_OpenTicketStatusBoard
 
                         Dim InputCtrl As Control = ctrl.Controls(1)
                         Dim InputCtrlID As String
+                        Dim Value As String = Session("LabelInputMap")(LabelKey)("Value")
 
                         Select Case FieldType
                             Case "Checkbox"
                                 Dim CheckBox As CheckBox = DirectCast(ctrl.Controls(1), CheckBox)
                                 InputCtrlID = "CheckBox_" & LabelKey
-                                Dim Checked As String = If(Session("LabelInputMap")(LabelKey) = "1", "1", "") 'to prevent empty strings when checkbox is NOT checked
+                                Dim Checked As String = If(Value = "1", "1", "") 'to prevent empty strings when checkbox is NOT checked
                                 CheckBox.Checked = If(Checked = "1", True, False)
                                 myTextBox.Text = Checked
                             Case "HOA"
@@ -405,14 +426,14 @@ Partial Class MR_OpenTicketStatusBoard
                                 End If
                             Case "Text"
                                 InputCtrlID = "Text_" & LabelKey
-                                myTextBox.Text = Session("LabelInputMap")(LabelKey)
-                                DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                                myTextBox.Text = Value
+                                DirectCast(InputCtrl, TextBox).Text = Value
                             Case "Date"
                                 Dim jsConfig As New Dictionary(Of String, String)
 
                                 InputCtrlID = "Date_" & LabelKey
-                                myTextBox.Text = Session("LabelInputMap")(LabelKey)
-                                DirectCast(InputCtrl, TextBox).Text = Session("LabelInputMap")(LabelKey)
+                                myTextBox.Text = Value
+                                DirectCast(InputCtrl, TextBox).Text = Value
 
                                 jsConfig("id") = InputCtrlID
                                 jsConfig("validBackColor") = "#F5F5F5"
@@ -425,7 +446,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 Dim IRGunTextBox As TextBox = DirectCast(ctrl.Controls(7), TextBox)
                                 Dim BathTextBoxID As String = "BathTemp_" & LabelKey
                                 Dim IRGunTextBoxID As String = "IrGunTemp_" & LabelKey
-                                Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                Dim UnderlyingTextBoxText As String = Value
                                 Dim Temps As String() = UnderlyingTextBoxText.Split("/")
 
                                 BathTextBox.ID = BathTextBoxID
@@ -444,7 +465,7 @@ Partial Class MR_OpenTicketStatusBoard
                                 Dim Dp2Box As CheckBox = DirectCast(ctrl.Controls(7), CheckBox)
                                 Dim Dp1BoxID As String = "Dp1_" & LabelKey
                                 Dim Dp2BoxID As String = "Dp2_" & LabelKey
-                                Dim UnderlyingTextBoxText As String = Session("LabelInputMap")(LabelKey)
+                                Dim UnderlyingTextBoxText As String = Value
                                 Dim Temps As String() = UnderlyingTextBoxText.Split("/")
                                 Dim DpNums As String() = Range.Split("&")
 
@@ -828,7 +849,7 @@ Partial Class MR_OpenTicketStatusBoard
                 SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#F5F5F5"), "", Pnl)
             End If
         Next
-        Session("LabelInputMap")(LabelKey) = UserInput
+        Session("LabelInputMap")(LabelKey)("Value") = UserInput
 
         If Cbx.Visible Then 'cbx to verify if value is out of range
             LabelOutOfRangeMap(LabelKey) = Cbx.Checked
@@ -928,14 +949,19 @@ Partial Class MR_OpenTicketStatusBoard
     Public Delegate Function ModifyInputDelegate(ID As String, Value As String) As Boolean
     Function ModifyInput(ID As String, Value As String) As Boolean
         Dim LabelKey As String = ID.Split("_")(1)
-        Dim PrevValue As String = Session("LabelInputMap")(LabelKey)
+        Dim InputOfInterest As Dictionary(Of String, String) = Session("LabelInputMap")(LabelKey)
+        Dim SatiUser As String = User.Identity.Name.ToString()
+        Dim PrevValue As String = InputOfInterest("Value")
 
         Session("DisplayError") = False
 
         If Value = PrevValue Then Return False 'value has NOT changed, so do NOT modify input
 
+        InputOfInterest("Operator") = SatiUser
+        InputOfInterest("Date") = Date.Parse(System.DateTime.Now)
+
         ValidateInput(ID, Value)
-        UploadToDataTable(User.Identity.Name.ToString)
+        UploadToDataTable(SatiUser)
 
         Try 'in case user in on last input, in which case sql will return 'There is no row at position 0.'
             QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
@@ -1098,37 +1124,25 @@ Partial Class MR_OpenTicketStatusBoard
             Dim Panel As New Panel()
             Dim Button As New Button()
             Dim Label As New Label()
-
-            Panel.Attributes.Add("style", "display: flex; flex-direction: column;")
-
-            Label.Text = DR("Title") & ":"
-
-            Button.ID = "StampList_" & DR("ID")
-
-            If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
-                Dim StampBorderColor As String
-                Dim ButtonText As String
-                'Button.Text = If(IsDBNull(DR("StampedBy")), "Stamp", DR("StampedBy"))
-
-                If IsDBNull(DR("StampedBy")) Then
-                    ButtonText = "Stamp"
-                    StampBorderColor = "red"
-                Else
-                    ButtonText = DR("StampedBy")
-                    StampBorderColor = "#33CC33"
-                End If
-
-                Button.Text = ButtonText
-                Panel.Attributes.Add("style", "padding: var(--UWhitespace); border: 5px solid " & StampBorderColor) 'control in 'Panel' variable is the parent of the 'Button' control
-            Else
-                Button.Text = "Stamp"
-            End If
-
-            Button.Enabled = False
+            Dim StampBorderColor As String = "red"
+            Dim ButtonText As String = "Stamp"
 
             Panel.Controls.Add(Label)
             Panel.Controls.Add(Button)
             StampPanel.Controls.Add(Panel)
+
+            Panel.Attributes.Add("style", "display: flex; flex-direction: column;")
+            Label.Text = DR("Title") & ":"
+            Button.ID = "StampList_" & DR("ID")
+
+            If Request.QueryString("Key") IsNot Nothing AndAlso IsDBNull(DR("StampedBy")) = False Then
+                ButtonText = DR("StampedBy")
+                StampBorderColor = "#33CC33"
+            End If
+
+            Button.Enabled = False
+            Button.Text = ButtonText
+            Panel.Attributes.Add("style", "padding: var(--UWhitespace); border: 5px solid " & StampBorderColor) 'control in 'Panel' variable is the parent of the 'Button' control
 
             If Request.QueryString("Key") IsNot Nothing Then 'if true, user is filling out a log sheet
                 Dim UserContainsRole As Boolean
@@ -1255,9 +1269,13 @@ Partial Class MR_OpenTicketStatusBoard
         'reset Inputs, OutOfRange, and Operator field values in DB
         For i As Integer = 0 To LabelKeys.Count - 1
             Dim LabelKey As Integer = LabelKeys(i)
-
+            'Session("LabelInputMap")(LabelKey) = String.Empty
+            Session("LabelInputMap")(LabelKey) = New Dictionary(Of String, String) From {
+                {"Date", String.Empty},
+                {"Operator", String.Empty},
+                {"Value", String.Empty}
+            }
             LabelOutOfRangeMap(LabelKey) = Nothing
-            Session("LabelInputMap")(LabelKey) = String.Empty
         Next
         UploadToDataTable(Nothing)
 
