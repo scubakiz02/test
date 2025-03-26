@@ -25,9 +25,9 @@ Partial Class MR_OpenTicketStatusBoard
         Dim SqlFuncDR As Data.DataRow
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
 
-        'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMain.aspx
+        'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
-            Response.Redirect("/ChecklistLogging/ChecklistLoggingMain.aspx")
+            Response.Redirect("/ChecklistLogging/ChecklistLoggingMainMaint.aspx")
         ElseIf Request.QueryString.Count > 0 Then
             Dim QsDepartment As String = Request.QueryString("Department")
             Dim QsView As String = Request.QueryString("View")
