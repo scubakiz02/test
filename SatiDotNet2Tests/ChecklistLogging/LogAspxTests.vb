@@ -217,6 +217,14 @@ Public Class GetRange
         T_LogDataDR = Nothing 'LogDR is never initialized if url does NOT have 'Key' in querystring
         Assert.Equal(T_LogLabelRange, LogAspx.GetRange(Nothing, T_LogDataDR, T_LogLabelDR))
     End Sub
+
+    <Fact>
+    Public Sub GetRange6()
+        'if, for whatever reason, some abnormal args are passed and an error occurs, return an empty string
+        T_LogDataDR = T_LogDataDT.NewRow()
+        T_LogLabelDR = T_LogLabelDT.NewRow()
+        Assert.Equal(String.Empty, LogAspx.GetRange(KeyFromQueryString, T_LogDataDR, T_LogLabelDR))
+    End Sub
 End Class
 
 Public Class GetInputs

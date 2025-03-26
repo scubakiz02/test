@@ -47,6 +47,33 @@ Partial Class MR_OpenTicketStatusBoard
     Dim Directory As String
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
+    Public Delegate Sub DeleteNoteDelegate(ID As String)
+    <WebMethod()>
+    Public Shared Function DeleteNoteValue(T_LogOperatorCommentsKey As String) As String
+        Try 'in case code-behind throws an error
+            Dim Delete_Note As DeleteNoteDelegate = HttpContext.Current.Session("DeleteNote")
+            Delete_Note(T_LogOperatorCommentsKey)
+        Catch ex As Exception
+            Return False
+        End Try
+
+        Return True
+    End Function
+
+    Public Delegate Sub UpdateNoteDelegate(ID As String, Value As String)
+    <WebMethod()>
+    Public Shared Function UpdateNoteValue(T_LogOperatorCommentsKey As String, Comment As String) As String
+        Try 'in case code-behind throws an error
+            Dim Update_Note As UpdateNoteDelegate = HttpContext.Current.Session("UpdateNote")
+            Update_Note(T_LogOperatorCommentsKey, Comment)
+        Catch ex As Exception
+            Return False
+        End Try
+
+        Return True
+    End Function
+
+    Public Delegate Function ModifyInputDelegate(ID As String, Value As String) As Boolean
     <WebMethod()>
     Public Shared Function DbWrite(SenderID As String, SenderValue As String) As String
         Try 'in case code-behind throws an error
@@ -108,9 +135,13 @@ Partial Class MR_OpenTicketStatusBoard
 
         If KeyFromQueryString IsNot Nothing Then 'if this is true, displaying Log.aspx for operator to fill out
             Dim ModifyInputDelegate As ModifyInputDelegate = AddressOf ModifyInput
+            Dim UpdateNoteDelegate As UpdateNoteDelegate = AddressOf UpdateNote
+            Dim DeleteNoteDelegate As DeleteNoteDelegate = AddressOf DeleteNote
             Dim ValidDateDelegate As ValidDateDelegate = AddressOf LogAspx.ValidDate
 
             Session("ModifyInput") = ModifyInputDelegate
+            Session("UpdateNote") = UpdateNoteDelegate
+            Session("DeleteNote") = DeleteNoteDelegate
             Session("ValidDate") = ValidDateDelegate
 
             ScriptManager.GetCurrent(Me.Page).EnablePageMethods = True
@@ -946,7 +977,6 @@ Partial Class MR_OpenTicketStatusBoard
         Response.Redirect(Request.Path & "?Key=" & KeyFromQueryString & If(Request.QueryString("WHERE") IsNot Nothing, "&WHERE=" & Request.QueryString("WHERE"), String.Empty) & If(Request.QueryString("Department") IsNot Nothing, "&Department=" & Request.QueryString("Department"), String.Empty) & If(Request.QueryString("View") IsNot Nothing, "&View=" & Request.QueryString("View"), String.Empty) & "&IP_ScrollPos=" & ItemsPanel_HiddenField.Value, False) 'trigger postback AFTER this code has ran
     End Sub
 
-    Public Delegate Function ModifyInputDelegate(ID As String, Value As String) As Boolean
     Function ModifyInput(ID As String, Value As String) As Boolean
         Dim LabelKey As String = ID.Split("_")(1)
         Dim InputOfInterest As Dictionary(Of String, String) = Session("LabelInputMap")(LabelKey)
@@ -991,6 +1021,26 @@ Partial Class MR_OpenTicketStatusBoard
 
         Return True
     End Function
+
+    Sub UpdateNote(ID As String, Comment As String)
+        QueryConfig("@T_LogOperatorCommentsKey") = New Dictionary(Of String, String) From {
+            {"value", ID},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@Comment") = New Dictionary(Of String, String) From {
+            {"value", Comment},
+            {"typeOf", "string"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogOperatorComments] SET Comment=@Comment WHERE [Key]=@T_LogOperatorCommentsKey", QueryConfig)
+    End Sub
+
+    Sub DeleteNote(ID As String)
+        QueryConfig("@T_LogOperatorCommentsKey") = New Dictionary(Of String, String) From {
+            {"value", ID},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE [Key]=@T_LogOperatorCommentsKey", QueryConfig)
+    End Sub
 
     Sub Update_All_InputsValid_Field()
         Dim All_InputsValid As Boolean = True

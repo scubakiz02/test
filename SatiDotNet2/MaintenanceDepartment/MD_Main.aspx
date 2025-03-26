@@ -5,7 +5,7 @@
         <asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Maintenance Department"></asp:Label><br />
         <br />
         <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/MR/MR_Viewer.aspx">Maintenance Requests</asp:HyperLink><br />
-        <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistLoggingMain.aspx">Checklist Logging</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistLoggingMainMaint.aspx">Checklist Logging</asp:HyperLink><br />
 
         <br />
         <asp:HyperLink ID="HyperLink3" runat="server">Maintenance Request Reports</asp:HyperLink><br />

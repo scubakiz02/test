@@ -1,4 +1,4 @@
-<%@ Page Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="ChecklistLoggingMain.aspx.vb" Inherits="DBMaintenance_DBMaintenanceMain" Title="Untitled Page" %>
+<%@ Page Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="ChecklistLoggingMainAll.aspx.vb" Inherits="DBMaintenance_DBMaintenanceMain" Title="Untitled Page" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <asp:Panel ID="Panel1" runat="server">
@@ -11,10 +11,10 @@
         <br />
 
         Status Board:<br />
-<%--        <asp:HyperLink ID="HyperLink12" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=All&View=Focus">All Departments, Focused View</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLink12" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=All&View=Focus">All Departments, Focused View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=All&View=Full">All Departments, Full View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink3" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Production&View=Focus">Production, Focused View</asp:HyperLink><br />
-        <asp:HyperLink ID="HyperLink4" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Production&View=Full">Production, Full View</asp:HyperLink><br />--%>
+        <asp:HyperLink ID="HyperLink4" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Production&View=Full">Production, Full View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink5" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Focus">Maintenance, Focused View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink6" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Full">Maintenance, Full View</asp:HyperLink><br />
         <br />

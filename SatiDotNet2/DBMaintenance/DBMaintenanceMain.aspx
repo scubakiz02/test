@@ -55,7 +55,7 @@
         <asp:HyperLink ID="HyperLink34" runat="server" NavigateUrl="~/WI_pages/WorkInstructionViewer.aspx">Aaron wi view</asp:HyperLink><br />
         <br />
         <br />
-        <asp:HyperLink ID="HyperLink36" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistLoggingMain.aspx">Check list page</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLink36" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistLoggingMainAll.aspx">Check list page</asp:HyperLink><br />
         <br />
         <br />
     </asp:Panel>

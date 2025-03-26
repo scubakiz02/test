@@ -40,6 +40,10 @@
                 let EditPreviewPanel;
                 let AddNoteCounter;
 
+                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                    setItemsPanel(); // Ensure setItemsPanel function is called after every partial postback
+                });
+
                 window.addEventListener("load", function () {
                     let fileUpload = document.getElementById('<%= Uploader.ClientID %>');
                     AddNoteCounter = 0;
@@ -481,7 +485,6 @@
 
                 function callCodeBehindEvent() {
                     let value;
-                    let url = new URL(window.location.href);
                     let id = this.id.split("ctl00_ContentPlaceHolder1_")[1];
                     const self = this;
 
@@ -496,10 +499,7 @@
 
                     PageMethods.DbWrite(id, value, function (ChangeInValue) {
                         if (ChangeInValue.toLowerCase() === "true") {
-                            let IP_ScrollPos = getAspControl("ItemsPanel").scrollTop;
-                            if (IP_ScrollPos == 0) IP_ScrollPos = url.searchParams.get("IP_ScrollPos"); //safeguarding in case ItemsPanel.scrollTop is 0 (happens with 'DP' fieldtype in certain cases)
-                            url.searchParams.set("IP_ScrollPos", IP_ScrollPos);
-                            window.location.href = url.toString();
+                            refreshPage();
                         }
                     }, function (error) {
                         console.error("Error writing to DB: " + error.get_message());
@@ -513,6 +513,63 @@
 
                 function showSpinner() {
                     document.getElementById("loadingSpinner").style.display = "block";
+                }
+
+                function refreshPage() {
+                    let url = new URL(window.location.href);
+                    let IP_ScrollPos = getAspControl("ItemsPanel").scrollTop;
+                    if (IP_ScrollPos == 0) IP_ScrollPos = url.searchParams.get("IP_ScrollPos"); //safeguarding in case ItemsPanel.scrollTop is 0 (happens with 'DP' fieldtype in certain cases)
+                    url.searchParams.set("IP_ScrollPos", IP_ScrollPos);
+                    window.location.href = url.toString();
+                }
+
+                function GetNoteConfig() {
+                    const self = this;
+                    let parentTable = this;
+                    let textboxValue;
+                    let noteKey;
+
+                    while (!(parentTable instanceof HTMLTableElement)) {
+                        parentTable = parentTable.parentElement;
+                    }
+
+                    iterateChildren(function () {
+                        if (this.id.includes("NotesBind")) {
+                            textboxValue = this.value;
+                        }
+                        else if (this.id.includes("KeyEval")) {
+                            noteKey = this.innerText;
+                        }
+                    }, parentTable);
+
+                    return {
+                        "noteKey": noteKey,
+                        "textboxValue": textboxValue
+                    }
+                }
+
+                function UpdateOperatorNote() {
+                    const { noteKey, textboxValue } = GetNoteConfig.call(this);
+
+                    PageMethods.UpdateNoteValue(noteKey, textboxValue, function (success) {
+                        if (success) {
+                            refreshPage();
+                        }
+                    }, function (error) {
+                        console.error("Error writing to DB: " + error.get_message());
+                    });
+                }
+
+                function DeleteOperatorNote() {
+                    const { noteKey, textboxValue } = GetNoteConfig.call(this);
+
+                    PageMethods.DeleteNoteValue(noteKey, function (success) {
+                        if (success) {
+                            refreshPage();
+                        }
+                    }, function (error) {
+                        console.error("Error writing to DB: " + error.get_message());
+                    });
                 }
             </script>
             <style>
@@ -638,6 +695,29 @@
                         pointer-events: all;
                         z-index: 1;
                     }
+
+                .hidden-column {
+                    display: none;
+                }
+
+                .GridView {
+                    width: 100%;
+                    table-layout: auto; /* Keeps the layout stable */
+                }
+
+                .minWidthCol {
+                    width: 1px; /* Smallest possible width */
+                    white-space: nowrap; /* Prevents text from wrapping */
+                }
+
+                .expandCol {
+                    width: auto; /* Takes up the rest of the available space */
+                }
+
+
+                .GridView td, .GridView th, .CommentGridViewControl {
+                    padding: var(--UWhitespace);
+                }
             </style>
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
@@ -651,7 +731,7 @@
 
                             <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
                                 <button data-close-button onclick="return false;" class="HeaderPanelButtons">No</button>
-                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick" BackColor="Red"/>
+                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick" BackColor="Red" />
                             </div>
                         </div>
                     </div>
@@ -3732,7 +3812,7 @@
 
                 </asp:Panel>
 
-                <asp:Panel runat="server" ID="FooterPanel" Style="position: fixed; bottom: 0; width: calc(100% - 20px); display: flex; flex-direction: column;">
+                <asp:Panel runat="server" ID="FooterPanel" Style="position: fixed; bottom: 0; width: calc(100% - 20px); display: flex; flex-direction: column; gap: var(--UWhitespace);">
 
                     <%-- max-width of 100vw b/c setFooterAtBottom is called AFTER SetHoverEffect function--%>
                     <asp:Panel ID="ImageHoverLinkPanel" Style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--UWhitespace); max-width: 100vw;" runat="server">
@@ -3805,20 +3885,54 @@
 
                     </asp:Panel>
 
-                    <asp:Panel ID="AddCommentPanel" runat="server" Style="margin-top: var(--UWhitespace);">
+                    <asp:Panel ID="AddCommentPanel" runat="server">
                         <asp:Label runat="server">Add note: </asp:Label>
                         <asp:Label runat="server" ID="NoteErrorLabel" Style="color: red"></asp:Label>
                         <br />
                         <div style="display: flex;">
-                            <asp:TextBox ID="CommentTextBox" runat="server" Style="width: calc(100% - var(--AddButtonWidth));"></asp:TextBox>
+                            <asp:TextBox ID="CommentTextBox" runat="server" Style="width: calc(100% - var(--AddButtonWidth)); padding: var(--UWhitespace);"></asp:TextBox>
                             <asp:Button runat="server" ID="AddCommentButton" OnClientClick="addNoteToLog();" OnClick="AddCommentButton_Click" Text="Add" Style="width: var(--AddButtonWidth);"></asp:Button>
                         </div>
                     </asp:Panel>
 
-                    <asp:GridView ID="CommentGridView" Visible="False" runat="server" AllowSorting="True" AutoGenerateColumns="False" DataSourceID="CommentSqlDataSource" BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical">
+                    <asp:GridView ID="CommentGridView" CssClass="GridView" Visible="False" runat="server" AllowSorting="True" AutoGenerateColumns="False" DataSourceID="CommentSqlDataSource" BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical">
                         <AlternatingRowStyle BackColor="#CCCCCC" />
                         <Columns>
-                            <asp:BoundField DataField="Comment" HeaderText="Notes" SortExpression="Comment" />
+                            <asp:TemplateField HeaderText="Key">
+                                <HeaderStyle CssClass="hidden-column" />
+                                <ItemStyle CssClass="hidden-column" />
+                                <ItemTemplate>
+                                    <asp:Label ID="KeyEvalLabel" runat="server" Text='<%# Eval("Key") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+
+                            <asp:TemplateField HeaderText="Notes">
+                                <HeaderStyle CssClass="expandCol" />
+                                <ItemStyle CssClass="expandCol" />
+                                <ItemTemplate>
+                                    <asp:Label runat="server" Text='<%# Eval("Comment") %>'></asp:Label>
+                                </ItemTemplate>
+                                <EditItemTemplate>
+                                    <asp:TextBox ID="NotesBindTextBox" runat="server" Text='<%# Bind("Comment") %>' style="width: calc(100% - var(--UWhitespace) * 3);" CssClass="CommentGridViewControl"></asp:TextBox>
+                                </EditItemTemplate>
+                            </asp:TemplateField>
+
+                            <asp:TemplateField ShowHeader="False">
+                                <HeaderStyle CssClass="minWidthCol" />
+                                <ItemStyle CssClass="minWidthCol" />
+                                <ItemTemplate>
+                                    <div style="display: flex; text-wrap: nowrap;">
+                                        <asp:LinkButton runat="server" CommandName="Edit" Text="Edit" CssClass="CommentGridViewControl"></asp:LinkButton>
+                                        <asp:LinkButton runat="server" CommandName="Delete" Text="Delete" CssClass="CommentGridViewControl" OnClientClick="DeleteOperatorNote.call(this); return false;" />
+                                    </div>
+                                </ItemTemplate>
+                                <EditItemTemplate>
+                                    <div style="display: flex; text-wrap: nowrap;">
+                                        <asp:LinkButton runat="server" CommandName="Cancel" Text="Cancel" CssClass="CommentGridViewControl" onClientClick="refreshPage();" />
+                                        <asp:LinkButton runat="server" CommandName="Update" Text="Update" CssClass="CommentGridViewControl" OnClientClick="UpdateOperatorNote.call(this); return false;" />
+                                    </div>
+                                </EditItemTemplate>
+                            </asp:TemplateField>
                         </Columns>
                         <FooterStyle BackColor="#CCCCCC" />
                         <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
@@ -3835,7 +3949,7 @@
                         SelectCommand=""
                         UpdateCommand="UPDATE [ALTS].[dbo].[T_LogOperatorComments] SET Comment=@Comment WHERE [Key]=@Key"></asp:SqlDataSource>
 
-                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding: var(--UWhitespace) 0;"></asp:LinkButton>
+                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
                 </asp:Panel>
             </div>
         </ContentTemplate>
