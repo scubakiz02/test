@@ -205,14 +205,14 @@ Partial Class DBMaintenance_EditRoles
     End Sub
 
 
-    Protected Sub ButtonDeleteUser_Click(sender As Object, e As EventArgs) Handles ButtonDeleteUser.Click
-        If Not Me.ActiveUsersDropDownList.SelectedValue = "Select User..." Then
-            Dim UserID As String = Me.ActiveUsersDropDownList.SelectedValue
-            Dim DeleteSQL As String = "UPDATE [SatiUsers].[dbo].[aspnet_Users] SET IsAnonymous=1 WHERE UserID='" & UserID & "'"
-            SatiCode.DeleteMyAltsRecords(DeleteSQL)
-            Me.ActiveUsersDropDownList.Items.RemoveAt(Me.ActiveUsersDropDownList.SelectedIndex)
-        End If
-    End Sub
+    'Protected Sub ButtonDeleteUser_Click(sender As Object, e As EventArgs) Handles ButtonDeleteUser.Click
+    '    If Not Me.ActiveUsersDropDownList.SelectedValue = "Select User..." Then
+    '        Dim UserID As String = Me.ActiveUsersDropDownList.SelectedValue
+    '        Dim DeleteSQL As String = "UPDATE [SatiUsers].[dbo].[aspnet_Users] SET IsAnonymous=1 WHERE UserID='" & UserID & "'"
+    '        SatiCode.DeleteMyAltsRecords(DeleteSQL)
+    '        Me.ActiveUsersDropDownList.Items.RemoveAt(Me.ActiveUsersDropDownList.SelectedIndex)
+    '    End If
+    'End Sub
 
     Protected Sub RestoreUserButton_Click(sender As Object, e As EventArgs)
         If Not Me.InactiveUsersDropDownList.SelectedValue = "Select User..." Then
@@ -310,4 +310,14 @@ Partial Class DBMaintenance_EditRoles
         Connection.Close()
     End Sub
 
+    Protected Sub ConfirmUserDelete_ButtonClick(sender As Object, e As EventArgs) Handles ConfirmUserDelete_Button.Click
+        Dim Ddl As DropDownList = ActiveUsersDropDownList
+
+        If Not Ddl.SelectedValue = "Select User..." Then
+            Dim TheItem As Integer = Ddl.SelectedIndex
+
+            Membership.DeleteUser(Ddl.SelectedItem.Text)
+            Response.Redirect(Request.Url.ToString()) 'refresh screen, to clear out data from controls related to the now deleted user
+        End If
+    End Sub
 End Class

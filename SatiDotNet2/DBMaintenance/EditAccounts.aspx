@@ -6,6 +6,105 @@
 
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
         <ContentTemplate>
+            <script type="text/javascript">
+                function openModal(modal) {
+                    if (modal == null || getUsername().includes("...")) return
+                    modal.classList.add('active')
+                    overlay.classList.add('active')
+                    return false; //prevent postback
+                }
+
+                function closeModal(modal) {
+                    if (modal == null) return
+                    modal.classList.remove('active')
+                    overlay.classList.remove('active')
+                    return false; //prevent postback
+                }
+
+                function getUsername() {
+                    let ddl = getAspControl("ActiveUsersDropDownList");
+                    let value = ddl.options[ddl.selectedIndex].text;
+                    document.getElementById("UsernameLabel").innerHTML = value;
+                    return value;
+                }
+
+                function getAspControl(id) {
+                    return document.querySelector('[id$="' + id + '"]');
+                }
+            </script>
+            <style>
+                :root {
+                    --UWhitespace: 0.5em;
+                    --UFontSize: (calc(var(--UWhitespace) * 3.25));
+                }
+
+                .modal {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    transition: 200ms ease-in-out;
+                    border: 1px solid black;
+                    border-radius: 10px;
+                    z-index: 10;
+                    background-color: white;
+                    width: 500px;
+                    max-width: 80%;
+                    font-size: calc(var(--UFontSize));
+                }
+
+                    .modal.active {
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+
+                .modal-header {
+                    padding: var(--UWhitespace);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 1px solid black;
+                }
+
+                    .modal-header .title {
+                        font-weight: bold;
+                    }
+
+                    .modal-header .close-button {
+                        cursor: pointer;
+                        border: none;
+                        outline: none;
+                        background: none;
+                        font-weight: bold;
+                    }
+
+                .modal-body {
+                    padding: var(--UWhitespace);
+                }
+
+                #overlay {
+                    position: fixed;
+                    opacity: 0;
+                    transition: 200ms ease-in-out;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, .5);
+                    pointer-events: none;
+                }
+
+                    #overlay.active {
+                        opacity: 1;
+                        pointer-events: all;
+                        z-index: 1;
+                    }
+
+                .HeaderPanelButtons {
+                    padding: var(--UWhitespace);
+                    font-size: var(--UFontSize);
+                }
+            </style>
+
             <div style="display: flex; flex-direction: column;">
                 <asp:Label ID="Label1" runat="server" Font-Bold="True" Font-Size="X-Large" Text="Edit Account(s):"></asp:Label>
                 <ul style="list-style-type: none; padding: 0;">
@@ -14,7 +113,7 @@
                     <li>
                         <asp:RadioButton ID="LockedUsersRB" runat="server" GroupName="Options" Text="Unlock Users" AutoPostBack="True" OnCheckedChanged="RB_StatusChanged" /></li>
                     <li>
-                        <asp:RadioButton ID="InactiveUsersRB" runat="server" GroupName="Options" Text="Restore Deleted Users" AutoPostBack="True" OnCheckedChanged="RB_StatusChanged" /></li>
+                        <asp:RadioButton ID="InactiveUsersRB" runat="server" GroupName="Options" Text="Restore Inactive Users" AutoPostBack="True" OnCheckedChanged="RB_StatusChanged" /></li>
                 </ul>
             </div>
 
@@ -29,8 +128,26 @@
                 </asp:DropDownList>
                 &nbsp;&nbsp;
                 <asp:Button ID="LockUserButton" runat="server" OnClick="LockUserButton_Click" ForeColor="Gray" BackColor="LightGray"
-                    Text="Lock User" />&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:Button Visible="False" ID="ButtonDeleteUser" runat="server" Text="Delete User" />
+                    Text="Lock User" />&nbsp;
+                <asp:Button runat="server" ID="DeleteUser_Button" Text="Delete User" BackColor="red" OnClientClick="openModal(document.getElementById('modal')); return false;" />
+
+                <div class="modal" id="modal">
+                    <div class="modal-header">
+                        <div class="title">*WARNING*</div>
+                    </div>
+                    <div class="modal-body">
+                        The user account for *
+                        <span id="UsernameLabel" style="color: red; font-weight: bolder; font-style: italic;"></span>
+                        * will be permanently deleted. This action is final and cannot be reversed. Do you wish to continue?
+
+                        <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
+                            <button onclick="closeModal(document.getElementById('modal')); return false;" class="HeaderPanelButtons">No</button>
+                            <asp:Button ID="ConfirmUserDelete_Button" Text="Yes" runat="server" CssClass="HeaderPanelButtons" BackColor="Red" />
+                        </div>
+                    </div>
+                </div>
+                <div id="overlay" onclick="closeModal(document.getElementById('modal')); return false;"></div>
+
                 <br />
                 <br />
                 User belong to:<br />
@@ -96,7 +213,7 @@
                         Text="Lock User" />&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
                 <asp:Button ID="UnlockUsersButton" runat="server" OnClick="UnlockUsersButton_Click"
-                   ForeColor="Gray" BackColor="LightGray" Text="UnLock User" />&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ForeColor="Gray" BackColor="LightGray" Text="UnLock User" />&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <br />
                 <br />
                 User Belongs To:<br />
