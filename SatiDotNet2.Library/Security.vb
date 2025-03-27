@@ -111,8 +111,9 @@ Public Class Security
                     For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In QueryConfig
                         Dim paramValue As String = kvp.Key
                         Dim paramConfig As Dictionary(Of String, String) = kvp.Value
+                        Dim DbValue As String = paramConfig("value")
 
-                        cmd.Parameters.Add(paramValue, GetSqlDbType(paramConfig("typeOf"))).Value = paramConfig("value")
+                        cmd.Parameters.Add(paramValue, GetSqlDbType(paramConfig("typeOf"))).Value = If(DbValue Is Nothing, DBNull.Value, DbValue)
                     Next
 
                     conn.Open()
@@ -129,4 +130,99 @@ Public Class Security
     Function StripIllegalFileSysChars(ChecklistFolder As String, DatePeriodFolder As String) As String
         Return Path.Combine(Regex.Replace(ChecklistFolder, "[:#'""/\\]", ""), Regex.Replace(DatePeriodFolder, "[/\\]", "-"))
     End Function
+
+    Public Function GetStatusBoardRole(View As String, Department As String, Where As Date) As String()
+        Dim Res As New List(Of String)
+
+        If Where <> Today.Date Then
+            Res.Add("admin")
+        ElseIf View = "Focus" AndAlso Department = "Production" Then 'if view is focus & department is production, return should be nothing
+            Res.Add(Nothing)
+        ElseIf View = "Full" Then 'if user wnats to see past issues column, they will need the associated supervisor role
+            If Department <> "Production" Then
+                Res.Add("FMManagerApproval")
+                Res.Add("QSHEManagerApproval")
+            Else
+                Res.Add("PC")
+            End If
+        Else 'user will need to at minimum have 'Maintenance' role to view 'All' or 'Maintenance' department logs
+            If Department <> "Production" Then
+                Res.Add("Maintenance")
+            End If
+        End If
+
+        Return Res.ToArray()
+    End Function
 End Class
+
+Public Class SatiUser
+    Inherits Security
+
+    Private ReadOnly UserName As String
+    Private ReadOnly UserDS As Data.DataSet
+    Private ReadOnly DepartmentDS As Data.DataSet
+    Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+    Private Roles As New List(Of String)
+    Private ReadOnly DepartmentsHashmap As New Dictionary(Of String, String) From {
+        {"All", Nothing}
+    }
+
+    Public Sub New(ByVal User As String)
+        Dim UserRC As Integer
+        Dim DepartmentRC As Integer
+        Dim UserDR As Data.DataRow
+        Dim DepartmentDR As Data.DataRow
+
+        UserName = LCase(User)
+
+        QueryConfig("@username") = New Dictionary(Of String, String) From {
+            {"value", UserName},
+            {"typeOf", "string"}
+        }
+        'MyBase keyword refers to parent class 'Security', which this class inherits
+        UserDS = MyBase.GetMyDataSetParamQuery("SELECT RoleName FROM [SatiUsers].[dbo].[aspnet_UsersInRoles] RoleList INNER JOIN [SatiUsers].[dbo].[aspnet_Users] Users On RoleList.UserId = Users.UserId INNER JOIN [SatiUsers].[dbo].[aspnet_Roles] RoleInfo On RoleList.RoleId = RoleInfo.RoleId WHERE Users.LoweredUserName=@username ORDER BY RoleName", QueryConfig)
+        UserRC = UserDS.Tables(0).Rows.Count - 1
+        For I As Integer = 0 To UserRC
+            UserDR = UserDS.Tables(0).Rows(I)
+            Roles.Add(UserDR("RoleName"))
+        Next
+
+        QueryConfig.Clear()
+        'MyBase keyword refers to parent class 'Security', which this class inherits
+        DepartmentDS = MyBase.GetMyDataSetParamQuery("SELECT [Key], Department FROM [ALTS].[dbo].[T_LogDepartment]", QueryConfig)
+        DepartmentRC = DepartmentDS.Tables(0).Rows.Count - 1
+        For I As Integer = 0 To DepartmentRC
+            DepartmentDR = DepartmentDS.Tables(0).Rows(I)
+            DepartmentsHashmap(DepartmentDR("Department")) = DepartmentDR("Key")
+        Next
+
+    End Sub
+
+    Public Function GetDepartment() As String
+        Dim Res As String
+
+        If Roles.Contains("admin") Then
+            Res = "All"
+        ElseIf Roles.Contains("FMManagerApproval") OrElse Roles.Contains("QSHEManagerApproval") Then
+            Res = "Maintenance"
+        ElseIf Roles.Contains("PC") Then
+            Res = "Production"
+        Else
+            Res = Nothing
+        End If
+
+        Return Res
+    End Function
+
+    Public Function GetDepartmentKey() As String
+        Dim Department As String = GetDepartment()
+
+        If Department Is Nothing Then
+            Return Nothing
+        Else
+            Return DepartmentsHashmap(Department)
+        End If
+
+    End Function
+End Class
+

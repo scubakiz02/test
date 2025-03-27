@@ -572,7 +572,7 @@
                             <asp:Label runat="server" Text="*Required*" Style="color: red; font-style: italic;"></asp:Label>
                         </div>
 
-                        <asp:DropDownList ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
+                        <asp:DropDownList Enabled="False" ID="DepartmentDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
                             DataSourceID="DepartmentDropDownList_SqlDataSource" DataTextField="Department"
                             DataValueField="Key" OnSelectedIndexChanged="DepartmentDropDownList_SelectedIndexChanged"
                             CssClass="Width">

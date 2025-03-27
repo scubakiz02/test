@@ -193,22 +193,41 @@ End Class
 Public Class GetAreaDdlSelectCommandTests
     Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
     Dim Security = New Security()
+    Dim ExpectedQuery As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+    Dim ExpectedQueryWithDepartment As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL AND DepartmentKey=@DepartmentKey OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
 
     <Fact>
     Public Sub GetAreaDdlSelectCommandTest1()
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(Nothing)
-        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area")
+        'pass in a null Area IntervalKey and 'All' Department (2nd arg). expect AreaIntervalKey return of -1 as well as the expected query
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(Nothing, Nothing)
+        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = ExpectedQuery)
     End Sub
 
     <Fact>
     Public Sub GetAreaDdlSelectCommandTest2()
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig("All")
-        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area")
+        'pass in a 'All' Area IntervalKey and 'All' Department (2nd arg). expect AreaIntervalKey return of -1 as well as the expected query
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig("All", Nothing)
+        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = ExpectedQuery)
     End Sub
 
     <Fact>
     Public Sub GetAreaDdlSelectCommandTest3()
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3)
-        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area")
+        'pass in existing Area IntervalKey and 'All' Department (2nd arg). expect it back for AreaIntervalKey as well as the expected query
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, Nothing)
+        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQuery)
+    End Sub
+
+    <Fact>
+    Public Sub GetAreaDdlSelectCommandTest4()
+        'pass in existing Area IntervalKey and a valid Department key (2nd arg). expect AreaIntervalKey as well as the expected query WITH department as a return
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 1)
+        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQueryWithDepartment)
+    End Sub
+
+    <Fact>
+    Public Sub GetAreaDdlSelectCommandTest5()
+        'pass in existing Area IntervalKey and a valid Department key (2nd arg). expect AreaIntervalKey as well as the expected query WITH department as a return
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 2)
+        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQueryWithDepartment)
     End Sub
 End Class

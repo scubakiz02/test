@@ -4,6 +4,7 @@ Imports SatiDotNet2.Library
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
+    Dim CurrUser As New SatiUser(User.Identity.Name.ToString())
     Dim ChecklistBuilder As New ChecklistBuilderAspxLibrary
     Dim Security As New Security
     Dim VisiblePanels As New List(Of Panel)
@@ -29,12 +30,13 @@ Partial Class MR_OpenTicketStatusBoard
     Dim CommentFromQueryString As String
     Dim EditPreviewPanel_ScrollPos As String
     Dim FormViewInsert As FormView = Nothing
-    Dim Department As String
+    Dim Department As String = CurrUser.GetDepartment()
+    Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
-        MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval"}, Server)
+        MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval", "PC"}, Server)
         Me.MaintainScrollPositionOnPostBack = True
         AreaFromQueryString = Request.QueryString("Area")
         LabelFromQueryString = Request.QueryString("Label")
@@ -53,18 +55,19 @@ Partial Class MR_OpenTicketStatusBoard
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
 
             'AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaIntervalKey") Is Nothing OrElse Session("AreaIntervalKey") = "All", String.Empty, " A.IntervalKey=" & Session("AreaIntervalKey") & " AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
-            AreaDdlSelectConfig = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"))
+            AreaDdlSelectConfig = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey)
             AreaDropDownList_SqlDataSource.SelectCommand = AreaDdlSelectConfig("SelectQuery")
             AreaDropDownList_SqlDataSource.SelectParameters.Clear()
             AreaDropDownList_SqlDataSource.SelectParameters.Add("AreaIntervalKey", AreaDdlSelectConfig("AreaIntervalKey"))
+            If AreaDdlSelectConfig("SelectQuery").Contains("@DepartmentKey") Then AreaDropDownList_SqlDataSource.SelectParameters.Add("DepartmentKey", DepartmentKey)
 
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
                 DepartmentInterfacePanel.Enabled = True
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-                    {"value", AreaFromQueryString},
-                    {"typeOf", "int"}
-                }
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
                 'AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
                 AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=@AreaKey"
                 AreaFormView_SqlDataSource.SelectParameters.Clear()
@@ -102,9 +105,9 @@ Partial Class MR_OpenTicketStatusBoard
                 If LabelFromQueryString IsNot Nothing Then
                     QueryConfig.Clear()
                     QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                        {"value", LabelFromQueryString},
-                        {"typeOf", "int"}
-                    }
+                    {"value", LabelFromQueryString},
+                    {"typeOf", "int"}
+                }
                     FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
                     DbRange = Security.GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Range")
                     Unit = Security.GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=@LabelKey", QueryConfig, "Key")
@@ -179,11 +182,14 @@ Partial Class MR_OpenTicketStatusBoard
                     {"value", AreaFromQueryString},
                     {"typeOf", "int"}
                 }
-                Department = Security.GetSingleDbField("SELECT D.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] WHERE A.[Key]=@AreaKey", QueryConfig, "Key")
-                DepartmentDropDownList.SelectedValue = Department
+                If Department = "All" Then
+                    DepartmentKey = Security.GetSingleDbField("SELECT DepartmentKey FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryConfig, "DepartmentKey")
+                    DepartmentDropDownList.Enabled = True 'admins have the ability to change the department
+                End If
+                DepartmentDropDownList.SelectedValue = DepartmentKey
 
-                'remove static ListItem for DepartmentDropDownList once user has selected an Department
-                If Department IsNot Nothing Then
+                'remove static ListItem for DepartmentDropDownList once Department has been selected 
+                If DepartmentKey IsNot Nothing Then
                     DepartmentDropDownList.Items(0).Enabled = False
                     IntervalInterfacePanel.Enabled = True
                 End If
@@ -228,17 +234,10 @@ Partial Class MR_OpenTicketStatusBoard
                     ElseIf ShiftDropDownList.Items.FindByText(Assignee) IsNot Nothing Then
                         ShiftDropDownList.SelectedValue = Assignee
                         AssignToMenu_onClick(ShiftAssigneeButton, EventArgs.Empty)
-                    Else 'REFACTOR!!! Find a more efficient solution to determine if User DropDownList should be shown
-                        QueryConfig("@Assignee") = New Dictionary(Of String, String) From {
-                            {"value", Assignee},
-                            {"typeOf", "string"}
-                        }
-                        If Security.GetSingleDbField("SELECT COUNT(Assignee) As Assignee FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey AND Assignee=@Assignee", QueryConfig, "Assignee") = "1" Then
-                            UsersDropDownList.DataBind()
-                            UsersDropDownList.SelectedValue = Assignee
-                            AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
-                        End If
-                        QueryConfig.Remove("@Assignee")
+                    Else
+                        UsersDropDownList.DataBind()
+                        UsersDropDownList.SelectedValue = Assignee
+                        AssignToMenu_onClick(UserAssigneeButton, EventArgs.Empty)
                     End If
 
                     If Interval = "ONE TIME ONLY" Then
@@ -264,14 +263,15 @@ Partial Class MR_OpenTicketStatusBoard
                 Dim TopmostDeadRecordKey As String = Security.GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] A WHERE (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogData] D WHERE A.[Key]= D.AreaKey) = 0  And ABS(DATEDIFF(Day, GETDATE(), A.DateCreated)) > 30 And (A.IntervalKey Is NULL Or A.DepartmentKey Is NULL Or (Select COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) = 0)", New Dictionary(Of String, Dictionary(Of String, String)), "Key")
                 If TopmostDeadRecordKey IsNot Nothing Then
                     QueryConfig("@TopDeadRecord") = New Dictionary(Of String, String) From {
-                        {"value", TopmostDeadRecordKey},
-                        {"typeOf", "string"}
-                    }
+                    {"value", TopmostDeadRecordKey},
+                    {"typeOf", "string"}
+                }
                     Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@TopDeadRecord", QueryConfig)
                     QueryConfig.Remove("@TopDeadRecord")
                 End If
             End If
 
+            AreaIntervalDropDownList.SelectedValue = Session("AreaIntervalKey")
         Else
             Session("AreaIntervalKey") = AreaIntervalDropDownList.SelectedValue
         End If
@@ -697,6 +697,7 @@ Partial Class MR_OpenTicketStatusBoard
             Dim DuplicateDS As Data.DataSet = SatiCode.GetMyDataSet("SELECT Area FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE I.Interval <> 'ONE TIME ONLY' OR A.IntervalKey IS NULL")
             Dim DuplicateRC As Integer = DuplicateDS.Tables(0).Rows.Count
             Dim DuplicateDR As Data.DataRow
+
             UserInput = sender.Parent.FindControl("AreaTextBox").Text
 
             If String.IsNullOrEmpty(UserInput) Then
@@ -724,9 +725,14 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", Today},
                 {"typeOf", "string"}
             }
-            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, Active) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, 1);", QueryConfig)
+            QueryConfig("@DepartmentKey") = New Dictionary(Of String, String) From {
+                {"value", DepartmentKey},
+                {"typeOf", "int"}
+            }
+            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, DepartmentKey, Active) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, @DepartmentKey, 1);", QueryConfig)
 
             QueryConfig.Remove("@Date")
+            QueryConfig.Remove("@DepartmentKey")
             AreaFromQueryString = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE IntervalKey IS NULL AND Area=@UserInput ORDER BY [Key] DESC", QueryConfig, "Key") 'get unique key value of checklist that was just created
 
             'add record to FROM [ALTS].[dbo].[T_LogStampList] for each stamp that exists in [ALTS].[dbo].[T_LogStampTitle]
@@ -848,21 +854,35 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"))
+        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey)
+        Dim SqlQuery As String = AreaDdlSelectConfig("SelectQuery")
+
+        If SqlQuery.Contains("@DepartmentKey") Then
+            QueryConfig("@DepartmentKey") = New Dictionary(Of String, String) From {
+                {"value", DepartmentKey},
+                {"typeOf", "int"}
+            }
+        End If
 
         QueryConfig("@AreaIntervalKey") = New Dictionary(Of String, String) From {
             {"value", AreaDdlSelectConfig("AreaIntervalKey")},
             {"typeOf", "int"}
         }
-        AreaFromQueryString = Security.GetSingleDbField(AreaDdlSelectConfig("SelectQuery").Insert(6, " TOP(1)"), QueryConfig, "Key")
+        AreaFromQueryString = Security.GetSingleDbField(SqlQuery.Insert(6, " TOP(1)"), QueryConfig, "Key")
         QueryConfig.Remove("@AreaIntervalKey")
 
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
         }
-        LabelFromQueryString = SetLabelFromQueryString()
-        CommentFromQueryString = SetCommentFromQueryString()
+
+        If AreaFromQueryString Is Nothing = False Then 'check to see if any checklists exist for this interval
+            LabelFromQueryString = SetLabelFromQueryString()
+            CommentFromQueryString = SetCommentFromQueryString()
+        Else 'remove ALL querystrings
+            Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path))
+        End If
+
         RefreshPreview()
     End Sub
 

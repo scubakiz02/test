@@ -109,48 +109,6 @@ Public Class ValidateBackColor
     End Sub
 
 End Class
-
-Public Class GetStatusBoardRole
-    Dim LogAspx = New LogAspxLibrary()
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest1()
-        'if Where does not match today, return should be 'admin'
-        Assert.Equal(New String() {"admin"}, LogAspx.GetStatusBoardRole("Full", "Production", "03/09/2025"))
-    End Sub
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest2()
-        'if view is full & department is maintenance, return should be 'FMManagerApproval'
-        Assert.Equal(New String() {"FMManagerApproval", "QSHEManagerApproval"}, LogAspx.GetStatusBoardRole("Full", "Maintenance", Today.Date))
-    End Sub
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest3()
-        'if view is full & department is production, return should be 'PC'
-        Assert.Equal(New String() {"PC"}, LogAspx.GetStatusBoardRole("Full", "Production", Today.Date))
-    End Sub
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest4()
-        'if view is focus & department is production, return should be nothing
-        Assert.Equal(New String() {Nothing}, LogAspx.GetStatusBoardRole("Focus", "Production", Today.Date))
-    End Sub
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest5()
-        'if view is focus & department is all, return should be 'Maintenance'
-        Assert.Equal(New String() {"Maintenance"}, LogAspx.GetStatusBoardRole("Focus", "All", Today.Date))
-    End Sub
-
-    <Fact>
-    Public Sub GetStatusBoardRoleTest6()
-        'if view is focus & department is Maintenance, return should be 'Maintenance'
-        Assert.Equal(New String() {"Maintenance"}, LogAspx.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
-    End Sub
-
-End Class
-
 Public Class GetRange
     Dim LogAspx = New LogAspxLibrary()
     Dim T_LogDataDT As New DataTable()

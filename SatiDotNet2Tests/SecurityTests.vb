@@ -111,10 +111,26 @@ Public Class ExecuteSqlParamQueryTests
             {"typeOf", "string"}
         }
 
-        InsertIntoQuerySuccess = Security.ExecuteSqlParamQuery("INSERT INTO [SatiTest].[dbo].[T_LogSqlInjectionPrevention] VALUES (@username, @password, @fullname)", QueryObject)
+        InsertIntoQuerySuccess = Security.ExecuteSqlParamQuery("INSERT INTO [SatiTest].[dbo].[T_LogSqlInjectionPrevention] (username, password, fullname, willitnull) VALUES (@username, @password, @fullname, 'not null')", QueryObject)
         DeleteQuerySuccess = Security.ExecuteSqlParamQuery("DELETE FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username AND password=@password AND fullname=@fullname", QueryObject)
 
         Assert.True(If(InsertIntoQuerySuccess AndAlso DeleteQuerySuccess, True, False))
+    End Sub
+
+    <Fact>
+    Public Sub ExecuteSqlParamQuery5()
+        'ensure you can make a non-null field value null in DB
+        Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        QueryObject("@id") = New Dictionary(Of String, String) From {
+            {"value", "3"},
+            {"typeOf", "int"}
+        }
+        QueryObject("@null") = New Dictionary(Of String, String) From {
+            {"value", Nothing},
+            {"typeOf", "int"}
+        }
+
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET willitnull=@null WHERE id=@id", QueryObject))
     End Sub
 End Class
 
@@ -265,4 +281,123 @@ Public Class StripIllegalFileSysCharsTests
         'ensure slashes (/\) are replaced with '-' char in arg 2
         Assert.Equal("dummy checklist\Month of 03-2025", Security.StripIllegalFileSysChars("dummy ""checklist""", "Month of 03\2025"))
     End Sub
+End Class
+
+
+Public Class GetStatusBoardRole
+    Dim Security = New Security()
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest1()
+        'if Where does not match today, return should be 'admin'
+        Assert.Equal(New String() {"admin"}, Security.GetStatusBoardRole("Full", "Production", "03/09/2025"))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest2()
+        'if view is full & department is maintenance, return should be 'FMManagerApproval'
+        Assert.Equal(New String() {"FMManagerApproval", "QSHEManagerApproval"}, Security.GetStatusBoardRole("Full", "Maintenance", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest3()
+        'if view is full & department is production, return should be 'PC'
+        Assert.Equal(New String() {"PC"}, Security.GetStatusBoardRole("Full", "Production", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest4()
+        'if view is focus & department is production, return should be nothing
+        Assert.Equal(New String() {Nothing}, Security.GetStatusBoardRole("Focus", "Production", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest5()
+        'if view is focus & department is all, return should be 'Maintenance'
+        Assert.Equal(New String() {"Maintenance"}, Security.GetStatusBoardRole("Focus", "All", Today.Date))
+    End Sub
+
+    <Fact>
+    Public Sub GetStatusBoardRoleTest6()
+        'if view is focus & department is Maintenance, return should be 'Maintenance'
+        Assert.Equal(New String() {"Maintenance"}, Security.GetStatusBoardRole("Focus", "Maintenance", Today.Date))
+    End Sub
+
+End Class
+
+Public Class GetDepartmentTests
+    Dim BrettTeets = New SatiUser("Brett Teets") 'Maintenance
+    Dim SzymonTyburek = New SatiUser("Szymon Tyburek") 'admin
+    Dim SzymonTyburekLowered = New SatiUser("szymon tyburek") 'admin
+    Dim AndySoto = New SatiUser("Andy Soto") 'Production
+    Dim SungJinwoo = New SatiUser("Sung Jinwoo") 'not a real user. if you don't recognize this name, watch 'Solo Leveling'. Very good anime.
+
+    Dim T_LogDepartmentProdKey As Integer = 1
+    Dim T_LogDepartmentMaintKey As Integer = 2
+
+    <Fact>
+    Public Sub GetDepartment1()
+        'if user has admin role, return 'All'
+        Assert.Equal("All", SzymonTyburek.GetDepartment())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartment2()
+        'same as GetDepartment1, but the name passed to the constructor is lowercased
+        Assert.Equal("All", SzymonTyburekLowered.GetDepartment())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartment3()
+        'if user has PC role, return 'Production'
+        Assert.Equal("Production", AndySoto.GetDepartment())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartment4()
+        'if user has a maintenance manager role (F&M or QSHE), return 'Maintenance'
+        Assert.Equal("Maintenance", BrettTeets.GetDepartment())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartment5()
+        'if user does NOT exist, expect Nothing
+        Assert.Equal(Nothing, SungJinwoo.GetDepartment())
+    End Sub
+End Class
+
+Public Class GetDepartmentKeyTests
+    Dim BrettTeets = New SatiUser("Brett Teets") 'Maintenance
+    Dim SzymonTyburek = New SatiUser("Szymon Tyburek") 'admin
+    Dim SzymonTyburekLowered = New SatiUser("szymon tyburek") 'admin
+    Dim AndySoto = New SatiUser("Andy Soto") 'Production
+    Dim SungJinwoo = New SatiUser("Sung Jinwoo") 'not a real user. if you don't recognize this name, watch 'Solo Leveling'. Very good anime.
+
+    Dim T_LogDepartmentProdKey As Integer = 1
+    Dim T_LogDepartmentMaintKey As Integer = 2
+
+    <Fact>
+    Public Sub GetDepartmentKey1()
+        'if user does NOT exist, expect Nothing
+        Assert.Equal(Nothing, SungJinwoo.GetDepartmentKey())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartmentKey2()
+        'if user has admin role, return Nothing
+        Assert.Equal(Nothing, SzymonTyburek.GetDepartmentKey())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartmentKey3()
+        'if user has PC role, return 'Production'
+        Assert.Equal(T_LogDepartmentProdKey, AndySoto.GetDepartmentKey())
+    End Sub
+
+    <Fact>
+    Public Sub GetDepartmentKey4()
+        'if user has a maintenance manager role (F&M or QSHE), return 'Maintenance'
+        Assert.Equal(T_LogDepartmentMaintKey, BrettTeets.GetDepartmentKey())
+    End Sub
+
 End Class
