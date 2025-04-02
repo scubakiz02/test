@@ -8,6 +8,7 @@
         <br />
 
         <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistBuilder.aspx">Build Checklist</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistReport.aspx">Report Checklist</asp:HyperLink><br />
         <br />
 
         Status Board:<br />

@@ -226,3 +226,45 @@ Public Class SatiUser
     End Function
 End Class
 
+Public Class AspWebpage
+    Private ReadOnly WebpageUrl As String
+    Private QsConfig As New Dictionary(Of String, String)
+    Private UrlWithQs As String
+
+    Sub New(Url As String, QsKeys As List(Of String))
+        WebpageUrl = Url
+        UrlWithQs = Url
+
+        For Each QsKey As String In QsKeys
+            QsConfig(QsKey) = Nothing
+        Next
+    End Sub
+
+    Public Sub SetUrl(Key As String, Value As String)
+        Dim QsPresent As Boolean = False
+        QsConfig(Key) = Value
+        UrlWithQs = WebpageUrl 'reset
+
+        For Each kvp As KeyValuePair(Of String, String) In QsConfig
+            Dim QsKey As String = kvp.Key
+            Dim QsValue As String = kvp.Value
+
+            If QsValue IsNot Nothing AndAlso UrlWithQs.Contains(QsKey) = False Then
+                If QsPresent Then
+                    UrlWithQs += "&"
+                Else
+                    QsPresent = True
+                    UrlWithQs += "?"
+                End If
+
+                UrlWithQs += QsKey & "=" & QsValue
+            End If
+        Next
+    End Sub
+
+    Public Function GetUrl() As String
+        Return UrlWithQs
+    End Function
+
+End Class
+

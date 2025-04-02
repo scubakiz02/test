@@ -401,3 +401,47 @@ Public Class GetDepartmentKeyTests
     End Sub
 
 End Class
+'
+Public Class AspWebpageClassTests
+    Dim Url As String = "/ChecklistLogging/ChecklistReport.aspx"
+    Dim ChecklistReport As New AspWebpage(Url, New List(Of String) From {"Area", "StartDate", "EndDate", "PageIdx"})
+
+    <Fact>
+    Public Sub ConstructorTest1()
+        'instantiate w/o adding querystring values. Should return arg 1 passed to constructor
+        Assert.Equal(Url, ChecklistReport.GetUrl())
+    End Sub
+
+    <Fact>
+    Public Sub ConstructorTest2()
+        'set url with 1 querystring key/value pair. Should return url with querystring value
+        ChecklistReport.SetUrl("Area", "45")
+        Assert.Equal(Url & "?Area=45", ChecklistReport.GetUrl())
+    End Sub
+
+    <Fact>
+    Public Sub ConstructorTest3()
+        'set url with 1 querystring key/value pair, but the value is Nothing. Should return url 
+        ChecklistReport.SetUrl("Area", Nothing)
+        Assert.Equal(Url, ChecklistReport.GetUrl())
+    End Sub
+
+    <Fact>
+    Public Sub ConstructorTest4()
+        'set url with several querystring key/value pairs. Should return url with querystring values that are not nothing
+        ChecklistReport.SetUrl("Area", "45")
+        ChecklistReport.SetUrl("PageIdx", "3")
+        ChecklistReport.SetUrl("StartDate", Nothing)
+        Assert.Equal(Url & "?Area=45&PageIdx=3", ChecklistReport.GetUrl())
+    End Sub
+
+
+    <Fact>
+    Public Sub ConstructorTest5()
+        'set several url querystring key/value pairs and ensure previous querystring key/value pairs are overwritten if the situation calls for it
+        ChecklistReport.SetUrl("Area", "45")
+        ChecklistReport.SetUrl("PageIdx", "3")
+        ChecklistReport.SetUrl("Area", "48")
+        Assert.Equal(Url & "?Area=48&PageIdx=3", ChecklistReport.GetUrl())
+    End Sub
+End Class
