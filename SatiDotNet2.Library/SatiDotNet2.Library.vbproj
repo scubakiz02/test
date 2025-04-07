@@ -103,6 +103,7 @@
     <Compile Include="ChecklistLogging\LogAspxLibrary.vb" />
     <Compile Include="ChecklistLogging\ChecklistReport.vb" />
     <Compile Include="General.vb" />
+    <Compile Include="PhaseStageController.vb" />
     <Compile Include="SampleClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -1,6 +1,8 @@
 ﻿Imports System.Text
 Imports Xunit
 Imports SatiDotNet2.Library
+Imports System
+Imports System.Globalization
 
 Public Class GroupReportTests
     Dim GroupKey As Integer = 1
@@ -86,28 +88,38 @@ Public Class GroupReportTests
         Return True
     End Function
 
+    '<Fact>
+    'Public Sub ConstructorTest1()
+    '    'execute sql query with the same GroupKey as FDCG instantiation of GroupReport class. Compare the 2 DataSets, expect false
+    '    Dim DS As Data.DataSet
+
+    '    DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
+
+    '    Assert.False(AreDataSetsEqual(DS, FDCG.GetDS()))
+    'End Sub
+
+    '<Fact>
+    'Public Sub ConstructorTest2()
+    '    'instantiate GroupReport class with GroupKey of 2, and compare it to DS of GroupKey 1, which should NOT be same, returning false
+    '    Dim DS As Data.DataSet
+
+    '    DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
+
+    '    Assert.False(AreDataSetsEqual(DS, New GroupReport(New Dictionary(Of String, String) From {
+    '        {"GroupKey", 2},
+    '        {"AreaKey", 0}
+    '    }).GetDS()))
+    'End Sub
+
+
     <Fact>
     Public Sub ConstructorTest1()
-        'execute sql query with the same GroupKey as FDCG instantiation of GroupReport class. Compare the 2 DataSets, expect false
-        Dim DS As Data.DataSet
-
-        DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
-
-        Assert.False(AreDataSetsEqual(DS, FDCG.GetDS()))
+        'ensure that if a date range does NOT exists, and after calling FDCG.OrderByDate(), the DS has no records
+        FDCG.SetDateRange(Nothing, Nothing)
+        Assert.Equal(Of Integer)(0, FDCG.OrderDSByDate().Tables(0).Rows.Count)
+        FDCG.SetDateRange("03/16/2025", "03/31/2025") 'return date range to the og values, set in constructor of this class
     End Sub
 
-    <Fact>
-    Public Sub ConstructorTest2()
-        'instantiate GroupReport class with GroupKey of 2, and compare it to DS of GroupKey 1, which should NOT be same, returning false
-        Dim DS As Data.DataSet
-
-        DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
-
-        Assert.False(AreDataSetsEqual(DS, New GroupReport(New Dictionary(Of String, String) From {
-            {"GroupKey", 2},
-            {"AreaKey", 0}
-        }).GetDS()))
-    End Sub
 
     <Fact>
     Public Sub ConstructorTest6()
@@ -434,4 +446,257 @@ Public Class GroupReportTests
         FDCG.SetDateRange(Nothing, Nothing)
         Assert.Equal(FDCG.InvalidDateMessage, FDCG.DateInRange("03/22/5"))
     End Sub
+End Class
+
+Public Class LabelFunctionTests
+    Inherits Security
+
+    Private GroupReport As New GroupReport(New Dictionary(Of String, String) From {
+        {"GroupKey", 0},
+        {"AreaKey", 0}
+    })
+    Private NitrogenDailyLabels As New List(Of String) From {"Recirculation Water | >75 GPM", "DP Across Media | 1-3 inH20", "Recirculation Water | 3-10 pH"}
+    Private DS As Data.DataSet
+
+    Public Sub New()
+        GroupReport.SetArea(58) 'SC-1 Fume Scrubber Monitoring Daily
+        GroupReport.SetDateRange("04/01/2025", "04/01/2025")
+    End Sub
+
+    <Fact>
+    Public Sub BaselineTest1()
+        'check if return dataset from class instantiation is as expected
+        Assert.Equal(3, GroupReport.GetDS().Tables(0).Rows.Count)
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest1()
+        'pass empty List data structure, expect 3 rows in return, since date range is 1 day (04/01/2025)
+        DS = GroupReport.ExcludeLabels(New List(Of String))
+        Assert.Equal(3, DS.Tables(0).Rows.Count)
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest2()
+        'pass List with 1 element, expect 2 rows in return
+        DS = GroupReport.ExcludeLabels(New List(Of String) From {NitrogenDailyLabels(0)})
+        Assert.Equal(2, DS.Tables(0).Rows.Count)
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest3()
+        'pass List with 1 element, expect 2 rows in return. check to make sure the 2 rows left are the labels that should still exist
+        Dim AccurateData = True
+        Dim LabelToRemove = NitrogenDailyLabels(0)
+        DS = GroupReport.ExcludeLabels(New List(Of String) From {LabelToRemove})
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            If DR("Label") = LabelToRemove Then
+                AccurateData = False
+            End If
+        Next
+
+        Assert.True(AccurateData)
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest4()
+        'pass List with 2 elements to arg, expect 1 row in return
+        DS = GroupReport.ExcludeLabels(New List(Of String) From {NitrogenDailyLabels(0), NitrogenDailyLabels(1)})
+        Assert.Equal(1, DS.Tables(0).Rows.Count)
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest5()
+        'pass List with 2 elements, expect 1 row in return. check to make sure the row left is the one that should exist
+        DS = GroupReport.ExcludeLabels(New List(Of String) From {NitrogenDailyLabels(0), NitrogenDailyLabels(1)})
+        Assert.True(DS.Tables(0).Rows.Count = 1 AndAlso DS.Tables(0).Rows(0)("Label") = NitrogenDailyLabels(2))
+    End Sub
+
+    <Fact>
+    Public Sub ExcludeLabelsTest6()
+        'ensure GroupReport.ExcludeLabels() excludes only the most recently passed labels
+        'pass List with 1 element, then call the same function again but pass List in with 2 elements
+        'expect 1 row in return. check to make sure the row left is the one that should exist
+        GroupReport.ExcludeLabels(New List(Of String) From {NitrogenDailyLabels(2)})
+        DS = GroupReport.ExcludeLabels(New List(Of String) From {NitrogenDailyLabels(0), NitrogenDailyLabels(1)})
+        Assert.True(DS.Tables(0).Rows.Count = 1 AndAlso DS.Tables(0).Rows(0)("Label") = NitrogenDailyLabels(2))
+    End Sub
+
+    <Fact>
+    Public Sub GetLabelsTest1()
+        'ensure, after constructor is ran, that GroupReport.GetLabels() returns a list of all labels from a checklist
+        Assert.Equal(Of List(Of String))(NitrogenDailyLabels, GroupReport.GetLabels())
+    End Sub
+
+    <Fact>
+    Public Sub GetLabelsTest2()
+        'call several GroupReport functions, to simulate an instantiation being used. All this to ensure that GroupReport.GetLabels() returns a list of all labels from a checklist
+        ExcludeLabelsTest4()
+        ExcludeLabelsTest5()
+        Assert.Equal(Of List(Of String))(NitrogenDailyLabels, GroupReport.GetLabels())
+    End Sub
+
+    <Fact>
+    Public Sub GetLabelsTest3()
+        'ensure, after changing Group, then changing Group back to 'All', that GroupReport.GetLabels() returns an empty list
+        GroupReport.SetGroup(2)
+        GroupReport.SetGroup(0) 'return back to og from constructor
+        Assert.Equal(Of List(Of String))(New List(Of String), GroupReport.GetLabels())
+    End Sub
+
+    <Fact>
+    Public Sub GetLabelsTest4()
+        'ensure, after changing Area, then changing Area back to Nitrogen Daily, that GroupReport.GetLabels() returns a list of all labels from Nitrogen Daily
+        GroupReport.SetArea(48)
+        GroupReport.SetArea(58) 'return back to og from constructor
+        Assert.Equal(Of List(Of String))(NitrogenDailyLabels, GroupReport.GetLabels())
+    End Sub
+
+    <Fact>
+    Public Sub OrderByDateTest1()
+        'ensure, after calling GroupReport.OrderByDate(), the DS is not equal to the dataset returned by GroupReport.GetDS()
+        Assert.NotEqual(Of DataSet)(GroupReport.GetDS(), GroupReport.OrderDSByDate())
+    End Sub
+
+    <Fact>
+    Public Sub OrderByDateTest2()
+        'ensure that if a date range does NOT exists, and after calling GroupReport.OrderByDate(), the DS has no records
+        GroupReport.SetDateRange(Nothing, Nothing)
+        Assert.Equal(Of Integer)(0, GroupReport.OrderDSByDate().Tables(0).Rows.Count)
+        GroupReport.SetDateRange("04/01/2025", "04/01/2025") 'return date range to the og values, set in constructor of this class
+    End Sub
+
+    <Fact>
+    Public Sub OrderByDateTest3()
+        'call OrderDSByDate(), test against a live dataset to ensure each label is display for a date, then the next date
+        Dim AccurateData As Boolean = True
+        Dim DR As Data.DataRow
+
+        GroupReport.ExcludeLabels(New List(Of String)) 'no labels are excluded
+        GroupReport.SetDateRange("04/01/2025", "04/03/2025")
+        DS = GroupReport.OrderDSByDate()
+
+        For I As Integer = 0 To 2 'ensure first 3 rows have the same date
+            DR = DS.Tables(0).Rows(I)
+
+            If DR("Label") <> NitrogenDailyLabels(I) OrElse DR("Date").Contains("04-01-2025") = False Then 'ensure the first 3 rows have a different label, but the same date
+                AccurateData = False
+                Exit For
+            End If
+        Next
+
+        'since there are 3 labels for Nitrogen Daily, the date for the next DataRow should contains "04/02/2025"
+        DR = DS.Tables(0).Rows(3)
+        If DR("Date").Contains("04-02-2025") = False Then
+            AccurateData = False
+        End If
+
+        Assert.True(AccurateData)
+        GroupReport.SetDateRange("04/01/2025", "04/01/2025") 'return date range to the og values, set in constructor of this class
+    End Sub
+
+    <Fact>
+    Public Sub OrderByDateTest4()
+        'if GroupReport.OrderDSByDate() is called first, DS returned from GetDS() matches DS returned by GroupReport.OrderDSByDate()
+
+        GroupReport.SetDateRange("04/01/2025", "04/03/2025")
+
+        DS = GroupReport.OrderDSByDate()
+        Assert.Equal(Of DataSet)(DS, GroupReport.GetDS())
+        GroupReport.UndoOrderDSByDate() 'undo order ds by date, to return ds to og state
+
+        GroupReport.SetDateRange("04/01/2025", "04/01/2025") 'return date range to the og values, set in constructor of this class
+    End Sub
+
+    '<Fact>
+    'Public Sub UndoOrderByDateTest1()
+    '    'GroupReport.UndoOrderDSByDate() reverses result from GroupReport.OrderDSByDate()
+
+    '    GroupReport.SetDateRange("04/01/2025", "04/03/2025")
+
+    '    DS = GroupReport.GetDS()
+    '    GroupReport.OrderDSByDate()
+    '    Assert.Equal(Of DataSet)(DS, GroupReport.UndoOrderDSByDate())
+
+    '    GroupReport.SetDateRange("04/01/2025", "04/01/2025") 'return date range to the og values, set in constructor of this class
+    'End Sub
+
+    <Fact>
+    Public Sub DateTest1()
+        'ensure InputDate includes date and time
+        Dim DS As Data.DataSet = GroupReport.GetDS()
+        Dim AccurateData As Boolean = True
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            If (IsDateOnly(DR("InputDate"))) Then 'b/c the dataset is on AreaKey 58 for 04/01/2025, which has date stamps for each input, this condition should NOT be true
+                AccurateData = False
+            End If
+        Next
+
+        Assert.True(AccurateData)
+    End Sub
+
+    <Fact>
+    Public Sub DateTest3()
+        'ensure Accurate StartDate and InputDate values.
+        'Test against edgecase T_LogData Key 334, where the InputDate has a date different than StartDate field
+        'This means operator filled in data AFTER the due date
+
+        'setup environment for T_LogData Key 334
+        GroupReport.SetDateRange("2025-03-23", "2025-03-23")
+        GroupReport.SetArea(57)
+
+        Dim DS As Data.DataSet = GroupReport.GetDS()
+        Dim ExpectedMismatches As Boolean = True
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            If Date.Parse(DR("StartDate")).Day = Date.Parse(DR("InputDate")).Day Then
+                ExpectedMismatches = False
+                Exit For
+            End If
+        Next
+
+        Assert.True(ExpectedMismatches)
+
+        OgEnvironment()
+    End Sub
+
+    <Fact>
+    Public Sub InputDateNeverNull1()
+        'StartDate should ALWAYS have a value!!!!
+
+        'Group=3&Area=75&StartDate=4/4/2025&EndDate=4/4/2025
+        'the querystring above is an instance where StartDate field values display as empty
+        'Group is 0 for current environment (All), so am NOT calling GroupReport.SetGroup()
+
+        Dim DS As Data.DataSet
+        Dim NullInputDate As Boolean = False
+
+        GroupReport.SetArea(75)
+        GroupReport.SetDateRange("4/4/2025", "4/4/2025")
+        DS = GroupReport.GetDS()
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            If String.IsNullOrEmpty(DR("StartDate")) Then
+                NullInputDate = True
+                Exit For
+            End If
+        Next
+
+        Assert.False(NullInputDate)
+    End Sub
+
+    Private Sub OgEnvironment()
+        'return environment to og setup from constructor
+        GroupReport.SetArea(58) 'SC-1 Fume Scrubber Monitoring Daily
+        GroupReport.SetDateRange("04/01/2025", "04/01/2025")
+    End Sub
+
+
+
+    Private Function IsDateOnly(DateValue As String) As Boolean
+        Dim parsedDate As DateTime
+        Return DateTime.TryParseExact(DateValue, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, parsedDate)
+    End Function
 End Class

@@ -200,12 +200,13 @@ Partial Class MR_OpenTicketStatusBoard
                 OutOfRangeMap.Add(MapKey, Nothing)
             Next
 
-            My_DR("Inputs") = JsonSerializer.Serialize(InputsMap)
             My_DR("OutOfRange") = JsonSerializer.Serialize(OutOfRangeMap)
             My_DR("Date") = CurrLogDate
             My_DR("Operator") = Nothing
             My_DR("CompleteLog") = False
             My_DR("Shift") = Security.GetSingleDbField("SELECT Shift FROM [ALTS].[dbo].[T_Log_GetShift]()", New Dictionary(Of String, Dictionary(Of String, String)), "Shift")
+            My_DR("Inputs") = JsonSerializer.Serialize(InputsMap) 'old format (date & operator are NOT recorded for each input)
+            My_DR("Inputs") = JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(My_DR)) 'new format (date & operator are recorded for each input)
             My_DS.Tables("T_LogData").Rows.Add(My_DR)
             My_DA.Update(My_DS, "T_LogData")
         Catch ex As Exception

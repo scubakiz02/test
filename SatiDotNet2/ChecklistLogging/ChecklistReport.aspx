@@ -7,6 +7,35 @@
 
         window.addEventListener("load", function () {
             const ReportGridView = document.getElementById('<%= ReportGridView.ClientID %>');
+            const CheckAllCbx = document.getElementById('<%= CheckAll_CheckBox.ClientID %>');
+            const LabelCbxList = document.getElementById('<%= LabelCbxList.ClientID %>');
+            const openModalButtons = document.querySelectorAll('[data-modal-target]')
+            const closeModalButtons = document.querySelectorAll('[data-close-button]')
+
+            CheckAllCbx.addEventListener("click", function () {
+                let checked = this.checked;
+
+                for (const row of LabelCbxList.rows) {
+                    for (const cell of row.cells) {
+                        const checkbox = cell.querySelector('input[type="checkbox"]')
+                        checkbox.checked = checked;
+                    }
+                }
+            })
+
+            openModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = document.querySelector(button.dataset.modalTarget)
+                    openModal(modal)
+                })
+            })
+
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = button.closest('.modal')
+                    closeModal(modal)
+                })
+            })
 
             StartDate_Textbox = document.getElementById('<%= StartDate_TextBox.ClientID %>')
             EndDate_Textbox = document.getElementById('<%= EndDate_Textbox.ClientID %>')
@@ -21,6 +50,11 @@
                 SetSpinAnimation.call(ReportGridView);
             }
         })
+
+        function SetCbxStatus() { //b/c CheckAll_CheckBox & CompareFields_CheckBox do NOT use AutoPostBack, which means their Checked status is NOT managed by ASP.NET
+            PageMethods.CheckAll(document.getElementById('<%= CheckAll_CheckBox.ClientID %>').checked);
+            PageMethods.CompareFields(document.getElementById('<%= CompareFields_CheckBox.ClientID %>').checked);
+        }
 
         function SetTbxInputListener(ErrorLabel) {
             const self = this;
@@ -109,6 +143,19 @@
             toSyncArr.push({ "idToSync": id, "yPosToSync": yPos });
         }
 
+        function openModal(modal) {
+            if (modal == null) return
+            modal.classList.add('active')
+            overlay.classList.add('active')
+            return false; //prevent postback
+        }
+
+        function closeModal(modal) {
+            if (modal == null) return
+            modal.classList.remove('active')
+            overlay.classList.remove('active')
+            return false; //prevent postback
+        }
     </script>
     <style>
         :root {
@@ -158,6 +205,63 @@
         .GridViewColumn {
             text-wrap: nowrap;
         }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: 200ms ease-in-out;
+            border: 1px solid black;
+            border-radius: 10px;
+            z-index: 10;
+            background-color: white;
+            max-width: 80%;
+            font-size: calc(var(--UFontSize));
+            text-wrap: nowrap;
+        }
+
+            .modal.active {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+        .modal-header {
+            padding: var(--UWhitespace);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid black;
+        }
+
+            .modal-header .close-button {
+                cursor: pointer;
+                border: none;
+                outline: none;
+                background: none;
+                font-weight: bold;
+            }
+
+        .modal-body {
+            padding: var(--UWhitespace);
+        }
+
+        #overlay {
+            position: fixed;
+            opacity: 0;
+            transition: 200ms ease-in-out;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, .5);
+            pointer-events: none;
+        }
+
+            #overlay.active {
+                opacity: 1;
+                pointer-events: all;
+                z-index: 1;
+            }
 
         @keyframes spin {
             0% {
@@ -225,6 +329,38 @@
                     </div>
                 </div>
 
+                <asp:Panel ID="LabelCbxList_Panel" runat="server" Style="display: flex; flex-direction: column;">
+                    <asp:Button Enabled="False" ID="FilterData_Button" Text="Filter Data" data-modal-target="#modal" runat="server" OnClientClick="return false;" />
+                    <div class="modal" id="modal">
+                        <div class="modal-header">
+                            <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
+                                <span>Labels To <span style="font-weight: bold;">Exclude</span>:</span>
+
+                                <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                                <div>
+                                    <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
+                                </div>
+
+                                <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                                <div>
+                                    <asp:CheckBox ID="CompareFields_CheckBox" Text="Compare Fields" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right" >
+                            </asp:CheckBoxList>
+
+                            <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
+                                <button data-close-button class="HeaderPanelButtons">Cancel</button>
+                                <asp:Button ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" OnClientClick="SetCbxStatus();" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="overlay"></div>
+                </asp:Panel>
+
+
             </asp:Panel>
 
             <asp:GridView ID="ReportGridView" CssClass="ReportGridView" runat="server" AllowPaging="true" PageSize="14"
@@ -253,9 +389,14 @@
                             <asp:Label runat="server" Text='<%# Eval("Value") %>'></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Date">
+                    <asp:TemplateField HeaderText="Start Date">
                         <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("Date") %>'></asp:Label>
+                            <asp:Label runat="server" Text='<%# Eval("StartDate") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Input Date">
+                        <ItemTemplate>
+                            <asp:Label runat="server" Text='<%# Eval("InputDate") %>'></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Operator">

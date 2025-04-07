@@ -46,6 +46,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim VirtualDirectory As String
     Dim Directory As String
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+    Private Format As New Format()
 
     Public Delegate Sub DeleteNoteDelegate(ID As String)
     <WebMethod()>
@@ -988,7 +989,7 @@ Partial Class MR_OpenTicketStatusBoard
         If Value = PrevValue Then Return False 'value has NOT changed, so do NOT modify input
 
         InputOfInterest("Operator") = SatiUser
-        InputOfInterest("Date") = Date.Parse(System.DateTime.Now)
+        InputOfInterest("Date") = Format.DateField(System.DateTime.Now.ToString())
 
         ValidateInput(ID, Value)
         UploadToDataTable(SatiUser)

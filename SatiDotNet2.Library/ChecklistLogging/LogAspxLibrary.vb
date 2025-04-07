@@ -4,6 +4,7 @@ Imports System.Text.Json
 
 Public Class LogAspxLibrary
     Dim Sql As New Security
+    Dim Format As New Format()
 
     'return value of: true is valid; false is invalid; null is out of range
     Public Function ValidateByBackColor(NumOfNotes As Integer, BackColor As String) As Boolean?
@@ -93,11 +94,18 @@ Public Class LogAspxLibrary
                 Dim T_LogDataKey As Integer = kvp.Key
                 Dim UserInput As String = kvp.Value
                 Dim InputOperator As String = If(IsDBNull(DR("Operator")) = False, DR("Operator"), String.Empty)
-                Dim NewInputConfig As New Dictionary(Of String, String) From {
-                    {"Date", Convert.ToDateTime(DR("Date")).ToString("yyyy-MM-dd HH:mm:ss")}, 'must use Convert.ToDateTime() method to ensure Date holds the time
-                    {"Operator", InputOperator},
-                    {"Value", UserInput}
-                }
+                Dim NewInputConfig As New Dictionary(Of String, String)
+                Dim DateValue As String
+
+                If String.IsNullOrEmpty(UserInput) = False Then
+                    DateValue = Format.DateField(DR("Date"))
+                Else
+                    DateValue = String.Empty
+                End If
+
+                NewInputConfig("Date") = DateValue
+                NewInputConfig("Operator") = InputOperator
+                NewInputConfig("Value") = UserInput
 
                 Res(T_LogDataKey) = NewInputConfig
             Next

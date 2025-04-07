@@ -191,12 +191,13 @@ Public Class GetInputs
     Dim CorrectConfigStringified As String
     Dim LogDT As New DataTable()
     Dim LogDR As Data.DataRow
+    Private Format As New Format()
 
     Public Sub New() 'constructor
         'using live data from T_LogData record Key 280
         'Date: "2025-03-16 00:00:00"
         'Inputs: {"575":"A4124","576":"08/25","577":"A4124","578":"08/25","579":"170900000055"} 
-        Dim LogDate As String = Convert.ToDateTime("2025-03-16 00:00:00").ToString("yyyy-MM-dd HH:mm:ss")
+        Dim LogDate As String = Format.DateField("2025-03-16 00:00:00")
         Dim LogUser As String = "mark kiser"
 
         LogDT.Columns.Add("Date", GetType(Date))
@@ -276,7 +277,17 @@ Public Class GetInputs
     <Fact>
     Public Sub GetInputs4()
         'baseline test for T_LogData Inputs field value with the new format (Dictionary(Of Integer, Dictionary(Of String, String)))
-        LogDR("Inputs") = "{""575"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""A4124""},""576"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""08/25""},""577"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""A4124""},""578"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""08/25""},""579"":{""Date"":""2025-03-16 00:00:00"",""Operator"":""mark kiser"",""Value"":""170900000055""}}"
+        LogDR("Inputs") = "{""575"":{""Date"":""03/16/2025 12:00:00 AM"",""Operator"":""mark kiser"",""Value"":""A4124""},""576"":{""Date"":""03/16/2025 12:00:00 AM"",""Operator"":""mark kiser"",""Value"":""08/25""},""577"":{""Date"":""03/16/2025 12:00:00 AM"",""Operator"":""mark kiser"",""Value"":""A4124""},""578"":{""Date"":""03/16/2025 12:00:00 AM"",""Operator"":""mark kiser"",""Value"":""08/25""},""579"":{""Date"":""03/16/2025 12:00:00 AM"",""Operator"":""mark kiser"",""Value"":""170900000055""}}"
         Assert.Equal(CorrectConfigStringified, JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(LogDR))) 'stringify return from GetInputs, to ensure the dictinaries are EXACTLY the same
     End Sub
+
+    <Fact>
+    Public Sub GetInputs6()
+        'when converting empty json in old format into new format, ensure date is an empty string if value and operator are
+        LogDR("Inputs") = "{""575"":"""",""576"":"""",""577"":"""",""578"":"""",""579"":""""}" 'old format
+        LogDR("Operator") = String.Empty
+        Dim NewFormat As String = "{""575"":{""Date"":"""",""Operator"":"""",""Value"":""""},""576"":{""Date"":"""",""Operator"":"""",""Value"":""""},""577"":{""Date"":"""",""Operator"":"""",""Value"":""""},""578"":{""Date"":"""",""Operator"":"""",""Value"":""""},""579"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
+        Assert.Equal(NewFormat, JsonSerializer.Serialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(LogAspx.GetInputs(LogDR))) 'stringify return from GetInputs, to ensure the dictinaries are EXACTLY the same
+    End Sub
+
 End Class

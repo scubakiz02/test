@@ -445,3 +445,39 @@ Public Class AspWebpageClassTests
         Assert.Equal(Url & "?Area=48&PageIdx=3", ChecklistReport.GetUrl())
     End Sub
 End Class
+
+
+Public Class FormatDateTests
+    Private Format As New Format()
+
+    <Fact>
+    Public Sub FormateDateTest1()
+        Assert.Equal("03/25/2025 12:00:00 AM", Format.DateField("03/25/2025"))
+    End Sub
+
+    <Fact>
+    Public Sub FormateDateTest2()
+        Assert.Equal("03/31/2025 12:00:00 AM", Format.DateField("03-31-2025"))
+    End Sub
+
+    <Fact>
+    Public Sub FormateDateTest3()
+        Assert.Equal("03/31/2025 12:00:00 AM", Format.DateField("2025-03-31"))
+    End Sub
+
+    <Fact>
+    Public Sub FormateDateTest4()
+        Assert.Equal("03/31/2025 12:00:00 AM", Format.DateField("2025-03-31 00:00:00"))
+    End Sub
+
+    <Fact>
+    Public Sub FormateDateTest5()
+        Assert.Equal("03/26/2025 03:43:55 PM", Format.DateField("3/26/2025 3:43:55 PM"))
+    End Sub
+
+    <Fact>
+    Public Sub FormateDateTest6()
+        Assert.Equal("03/27/2025 10:53:19 AM", Format.DateField("3/27/2025 10:53:19 AM"))
+    End Sub
+
+End Class

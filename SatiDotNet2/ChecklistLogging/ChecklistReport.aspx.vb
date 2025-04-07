@@ -32,6 +32,17 @@ Partial Class MR_OpenTicketStatusBoard
         Return Res
     End Function
 
+    <WebMethod()>
+    Public Shared Sub CheckAll(Checked As Boolean)
+        HttpContext.Current.Session("CheckAll") = Checked
+    End Sub
+
+    <WebMethod()>
+    Public Shared Sub CompareFields(Checked As Boolean)
+        HttpContext.Current.Session("CompareFields") = Checked
+    End Sub
+
+
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         Dim SetQsDatesDelegate As SetQsDatesDelegate = AddressOf SetQsDates
         Dim SqlSelectCommand As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A ORDER BY A.Area"
@@ -50,6 +61,10 @@ Partial Class MR_OpenTicketStatusBoard
             Session("AspWebpage") = New AspWebpage("/ChecklistLogging/ChecklistReport.aspx", New List(Of String) From {"Group", "Area", "StartDate", "EndDate", "PageIdx"})
         End If
         'to ensure each user of this webpage gets their own class objects
+
+        If Session("LabelsToExclude") Is Nothing Then
+            Session("LabelsToExclude") = New List(Of String)
+        End If
 
         ' MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         Me.MaintainScrollPositionOnPostBack = True
@@ -75,16 +90,61 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+        Dim DS As Data.DataSet = Session("GroupReport").GetDS()
+
         GroupDropDownList.SelectedValue = GroupFromQueryString
         AreaDropDownList.SelectedValue = AreaFromQueryString
         StartDate_TextBox.Text = StartDateFromQueryString
         EndDate_TextBox.Text = EndDateFromQueryString
         ReportGridView.PageIndex = PageIdxFromQueryString
 
-        ReportGridView.DataSource = Session("GroupReport").GetDS().Tables(0)
+        ReportGridView.DataSource = DS.Tables(0)
         ReportGridView.DataBind()
 
         ClientScript.RegisterStartupScript(Me.GetType(), "GridViewCols", "ColWidths(" & JsonSerializer.Serialize(Of Dictionary(Of String, String))(Session("GroupReport").GetMaxFieldVals()) & ");", True)
+
+        'build LabelCbxList children dynamically using DS variable
+        If AreaFromQueryString IsNot Nothing AndAlso AreaFromQueryString <> 0 Then 'if AreaFromQueryString is nothing or 0, then it area ddl is at 'All'
+            FilterData_Button.Enabled = True
+            CheckAll_CheckBox.Checked = Session("CheckAll")
+            CompareFields_CheckBox.Checked = Session("CompareFields")
+
+            Dim Labels As List(Of String) = Session("GroupReport").GetLabels()
+            Dim Cbx As ListItem
+
+            LabelCbxList.Items.Clear()
+            For Each Label As String In Labels
+                Cbx = New ListItem(Label, Label)
+                LabelCbxList.Items.Add(Cbx)
+
+                If Session("LabelsToExclude").Contains(Label) Then
+                    Cbx.Selected = True
+                End If
+            Next
+        End If
+    End Sub
+
+    Protected Sub UpdateLabelsButton_OnClick(sender As Object, e As EventArgs)
+        Dim LabelsToExclude As New List(Of String) 'b/c interacting with Session("LabelsToExclude") directly tends to cause issues
+
+        For Each LabelCbx As ListItem In LabelCbxList.Items
+            Dim CbxText As String = LabelCbx.Text
+
+            If LabelCbx.Selected Then 'if selected property is true, it means it's checked
+                LabelsToExclude.Add(CbxText)
+            ElseIf LabelCbx.Selected = False Then
+                LabelsToExclude.Remove(CbxText)
+            End If
+        Next
+
+        If CompareFields_CheckBox.Checked Then
+            Session("GroupReport").OrderDSByDate()
+        Else
+            Session("GroupReport").UndoOrderDSByDate()
+        End If
+
+        Session("LabelsToExclude") = New List(Of String)(LabelsToExclude)
+        Session("GroupReport").ExcludeLabels(Session("LabelsToExclude"))
     End Sub
 
     Protected Sub SetGridViewSrc()
@@ -104,14 +164,26 @@ Partial Class MR_OpenTicketStatusBoard
 
         Session("AspWebpage").SetUrl("Area", SelectedValue)
         Session("GroupReport").SetArea(SelectedValue)
+
+        LabelCbxList.Items.Clear()
+        Session.Remove("LabelsToExclude")
+
         RefreshPreview()
     End Sub
 
     Protected Sub GroupDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim SelectedValue As String = GroupDropDownList.SelectedValue
 
+        'reset area values as well
+        Session("AspWebpage").SetUrl("Area", 0)
+        Session("GroupReport").SetArea(0)
+
         Session("AspWebpage").SetUrl("Group", SelectedValue)
         Session("GroupReport").SetGroup(SelectedValue)
+
+        LabelCbxList.Items.Clear()
+        Session.Remove("LabelsToExclude")
+
         RefreshPreview()
     End Sub
 

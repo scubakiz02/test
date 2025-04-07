@@ -3,6 +3,7 @@ Imports System.Data.SqlClient
 Imports System.Web
 Imports System.Text.RegularExpressions
 Imports System.IO
+Imports System.Globalization
 
 Public Class Security
     Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
@@ -264,6 +265,18 @@ Public Class AspWebpage
 
     Public Function GetUrl() As String
         Return UrlWithQs
+    End Function
+
+End Class
+
+Public Class Format
+    Public Sub New()
+
+    End Sub
+
+    Public Function DateField(InputDate As String) As String
+        Dim ParsedDate As DateTime = DateTime.Parse(InputDate)
+        Return ParsedDate.ToString("MM/dd/yyyy hh:mm:ss tt")
     End Function
 
 End Class
