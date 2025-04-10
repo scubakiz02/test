@@ -15,6 +15,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+    Private Shared StampIndicator As New StampIndicator()
 
     Private Sub PageInit(sender As Object, e As EventArgs) Handles Me.Init
         Dim DS As New Data.DataSet
@@ -24,6 +25,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim AreaRC As Integer
         Dim SqlFuncDR As Data.DataRow
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
+        Dim StampIndicatorLabels As New Dictionary(Of String, String)
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
@@ -57,6 +59,25 @@ Partial Class MR_OpenTicketStatusBoard
             If Session("ViewFromQueryString") = "Full" Then
                 AdminPanel.Visible = True
             End If
+
+            'add controls to StampIndicatorLabelsPanel dynamically, to display to users in Full View what each stamp icon indicates
+            StampIndicatorLabels = StampIndicator.GetTitleIconHash()
+            For Each StampIndicatorLabel As KeyValuePair(Of String, String) In StampIndicatorLabels
+                Dim Panel As New Panel()
+                Dim Title As New Label()
+                Dim Icon As New ImageButton()
+
+                Panel.Attributes.Add("style", "display: flex; align-items: center;")
+
+                Icon.Attributes.Add("style", StampIndicator.StampIconCss)
+                Icon.ImageUrl = StampIndicatorLabel.Value
+
+                Title.Text = StampIndicatorLabel.Key & " ="
+
+                StampIndicatorLabelsPanel.Controls.Add(Panel)
+                Panel.Controls.Add(Title)
+                Panel.Controls.Add(Icon)
+            Next
 
             'build button controls for checklists that have a department, interval, assignee, & at least 1 input
             QueryConfig("@Department") = New Dictionary(Of String, String) From {
@@ -232,7 +253,12 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         Next
 
-        If AllEmptyInputs = False Then
+        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
+            {"value", DR("Key")},
+            {"typeOf", "int"}
+        }
+
+        If AllEmptyInputs = False OrElse Security.GetSingleDbField("SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey", QueryConfig, "CompleteLog") Then
             LogStatus = DR("LogStatus")
             StripeColor = DR("StripeColor")
         Else
@@ -281,27 +307,26 @@ Partial Class MR_OpenTicketStatusBoard
         RC = DS.Tables(0).Rows.Count
 
         For I = 0 To RC - 1
-            If I > 0 Then Exit For 'I will only be > 1 when double booking records of a checklist occurs in DB
+            Dim Panel As Panel
+            Dim CurrentLogsButton As Button
+            Dim BuildLogExport As Tuple(Of Panel, Button)
 
-            Dim CurrentLogsButton As New Button()
+            If I > 0 Then Exit For 'Will be > 1 when double booking records of a checklist occurs in DB, so account for this edgecase
+
             DR = DS.Tables(0).Rows(I)
-
             Assignee = If(IsDBNull(DR("Assignee")), Nothing, DR("Assignee").ToString())
 
-            SetButtonBackground(DR)
-            CurrentLogsButton.ID = DR("Key")
+            BuildLogExport = BuildLog(DR)
+            Panel = BuildLogExport.Item1
+            CurrentLogsButton = BuildLogExport.Item2
 
             If DuplicateRecord Then
+                CurrentLogsButton.Attributes.Add("style", "background: red; border: none;")
                 CurrentLogsButton.Text = "CONTACT DB ADMIN: " & DR("Area")
-                LogStatus = "red"
-                StripeColor = "red"
-            Else
-                CurrentLogsButton.Text = DR("Area")
-                AddHandler CurrentLogsButton.Click, AddressOf RedirectToLogAspx
-            End If
+                CurrentLogsButton.Enabled = False
 
-            CurrentLogsButton.Attributes.Add("style", "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px); ")
-            CurrentLogsButton.CssClass = "ChecklistButton"
+                Panel.Attributes.Add("style", "background-color: red; cursor: auto;")
+            End If
 
             Select Case DR("Interval")
                 Case "ONE TIME ONLY"
@@ -359,7 +384,7 @@ Partial Class MR_OpenTicketStatusBoard
             End Select
 
             If SubSectionId IsNot Nothing Then
-                CType(CurrentLogsPanel.FindControl(SubSectionId & "Panel"), Panel).Controls.Add(CurrentLogsButton)
+                CType(CurrentLogsPanel.FindControl(SubSectionId & "Panel"), Panel).Controls.Add(Panel)
                 CType(CurrentLogsPanel.FindControl(SubSectionId & "NoneLabel"), Label).Visible = False
             End If
         Next
@@ -374,21 +399,44 @@ Partial Class MR_OpenTicketStatusBoard
         RC = DS.Tables(0).Rows.Count
 
         For I = 0 To RC - 1
-            Dim PastIssuesButton As New Button()
             DR = DS.Tables(0).Rows(I)
-
-            SetButtonBackground(DR)
-            PastIssuesButton.ID = DR("Key")
-            PastIssuesButton.Text = DR("Area")
-            SetButtonText(PastIssuesButton, DR)
-
-            AddHandler PastIssuesButton.Click, AddressOf RedirectToLogAspx
-            PastIssuesButton.Attributes.Add("style", "max-width: 100%; background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px); ")
-            PastIssuesButton.CssClass = "ChecklistButton"
-            PastIssuesPanel.Controls.Add(PastIssuesButton)
+            PastIssuesPanel.Controls.Add(BuildLog(DR).Item1)
         Next
 
     End Sub
+
+    Public Function BuildLog(DR As Data.DataRow) As Tuple(Of Panel, Button)
+        Dim Panel As New Panel()
+        Dim SubPanel As New Panel()
+        Dim LogButton As New Button()
+        Dim IconPanel As New Panel()
+        Dim CssStripedBackground As String
+
+        SetButtonBackground(DR)
+        CssStripedBackground = "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px);"
+
+        Panel.Attributes.Add("style", "display: inline-block; border: 2px solid black; " & CssStripedBackground)
+        SubPanel.Attributes.Add("style", "display: flex")
+        LogButton.Attributes.Add("style", "width: 100%; border: none; cursor: pointer; " & CssStripedBackground)
+        IconPanel.Attributes.Add("style", "display: grid; align-items: center;")
+
+        IconPanel.ID = "IconPanel_" & DR("Key") 'will be used within SetStampIndicators()
+
+        StampIndicator.CreateIcons(IconPanel, DR("Key"), AddressOf RedirectToLogAspx)
+        SetButtonText(LogButton, DR)
+        LogButton.ID = DR("Key")
+        LogButton.Text = DR("Area")
+        LogButton.CssClass = "ChecklistButton"
+        AddHandler LogButton.Click, Sub(sender As Object, e As EventArgs)
+                                        RedirectToLogAspx(LogButton.ID)
+                                    End Sub
+
+        Panel.Controls.Add(SubPanel)
+        SubPanel.Controls.Add(LogButton)
+        SubPanel.Controls.Add(IconPanel)
+
+        Return Tuple.Create(Panel, LogButton)
+    End Function
 
     Sub SetButtonText(Button As Button, DR As Data.DataRow)
         If Not IsDBNull(DR("Assignee")) Then
@@ -400,39 +448,8 @@ Partial Class MR_OpenTicketStatusBoard
 
     End Sub
 
-
-    Protected Sub TimeTravelCalendar_OnSelectionChanged(sender As Object, e As EventArgs)
-        Response.Redirect(Request.FilePath.ToString & "?WHERE=" & TimeTravelCalendar.SelectedDate & "&Department=" & Session("DepartmentFromQueryString") & "&View=" & Request.QueryString("View"))
-    End Sub
-
-    Protected Sub TimeTravelCalendar_OnDayRender(sender As Object, e As DayRenderEventArgs)
-        'Dim FirstDate As String = GetSingleDbField("SELECT Min(Date) As FirstDate FROM [ALTS].[dbo].[T_LogData]", "FirstDate")
-        'Dim LastDate As String = GetSingleDbField("SELECT Max(Date) As LastDate FROM [ALTS].[dbo].[T_LogData]", "LastDate")
-        'Dim CalendarDate As Date = e.Day.Date
-
-        'If FirstDate Is Nothing OrElse LastDate Is Nothing Then
-        '    Exit Sub
-        'End If
-
-        'If Date.Parse(LastDate).Date < Today.Date Then
-        '    LastDate = Today.ToString()
-        'End If
-
-        'If CalendarDate < Date.Parse(FirstDate).Date OrElse CalendarDate > Date.Parse(LastDate).Date Then
-        '    e.Day.IsSelectable = False
-        '    e.Cell.BackColor = System.Drawing.Color.LightGray
-        '    e.Cell.ForeColor = System.Drawing.Color.DarkGray
-        'End If
-
-        If e.Day.Date = Today.Date Then
-            e.Cell.BackColor = System.Drawing.Color.LightGray
-            e.Cell.ForeColor = System.Drawing.Color.DarkGray
-        End If
-    End Sub
-
-    Protected Sub RedirectToLogAspx(sender As Object, e As EventArgs)
-        'Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID & If(Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date, "&WHERE=" & Request.QueryString("WHERE"), String.Empty) & "&Department=" & Request.QueryString("Department") & "&View=" & Request.QueryString("View"))
-        Response.Redirect("/ChecklistLogging/Log.aspx?Key=" & sender.ID)
+    Private Sub RedirectToLogAspx(Key As Integer)
+        Response.Redirect("Log.aspx?Key=" & Key)
     End Sub
 
     Protected Sub PageRefresh_OnTick(sender As Object, e As EventArgs)

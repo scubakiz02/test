@@ -737,17 +737,17 @@
                     </div>
                     <div id="overlay"></div>
 
-                    <div style="display: flex; justify-content: space-between; flex-direction: row-reverse;">
+                    <div style="display: flex; justify-content: space-between; flex-direction: row;">
+                        <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
                         <asp:Label ID="DateLabel" runat="server" Style="text-wrap: nowrap; font-style: italic;"></asp:Label>
-                        <asp:Panel ID="StampPanel" runat="server" Style="display: flex; gap: var(--UWhitespace);"></asp:Panel>
                     </div>
 
-                    <asp:Panel runat="server" Style="display: flex; align-items: flex-start; justify-content: space-between; flex-direction: row-reverse; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; flex-direction: row;">
+                        <asp:Panel ID="StampPanel" runat="server" Style="display: flex; gap: var(--UWhitespace);"></asp:Panel>
                         <asp:Button ID="WrongFormButton" Text="Wrong Form" CssClass="HeaderPanelButtons" BackColor="Red" runat="server" data-modal-target="#modal" OnClientClick="return false;" />
+                    </div>
 
-                        <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
-                            <%--<asp:Label ID="CommentPanelLabel" runat="server" Font-Size="X-Large" Font-Bold="true"></asp:Label>--%>
-                        </asp:Panel>
+                    <asp:Panel ID="CommentPanel" CssClass="SymmetricalGapping" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                     </asp:Panel>
 
                     <div class="SymmetricalGapping" style="display: flex; align-items: baseline; flex-direction: column;">
@@ -3885,7 +3885,7 @@
 
                     </asp:Panel>
 
-                    <asp:Panel ID="AddCommentPanel" runat="server">
+                    <asp:Panel ID="AddCommentPanel" runat="server" style="margin-bottom: var(--UWhitespace);">
                         <asp:Label runat="server">Add note: </asp:Label>
                         <asp:Label runat="server" ID="NoteErrorLabel" Style="color: red"></asp:Label>
                         <br />
@@ -3913,7 +3913,7 @@
                                     <asp:Label runat="server" Text='<%# Eval("Comment") %>'></asp:Label>
                                 </ItemTemplate>
                                 <EditItemTemplate>
-                                    <asp:TextBox ID="NotesBindTextBox" runat="server" Text='<%# Bind("Comment") %>' style="width: calc(100% - var(--UWhitespace) * 3);" CssClass="CommentGridViewControl"></asp:TextBox>
+                                    <asp:TextBox ID="NotesBindTextBox" runat="server" Text='<%# Bind("Comment") %>' Style="width: calc(100% - var(--UWhitespace) * 3);" CssClass="CommentGridViewControl"></asp:TextBox>
                                 </EditItemTemplate>
                             </asp:TemplateField>
 
@@ -3928,7 +3928,7 @@
                                 </ItemTemplate>
                                 <EditItemTemplate>
                                     <div style="display: flex; text-wrap: nowrap;">
-                                        <asp:LinkButton runat="server" CommandName="Cancel" Text="Cancel" CssClass="CommentGridViewControl" onClientClick="refreshPage();" />
+                                        <asp:LinkButton runat="server" CommandName="Cancel" Text="Cancel" CssClass="CommentGridViewControl" OnClientClick="refreshPage();" />
                                         <asp:LinkButton runat="server" CommandName="Update" Text="Update" CssClass="CommentGridViewControl" OnClientClick="UpdateOperatorNote.call(this); return false;" />
                                     </div>
                                 </EditItemTemplate>
@@ -3948,8 +3948,6 @@
                     <asp:SqlDataSource ID="CommentSqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
                         SelectCommand=""
                         UpdateCommand="UPDATE [ALTS].[dbo].[T_LogOperatorComments] SET Comment=@Comment WHERE [Key]=@Key"></asp:SqlDataSource>
-
-                    <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
                 </asp:Panel>
             </div>
         </ContentTemplate>

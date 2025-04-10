@@ -4,7 +4,6 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="60000"></asp:Timer>
-    <%--<asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="10000"></asp:Timer>--%>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
 
         <ContentTemplate>
@@ -80,7 +79,8 @@
                     text-wrap: nowrap;
                     align-items: baseline;
                     justify-content: space-between;
-                    flex-direction: column
+                    flex-direction: column;
+                    gap: var(--UWhitespace);
                 }
 
                 .ColoredSquares {
@@ -106,6 +106,17 @@
 
                     .DepartmentMenu {
                         font-size: calc(var(--UFontSize) * 1.5);
+                    }
+
+                    .StampIndicators {
+                        display: flex;
+                        gap: var(--UWhitespace);
+                    }
+
+                    .PageHeader {
+                        display: flex;
+                        flex-direction: row-reverse;
+                        justify-content: space-between;
                     }
                 }
 
@@ -139,6 +150,17 @@
                     .ColorCodingMessages {
                         justify-content: normal;
                         flex-direction: row;
+                        gap: unset;
+                    }
+
+                    .PastIssuesHeader {
+                        display: flex;
+                        align-items: baseline;
+                        gap: var(--UWhitespace);
+                    }
+
+                    .PageHeader {
+                        align-items: center;
                     }
                 }
 
@@ -188,54 +210,48 @@
             <div style="display: flex; flex-direction: column-reverse;">
 
                 <asp:Panel ID="AdminPanel" runat="server" Visible="False" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                    <asp:Label runat="server" CssClass="SectionLabel" Text="Past Issues"></asp:Label>
-
-                    <div>
-                        <asp:Panel runat="server" Style="float: left; margin-right: var(--UWhitespace);" Visible="False">
-                            <asp:Label ID="TimeTravelLabel" CssClass="" runat="server" Text=""></asp:Label>
-                            <asp:Calendar runat="server" ID="TimeTravelCalendar" CssClass="TimeTravelCalendar" OnDayRender="TimeTravelCalendar_OnDayRender" OnSelectionChanged="TimeTravelCalendar_OnSelectionChanged"></asp:Calendar>
-                        </asp:Panel>
-                        <asp:Panel runat="server">
-                            <%--Style="margin: 0 var(--UWhitespace); padding: var(--UWhitespace); border: 2px solid black;"--%>
-                            <asp:Panel ID="PastIssuesPanel" runat="server" Style="">
-                            </asp:Panel>
-                        </asp:Panel>
+                    <div class="PastIssuesHeader">
+                        <asp:Label runat="server" CssClass="SectionLabel" Text="Past Issues"></asp:Label>
+                        <asp:Panel runat="server" ID="StampIndicatorLabelsPanel" CssClass="StampIndicators"></asp:Panel>
                     </div>
+
+                    <asp:Panel ID="PastIssuesPanel" runat="server" Style="">
+                    </asp:Panel>
                 </asp:Panel>
 
                 <asp:Panel runat="server">
-                    <div style="display: flex; justify-content: space-between">
+                    <div class="PageHeader">
+                        <asp:Label ID="WhereLabel" CssClass="SubSectionLabel" runat="server" />
+
                         <asp:Panel ID="ColorCodingMessages" CssClass="ColorCodingMessages" runat="server" Style="">
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <svg class="ColoredSquares" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                         <path d="m0,0h1v1H0" fill="#FFC0CB" />
                                     </svg>
-                                    <p style="">= NOT STARTED</p>
+                                    <p style="margin: 0">= NOT STARTED</p>
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: center; margin: 0 10px;">
                                     <svg class="ColoredSquares" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                         <path d="m0,0h1v1H0" fill="#FF0000" />
                                     </svg>
-                                    <p style="">= NEEDS COMPLETION</p>
+                                    <p style="margin: 0">= NEEDS COMPLETION</p>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <div style="display: flex; align-items: center; justify-content: center;">
-                                    <div class="ColoredSquares" style="padding: 0; margin: 0 5px; background: repeating-linear-gradient(60deg, #33cc33, #33cc33 10px, #ADD8E6, #ADD8E6 20px);">
+                                    <div class="ColoredSquares" style="padding: 0; margin: 0 var(--UWhitespace); background: repeating-linear-gradient(60deg, #33cc33, #33cc33 10px, #ADD8E6, #ADD8E6 20px);">
                                     </div>
-                                    <p style="">= COMPLETE & NEEDS STAMP</p>
+                                    <p style="margin: 0">= COMPLETE & NEEDS STAMP</p>
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: center; margin: 0 10px;">
                                     <svg class="ColoredSquares" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1">
                                         <path d="m0,0h1v1H0" fill="#33CC33" />
                                     </svg>
-                                    <p style="">= COMPLETE</p>
+                                    <p style="margin: 0">= COMPLETE</p>
                                 </div>
                             </div>
                         </asp:Panel>
-
-                        <asp:Label ID="WhereLabel" CssClass="SubSectionLabel" Style="padding: var(--UWhitespace);" runat="server" />
                     </div>
 
                     <asp:Panel runat="server" ID="CurrentLogsPanel" CssClass="CurrentLogsPanel">
