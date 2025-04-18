@@ -20,11 +20,11 @@ jobs:
       uses: NuGet/setup-nuget@v1
 
     - name: Restore NuGet packages for solution
-      run: nuget restore SatiDotNet2.sln   
+      run: nuget restore SatiDotNet2/SatiDotNet2.sln   
 
     - name: Build solution
-      run: msbuild SatiDotNet2.sln /p:Configuration=Release
+      run: msbuild SatiDotNet2/SatiDotNet2.sln /p:Configuration=Release
 
     - name: Run xUnit tests
       run: |
-        cd .. & vstest.console.exe "SatiDotNet2Tests\bin\Release\SatiDotNet2Tests.dll" & cd SatiDotNet2
+        vstest.console.exe "SatiDotNet2Tests\bin\Release\SatiDotNet2Tests.dll" 
