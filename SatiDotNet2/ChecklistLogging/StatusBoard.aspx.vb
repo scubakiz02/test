@@ -422,7 +422,10 @@ Partial Class MR_OpenTicketStatusBoard
 
         IconPanel.ID = "IconPanel_" & DR("Key") 'will be used within SetStampIndicators()
 
-        StampIndicator.CreateIcons(IconPanel, DR("Key"), AddressOf RedirectToLogAspx)
+        If LogStatus <> "red" AndAlso LogStatus <> "pink" Then 'has to be complete to receive icons
+            StampIndicator.CreateIcons(IconPanel, DR("Key"), AddressOf RedirectToLogAspx)
+        End If
+
         SetButtonText(LogButton, DR)
         LogButton.ID = DR("Key")
         LogButton.Text = DR("Area")

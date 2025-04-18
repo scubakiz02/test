@@ -201,7 +201,7 @@ Public Class PhaseControllerTests
     <Fact>
     Public Sub GetPhasesTest3()
         'execute GetPhases() on PhaseController, instantiated with AreaKey 75, which should have a label with a NULL PhaseOrder (purposefully done)
-        'ensure is not NULL and does NOT include the Label with a NULL PhaseOrder 
+        'ensure result from PhaseController.GetPhases() is not NULL and does NOT include the Label with a NULL PhaseOrder 
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         Dim DS As Data.DataSet
         Dim RC As Integer
@@ -233,6 +233,14 @@ Public Class PhaseControllerTests
         'use Assert.Equal(Of ...) to compare the 2 Dictionaries, b/c they do NOT need to be sorted the same way
         Assert.Equal(Of Dictionary(Of Integer, Dictionary(Of String, String)))(GetPhasesExpected, PhaseController.GetPhases())
     End Sub
+
+    <Fact>
+    Public Sub GetPhasesTest4()
+        'execute GetPhases() on PhaseController with a Checklist that does NOT contain Phases (Nitrogen Daily) and contains values on input(s) (bug existed with these conditions)
+        PhaseController = New PhaseController(48, JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))("{""388"":{""Date"":"""",""Operator"":"""",""Value"":""12""},""389"":{""Date"":"""",""Operator"":"""",""Value"":""32""},""390"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"))
+        Assert.Equal(Nothing, PhaseController.GetPhases())
+    End Sub
+
 
     <Fact>
     Public Sub NoPhasesTest1()

@@ -61,7 +61,9 @@
     End Sub
 
     Private Sub SetPhases(Inputs As Dictionary(Of Integer, Dictionary(Of String, String)))
-        GlobalPhaseOrder = 1
+        If PhaseOrderToLabels.Count = 0 Then 'this means checklist does NOT contain Phases
+            Exit Sub
+        End If
 
         For Each LabelInput As KeyValuePair(Of Integer, Dictionary(Of String, String)) In Inputs
             Dim LabelKey As Integer = LabelInput.Key

@@ -10,38 +10,44 @@ Public Class StampIndicatorTests
     Private StampIndicator As New StampIndicator()
     Private CurrDS As New Data.DataSet
     Private TitleToIcon As New Dictionary(Of String, String)
-
-    Private Sub OgEnvironment()
-
-    End Sub
+    Dim DT As New DataTable()
+    Dim DR As Data.DataRow
 
     Sub New()
         CurrDS = GetMyDataSetParamQuery("SELECT Title, Base64Icon FROM [ALTS].[dbo].[T_LogStampTitle]", New Dictionary(Of String, Dictionary(Of String, String)))
         For Each CurrDR As DataRow In CurrDS.Tables(0).Rows
             TitleToIcon(CurrDR("Title")) = CurrDR("Base64Icon")
         Next
+
+        DT.Columns.Add("Base64Icon", GetType(String))
     End Sub
 
-    Public Function SerializeList(List As List(Of String)) As String
+    Private Sub AddToDataTable(Base64 As String)
+        DR = DT.NewRow()
+        DR("Base64Icon") = Base64
+    End Sub
+
+    Private Function SerializeList(List As List(Of String)) As String
         Return JsonSerializer.Serialize(Of List(Of String))(List)
     End Function
 
-    Public Function SerializeHash(Hash As Dictionary(Of String, String)) As String
+    Private Function SerializeHash(Hash As Dictionary(Of String, String)) As String
         Return JsonSerializer.Serialize(Of Dictionary(Of String, String))(Hash)
     End Function
 
     <Fact>
     Public Sub IconsTest1()
-        '2 stamps required, 2 stamps received (F&M Manager, Q/SHE Manager). Expect a list holding this information
-        Dim Res As New List(Of String) From {TitleToIcon("F&M Manager"), TitleToIcon("Q/SHE Manager")}
-        Assert.Equal(SerializeList(Res), SerializeList(StampIndicator.Icons(263)))
+        '2 stamps required, 2 stamps received (F&M Manager, Q/SHE Manager)
+        'Expect a list holding information of needed stamps, which is null
+        Assert.Equal(SerializeList(New List(Of String)), SerializeList(StampIndicator.Icons(263)))
     End Sub
 
     <Fact>
     Public Sub IconsTest2()
-        '1 stamp required, 1 stamp received (F&M Manager). Expect a list holding this information
+        '2 stamps required, 1 stamps received
+        'Expect a list holding information of needed stamps, which is F&M Manager
         Dim Res As New List(Of String) From {TitleToIcon("F&M Manager")}
-        Assert.Equal(SerializeList(Res), SerializeList(StampIndicator.Icons(411)))
+        Assert.Equal(SerializeList(Res), SerializeList(StampIndicator.Icons(526)))
     End Sub
 
     <Fact>
@@ -56,23 +62,34 @@ Public Class StampIndicatorTests
 
     <Fact>
     Public Sub CreateIconsTest1()
-        '1 stamp required, 1 stamp received for T_LogData record 411.
+        '2 stamps required, 1 stamps received
         'Last arg is true, meaning user is IN full view.
-        'As a result, expect 1 child control in the Panel returned from CreateIcons() function
+        'As a result, expect 1 child controls in the Panel returned from CreateIcons() function
         Dim Panel As New Panel()
         Panel.ID = "blah_23"
-        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 411, AddressOf DummyClickEvent, True)
+        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 526, AddressOf DummyClickEvent, True)
         Assert.Equal(1, ResPanel.Controls.Count)
     End Sub
 
     <Fact>
     Public Sub CreateIconsTest2()
-        '1 stamp required, 1 stamp received for T_LogData record 411.
-        'Last arg is false, meaning user is NOT in full view.
-        'As a result, expect 1 child control in the Panel returned from CreateIcons() function
+        '2 stamps required, 2 stamps received (F&M Manager, Q/SHE Manager)
+        'Last arg is false, meaning user is not in full view.
+        'As a result, expect 0 child controls in the Panel returned from CreateIcons() function
         Dim Panel As New Panel()
         Panel.ID = "blah_23"
-        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 411, AddressOf DummyClickEvent, False)
+        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 263, AddressOf DummyClickEvent, True)
+        Assert.Equal(0, ResPanel.Controls.Count)
+    End Sub
+
+    <Fact>
+    Public Sub CreateIconsTest3()
+        '2 stamps required, 1 stamps received
+        'Last arg is true, meaning user is not IN full view.
+        'As a result, expect 0 child controls in the Panel returned from CreateIcons() function
+        Dim Panel As New Panel()
+        Panel.ID = "blah_23"
+        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 526, AddressOf DummyClickEvent, False)
         Assert.Equal(0, ResPanel.Controls.Count)
     End Sub
 End Class

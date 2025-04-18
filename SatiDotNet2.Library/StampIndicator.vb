@@ -20,16 +20,30 @@ Public Class StampIndicator
             {"typeOf", "int"}
         }
 
-        If NumOfStamps(T_LogDataKey) > 0 Then
+        If NumOfStamps(T_LogDataKey) < NumOfNeededStamps(T_LogDataKey) Then
             Dim RC As Integer
 
-            StatusBoardDS = GetMyDataSetParamQuery("SELECT ST.Base64Icon FROM [ALTS].[dbo].[T_LogStamp] S  INNER JOIN [ALTS].[dbo].[T_LogStampList] SL ON S.StampKey=SL.[Key]  INNER JOIN [ALTS].[dbo].[T_LogStampTitle] ST ON SL.TitleKey=ST.[Key]  WHERE S.DataRecordKey=@DataRecordKey AND S.Active=1  ORDER BY ST.[Key]", QueryObject)
+            StatusBoardDS = GetMyDataSetParamQuery("SELECT SL.[Key] As StampKey, ST.Base64Icon
+              FROM [ALTS].[dbo].[T_LogStampList] SL
+              INNER JOIN [ALTS].[dbo].[T_LogStampTitle] ST ON SL.TitleKey=ST.[Key]  
+              WHERE 
+              AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogData] D WHERE [Key]=@DataRecordKey) 
+              AND Active=1", QueryObject)
             RC = StatusBoardDS.Tables(0).Rows.Count
+
+            QueryObject("@StampKey") = New Dictionary(Of String, String) From {
+                {"value", String.Empty},
+                {"typeOf", "int"}
+            }
 
             For I As Integer = 0 To RC - 1
                 Dim StatusBoardDR As Data.DataRow = StatusBoardDS.Tables(0).Rows(I)
 
-                IconsList.Add(StatusBoardDR("Base64Icon"))
+                QueryObject("@StampKey")("value") = StatusBoardDR("StampKey")
+
+                If GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogStamp] S WHERE StampKey=@StampKey AND DataRecordKey=@DataRecordKey", QueryObject, "Key") Is Nothing Then
+                    IconsList.Add(StatusBoardDR("Base64Icon"))
+                End If
             Next
         End If
 
