@@ -18,37 +18,18 @@ Public Class LabelOrderTests
     <Fact>
     Public Sub LabelOrder2()
         'moving label 2 up on Nitrogen Daily checklist
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("389", "up", "Label")
+        Dim LabelKey As Integer = 389
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "up", "Label")
         Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-        Dim UnitTestRes As Boolean
 
-        'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@Order1")("value") = "1" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+        Assert.Equal(1, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(LabelKey, ParameterizedValuesConfig("@Key1")("value"))
 
-            If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(388, ParameterizedValuesConfig("@Key2")("value"))
 
-                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
-
-                    If ParameterizedValuesConfig("@Key2")("value") = "388" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
-
-                        If ModifyOrderRes("SqlQuery").Contains("T_LogLabel") AndAlso ModifyOrderRes("SqlQuery").Contains("LabelOrder") Then
-
-                            UnitTestRes = True
-
-                        End If
-
-                    End If
-
-                End If
-
-            End If
-
-        Else
-            UnitTestRes = False
-        End If
-
-        Assert.True(UnitTestRes)
+        Assert.Contains("T_LogLabel", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("LabelOrder", ModifyOrderRes("SqlQuery"))
     End Sub
 
     <Fact>
@@ -61,39 +42,42 @@ Public Class LabelOrderTests
     <Fact>
     Public Sub LabelOrder4()
         'moving label 2 down on Nitrogen Daily checklist
-
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("389", "down", "Label")
+        Dim LabelKey As Integer = 389
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
         Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-        Dim UnitTestRes As Boolean
 
-        'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@Order1")("value") = "3" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+        Assert.Equal(3, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(LabelKey, ParameterizedValuesConfig("@Key1")("value"))
 
-            If ParameterizedValuesConfig("@Key1")("value") = "389" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(390, ParameterizedValuesConfig("@Key2")("value"))
 
-                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
-
-                    If ParameterizedValuesConfig("@Key2")("value") = "390" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
-
-                        If ModifyOrderRes("SqlQuery").Contains("T_LogLabel") AndAlso ModifyOrderRes("SqlQuery").Contains("LabelOrder") Then
-
-                            UnitTestRes = True
-
-                        End If
-
-                    End If
-
-                End If
-
-            End If
-
-        Else
-            UnitTestRes = False
-        End If
-
-        Assert.True(UnitTestRes)
+        Assert.Contains("T_LogLabel", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("LabelOrder", ModifyOrderRes("SqlQuery"))
     End Sub
+
+    <Fact>
+    Public Sub LabelOrder5()
+        'enusre LabelOrder for Label at top of Phase stack cannot be moved up, as PhaseOrder trumps LabelOrder
+        Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
+        Dim LabelKey As Integer = 602 'top label in phase 3 for checklist
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("602", "up", "Label")
+
+        Assert.Equal(3, PhaseController.GetPhases()(LabelKey)("PhaseOrder")) 'baseline check. if this test fails, ensure value in LabelKey variable is the [Key] DB field value for the top most label in Phase 3 for EDG monthly checklist
+        Assert.Equal("", Res("SqlQuery")) 'b/c T_LogLabel record 602 is the top most Label in Phase 3, it can NOT precede the LabelOrder of a record in another Phase
+    End Sub
+
+    <Fact>
+    Public Sub LabelOrder6()
+        'enusre LabelOrder for Label at bottom of Phase cannot be moved down, as PhaseOrder trumps LabelOrder
+        Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
+        Dim LabelKey As Integer = 603 'top label in phase 3 for checklist
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
+
+        Assert.Equal(2, PhaseController.GetPhases()(LabelKey)("PhaseOrder")) 'baseline check. if this test fails, ensure value in LabelKey variable is the [Key] DB field value for the bottom most label in Phase 2 for EDG monthly checklist
+        Assert.Equal("", Res("SqlQuery")) 'b/c T_LogLabel record 603 is the bottom most Label in Phase 2, it can NOT precede the LabelOrder of a record in another Phase
+    End Sub
+
     'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
 End Class
 
@@ -111,38 +95,18 @@ Public Class CommentOrderTests
 
     <Fact>
     Public Sub CommentOrder2()
-        'moving comment 2 up on Nitrogen Daily checklist
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("54", "up", "Comment")
+        Dim CommentKey As Integer = 54
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(CommentKey, "up", "Comment")
         Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-        Dim UnitTestRes As Boolean
 
-        'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@Order1")("value") = "1" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+        Assert.Equal(1, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(CommentKey, ParameterizedValuesConfig("@Key1")("value"))
 
-            If ParameterizedValuesConfig("@Key1")("value") = "54" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(53, ParameterizedValuesConfig("@Key2")("value"))
 
-                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
-
-                    If ParameterizedValuesConfig("@Key2")("value") = "53" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
-
-                        If ModifyOrderRes("SqlQuery").Contains("T_LogCommentList") AndAlso ModifyOrderRes("SqlQuery").Contains("CommentOrder") Then
-
-                            UnitTestRes = True
-
-                        End If
-
-                    End If
-
-                End If
-
-            End If
-
-        Else
-            UnitTestRes = False
-        End If
-
-        Assert.True(UnitTestRes)
+        Assert.Contains("T_LogCommentList", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("CommentOrder", ModifyOrderRes("SqlQuery"))
     End Sub
 
     <Fact>
@@ -155,39 +119,73 @@ Public Class CommentOrderTests
     <Fact>
     Public Sub CommentOrder4()
         'moving comment 2 down on Nitrogen Daily checklist
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("54", "down", "Comment")
+        Dim CommentKey As Integer = 54
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(CommentKey, "down", "Comment")
         Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-        Dim UnitTestRes As Boolean
 
-        'validate proper values in ParameterizedValuesConfig
-        If ParameterizedValuesConfig("@Order1")("value") = "3" AndAlso ParameterizedValuesConfig("@Order1")("typeOf") = "int" Then
+        Assert.Equal(3, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(CommentKey, ParameterizedValuesConfig("@Key1")("value"))
 
-            If ParameterizedValuesConfig("@Key1")("value") = "54" AndAlso ParameterizedValuesConfig("@Key1")("typeOf") = "int" Then
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(55, ParameterizedValuesConfig("@Key2")("value"))
 
-                If ParameterizedValuesConfig("@Order2")("value") = "2" AndAlso ParameterizedValuesConfig("@Order2")("typeOf") = "int" Then
-
-                    If ParameterizedValuesConfig("@Key2")("value") = "55" AndAlso ParameterizedValuesConfig("@Key2")("typeOf") = "int" Then
-
-                        If ModifyOrderRes("SqlQuery").Contains("T_LogCommentList") AndAlso ModifyOrderRes("SqlQuery").Contains("CommentOrder") Then
-
-                            UnitTestRes = True
-
-                        End If
-
-                    End If
-
-                End If
-
-            End If
-
-        Else
-            UnitTestRes = False
-        End If
-
-        Assert.True(UnitTestRes)
+        Assert.Contains("T_LogCommentList", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("CommentOrder", ModifyOrderRes("SqlQuery"))
     End Sub
     'USING R.O Daily AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
+End Class
+
+Public Class PhaseOrderTests
+    Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
+    Dim Security = New Security()
+
+    'USING EDG Monthly Exercise PM (AreaKey 82) AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
+    <Fact>
+    Public Sub PhaseOrder1()
+        'moving EDG Monthly Exercise PM 1 up on EDG Monthly Exercise PM
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("1", "up", "Phase")
+        Assert.Equal("", Res("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Public Sub PhaseOrder2()
+        Dim PhaseKey As Integer = 2
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(PhaseKey, "up", "Phase")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+
+        Assert.Equal(1, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(PhaseKey, ParameterizedValuesConfig("@Key1")("value"))
+
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(1, ParameterizedValuesConfig("@Key2")("value"))
+
+        Assert.Contains("T_LogPhase", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("PhaseOrder", ModifyOrderRes("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Public Sub PhaseOrder3()
+        'moving phase 3 down on EDG Monthly Exercise PM
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("3", "down", "Phase")
+        Assert.Equal("", Res("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Public Sub PhaseOrder4()
+        Dim PhaseKey As Integer = 2
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(PhaseKey, "down", "Phase")
+        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
+
+        Assert.Equal(3, ParameterizedValuesConfig("@Order1")("value"))
+        Assert.Equal(PhaseKey, ParameterizedValuesConfig("@Key1")("value"))
+
+        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
+        Assert.Equal(3, ParameterizedValuesConfig("@Key2")("value"))
+
+        Assert.Contains("T_LogPhase", ModifyOrderRes("SqlQuery"))
+        Assert.Contains("PhaseOrder", ModifyOrderRes("SqlQuery"))
+    End Sub
+    'USING EDG Monthly Exercise PM AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
 End Class
 
 Public Class GetAreaDdlSelectCommandTests

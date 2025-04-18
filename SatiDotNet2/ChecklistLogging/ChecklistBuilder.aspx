@@ -24,6 +24,8 @@
             let inputPanel;
             let inputPos;
 
+            document.getElementById("Overlay").style.display = "none"; //hide loading wheel overlay on PreviewPanel_iframe
+
             for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
 
             window.iframeEnabled = iframeEnabled;
@@ -68,13 +70,22 @@
         function iframeEnabled(bit) {
             PreviewPanel_iframe = getAspControl("PreviewPanel_iframe");
             EditPreviewPanel = document.getElementById("<%=EditPreviewPanel.ClientID%>");
+            document.getElementById("Overlay").style.display = "flex"; //display loading wheel over PreviewPanel_iframe
 
             if (!bit) {
                 window.location.href = window.location.href; //redirect to current url, to prevent 'Confirm Form Resubmission' alert window
                 EditPreviewPanel.classList.remove("disabled");
+                PreviewPanel_iframe.style.width = "166%";
+                PreviewPanel_iframe.style.height = "166%";
+                PreviewPanel_iframe.style.transform = "scale(.6)";
+                PreviewPanel_iframe.style.origin = "left top";
             }
             else {
                 EditPreviewPanel.classList.add("disabled");
+                PreviewPanel_iframe.style.width = "100%";
+                PreviewPanel_iframe.style.height = "100%";
+                PreviewPanel_iframe.style.transform = "unset";
+                PreviewPanel_iframe.style.origin = "unset";
             }
         }
     </script>
@@ -162,6 +173,33 @@
 
         .iframePanel {
             width: 600px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 6px solid #fff;
+            border-top: 6px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: .9;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         @media (min-width: 1920px) {
@@ -381,6 +419,26 @@
                             </asp:Panel>
                         </div>
                     </div>
+
+                    <asp:Panel Enabled="False" ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
+                        <div style="display: flex; gap: var(--UWhitespace);">
+                            <asp:Label runat="server" Text="Select Phase:"></asp:Label>
+                            <asp:Button Text="Edit" runat="server" OnClick="EditPhasesButton_OnClick" OnClientClick="iframeEnabled(true);" />
+                        </div>
+
+                        <asp:DropDownList
+                            ID="PhaseDropDownList"
+                            runat="server"
+                            DataSourceID="PhaseDropDownList_SqlDataSource"
+                            DataTextField="Phase"
+                            DataValueField="Key"
+                            CssClass="Width"
+                            AutoPostBack="True"
+                            OnSelectedIndexChanged="PhaseDropDownList_SelectedIndexChanged">
+                        </asp:DropDownList>
+                        <asp:SqlDataSource ID="PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
+                    </asp:Panel>
+
                     <div style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
                         <asp:Panel runat="server" ID="RangeOrderInterfacePanel" Enabled="false" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
                             <asp:Label runat="server" ID="RangeOrderLabel" Text="Range Order:"></asp:Label>
@@ -541,27 +599,9 @@
                 </asp:Panel>
 
                 <asp:Panel runat="server" ID="StampInterfacePanel" Enabled="False" CssClass="InterfacePanel">
-                    Stamps:&nbsp;
-                <asp:Button Text="Create" runat="server" Enabled="False" />
-                    <asp:Button Text="Edit" runat="server" OnClick="EditStampsButton_OnClick" />
-
-                    <%--InsertCommand value is a select query, because it's a workaround on the asp.net architecture to prevent empty TextBox values from creating a record in DB--%>
-                    <asp:SqlDataSource ID="StampFormView_SqlDataSource" runat="server" ConflictDetection="OverwriteChanges" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                        DeleteCommand="DELETE FROM [T_LogStampList] WHERE [Key] = @original_Key AND [Title] = @original_Title"
-                        InsertCommand="SELECT * FROM T_LogStampList"
-                        SelectCommand=""
-                        UpdateCommand="UPDATE [T_LogStampList] SET [Title] = @Title WHERE [Key] = @original_Key AND [Title] = @original_Title">
-                        <DeleteParameters>
-                            <asp:Parameter Name="original_Key" Type="Int32" />
-                            <asp:Parameter Name="original_Title" Type="String" />
-                        </DeleteParameters>
-                        <InsertParameters>
-                            <asp:Parameter Name="Title" Type="String" />
-                        </InsertParameters>
-                        <UpdateParameters>
-                            <asp:Parameter Name="Title" Type="String" />
-                        </UpdateParameters>
-                    </asp:SqlDataSource>
+                    <asp:Label runat="server" Text="Stamps:"></asp:Label>
+                    <asp:Button Text="Create" runat="server" Enabled="False" />
+                    <asp:Button Text="Edit" runat="server" OnClick="EditStampsButton_OnClick" OnClientClick="iframeEnabled(true);" />
                 </asp:Panel>
 
                 <div class="InterfacePanel" style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
@@ -651,8 +691,11 @@
 
         </asp:Panel>
 
-        <asp:Panel runat="server" CssClass="iframePanel" Style="border: 2px solid black; overflow: hidden;">
-            <iframe id="PreviewPanel_iframe" runat="server" style="border: none; width: 166%; height: 166%; margin: 0; max-width: none; transform: scale(.6); transform-origin: left top;"></iframe>
+        <asp:Panel runat="server" CssClass="iframePanel" Style="border: 2px solid black; overflow: hidden; position: relative;">
+            <iframe id="PreviewPanel_iframe" runat="server" style="border: none; width: 166%; height: 166%; transform: scale(.6); transform-origin: left top; margin: 0; max-width: none;"></iframe>
+            <div id="Overlay" class="overlay" style="justify-content: center; align-items: center; display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                <div class="spinner"></div>
+            </div>
         </asp:Panel>
     </asp:Panel>
 </asp:Content>

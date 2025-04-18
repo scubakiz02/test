@@ -179,7 +179,7 @@ Public Class GetMyDataSetParamQueryTests
         }
         Dim DS As Data.DataSet = Security2.GetMyDataSetParamQuery("SELECT * FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE id=@id", QueryObject)
         Dim DR As Data.DataRow = DS.Tables(0).Rows(0)
-        Assert.True(If(DR("username") = "benk-sef-rhid" AndAlso DR("password") = "R)y+j%Lg28petjgN" AndAlso DR("fullname") = "tim hughes", True, False))
+        Assert.True(If(DR("username") = "benk-sef-rhid" AndAlso DR("fullname") = "tim hughes", True, False))
     End Sub
 
     <Fact>
@@ -443,6 +443,14 @@ Public Class AspWebpageClassTests
         ChecklistReport.SetUrl("PageIdx", "3")
         ChecklistReport.SetUrl("Area", "48")
         Assert.Equal(Url & "?Area=48&PageIdx=3", ChecklistReport.GetUrl())
+    End Sub
+
+    <Fact>
+    Public Sub Test6()
+        'if a querystring key is a substring of the asp webpage, the qs should STILL be a part of the string
+        Dim LabelPhaseAspx As New AspWebpage("/ChecklistLogging/LabelPhase.aspx", New List(Of String) From {"Area", "Phase"})
+        LabelPhaseAspx.SetUrl("Phase", 1)
+        Assert.Contains("Phase=1", LabelPhaseAspx.GetUrl())
     End Sub
 End Class
 

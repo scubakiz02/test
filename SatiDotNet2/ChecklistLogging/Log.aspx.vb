@@ -47,6 +47,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim Directory As String
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Private Format As New Format()
+    Private PhaseController As PhaseController
 
     Public Delegate Sub DeleteNoteDelegate(ID As String)
     <WebMethod()>
@@ -125,6 +126,8 @@ Partial Class MR_OpenTicketStatusBoard
         Dim PhotoDR As Data.DataRow
         Dim PhotoRC As Integer
         Dim ImageUrl As String
+        Dim PhaseConfig As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim CurrPhaseOrder As Integer
 
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
@@ -155,7 +158,8 @@ Partial Class MR_OpenTicketStatusBoard
             MostRecentRecKey = Security.GetSingleDbField("SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC", QueryConfig, "Key")
 
             'get info needed to build checklist (labels, ranges, units, checklist name, etc.)
-            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
+            'DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY L.LabelOrder", QueryConfig)
+            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) A.[Key] As AreaKey, Area, I.SqlFunc, I.SqlFunc2ndArg, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, U.Unit, D.Date From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogData] D ON A.[Key]=D.AreaKey INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON L.PhaseKey=P.[Key] LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE D.[Key]=@T_LogDataKey ORDER BY P.PhaseOrder, L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
             'CommentSqlDataSource.SelectCommand = "SELECT OpComments.[Key], OpComments.Comment FROM [ALTS].[dbo].[T_LogOperatorComments] OpComments WHERE OpComments.CommentKey=(Select Top(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC)"
@@ -262,13 +266,18 @@ Partial Class MR_OpenTicketStatusBoard
             uploadDirectory = Path.Combine(Session("SUP_IO"), Directory).Replace("\", "/")
             VirtualDirectory = Path.Combine(Session("SUP_VD"), Directory).Replace("\", "/")
         ElseIf AreaFromQueryString IsNot Nothing Then  'if this is true, displaying webpage in iframe within ChecklistBuilder.aspx
+            Dim TempDataKey As Integer
+
             QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                 {"value", AreaFromQueryString},
                 {"typeOf", "int"}
             }
 
+            TempDataKey = Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey", QueryConfig, "Key")
+
             'get info needed to build the checklist (name, labels, units, ranges, etc.)
-            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, L.CheckboxOverTextbox, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=@AreaKey ORDER BY L.LabelOrder", QueryConfig)
+            'DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=@AreaKey ORDER BY L.LabelOrder", QueryConfig)
+            DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) Area, L.Label As Label, L.[Key] As LabelKey, L.Range As Range, L.FieldType, U.Unit From [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON A.[Key]=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON L.PhaseKey=P.[Key] LEFT JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE A.[Key]=@AreaKey ORDER BY P.PhaseOrder, L.LabelOrder", QueryConfig)
             RC = DS.Tables(0).Rows.Count
 
             'reset session state LabelInputMap variable to ensure logic surrounding FieldType case statement below still works
@@ -312,6 +321,10 @@ Partial Class MR_OpenTicketStatusBoard
 
         QueryConfig.Clear()
 
+        PhaseController = New PhaseController(AreaFromQueryString, Session("LabelInputMap"))
+        PhaseConfig = PhaseController.GetPhases()
+        CurrPhaseOrder = PhaseController.GetPhase()
+
         For I = 0 To RC - 1
             Dim myPanel As Panel = CType(UpdatePanel.FindControl("Panel" & I), Panel)
             Dim Cbx As CheckBox
@@ -320,6 +333,34 @@ Partial Class MR_OpenTicketStatusBoard
             'Range = If(IsDBNull(DR("Range")), String.Empty, DR("Range"))
             Range = LogAspx.GetRange(Request.QueryString("Key"), LogDR, DR)
             Unit = If(IsDBNull(DR("Unit")), String.Empty, DR("Unit"))
+
+            If PhaseConfig IsNot Nothing AndAlso PhaseConfig.ContainsKey(LabelKey) Then
+                Dim Phase As String = PhaseConfig(LabelKey)("Phase")
+                Dim PhasePanelID As String = Phase.Replace(" ", "-") & "_Panel"
+                Dim PhasePanel As Panel = ItemsPanel.FindControl(PhasePanelID)
+
+                If PhasePanel Is Nothing Then
+                    Dim PhaseLabel As New Label
+                    PhasePanel = New Panel()
+
+                    PhaseLabel.Text = Phase
+                    'NOTE: for some odd reason, calc(var(--UFontSize) * 1) is a bigger font-size than var(--UFontSize) * 1
+                    PhaseLabel.Attributes.Add("style", "font-size: calc(var(--UFontSize) * 1); font-weight: bolder;")
+                    ItemsPanel.Controls.Add(PhaseLabel)
+
+                    PhasePanel.ID = PhasePanelID
+                    PhasePanel.Attributes.Add("style", "display: grid; grid-template-columns: 49% 49%; justify-content: space-between; gap: var(--UWhitespace);")
+
+                    ItemsPanel.Controls.Add(PhasePanel)
+                End If
+
+                PhasePanel.Controls.Add(myPanel)
+                ItemsPanel.Attributes("style") = "display: flex; flex-direction: column; gap: var(--UWhitespace); overflow: auto;"
+
+                If PhaseConfig(LabelKey)("PhaseOrder") > CurrPhaseOrder AndAlso Request.QueryString("Key") IsNot Nothing Then
+                    PhasePanel.Enabled = False
+                End If
+            End If
 
             myPanel.Visible = True
 
@@ -1143,10 +1184,10 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Sub hold()
-        '<asp:Button ID = "Button1" runat="server" Text="Auto Batch Stock (Polish)" Height="125px" Width="258px" LabelTip="Master drive fault: n4 outer pin ring, n2 lower plate, n3 inner pin ring. Audible grinding noise heard emanating from outer pin ring gearbox/motor assembly area. Grinding most audible in second half of brush cycle when spin direction changes. " BackColor="#33CC33" />
-        '<asp:Button ID = "Button2" runat="server" Text="Auto Batch Stock / 3500 (DSP)" Height="50px" Width="300px" BackColor="#FFFF66" />
-        '<asp:Button ID = "Button3" runat="server" Text="Button" Height="112px" Width="644px" BackColor="Red" />
-        '<asp:Button ID="Button4" runat="server" Text="Button" OnClick="myclick" CommandArgument="themrnumber" />
+        '<asp:Button ID="Button1" runat="server" Text="Auto Batch Stock (Polish)" Height="125px" Width="258px" LabelTip="Master drive fault: n4 outer pin ring, n2 lower plate, n3 inner pin ring. Audible grinding noise heard emanating from outer pin ring gearbox/motor assembly area. Grinding most audible in second half of brush cycle when spin direction changes. " BackColor="#33CC33"/>
+        '<asp:Button ID="Button2" runat="server" Text="Auto Batch Stock / 3500 (DSP)" Height="50px" Width="300px" BackColor="#FFFF66"/>
+        '<asp:Button ID="Button3" runat="server" Text="Button" Height="112px" Width="644px" BackColor="Red"/>
+        '<asp:Button ID="Button4" runat="server" Text="Button" OnClick="myclick" CommandArgument="themrnumber"/>
     End Sub
 
     Sub BuildDynamicAsp()

@@ -94,8 +94,8 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFromQueryString = SetLabelFromQueryString()
                 End If
 
-                'LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY LabelOrder"
-                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=@AreaKey ORDER BY LabelOrder"
+                'LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=@AreaKey ORDER BY LabelOrder"
+                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT L.[Key], [Label] FROM [T_LogLabel] L LEFT JOIN [T_LogPhase] P ON L.PhaseKey=P.[Key] WHERE L.[AreaKey]=@AreaKey ORDER BY P.PhaseOrder, L.LabelOrder"
                 LabelDropDownList_SqlDataSource.SelectParameters.Clear()
                 LabelDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
 
@@ -105,15 +105,16 @@ Partial Class MR_OpenTicketStatusBoard
                 If LabelFromQueryString IsNot Nothing Then
                     QueryConfig.Clear()
                     QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                    {"value", LabelFromQueryString},
-                    {"typeOf", "int"}
-                }
+                        {"value", LabelFromQueryString},
+                        {"typeOf", "int"}
+                    }
                     FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
                     DbRange = Security.GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Range")
                     Unit = Security.GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=@LabelKey", QueryConfig, "Key")
 
                     'enable associated functionalities
                     LabelDropDownList.Enabled = True
+                    PhaseInterfacePanel.Enabled = True
                     LabelOrderInterfacePanel.Enabled = True
                     UnitInterfacePanel.Enabled = True
                     FieldType_DropDownList.Enabled = True
@@ -128,6 +129,9 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFormView_SqlDataSource.SelectParameters.Clear()
                     LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
                     LabelFormView_SqlDataSource.DataBind()
+
+                    PhaseDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [AreaKey]=@AreaKey ORDER BY PhaseOrder"
+                    PhaseDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
 
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
@@ -306,6 +310,19 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
         FormViewInsert = Nothing
+    End Sub
+
+    Protected Sub PhaseDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        QueryConfig("@PhaseKey") = New Dictionary(Of String, String) From {
+            {"value", PhaseDropDownList.SelectedValue},
+            {"typeOf", "int"}
+        }
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+            {"value", LabelFromQueryString},
+            {"typeOf", "int"}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=@PhaseKey WHERE [Key]=@LabelKey", QueryConfig)
+        RefreshPreview()
     End Sub
 
     Sub CreateListItem(Config As Dictionary(Of String, String))
@@ -522,8 +539,14 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub EditStampsButton_OnClick(sender As Object, e As EventArgs)
         'Response.Redirect(StampSelectPage & "?" & Request.RawUrl.Split("?")(1)) 'add querystrings from current url to webpage listed within StampSelectPage
-        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
         PreviewPanel_iframe.Attributes.Add("src", StampSelectPage & "?" & Request.RawUrl.Split("?")(1))
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
+    End Sub
+
+    Protected Sub EditPhasesButton_OnClick(sender As Object, e As EventArgs)
+        'Response.Redirect(StampSelectPage & "?" & Request.RawUrl.Split("?")(1)) 'add querystrings from current url to webpage listed within StampSelectPage
+        PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/LabelPhase.aspx?Area=" & AreaFromQueryString)
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled2", "iframeEnabled(true);", True)
     End Sub
 
     Sub RefreshPreview()
@@ -1094,6 +1117,21 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub EditDatepickButton_OnClick(sender As Object, e As EventArgs)
         EditDatepickButton.Enabled = False
         DatepickCalendar.Visible = True
+    End Sub
+
+    Private Sub MR_OpenTicketStatusBoard_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+
+    End Sub
+
+    Protected Sub PhaseDropDownList_DataBound(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
+        PhaseDropDownList.Items.Insert(0, New ListItem("Select Phase...", ""))
+        PhaseDropDownList.SelectedIndex = 0
+
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                {"value", LabelFromQueryString},
+                {"typeOf", "string"}
+            }
+        PhaseDropDownList.SelectedValue = Security.GetSingleDbField("SELECT PhaseKey From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "PhaseKey")
     End Sub
 End Class
 

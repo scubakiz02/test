@@ -249,8 +249,14 @@ Public Class AspWebpage
         For Each kvp As KeyValuePair(Of String, String) In QsConfig
             Dim QsKey As String = kvp.Key
             Dim QsValue As String = kvp.Value
+            Dim UrlSplit As String() = UrlWithQs.Split("?")
+            Dim QueryStrings As New List(Of String)
 
-            If QsValue IsNot Nothing AndAlso UrlWithQs.Contains(QsKey) = False Then
+            If UrlSplit.Count > 1 Then 'if querystrings exist
+                QueryStrings.AddRange(UrlSplit(1).Split("&"))
+            End If
+
+            If QsValue IsNot Nothing AndAlso QueryStrings.Contains(QsKey & "=" & QsValue) = False Then 'qs value is not null AND qs key does NOT exist in the url
                 If QsPresent Then
                     UrlWithQs += "&"
                 Else
