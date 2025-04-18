@@ -19,6 +19,11 @@ jobs:
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1
 
+    - name: Print the root directory
+      run: |
+        echo "Current working directory: $(pwd)"
+        echo "Root directory (GITHUB_WORKSPACE): $GITHUB_WORKSPACE"
+
     - name: Restore NuGet packages for solution
       run: nuget restore SatiDotNet2/SatiDotNet2.sln   
 
