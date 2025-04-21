@@ -22,6 +22,7 @@
         </Triggers>
 
         <ContentTemplate>
+            <script src="../scripts/WebComponents/Spinner.js"></script>
             <script type="text/javascript" src="../scripts/ChecklistLogging/LogAspx.js"> </script>
             <script type="text/javascript">
                 let labels;
@@ -39,6 +40,7 @@
                 let PreviewPanel_iframe;
                 let EditPreviewPanel;
                 let AddNoteCounter;
+                let WebpageSpinner;
 
                 Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                     setItemsPanel(); // Ensure setItemsPanel function is called after every partial postback
@@ -47,6 +49,9 @@
                 window.addEventListener("load", function () {
                     let fileUpload = document.getElementById('<%= Uploader.ClientID %>');
                     AddNoteCounter = 0;
+
+                    WebpageSpinner = document.body.querySelector("#WebpageSpinner");
+                    document.body.appendChild(WebpageSpinner);
 
                     window.iframeEnabled = iframeEnabled;
 
@@ -719,6 +724,9 @@
                     padding: var(--UWhitespace);
                 }
             </style>
+
+            <sati-spinner id="WebpageSpinner"></sati-spinner>
+
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">
                     <div class="modal" id="modal">
@@ -731,14 +739,14 @@
 
                             <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
                                 <button data-close-button onclick="return false;" class="HeaderPanelButtons">No</button>
-                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClick="ResetLog_OnClick" BackColor="Red" />
+                                <asp:Button Text="Yes" runat="server" CssClass="HeaderPanelButtons" OnClientClick="WebpageSpinner.displaySpin();" OnClick="ResetLog_OnClick" BackColor="Red" />
                             </div>
                         </div>
                     </div>
                     <div id="overlay"></div>
 
                     <div style="display: flex; justify-content: space-between; flex-direction: row;">
-                        <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
+                        <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClientClick="WebpageSpinner.displaySpin();" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
                         <asp:Label ID="DateLabel" runat="server" Style="text-wrap: nowrap; font-style: italic;"></asp:Label>
                     </div>
 
@@ -3885,7 +3893,7 @@
 
                     </asp:Panel>
 
-                    <asp:Panel ID="AddCommentPanel" runat="server" style="margin-bottom: var(--UWhitespace);">
+                    <asp:Panel ID="AddCommentPanel" runat="server" Style="margin-bottom: var(--UWhitespace);">
                         <asp:Label runat="server">Add note: </asp:Label>
                         <asp:Label runat="server" ID="NoteErrorLabel" Style="color: red"></asp:Label>
                         <br />

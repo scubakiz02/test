@@ -108,7 +108,7 @@ Partial Class MR_OpenTicketStatusBoard
         End If
     End Sub
 
-    Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
+    Private Sub Page_Init(sender As Object, e As EventArgs) Handles Me.Init
         Dim I As Integer = 0
         Dim II As Integer = 0
         Dim RC As Integer = 0
@@ -981,7 +981,7 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         Next
 
-        CheckedStatus = Not sender.Checked 'because view state is reset after postback, the true Checked value is the opposite of the current one
+        CheckedStatus = sender.Checked
         LabelOutOfRangeMap(Tbx.ID.Split("_")(1)) = CheckedStatus
         Cbx.Checked = CheckedStatus
         UploadToDataTable(User.Identity.Name.ToString)

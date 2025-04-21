@@ -1,9 +1,11 @@
 ﻿<%@ Page Title="" Language="VB" MaintainScrollPositionOnPostback="true" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="ChecklistReport.aspx.vb" Inherits="MR_OpenTicketStatusBoard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <script src="../scripts/WebComponents/Spinner.js"></script>
     <script defer type="text/javascript">
         let StartDate_Textbox;
         let EndDate_Textbox;
+        let WebpageSpinner;
 
         window.addEventListener("load", function () {
             const ReportGridView = document.getElementById('<%= ReportGridView.ClientID %>');
@@ -11,6 +13,9 @@
             const LabelCbxList = document.getElementById('<%= LabelCbxList.ClientID %>');
             const openModalButtons = document.querySelectorAll('[data-modal-target]')
             const closeModalButtons = document.querySelectorAll('[data-close-button]')
+
+            WebpageSpinner = document.getElementById("WebpageSpinner");
+            document.body.appendChild(WebpageSpinner);
 
             CheckAllCbx.addEventListener("click", function () {
                 let checked = this.checked;
@@ -61,13 +66,13 @@
 
             this.addEventListener("keypress", function (e) {
                 if (e.key === "Enter") {
-                    displaySpin();
+                    WebpageSpinner.displaySpin();
                     PageMethods.SetQueryStringDates(this.value, StartDate_Textbox.value, EndDate_Textbox.value ? EndDate_Textbox.value : new Date().toLocaleDateString('en-US'), function (response) {
                         let message = response["DateInRange"];
 
                         ErrorLabel.innerHTML = message;
                         if (response.hasOwnProperty("Url")) window.location.replace(response["Url"]);
-                        if (message !== "") hideSpin();
+                        if (message !== "") WebpageSpinner.hideSpin();
                     });
                 }
             })
@@ -109,16 +114,8 @@
         function SetSpinAnimation() {
             let buttons = this.querySelectorAll("tbody a");
             buttons.forEach(button => {
-                button.addEventListener("click", displaySpin);
+                button.addEventListener("click", WebpageSpinner.displaySpin);
             });
-        }
-
-        function displaySpin() {
-            document.getElementById("Overlay").style.display = "flex";
-        }
-
-        function hideSpin() {
-            document.getElementById("Overlay").style.display = "none";
         }
 
         function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
@@ -274,9 +271,7 @@
         }
     </style>
 
-    <div id="Overlay" class="overlay" style="justify-content: center; align-items: center; display: none; width: 100vw; height: 100vh; top: 0; left: 0;">
-        <div class="spinner"></div>
-    </div>
+    <sati-spinner id="WebpageSpinner"></sati-spinner>
 
     <%--120px for header, 80.5px for footer (footer is actually 161px, so it's divided by 2 to reach desired effect)--%>
     <asp:Panel runat="server" Style="display: flex; justify-content: space-between; height: calc(100vh - (120px + 80.5px));">
@@ -291,7 +286,7 @@
                         DataValueField="Key"
                         OnSelectedIndexChanged="GroupDropDownList_SelectedIndexChanged"
                         CssClass="Width"
-                        onchange="displaySpin();">
+                        onchange="WebpageSpinner.displaySpin();">
                         <asp:ListItem Selected="True" Value="0">All</asp:ListItem>
                     </asp:DropDownList>
                     <asp:SqlDataSource ID="GroupDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
@@ -304,7 +299,7 @@
                         DataSourceID="AreaDropDownList_SqlDataSource" DataTextField="Area"
                         DataValueField="Key" OnSelectedIndexChanged="AreaDropDownList_SelectedIndexChanged"
                         CssClass="Width"
-                        onchange="displaySpin();">
+                        onchange="WebpageSpinner.displaySpin();">
                         <asp:ListItem Selected="True" Value="0">All</asp:ListItem>
                     </asp:DropDownList>
                     <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
@@ -348,7 +343,7 @@
                             </div>
                         </div>
                         <div class="modal-body">
-                            <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right" >
+                            <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right">
                             </asp:CheckBoxList>
 
                             <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">

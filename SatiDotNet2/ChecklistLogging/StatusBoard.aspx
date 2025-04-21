@@ -7,10 +7,18 @@
     <asp:UpdatePanel ID="UpdatePane" runat="server">
 
         <ContentTemplate>
+            <script src="../scripts/WebComponents/Spinner.js"></script>
             <script type="text/javascript">
+                let satiSpinner;
+
                 function redirect(url) {
                     window.location.href = url + this.id
                 }
+
+                window.addEventListener("load", function () {
+                    satiSpinner = document.body.querySelector("sati-spinner");
+                    document.body.appendChild(satiSpinner);
+                })
             </script>
 
             <style>
@@ -205,6 +213,8 @@
                     }
                 }
             </style>
+
+            <sati-spinner></sati-spinner>
 
             <%--style="display: flex; justify-content: space-between;"--%>
             <div style="display: flex; flex-direction: column-reverse;">

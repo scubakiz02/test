@@ -430,6 +430,7 @@ Partial Class MR_OpenTicketStatusBoard
         LogButton.ID = DR("Key")
         LogButton.Text = DR("Area")
         LogButton.CssClass = "ChecklistButton"
+        LogButton.OnClientClick = "satiSpinner.displaySpin();" 'takes a few seconds to redirect to Log.aspx. Display spinning wheel during this wait 
         AddHandler LogButton.Click, Sub(sender As Object, e As EventArgs)
                                         RedirectToLogAspx(LogButton.ID)
                                     End Sub
