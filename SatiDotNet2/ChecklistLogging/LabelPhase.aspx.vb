@@ -85,7 +85,8 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", PhaseListBox.SelectedValue},
             {"typeOf", "int"}
         }
-        Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey", QueryObject)
+        'Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey", QueryObject)
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=NULL WHERE PhaseKey=@PhaseKey; DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey", QueryObject)
 
         LabelPhaseAspx.SetUrl("Phase", Nothing)
         Response.Redirect(LabelPhaseAspx.GetUrl())
