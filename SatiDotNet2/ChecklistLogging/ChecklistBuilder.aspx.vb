@@ -34,6 +34,22 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
+    Private Sub Page_Init(sender As Object, e As EventArgs) Handles Me.Init
+    End Sub
+
+    Private Sub MR_OpenTicketStatusBoard_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
+        Dim PhaseShow As Boolean = Session("PhaseShow")
+
+        If PhaseShow Then
+            PhaseDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [AreaKey]=@Area ORDER BY PhaseOrder"
+            PhaseDropDownList_SqlDataSource.SelectParameters.Clear()
+            PhaseDropDownList_SqlDataSource.SelectParameters.Add("Area", AreaFromQueryString)
+        End If
+
+        PhaseShowHide_CheckBox.Checked = PhaseShow
+        PhaseInterfacePanel.Visible = PhaseShow
+    End Sub
+
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval", "PC"}, Server)
@@ -119,6 +135,7 @@ Partial Class MR_OpenTicketStatusBoard
                     UnitInterfacePanel.Enabled = True
                     FieldType_DropDownList.Enabled = True
                     RangeOrderInterfacePanel.Enabled = True
+                    PhaseShowHide_CheckBox.Enabled = True
 
                     UnitDropDownList.SelectedValue = Unit
 
@@ -129,9 +146,6 @@ Partial Class MR_OpenTicketStatusBoard
                     LabelFormView_SqlDataSource.SelectParameters.Clear()
                     LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
                     LabelFormView_SqlDataSource.DataBind()
-
-                    PhaseDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [AreaKey]=@AreaKey ORDER BY PhaseOrder"
-                    PhaseDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
 
                     'set field type
                     FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
@@ -286,6 +300,12 @@ Partial Class MR_OpenTicketStatusBoard
         Dim ListItemStylesRC As Integer = ListItemStylesDS.Tables(0).Rows.Count - 1
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
+
+        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
+                {"value", LabelFromQueryString},
+                {"typeOf", "string"}
+            }
+        PhaseDropDownList.SelectedValue = Security.GetSingleDbField("SELECT PhaseKey From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "PhaseKey")
 
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem control red
         For I = 0 To ListItemStylesRC
@@ -645,6 +665,7 @@ Partial Class MR_OpenTicketStatusBoard
         CommentOrderInterface.Enabled = EnabledValue
         IntervalInterfacePanel.Enabled = EnabledValue
         DepartmentInterfacePanel.Enabled = EnabledValue
+        PhaseShowHide_CheckBox.Enabled = EnabledValue
     End Sub
 
     Protected Sub EditButton_OnClick(sender As Object, e As EventArgs)
@@ -1119,19 +1140,13 @@ Partial Class MR_OpenTicketStatusBoard
         DatepickCalendar.Visible = True
     End Sub
 
-    Private Sub MR_OpenTicketStatusBoard_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
-
-    End Sub
-
     Protected Sub PhaseDropDownList_DataBound(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
         PhaseDropDownList.Items.Insert(0, New ListItem("Select Phase...", ""))
         PhaseDropDownList.SelectedIndex = 0
+    End Sub
 
-        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                {"value", LabelFromQueryString},
-                {"typeOf", "string"}
-            }
-        PhaseDropDownList.SelectedValue = Security.GetSingleDbField("SELECT PhaseKey From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "PhaseKey")
+    Protected Sub PhaseShowHide_OnCheckedChanged(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
+        Session("PhaseShow") = PhaseShowHide_CheckBox.Checked
     End Sub
 End Class
 

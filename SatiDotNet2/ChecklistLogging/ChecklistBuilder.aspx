@@ -31,13 +31,13 @@
             window.iframeEnabled = iframeEnabled;
 
             labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
-            labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text;
+            labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text.split("|")[0].trim();
             iterateChildren(function () {
                 if (this.id && this.id.includes("ItemsPanel")) {
                     ItemsPanel = this;
                     return;
                 }
-                else if (this.value && this.value.includes(labelDdlValue)) {
+                else if (this.value && this.value === labelDdlValue) {
                     inputPanel = this;
                     return;
                 }
@@ -219,7 +219,7 @@
         <%--height is 95% to prevent weird overlap with footer--%>
         <asp:Panel ID="EditPreviewPanel" CssClass="EditPreviewPanel" onscroll="setScrollPos.call(this)" runat="server" Style="">
             <div>
-                <asp:Panel runat="server" ID="AreaInterfacePanel" CssClass="InterfacePanel" Style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
+                <asp:Panel runat="server" BackColor="#FFA07A" ID="AreaInterfacePanel" CssClass="InterfacePanel" Style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
 
                     <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
 
@@ -321,7 +321,7 @@
                     </asp:SqlDataSource>
                 </asp:Panel>
 
-                <asp:Panel runat="server" ID="LabelInterfacePanel" CssClass="InterfacePanel" Style="display: flex; flex-direction: column; align-items: baseline; gap: var(--UWhitespace);">
+                <asp:Panel runat="server" BackColor="#90EE90" ID="LabelInterfacePanel" CssClass="InterfacePanel" Style="display: flex; flex-direction: column; align-items: baseline; gap: var(--UWhitespace);">
                     <div style="display: flex; flex-direction: column;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
@@ -420,7 +420,8 @@
                         </div>
                     </div>
 
-                    <asp:Panel Enabled="False" ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
+                    <asp:CheckBox Enabled="False" style="display: flex; flex-direction: row;" Text="Show/Hide Phases: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true"/>
+                    <asp:Panel Visible="False" ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
                         <div style="display: flex; gap: var(--UWhitespace);">
                             <asp:Label runat="server" Text="Select Phase:"></asp:Label>
                             <asp:Button Text="Edit" runat="server" OnClick="EditPhasesButton_OnClick" OnClientClick="iframeEnabled(true);" />
@@ -517,7 +518,7 @@
             </div>
 
             <div>
-                <asp:Panel runat="server" ID="CommentInterfacePanel" CssClass="InterfacePanel">
+                <asp:Panel runat="server" BackColor="#AFEEEE" ID="CommentInterfacePanel" CssClass="InterfacePanel">
                     <asp:Label runat="server" Text="Select Comment:"></asp:Label>&nbsp;
                     <br />
                     <asp:DropDownList ID="CommentDropDownList" Enabled="False" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
@@ -598,13 +599,13 @@
 
                 </asp:Panel>
 
-                <asp:Panel runat="server" ID="StampInterfacePanel" Enabled="False" CssClass="InterfacePanel">
+                <asp:Panel runat="server" BackColor="#DAB1DA" ID="StampInterfacePanel" Enabled="False" CssClass="InterfacePanel">
                     <asp:Label runat="server" Text="Stamps:"></asp:Label>
                     <asp:Button Text="Create" runat="server" Enabled="False" />
                     <asp:Button Text="Edit" runat="server" OnClick="EditStampsButton_OnClick" OnClientClick="iframeEnabled(true);" />
                 </asp:Panel>
 
-                <div class="InterfacePanel" style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
+                <div class="InterfacePanel" style="display: flex; flex-direction: column; gap: var(--UWhitespace); background-color: #FFFFCC;">
                     <asp:Panel runat="server" Enabled="false" ID="DepartmentInterfacePanel">
 
                         <div style="display: flex; align-items: center;">
