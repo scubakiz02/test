@@ -55,7 +55,7 @@ Public Class DateValidation
     End Sub
 
     <Fact>
-    Public Sub ValidDateTest10()
+    Public Sub AprilOf2054Test()
         'testing april of 2054, which should return true. In a previous iteration of ValidDate(), it interpreted this as april of 1954
         Assert.Equal("", LogAspx.ValidDate("04/54"))
     End Sub

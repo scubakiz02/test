@@ -42,7 +42,7 @@ Public Class LogAspxLibrary
             InputYear = Integer.Parse(DateDelimited(1))
             DateParseInput = Date.Parse(InputMonth & "/01/" & "20" & InputYear.ToString())
 
-            If DateParseInput.Year < Today.Year OrElse DateParseInput.Month < Today.Month Then 'ensure user input date is today or later, but do NOT check the day in DateParseInput variable value 
+            If DateParseInput.Year < Today.Year OrElse (DateParseInput.Year = Today.Year AndAlso DateParseInput.Month < Today.Month) Then 'ensure user input date is today or later, but do NOT check the day in DateParseInput variable value 
                 Throw New Exception("*Error: Date is in the past*")
             End If
         Catch ex As FormatException
