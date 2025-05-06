@@ -102,7 +102,7 @@
   <ItemGroup>
     <Compile Include="ChecklistLogging\ChecklistBuilderAspxLibrary.vb" />
     <Compile Include="ChecklistLogging\LogAspxLibrary.vb" />
-    <Compile Include="ChecklistLogging\ChecklistReport.vb" />
+    <Compile Include="Report.vb" />
     <Compile Include="General.vb" />
     <Compile Include="PhaseController.vb" />
     <Compile Include="SampleClass.vb" />

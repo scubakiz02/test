@@ -281,8 +281,27 @@ Public Class Format
     End Sub
 
     Public Function DateField(InputDate As String) As String
-        Dim ParsedDate As DateTime = DateTime.Parse(InputDate)
-        Return ParsedDate.ToString("MM/dd/yyyy hh:mm:ss tt")
+        Dim ParsedDate As DateTime
+
+        Try
+            ParsedDate = DateTime.Parse(InputDate)
+            Return ParsedDate.ToString("MM/dd/yyyy hh:mm:ss tt")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Public Function ValidLogDate(InputDate As String) As Boolean
+        If String.IsNullOrEmpty(Trim(InputDate)) Then Return False 'null or empty string edgecases
+
+        Try
+            Date.Parse(InputDate) 'invalid timestamp (date, hour, minute, seconds, etc.)
+            If DateField(InputDate) <> InputDate Then Return False 'ensure mm/dd/yyyy hh:mm:ss tt is the ONLY accepted format
+        Catch ex As Exception
+            Return False
+        End Try
+
+        Return True
     End Function
 
 End Class

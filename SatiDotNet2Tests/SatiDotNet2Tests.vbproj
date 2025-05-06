@@ -145,7 +145,7 @@
   <ItemGroup>
     <Compile Include="ChecklistLogging\ChecklistBuilderAspxTests.vb" />
     <Compile Include="ChecklistLogging\LogAspxTests.vb" />
-    <Compile Include="ChecklistLogging\ChecklistReportTests.vb" />
+    <Compile Include="ReportTests.vb" />
     <Compile Include="GeneralTests.vb" />
     <Compile Include="PhaseControllerTests.vb" />
     <Compile Include="SampleTests.vb" />

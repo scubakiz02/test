@@ -459,6 +459,21 @@ Public Class FormatDateTests
     Private Format As New Format()
 
     <Fact>
+    Public Sub DateFieldEdgeCase1()
+        Assert.Equal(Nothing, Format.DateField(Nothing))
+    End Sub
+
+    <Fact>
+    Public Sub DateFieldEdgeCase2()
+        Assert.Equal(Nothing, Format.DateField(String.Empty))
+    End Sub
+
+    <Fact>
+    Public Sub DateFieldEdgeCase3()
+        Assert.Equal(Nothing, Format.DateField("mm/dd/yyyy"))
+    End Sub
+
+    <Fact>
     Public Sub FormateDateTest1()
         Assert.Equal("03/25/2025 12:00:00 AM", Format.DateField("03/25/2025"))
     End Sub
@@ -486,6 +501,62 @@ Public Class FormatDateTests
     <Fact>
     Public Sub FormateDateTest6()
         Assert.Equal("03/27/2025 10:53:19 AM", Format.DateField("3/27/2025 10:53:19 AM"))
+    End Sub
+
+End Class
+
+Public Class ValidLogDateTests
+    Inherits Format
+
+    <Fact>
+    Public Sub Edgecase1()
+        Assert.False(ValidLogDate(""))
+    End Sub
+
+    <Fact>
+    Public Sub Edgecase2()
+        Assert.False(ValidLogDate(" "))
+    End Sub
+
+    <Fact>
+    Public Sub Edgecase3()
+        Assert.False(ValidLogDate(Nothing))
+    End Sub
+
+    <Fact>
+    Public Sub InvalidHr()
+        Assert.False(ValidLogDate("04/24/2025 25:00:00"))
+    End Sub
+
+    <Fact>
+    Public Sub InvalidMin()
+        Assert.False(ValidLogDate("04/24/2025 12:60:00"))
+    End Sub
+
+    <Fact>
+    Public Sub InvalidSeconds()
+        Assert.False(ValidLogDate("04/24/2025 12:00:60"))
+    End Sub
+
+    <Fact>
+    Public Sub InvalidFormats()
+        Assert.False(ValidLogDate("2025/04/24")) 'Wrong delimiter (/ instead of -)
+        Assert.False(ValidLogDate("04-24-2025")) 'Non-ISO format, ambiguous date
+        Assert.False(ValidLogDate("24-04-2025")) 'European format, Not SQL-compliant
+        Assert.False(ValidLogDate("abcd")) 'characters
+        Assert.False(ValidLogDate("2025-13-01")) 'Invalid month
+        Assert.False(ValidLogDate("2025-02-30")) 'Invalid day in February
+    End Sub
+
+    <Fact>
+    Public Sub EnsureProperFormat()
+        'only 1 proper format, and that is mm/dd/yyyy hh:mm:ss tt
+        'test against proper sql date type values that are NOT in the format described above
+        Assert.False(ValidLogDate("2025/04/24"))
+        Assert.False(ValidLogDate("1999-12-31 23:59:59"))
+        Assert.False(ValidLogDate("2000-01-01T00:00:00"))
+        Assert.False(ValidLogDate("1753-01-01")) 'Min valid SQL Server datetime
+        Assert.False(ValidLogDate("9999-12-31")) 'Max valid SQL Server datetime
     End Sub
 
 End Class
