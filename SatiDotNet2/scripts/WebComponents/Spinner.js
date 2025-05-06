@@ -12,10 +12,11 @@
 
     connectedCallback() {
         const self = this;
+        let documentBodyDOM = self;
 
         if (!self.Overlay) { //asp.net workaround b/c Overlay dynamic creation can be double-booked with asp.net architecture
             this.shadowRoot.innerHTML += `
-            <div id="Overlay" class="overlay" style="justify-content: center; align-items: center; display: none; width: 100%; height: 100%; top: 0; left: 0;">
+            <div id="Overlay" class="overlay" style="justify-content: center; align-items: center; display: none; top: 0; left: 0;">
                 <div class="spinner"></div>
             </div>
             `;
@@ -27,8 +28,8 @@
             style.textContent += `
             .overlay {
                 position: absolute;
-                width: 100%;
-                height: 100%;
+                width: 100vw;
+                height: 100vh;
                 background-color: black;
                 opacity: .5;
                 z-index: 999;
@@ -55,17 +56,23 @@
             `;
             this.shadowRoot.appendChild(style);
 
-            self.parentElement.style.position = "relative"; //add 'position: relative' css property to parent element of web component
+            //add web component to document body of html standard DOM
+            while (documentBodyDOM.nodeName.toLowerCase() !== "body") documentBodyDOM = documentBodyDOM.parentElement;
+            documentBodyDOM.appendChild(self);
 
+            documentBodyDOM.style.position = "relative"; //add 'position: relative' css property to parent element of web component
         }
     }
 
     displaySpin() {
+        self.Overlay.style.top = parseFloat(self.Overlay.style.top) + window.scrollY + "px"; // web component width and height coverage is relative to parent viewport, regardless of vertical scrolling
         self.Overlay.style.display = "flex";
+        self.parentElement.style.overflow = "hidden"; //lock scrolling for window within standard DOM
     }
 
     hideSpin() {
         self.Overlay.style.display = "none";
+        self.parentElement.style.overflow = ""; //unlock scrolling for window within standard DOM
     }
 }
 customElements.define("sati-spinner", Spinner);

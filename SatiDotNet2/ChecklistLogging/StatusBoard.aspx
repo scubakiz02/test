@@ -17,7 +17,6 @@
 
                 window.addEventListener("load", function () {
                     satiSpinner = document.body.querySelector("sati-spinner");
-                    document.body.appendChild(satiSpinner);
                 })
             </script>
 
