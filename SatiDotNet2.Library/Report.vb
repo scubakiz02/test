@@ -82,12 +82,27 @@ Public Class Report
     End Function
 
     Public Function SetDateRange(StartDate As String, EndDate As String) As Data.DataSet
+        Dim DateLowestBound As String
+        Dim DateHighestBound As String
+        Dim DateBoundsQueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        DateBoundsQueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", GetVar("AreaKey0")},
+            {"typeOf", "int"}
+        }
+
+        DateLowestBound = GetSingleDbField("SELECT FORMAT(MIN(Date), 'MM/dd/yyyy') As DateLowestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", DateBoundsQueryConfig, "DateLowestBound")
+        DateHighestBound = GetSingleDbField("SELECT FORMAT(MAX(Date), 'MM/dd/yyyy') As DateHighestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", DateBoundsQueryConfig, "DateHighestBound")
+
         SetVar("StartDate", StartDate, "string")
         SetVar("EndDate", EndDate, "string")
 
-        ConstructorQuery = ConstructorQuery.Replace("WHERE", "WHERE D.Date >= @StartDate AND D.Date <= @EndDate AND ")
-
-        PullAndStripDS()
+        If String.IsNullOrEmpty(StartDate) = False AndAlso String.IsNullOrEmpty(EndDate) = False AndAlso Date.Parse(StartDate) >= Date.Parse(DateLowestBound) AndAlso Date.Parse(EndDate) <= Date.Parse(DateHighestBound) Then
+            ConstructorQuery = ConstructorQuery.Replace("WHERE", "WHERE D.Date >= @StartDate AND D.Date <= @EndDate AND ")
+            PullAndStripDS()
+        Else
+            GroupDS = EmptyGroupDS
+        End If
 
         Return GroupDS
     End Function

@@ -1047,6 +1047,88 @@ Public Class DummyDS
 
 End Class
 
+Public Class ReturnZeroRecordsEdgecases
+    Inherits Security
+
+    Private Format As New Format()
+    Private Report As New Report(New Dictionary(Of String, String) From {
+        {"GroupKey", 0},
+        {"AreaKey", 58}
+    })
+    Private DateLowestBound As String = GetSingleDbField("SELECT FORMAT(MIN(Date), 'MM/dd/yyyy') As DateLowestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", New Dictionary(Of String, Dictionary(Of String, String)), "DateLowestBound")
+    Private DateHighestBound As String = GetSingleDbField("SELECT FORMAT(MAX(Date), 'MM/dd/yyyy') As DateHighestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", New Dictionary(Of String, Dictionary(Of String, String)), "DateHighestBound")
+
+    Public Sub New()
+        SetValidDateRange()
+    End Sub
+
+    Private Sub SetValidDateRange()
+        Report.SetDateRange("04/14/2025", "04/14/2025")
+    End Sub
+
+    Private Function NumOfRecords()
+        Return Report.GetDS().Tables(0).Rows.Count
+    End Function
+
+    Private Function DateTypeToMMDDYYYYStringFormat(Input As Date)
+        Return Format.DateField(Input.ToString).Split(" ")(0)
+    End Function
+
+    <Fact>
+    Private Sub Baseline()
+        Assert.NotEqual(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub StartDateAtLowerBound()
+        Report.SetDateRange(DateLowestBound, "04/14/2025")
+        Assert.NotEqual(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub StartDateAtUpperBound()
+        Report.SetDateRange(DateLowestBound, DateTypeToMMDDYYYYStringFormat(Today))
+        Assert.NotEqual(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub DateBeforeLowerBound()
+        Dim LowerBound As Date = Date.Parse(DateLowestBound).AddDays(-1)
+
+        Report.SetDateRange(DateTypeToMMDDYYYYStringFormat(LowerBound), "04/14/2025")
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub DateAfterUpperBound()
+        Report.SetDateRange(DateLowestBound, DateTypeToMMDDYYYYStringFormat(Today.AddDays(1)))
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub EndDatePrecedesStartDate()
+        Report.SetDateRange(DateHighestBound, DateLowestBound)
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub StartDateSucceedsEndDate()
+        Report.SetDateRange(DateTypeToMMDDYYYYStringFormat(Date.Parse(DateLowestBound).AddDays(1)), DateLowestBound)
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub EmptyStartDate()
+        Report.SetDateRange(String.Empty, DateHighestBound)
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+
+    <Fact>
+    Public Sub EmptyEndDate()
+        Report.SetDateRange(DateLowestBound, String.Empty)
+        Assert.Equal(0, NumOfRecords())
+    End Sub
+End Class
 Public Class RecordSetTests
     Inherits DummyDS
 

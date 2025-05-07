@@ -78,24 +78,7 @@
             })
 
             this.addEventListener("change", function () {
-                let EndDate;
-
-                if (EndDate_Textbox.value === "") {
-                    EndDate = null;
-                }
-                else {
-                    EndDate = EndDate_Textbox.value;
-                }
-
                 WebpageSpinner.displaySpin();
-
-                PageMethods.SetQueryStringDates(this.value, StartDate_Textbox.value, EndDate, function (response) {
-                    let message = response["DateInRange"];
-
-                    //ErrorLabel.innerHTML = message;
-                    if (response.hasOwnProperty("Url")) window.location.replace(response["Url"]);
-                    if (message !== "") WebpageSpinner.hideSpin();
-                });
             });
         }
 
@@ -301,12 +284,12 @@
             <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #FFA07A; text-wrap: nowrap;">
                 <div style="display: flex; align-items: center;">
                     <asp:Label Text="Start Date:" runat="server" />
-                    <asp:TextBox ID="StartDate_TextBox" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
+                    <asp:TextBox ID="StartDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
                 </div>
 
                 <div style="display: flex; align-items: center;">
                     <asp:Label Text="End Date:" runat="server" />
-                    <asp:TextBox ID="EndDate_TextBox" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
+                    <asp:TextBox ID="EndDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
                 </div>
 
                 <div>

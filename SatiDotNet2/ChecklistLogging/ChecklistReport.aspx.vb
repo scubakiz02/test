@@ -22,43 +22,7 @@ Partial Class MR_OpenTicketStatusBoard
     Private SatiCode As New Class1()
     Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "AdvancedFilters"}
 
-    Public Delegate Sub SetQsDatesDelegate(StartDate As String, EndDate As String)
-    <WebMethod()>
-    Public Shared Function SetQueryStringDates(UserInput As String, StartDate As String, EndDate As String) As Dictionary(Of String, String)
-        Dim DateInRange As String
-        Dim QsDates As SetQsDatesDelegate = HttpContext.Current.Session("SetQsDates")
-        Dim Res As New Dictionary(Of String, String)
-
-        'transform format of dates from client-side js to mm/dd/yyyy
-        UserInput = TrimDateFormat(UserInput)
-        StartDate = TrimDateFormat(StartDate)
-        EndDate = TrimDateFormat(EndDate)
-
-        DateInRange = HttpContext.Current.Session("Report").DateInRange(UserInput)
-
-        If String.IsNullOrEmpty(DateInRange) Then 'if DateInRange is null or an empty string, it means the date is valid
-            QsDates(StartDate, EndDate)
-            Res("Url") = HttpContext.Current.Session("AspWebpage").GetUrl()
-        End If
-
-        Res("DateInRange") = DateInRange
-
-        Return Res
-    End Function
-
-    Public Shared Function TrimDateFormat(InputDate As String) As String
-        Try
-            Return Format.DateField(InputDate).Split(" ")(0)
-        Catch ex As Exception
-            Return Nothing
-        End Try
-    End Function
-
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Dim SetQsDatesDelegate As SetQsDatesDelegate = AddressOf SetQsDates
-
-        Session("SetQsDates") = SetQsDatesDelegate
-
         'to ensure each user of this webpage gets their own class objects
         If Session("Report") Is Nothing Then
             Session("Report") = New Report(New Dictionary(Of String, String) From {
@@ -367,34 +331,6 @@ Partial Class MR_OpenTicketStatusBoard
         End If
     End Function
 
-    'Protected Sub DateTextBox_OnTextChanged(sender As Object, e As EventArgs)
-    '    Dim Calendar_TextBox As TextBox
-    '    Dim SelectedDate As Date = Format.DateField(sender.Text)
-    '    Dim StartDate As Date
-    '    Dim EndDate As String
-
-    '    If sender Is StartDate_TextBox Then
-    '        Calendar_TextBox = StartDate_TextBox
-    '        StartDate = SelectedDate
-
-    '        If EndDateFromQueryString Is Nothing Then
-    '            EndDate = Nothing
-    '        Else
-    '            EndDate = Date.Parse(EndDateFromQueryString)
-    '        End If
-    '    Else
-    '        Calendar_TextBox = EndDate_TextBox
-    '        StartDate = StartDateFromQueryString
-    '        EndDate = SelectedDate
-    '    End If
-
-    '    Calendar_TextBox.Text = SelectedDate
-
-    '    SetQsDates(StartDate, EndDate)
-
-    '    RefreshPreview()
-    'End Sub
-
     Protected Sub ReportGridView_RowCommand(sender As Object, e As GridViewCommandEventArgs)
 
     End Sub
@@ -513,23 +449,6 @@ Partial Class MR_OpenTicketStatusBoard
         Session.Remove("EditModeValues")
         ReportGridView.EditIndex = -1
         SetGridViewSrc()
-    End Sub
-
-    Protected Sub SetQsDates(StartDate As String, EndDate As String)
-        Dim StartDateNull As Boolean = If(StartDate Is Nothing, True, False)
-        Dim EndDateNull As Boolean = If(EndDate Is Nothing, True, False)
-
-        If StartDateNull = False AndAlso EndDateNull = False Then
-            Session("Report").SetDateRange(StartDate, EndDate)
-        End If
-
-        If StartDateNull = False Then
-            Session("AspWebpage").SetUrl("StartDate", StartDate)
-        End If
-
-        If EndDateNull = False Then
-            Session("AspWebpage").SetUrl("EndDate", EndDate)
-        End If
     End Sub
 
     Protected Sub ExportButton_OnClick(sender As Object, e As EventArgs) Handles ExportButton.Click
@@ -660,5 +579,25 @@ Partial Class MR_OpenTicketStatusBoard
 
         RefreshPreview()
     End Sub
+
+    Protected Sub DatepickTextBox_OnTextChanged(sender As Object, e As EventArgs)
+        Dim StartDate As String = MMDDYYYYFormat(StartDate_TextBox.Text)
+        Dim EndDate As String = MMDDYYYYFormat(EndDate_TextBox.Text)
+
+        Session("Report").SetDateRange(StartDate, EndDate)
+        Session("AspWebpage").SetUrl("StartDate", StartDate)
+        Session("AspWebpage").SetUrl("EndDate", EndDate)
+
+        RefreshPreview()
+    End Sub
+
+    Private Function MMDDYYYYFormat(DateStr As String) As String
+        Try 'format expected by HTML5 <input type="date">
+            Return Date.Parse(DateStr).ToString("MM/dd/yyyy")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
 End Class
 
