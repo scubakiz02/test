@@ -361,7 +361,7 @@
                     </asp:CheckBoxList>
 
                     <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
-                        <button onclick="return false;" data-close-button class="HeaderPanelButtons">Cancel</button>
+                        <button data-close-button class="HeaderPanelButtons">Cancel</button>
                         <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
                     </div>
                 </div>
@@ -383,7 +383,7 @@
                     </asp:CheckBoxList>
 
                     <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
-                        <button onclick="return false;" data-close-button class="HeaderPanelButtons">Cancel</button>
+                        <button data-close-button class="HeaderPanelButtons">Cancel</button>
                         <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateChecklistsButton" OnClick="UpdateChecklistsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
                     </div>
                 </div>

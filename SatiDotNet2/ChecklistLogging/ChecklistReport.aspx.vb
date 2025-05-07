@@ -11,6 +11,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Dim GroupFromQueryString As String
     Dim AreaFromQueryString As String
+    Dim LabelsFromQs As String
     Dim StartDateFromQueryString As String
     Dim EndDateFromQueryString As String
     Dim PageIdxFromQueryString As String
@@ -19,7 +20,7 @@ Partial Class MR_OpenTicketStatusBoard
     Private Shared Security As New Security()
     Private Shared Format As New Format()
     Private SatiCode As New Class1()
-    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "AdvancedFilters"}
+    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "AdvancedFilters"}
 
     Public Delegate Sub SetQsDatesDelegate(StartDate As String, EndDate As String)
     <WebMethod()>
@@ -69,22 +70,12 @@ Partial Class MR_OpenTicketStatusBoard
         If Session("AspWebpage") Is Nothing Then
             Session("AspWebpage") = New AspWebpage("/ChecklistLogging/ChecklistReport.aspx", QsKeys)
         End If
-        'to ensure each user of this webpage gets their own class objects
-
-        If Session("LabelsToInclude") Is Nothing Then
-            Dim LabelsHash As Dictionary(Of Integer, String) = Session("Report").GetLabels()
-
-            If LabelsHash.Count > 0 Then
-                Session("LabelsToInclude") = LabelsHash.Keys.ToList()
-            Else
-                Session("LabelsToInclude") = New List(Of Integer)
-            End If
-        End If
 
         ' MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         Me.MaintainScrollPositionOnPostBack = True
         GroupFromQueryString = Request.QueryString("Group")
         AreaFromQueryString = Request.QueryString("AreasToInclude")
+        LabelsFromQs = Request.QueryString("LabelsToInclude")
         PageIdxFromQueryString = Request.QueryString("PageIdx")
         StartDateFromQueryString = Request.QueryString("StartDate")
         EndDateFromQueryString = Request.QueryString("EndDate")
@@ -202,6 +193,13 @@ Partial Class MR_OpenTicketStatusBoard
             'build LabelCbxList children dynamically using DS variable
             Try 'in case AreaFromQueryString is nothing
                 Dim LabelsHash As Dictionary(Of Integer, String) = Session("Report").GetLabels()
+                Dim LabelsToInclude As List(Of Integer)
+
+                If LabelsFromQs Is Nothing Then
+                    LabelsToInclude = LabelsHash.Keys.ToList()
+                Else
+                    LabelsToInclude = JsonSerializer.Deserialize(Of List(Of Integer))(LabelsFromQs)
+                End If
 
                 'condition below ensures 1 checklist is being selected for reporting
                 If AreasList.Count = 1 Then
@@ -218,12 +216,12 @@ Partial Class MR_OpenTicketStatusBoard
                         Cbx1 = New ListItem(Label, LabelKey)
                         LabelCbxList.Items.Add(Cbx1)
 
-                        If Session("LabelsToInclude").Contains(LabelKey) Then
+                        If LabelsToInclude.Contains(LabelKey) Then
                             Cbx1.Selected = True
                         End If
                     Next
 
-                    If Session("LabelsToInclude").Count = LabelsHash.Count Then CheckAll_CheckBox.Checked = True
+                    If LabelsToInclude.Count = LabelsHash.Count Then CheckAll_CheckBox.Checked = True
                 End If
             Catch ex As Exception
 
@@ -234,8 +232,13 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Private Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
-        GroupDropDownList.Items.Add(New ListItem("All", "0"))
         GroupDropDownList.SelectedValue = GroupFromQueryString
+
+        For Each ListItem As ListItem In GroupDropDownList.Items
+            If ListItem.Text = "All" Then Exit Sub
+        Next
+
+        GroupDropDownList.Items.Add(New ListItem("All", "0"))
     End Sub
 
     'Public Sub ConfigureAreas()
@@ -274,7 +277,8 @@ Partial Class MR_OpenTicketStatusBoard
     'End Sub
 
     Protected Sub UpdateLabelsButton_OnClick(sender As Object, e As EventArgs)
-        Dim LabelsToInclude As New List(Of Integer) 'b/c interacting with Session("LabelsToInclude") directly tends to cause issues
+        Dim LabelsToInclude As New List(Of Integer)
+        Dim LabelsToIncludeStringified As String = String.Empty
 
         For Each LabelCbx As ListItem In LabelCbxList.Items
             Dim LabelKey As Integer = LabelCbx.Value
@@ -292,8 +296,11 @@ Partial Class MR_OpenTicketStatusBoard
             Session("Report").UndoOrderDSByDate()
         End If
 
-        Session("LabelsToInclude") = New List(Of Integer)(LabelsToInclude)
-        Session("Report").SetLabels(Session("LabelsToInclude"))
+        LabelsToIncludeStringified = JsonSerializer.Serialize(Of List(Of Integer))(LabelsToInclude)
+        Session("AspWebpage").SetUrl("LabelsToInclude", LabelsToIncludeStringified)
+        Session("Report").SetLabels(LabelsToInclude)
+
+        RefreshPreview() 'to have LabelsToInclude in querystring take effect
     End Sub
 
     Protected Sub UpdateChecklistsButton_OnClick(sender As Object, e As EventArgs)
@@ -314,7 +321,8 @@ Partial Class MR_OpenTicketStatusBoard
         Session("Report").SetAreas(Session("AreasToInclude"))
 
         LabelCbxList.Items.Clear()
-        Session.Remove("LabelsToInclude")
+
+        Session("AspWebpage").SetUrl("LabelsToInclude", Nothing)
 
         RefreshPreview() 'to see changes in AreasToInclude querystring key
     End Sub
@@ -336,14 +344,13 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub GroupDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim SelectedValue As String = GroupDropDownList.SelectedValue
 
-        'reset area values as well
         Session("AspWebpage").SetUrl("AreasToInclude", Nothing)
+        Session("AspWebpage").SetUrl("LabelsToInclude", Nothing)
 
         Session("AspWebpage").SetUrl("Group", SelectedValue)
         Session("Report").SetGroup(SelectedValue)
 
         LabelCbxList.Items.Clear()
-        Session.Remove("LabelsToInclude")
 
         RefreshPreview()
     End Sub
