@@ -7,6 +7,14 @@
         let EndDate_Textbox;
         let WebpageSpinner;
 
+        window.addEventListener("visibilitychange", function () {
+            // user has returned to the tab after viewing hyperlink in 'View File' column of ReportGridView
+            // induce a postback using javascript
+            if (!document.hidden) {
+                __doPostBack('<%= ReportGridView.ClientID %>', ''); 
+            }
+        });
+
         window.addEventListener("load", function () {
             const ReportGridView = document.getElementById('<%= ReportGridView.ClientID %>');
             const CheckAllCbx = document.getElementById('<%= CheckAll_CheckBox.ClientID %>');
@@ -500,6 +508,17 @@
                 <asp:TemplateField HeaderText="OperatorHidden" Visible="False">
                     <ItemTemplate>
                         <asp:Label ID="ReportOperatorHidden_Label" runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+
+                <asp:TemplateField HeaderText="View File">
+                    <ItemTemplate>
+                        <asp:HyperLink runat="server"
+                            Text="Log.aspx"
+                            NavigateUrl='<%# "Log.aspx?Key=" + Eval("DataKey").ToString() %>'
+                            Target="_blank"
+                            ToolTip="Opens a new tab">
+                        </asp:HyperLink>
                     </ItemTemplate>
                 </asp:TemplateField>
 
