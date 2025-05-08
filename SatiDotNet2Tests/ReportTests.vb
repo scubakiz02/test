@@ -1096,13 +1096,13 @@ Public Class ReturnZeroRecordsEdgecases
         Dim LowerBound As Date = Date.Parse(DateLowestBound).AddDays(-1)
 
         Report.SetDateRange(DateTypeToMMDDYYYYStringFormat(LowerBound), "04/14/2025")
-        Assert.Equal(0, NumOfRecords())
+        Assert.NotEqual(0, NumOfRecords())
     End Sub
 
     <Fact>
     Public Sub DateAfterUpperBound()
         Report.SetDateRange(DateLowestBound, DateTypeToMMDDYYYYStringFormat(Today.AddDays(1)))
-        Assert.Equal(0, NumOfRecords())
+        Assert.NotEqual(0, NumOfRecords())
     End Sub
 
     <Fact>

@@ -97,12 +97,14 @@ Public Class Report
         SetVar("StartDate", StartDate, "string")
         SetVar("EndDate", EndDate, "string")
 
-        If String.IsNullOrEmpty(StartDate) = False AndAlso String.IsNullOrEmpty(EndDate) = False AndAlso Date.Parse(StartDate) >= Date.Parse(DateLowestBound) AndAlso Date.Parse(EndDate) <= Date.Parse(DateHighestBound) Then
+        Try
+            If String.IsNullOrEmpty(StartDate) OrElse String.IsNullOrEmpty(EndDate) Then Throw New Exception("")
+
             ConstructorQuery = ConstructorQuery.Replace("WHERE", "WHERE D.Date >= @StartDate AND D.Date <= @EndDate AND ")
             PullAndStripDS()
-        Else
+        Catch ex As Exception
             GroupDS = EmptyGroupDS
-        End If
+        End Try
 
         Return GroupDS
     End Function
