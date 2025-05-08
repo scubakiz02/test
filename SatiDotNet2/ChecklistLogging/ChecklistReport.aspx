@@ -11,7 +11,7 @@
             // user has returned to the tab after viewing hyperlink in 'View File' column of ReportGridView
             // induce a postback using javascript
             if (!document.hidden) {
-                __doPostBack('<%= ReportGridView.ClientID %>', ''); 
+                __doPostBack('<%= ReportGridView.ClientID %>', '');
             }
         });
 
@@ -23,6 +23,23 @@
             const AreaCheckBoxList = document.getElementById('<%= AreaCheckBoxList.ClientID %>');
             const openModalButtons = document.querySelectorAll('[data-modal-target]')
             const closeModalButtons = document.querySelectorAll('[data-close-button]')
+            const gridPager = document.querySelector(".grid-pager");
+
+            if (gridPager) gridPager.style.width = ReportGridView.offsetWidth + "px";
+
+            //set height of ReportGridView programmatically
+            if (ReportGridView) {
+                let LargestReportGridViewHeight = sessionStorage.getItem("ReportGridView_Height") ? parseFloat(sessionStorage.getItem("ReportGridView_Height")) : 0;
+
+                debugger;
+                if (ReportGridView.offsetHeight > LargestReportGridViewHeight) {
+                    LargestReportGridViewHeight = ReportGridView.offsetHeight;
+                    sessionStorage.setItem("ReportGridView_Height", LargestReportGridViewHeight);
+                }
+
+                document.querySelector(".grid-container").style.height = LargestReportGridViewHeight + (ReportGridView.querySelector("tr").offsetHeight * 2) + "px"; //add height of 1 of the rows of ReportGridView to total, to ensure pager does not lay over bottom most row 
+                ReportGridView.style.visibility = "visible";
+            }
 
             WebpageSpinner = document.getElementById("WebpageSpinner");
             document.body.appendChild(WebpageSpinner);
@@ -199,12 +216,25 @@
             animation: spin 1s linear infinite;
         }
 
-        .ReportGridView td {
-            padding: var(--UWhitespace);
+        .ReportGridView td, .GridViewColumn {
+            text-wrap: nowrap;
         }
 
-        .GridViewColumn {
-            text-wrap: nowrap;
+            .ReportGridView td span, .ReportGridView a { /*pagination elements are html span elements*/
+                padding: var(--UWhitespace);
+            }
+
+        .grid-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-pager {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
         }
 
         .modal {
@@ -296,12 +326,12 @@
                     <asp:Button ID="ResetGridButton" OnClientClick="WebpageSpinner.displaySpin();" Text="Reset Grid" runat="server" Style="float: right;" />
                 </div>
 
-                <asp:CheckBox Text="Advanced Filters" ID="AdvancedFilters_CheckBox" AutoPostBack="True" onchange="WebpageSpinner.displaySpin();" OnCheckedChanged="AdvancedFilters_OnCheckedChanged" Style="display: flex; align-items: center;" TextAlign="Right" runat="server" />
+                <asp:CheckBox Text="View Filters" ID="ViewFilters_CheckBox" AutoPostBack="True" onchange="WebpageSpinner.displaySpin();" OnCheckedChanged="ViewFilters_OnCheckedChanged" Style="display: flex; align-items: center;" TextAlign="Right" runat="server" />
             </div>
         </div>
 
 
-        <asp:Panel runat="server" Visible="False" ID="AdvancedFilters_Panel" Style="display: flex; gap: var(--UWhitespace);">
+        <asp:Panel runat="server" Visible="False" ID="ViewFilters_Panel" Style="display: flex; gap: var(--UWhitespace);">
             <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #90EE90;">
                 <div style="display: flex; align-items: center;">
                     <asp:Label Text="Select Group:" runat="server" />
@@ -389,130 +419,135 @@
                     <asp:Button ID="ExportButton" Enabled="False" OnClientClick="WebpageSpinner.displaySpin();" Text="Go" runat="server" />
                 </div>
             </div>
+
+            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #FFFFCC;">
+                <span></span>
+            </div>
         </asp:Panel>
 
-        <iframe id="ReportEdit_iframe" runat="server" style="display: none;"></iframe>
-        <asp:GridView ID="ReportGridView" CssClass="ReportGridView" runat="server" AllowPaging="true" PageSize="14"
-            AllowSorting="True" AutoGenerateColumns="False"
-            BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical"
-            OnRowCommand="ReportGridView_RowCommand"
-            Style="table-layout: fixed;">
-            <AlternatingRowStyle BackColor="#CCCCCC" />
+        <div class="grid-container">
+            <asp:GridView ID="ReportGridView" CssClass="ReportGridView" runat="server" AllowPaging="true" PageSize="15"
+                AllowSorting="True" AutoGenerateColumns="False"
+                BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical"
+                OnRowCommand="ReportGridView_RowCommand"
+                PagerStyle-CssClass="grid-pager"
+                Style="table-layout: fixed; visibility: hidden;">
+                <AlternatingRowStyle BackColor="#CCCCCC" />
+                <Columns>
+                    <asp:TemplateField HeaderText="Checklist">
+                        <ItemTemplate>
+                            <asp:Label runat="server" Text='<%# Eval("Area") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="LabelKey" Visible="False">
+                        <ItemTemplate>
+                            <asp:Label ID="ReportLabelKey_Label" runat="server" Text='<%# Eval("LabelKey") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Label">
+                        <ItemTemplate>
+                            <asp:Label runat="server" Text='<%# Eval("Label") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
 
-            <Columns>
-                <asp:TemplateField HeaderText="Checklist">
-                    <ItemTemplate>
-                        <asp:Label runat="server" Text='<%# Eval("Area") %>'></asp:Label>
-                    </ItemTemplate>
-                </asp:TemplateField>
-                <asp:TemplateField HeaderText="LabelKey" Visible="False">
-                    <ItemTemplate>
-                        <asp:Label ID="ReportLabelKey_Label" runat="server" Text='<%# Eval("LabelKey") %>'></asp:Label>
-                    </ItemTemplate>
-                </asp:TemplateField>
-                <asp:TemplateField HeaderText="Label">
-                    <ItemTemplate>
-                        <asp:Label runat="server" Text='<%# Eval("Label") %>'></asp:Label>
-                    </ItemTemplate>
-                </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Value">
+                        <ItemTemplate>
+                            <asp:Label ID="ReportValue_Label" runat="server" Text='<%# Eval("Value") %>'></asp:Label>
+                            <asp:CheckBox Visible="False" ID="ReportValue_CheckBox" runat="server" Style="pointer-events: none;"></asp:CheckBox>
+                        </ItemTemplate>
 
-                <asp:TemplateField HeaderText="Value">
-                    <ItemTemplate>
-                        <asp:Label ID="ReportValue_Label" runat="server" Text='<%# Eval("Value") %>'></asp:Label>
-                        <asp:CheckBox Visible="False" ID="ReportValue_CheckBox" runat="server" Style="pointer-events: none;"></asp:CheckBox>
-                    </ItemTemplate>
+                        <EditItemTemplate>
+                            <asp:TextBox ID="ReportValue_TextBox" runat="server" Text='<%# Bind("Value") %>' />
 
-                    <EditItemTemplate>
-                        <asp:TextBox ID="ReportValue_TextBox" runat="server" Text='<%# Bind("Value") %>' />
+                            <asp:Panel ID="Checkbox_Panel" Visible="False" runat="server">
+                                <asp:CheckBox ID="ReportValue_CheckBox" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            </asp:Panel>
 
-                        <asp:Panel ID="Checkbox_Panel" Visible="False" runat="server">
-                            <asp:CheckBox ID="ReportValue_CheckBox" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
-                        </asp:Panel>
+                            <asp:Panel ID="DP_Panel" Visible="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                </div>
+                                <div style="display: flex; flex-direction: column">
+                                    <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
+                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                </div>
+                            </asp:Panel>
 
-                        <asp:Panel ID="DP_Panel" Visible="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                            <div style="display: flex; flex-direction: column">
-                                <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                            <asp:Panel ID="HOA_Panel" Visible="False" HOA="False" runat="server">
+                                <asp:DropDownList ID="ReportValue_DropDownList" runat="server">
+                                    <asp:ListItem Selected="True" Text="Switch Select..." />
+                                    <asp:ListItem Text="Hand" Value="Hand" />
+                                    <asp:ListItem Text="Off" Value="Off" />
+                                    <asp:ListItem Text="Auto" Value="Auto" />
+                                </asp:DropDownList>
+                            </asp:Panel>
+
+                        </EditItemTemplate>
+                    </asp:TemplateField>
+
+                    <asp:TemplateField HeaderText="Start Date">
+                        <ItemTemplate>
+                            <asp:Label ID="StartDate_Label" runat="server" Text='<%# Eval("StartDate") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+
+                    <asp:TemplateField HeaderText="Input Date">
+                        <ItemTemplate>
+                            <asp:Label runat="server" Text='<%# Eval("InputDate") %>'></asp:Label>
+                        </ItemTemplate>
+
+                        <EditItemTemplate>
+                            <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
+                                <asp:Label Text="mm/dd/yyyy hh:mm:ss tt" runat="server" />
+                                <asp:TextBox ID="ReportDate_TextBox" Text='<%# Eval("InputDate") %>' runat="server" />
+                                <asp:Label ID="InvalidReportDate_Label" Visible="False" ForeColor="Red" Text="Error: invalid date" runat="server" />
                             </div>
-                            <div style="display: flex; flex-direction: column">
-                                <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
-                            </div>
-                        </asp:Panel>
+                        </EditItemTemplate>
+                    </asp:TemplateField>
 
-                        <asp:Panel ID="HOA_Panel" Visible="False" HOA="False" runat="server">
-                            <asp:DropDownList ID="ReportValue_DropDownList" runat="server">
-                                <asp:ListItem Selected="True" Text="Switch Select..." />
-                                <asp:ListItem Text="Hand" Value="Hand" />
-                                <asp:ListItem Text="Off" Value="Off" />
-                                <asp:ListItem Text="Auto" Value="Auto" />
+                    <asp:TemplateField HeaderText="Operator">
+                        <ItemTemplate>
+                            <asp:Label runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
+                        </ItemTemplate>
+
+                        <EditItemTemplate>
+                            <%--<asp:TextBox ID="ReportOperator_TextBox" runat="server" Text='<%# Bind("InputOperator") %>' />--%>
+                            <asp:DropDownList
+                                DataTextField="Operator"
+                                DataValueField="Operator"
+                                ID="ReportOperator_DropDownList"
+                                runat="server">
                             </asp:DropDownList>
-                        </asp:Panel>
+                        </EditItemTemplate>
+                    </asp:TemplateField>
 
-                    </EditItemTemplate>
-                </asp:TemplateField>
+                    <asp:TemplateField HeaderText="OperatorHidden" Visible="False">
+                        <ItemTemplate>
+                            <asp:Label ID="ReportOperatorHidden_Label" runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
 
-                <asp:TemplateField HeaderText="Start Date">
-                    <ItemTemplate>
-                        <asp:Label ID="StartDate_Label" runat="server" Text='<%# Eval("StartDate") %>'></asp:Label>
-                    </ItemTemplate>
-                </asp:TemplateField>
+                    <asp:TemplateField HeaderText="View File">
+                        <ItemTemplate>
+                            <asp:HyperLink runat="server"
+                                Text="Log.aspx"
+                                NavigateUrl='<%# "Log.aspx?Key=" + Eval("DataKey").ToString() %>'
+                                Target="_blank"
+                                ToolTip="Opens a new tab">
+                            </asp:HyperLink>
+                        </ItemTemplate>
+                    </asp:TemplateField>
 
-                <asp:TemplateField HeaderText="Input Date">
-                    <ItemTemplate>
-                        <asp:Label runat="server" Text='<%# Eval("InputDate") %>'></asp:Label>
-                    </ItemTemplate>
-
-                    <EditItemTemplate>
-                        <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                            <asp:Label Text="mm/dd/yyyy hh:mm:ss tt" runat="server" />
-                            <asp:TextBox ID="ReportDate_TextBox" Text='<%# Eval("InputDate") %>' runat="server" />
-                            <asp:Label ID="InvalidReportDate_Label" Visible="False" ForeColor="Red" Text="Error: invalid date" runat="server" />
-                        </div>
-                    </EditItemTemplate>
-                </asp:TemplateField>
-
-                <asp:TemplateField HeaderText="Operator">
-                    <ItemTemplate>
-                        <asp:Label runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
-                    </ItemTemplate>
-
-                    <EditItemTemplate>
-                        <%--<asp:TextBox ID="ReportOperator_TextBox" runat="server" Text='<%# Bind("InputOperator") %>' />--%>
-                        <asp:DropDownList
-                            DataTextField="Operator"
-                            DataValueField="Operator"
-                            ID="ReportOperator_DropDownList"
-                            runat="server">
-                        </asp:DropDownList>
-                    </EditItemTemplate>
-                </asp:TemplateField>
-
-                <asp:TemplateField HeaderText="OperatorHidden" Visible="False">
-                    <ItemTemplate>
-                        <asp:Label ID="ReportOperatorHidden_Label" runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
-                    </ItemTemplate>
-                </asp:TemplateField>
-
-                <asp:TemplateField HeaderText="View File">
-                    <ItemTemplate>
-                        <asp:HyperLink runat="server"
-                            Text="Log.aspx"
-                            NavigateUrl='<%# "Log.aspx?Key=" + Eval("DataKey").ToString() %>'
-                            Target="_blank"
-                            ToolTip="Opens a new tab">
-                        </asp:HyperLink>
-                    </ItemTemplate>
-                </asp:TemplateField>
-
-                <asp:CommandField Visible="False" ShowEditButton="True" ShowCancelButton="True" />
-            </Columns>
-            <FooterStyle BackColor="#CCCCCC" />
-            <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
-            <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
-            <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
-            <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
-        </asp:GridView>
+                    <asp:CommandField Visible="False" ShowEditButton="True" ShowCancelButton="True" />
+                </Columns>
+                <FooterStyle BackColor="#CCCCCC" />
+                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
+                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
+                <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
+                <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
+            </asp:GridView>
+        </div>
     </div>
 
 </asp:Content>

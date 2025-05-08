@@ -16,11 +16,11 @@ Partial Class MR_OpenTicketStatusBoard
     Dim EndDateFromQueryString As String
     Dim PageIdxFromQueryString As String
     Dim AdminFromQueryString As String
-    Private AdvancedFiltersFromQs As String
+    Private ViewFiltersFromQs As String
     Private Shared Security As New Security()
     Private Shared Format As New Format()
     Private SatiCode As New Class1()
-    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "AdvancedFilters"}
+    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'to ensure each user of this webpage gets their own class objects
@@ -43,7 +43,7 @@ Partial Class MR_OpenTicketStatusBoard
         PageIdxFromQueryString = Request.QueryString("PageIdx")
         StartDateFromQueryString = Request.QueryString("StartDate")
         EndDateFromQueryString = Request.QueryString("EndDate")
-        AdvancedFiltersFromQs = Request.QueryString("AdvancedFilters")
+        ViewFiltersFromQs = Request.QueryString("ViewFilters")
 
         If StartDateFromQueryString IsNot Nothing AndAlso EndDateFromQueryString IsNot Nothing Then
             GroupDropDownList.Enabled = True
@@ -67,13 +67,13 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         End If
 
-        'set Visible property for AdvancedFilters_Panel and Checked property for AdvancedFilters_CheckBox
-        'if "AdvancedFilters" does NOT exist, set properties mentioned above to false
-        'if the above does not occur, a double click on AdvancedFilters_CheckBox will be required on initial load of webpage for proper functionality
-        Dim AdvancedFilters As Boolean = False
-        If AdvancedFiltersFromQs IsNot Nothing Then AdvancedFilters = AdvancedFiltersFromQs
-        AdvancedFilters_Panel.Visible = AdvancedFilters
-        AdvancedFilters_CheckBox.Checked = AdvancedFilters
+        'set Visible property for ViewFilters_Panel and Checked property for ViewFilters_CheckBox
+        'if "ViewFilters" does NOT exist, set properties mentioned above to true, meaning checkbox is checked by default
+        'if the above does not occur, a double click on ViewFilters_CheckBox will be required on initial load of webpage for proper functionality
+        Dim ViewFilters As Boolean = True
+        If ViewFiltersFromQs IsNot Nothing Then ViewFilters = ViewFiltersFromQs
+        ViewFilters_Panel.Visible = ViewFilters
+        ViewFilters_CheckBox.Checked = ViewFilters
     End Sub
 
     Private Function TextBoxDateFormat(DateStr As String) As String
@@ -565,8 +565,8 @@ Partial Class MR_OpenTicketStatusBoard
 
     End Sub
 
-    Protected Sub AdvancedFilters_OnCheckedChanged(sender As Object, e As EventArgs)
-        Session("AspWebpage").SetUrl("AdvancedFilters", Not sender.Checked) 'applying opposite of sender.Checked, b/c of when this line is executed relative to asp.net page lifecycle
+    Protected Sub ViewFilters_OnCheckedChanged(sender As Object, e As EventArgs)
+        Session("AspWebpage").SetUrl("ViewFilters", Not sender.Checked) 'applying opposite of sender.Checked, b/c of when this line is executed relative to asp.net page lifecycle
         RefreshPreview()
     End Sub
 
