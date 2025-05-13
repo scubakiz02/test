@@ -1,6 +1,7 @@
 ﻿
 Imports System.Text.Json
 Imports SatiDotNet2.Library
+Imports System.Web.Services
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -27,6 +28,8 @@ Partial Class MR_OpenTicketStatusBoard
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
         Dim StampIndicatorLabels As New Dictionary(Of String, String)
 
+        Session("PastIssues") = New Func(Of Integer, String)(AddressOf BuildPastIssues)
+
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
             Response.Redirect("/ChecklistLogging/ChecklistLoggingMainMaint.aspx")
@@ -48,7 +51,6 @@ Partial Class MR_OpenTicketStatusBoard
         Else
             'MenuAuthentication hierarchy based on querystrings user loaded the page with
             'MenuAuthenication.CheckGroupAuthenication("EditRoles", Server)
-
             Dim RequiredRoles As String() = Security.GetStatusBoardRole(Session("ViewFromQueryString"), Session("DepartmentFromQueryString"), Date.Parse(Session("WhereFromQueryString")))
             If RequiredRoles.Contains(Nothing) = False Then
                 MenuAuthenication.CheckGroupsAuthenication(RequiredRoles, Server)
@@ -60,25 +62,6 @@ Partial Class MR_OpenTicketStatusBoard
                 AdminPanel.Visible = True
             End If
 
-            'add controls to StampIndicatorLabelsPanel dynamically, to display to users in Full View what each stamp icon indicates
-            StampIndicatorLabels = StampIndicator.GetTitleIconHash()
-            For Each StampIndicatorLabel As KeyValuePair(Of String, String) In StampIndicatorLabels
-                Dim Panel As New Panel()
-                Dim Title As New Label()
-                Dim Icon As New ImageButton()
-
-                Panel.Attributes.Add("style", "display: flex; align-items: center;")
-
-                Icon.Attributes.Add("style", StampIndicator.StampIconCss)
-                Icon.ImageUrl = StampIndicatorLabel.Value
-
-                Title.Text = StampIndicatorLabel.Key & " ="
-
-                StampIndicatorLabelsPanel.Controls.Add(Panel)
-                Panel.Controls.Add(Title)
-                Panel.Controls.Add(Icon)
-            Next
-
             'build button controls for checklists that have a department, interval, assignee, & at least 1 input
             QueryConfig("@Department") = New Dictionary(Of String, String) From {
                 {"value", Session("DepartmentFromQueryString")},
@@ -87,6 +70,7 @@ Partial Class MR_OpenTicketStatusBoard
             AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area", QueryConfig)
             AreaRC = AreaDS.Tables(0).Rows.Count
 
+            Session("AreaKeys") = New List(Of Integer)
             For I = 0 To AreaRC - 1
                 QueryConfig.Clear()
                 AreaKey = AreaDS.Tables(0).Rows(I)("Key")
@@ -123,8 +107,8 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
 
                 Build(AreaKey)
+                Session("AreaKeys").Add(AreaKey)
             Next
-
         End If
     End Sub
 
@@ -388,22 +372,57 @@ Partial Class MR_OpenTicketStatusBoard
                 CType(CurrentLogsPanel.FindControl(SubSectionId & "NoneLabel"), Label).Visible = False
             End If
         Next
-
-        'build controls for PastIssuesPanel dynamically
-        QueryConfig("@Where") = New Dictionary(Of String, String) From {
-            {"value", Session("WhereFromQueryString")},
-            {"typeOf", "string"}
-        }
-        'DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
-        DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, D.Inputs, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
-        RC = DS.Tables(0).Rows.Count
-
-        For I = 0 To RC - 1
-            DR = DS.Tables(0).Rows(I)
-            PastIssuesPanel.Controls.Add(BuildLog(DR).Item1)
-        Next
-
     End Sub
+
+    Public Function BuildPastIssues(AreaKey As Integer) As String
+        Dim ClientSideConfig As New SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
+
+        If AdminPanel.Visible Then
+            Dim DS As New Data.DataSet
+            Dim DR As Data.DataRow
+            Dim RC As Integer
+            Dim AreaConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
+
+            'build controls for PastIssuesPanel dynamically
+            QueryConfig("@Where") = New Dictionary(Of String, String) From {
+                {"value", Session("WhereFromQueryString")},
+                {"typeOf", "string"}
+            }
+
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                    {"value", AreaKey},
+                    {"typeOf", "string"}
+                }
+
+            DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, D.Inputs, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
+            RC = DS.Tables(0).Rows.Count
+            For I = 0 To RC - 1
+                Dim IdConfig As New Dictionary(Of String, String)
+                Dim IconConfig As Dictionary(Of String, Dictionary(Of String, String))
+                Dim IconPathList As New List(Of String)
+
+                DR = DS.Tables(0).Rows(I)
+
+                SetButtonBackground(DR)
+                IdConfig("LogStatus") = LogStatus
+                IdConfig("StripeColor") = StripeColor
+
+                IconConfig = StampIndicator.Icons(DR("Key"))
+                For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In IconConfig
+                    IconPathList.Add(kvp.Value("IconImgFilePath"))
+                Next
+                IdConfig("iconsConfig") = JsonSerializer.Serialize(IconPathList)
+
+                AreaConfig(DR("Key")) = IdConfig
+
+                If ClientSideConfig.ContainsKey(DR("Area")) = False Then
+                    ClientSideConfig(DR("Area")) = AreaConfig
+                End If
+            Next
+        End If
+
+        Return JsonSerializer.Serialize(ClientSideConfig)
+    End Function
 
     Public Function BuildLog(DR As Data.DataRow) As Tuple(Of Panel, Button)
         Dim Panel As New Panel()
@@ -423,17 +442,14 @@ Partial Class MR_OpenTicketStatusBoard
         IconPanel.ID = "IconPanel_" & DR("Key") 'will be used within SetStampIndicators()
 
         If LogStatus <> "red" AndAlso LogStatus <> "pink" Then 'has to be complete to receive icons
-            StampIndicator.CreateIcons(IconPanel, DR("Key"), AddressOf RedirectToLogAspx)
+            StampIndicator.CreateIcons(IconPanel, DR("Key"))
         End If
 
-        SetButtonText(LogButton, DR)
+        'SetButtonText(LogButton, DR)
         LogButton.ID = DR("Key")
         LogButton.Text = DR("Area")
         LogButton.CssClass = "ChecklistButton"
-        LogButton.OnClientClick = "satiSpinner.displaySpin();" 'takes a few seconds to redirect to Log.aspx. Display spinning wheel during this wait 
-        AddHandler LogButton.Click, Sub(sender As Object, e As EventArgs)
-                                        RedirectToLogAspx(LogButton.ID)
-                                    End Sub
+        LogButton.OnClientClick = "redirect('Log.aspx?Key=" & DR("Key") & "'); satiSpinner.displaySpin();" ' Log.aspx redirect is js driven, to prevent page events firing within StatusBoard.aspx, which should reduce overall redirect time
 
         Panel.Controls.Add(SubPanel)
         SubPanel.Controls.Add(LogButton)
@@ -451,13 +467,4 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
     End Sub
-
-    Private Sub RedirectToLogAspx(Key As Integer)
-        Response.Redirect("Log.aspx?Key=" & Key)
-    End Sub
-
-    Protected Sub PageRefresh_OnTick(sender As Object, e As EventArgs)
-        Response.Redirect(Request.Url.ToString & "?Department=" & Session("DepartmentFromQueryString") & "&View=" & Session("ViewFromQueryString") & "&WHERE=" & Session("WhereFromQueryString"))
-    End Sub
-
 End Class

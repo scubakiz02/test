@@ -1,23 +1,225 @@
 ﻿<%@ Page Title="" Language="VB" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="StatusBoard.aspx.vb" Inherits="MR_OpenTicketStatusBoard" %>
 
-
-
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    <asp:Timer runat="server" OnTick="PageRefresh_OnTick" Interval="60000"></asp:Timer>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
 
         <ContentTemplate>
             <script src="../scripts/WebComponents/Spinner.js"></script>
             <script type="text/javascript">
                 let satiSpinner;
+                let threeDotSpinner;
+                let cancelBuildOfLogs = false;
+                let builtFirst50Logs = false;
+                let dataChunkingDone = false;
+                let checklistsConfig = {};
+                let BuildMoreLogs_Hyperlink;
+                let pageReloadInterval = 60000; //1 minute
+                let pageReloadTimer;
 
-                function redirect(url) {
-                    window.location.href = url + this.id
+                function startTimer() {
+                    pageReloadTimer = setInterval(() => {
+                        window.location.reload();
+                    }, pageReloadInterval);
                 }
 
                 window.addEventListener("load", function () {
                     satiSpinner = document.body.querySelector("sati-spinner");
+                    threeDotSpinner = document.body.querySelector(".dots-spinner");
+                    BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
+                    startTimer();
                 })
+
+                window.addEventListener("DOMContentLoaded", async function () {
+                    //build controls for PastIssuesPanel after html has rendered, to reduce long render times for initial load of page
+                    //waiting to receive server side event to build controls for Past Issues
+                    fetch('PastIssues.ashx')
+                        .then(response => {
+                            const reader = response.body.getReader();
+                            const decoder = new TextDecoder();
+
+                            function buildFirst50logs() {
+                                build50Logs();
+                                builtFirst50Logs = true; //this must be after invocation of build50Logs()
+                                threeDotSpinner.style.display = "none";
+                            }
+
+                            function readChunk() {
+                                reader.read().then(({ done, value }) => {
+                                    const UNIQUE_SEPARATOR = '948ae0ab';
+                                    let chunk = decoder.decode(value);
+
+                                    if (done) {
+                                        console.log('Stream finished');
+                                        dataChunkingDone = true;
+                                        if (!builtFirst50Logs) buildFirst50logs();
+                                        return;
+                                    }
+
+                                    for (const checklistChunk of chunk.split(UNIQUE_SEPARATOR)) {
+                                        let checklistChunkConfig = {};
+
+                                        if (checklistChunk === "") continue;
+
+                                        try {
+                                            checklistChunkConfig = JSON.parse(checklistChunk);
+                                            console.log("successful parsing of JSON: \n" + checklistChunk)
+                                        }
+                                        catch {
+                                            console.error("error when parsing JSON: \n" + checklistChunk);
+                                        }
+
+                                        checklistsConfig = { ...checklistsConfig, ...checklistChunkConfig };
+
+                                        //must collect all data chunks from http response, but ALSO build exactly the 50 first received logs
+                                        if (configCount(checklistsConfig) >= 50 && !builtFirst50Logs) buildFirst50logs();
+                                    }
+
+                                    readChunk(); // Read the next chunk
+                                });
+                            }
+
+                            readChunk(); // Start reading chunks
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                })
+
+                function build50Logs() {
+                    let checklistsToBuildConfig = {};
+
+                    for (const checklist of Object.keys(checklistsConfig)) {
+                        for (const areaKey of Object.keys(checklistsConfig[checklist])) {
+                            let drillDownPath = checklistsConfig[checklist];
+                            let logConfig = drillDownPath[areaKey];
+
+                            if (!checklistsToBuildConfig[checklist]) checklistsToBuildConfig[checklist] = {};
+
+                            checklistsToBuildConfig[checklist][areaKey] = logConfig;
+                            delete drillDownPath[areaKey];
+
+                            if (configCount(checklistsToBuildConfig) === 50 || configCount(checklistsConfig) === 0) {
+                                //calling the function below asynchronously
+                                //this is in case user invocates 'redirect' js function while BuildLogs() function is still executing
+                                //instead of having to wait for BuildLogs() to execute, redirect() is called right away, b/c BuildLogs() is executing asynchronously
+                                BuildLogs(checklistsToBuildConfig);
+                                threeDotSpinner.style.display = "none";
+
+                                //programmatically scroll to bottom of page IF user has clicked 'More...' hyperlink
+                                //'More...' hyperlink onclick event invocates build50Logs AND passes itself as this pointer
+                                if (this.id) {
+                                    let newInterval = 300000; //5 minutes
+
+                                    //set timer control interval property to 5 minutes upon interaction with 'More...' hyperlink
+                                    if (pageReloadInterval !== newInterval) {
+                                        clearInterval(pageReloadTimer);
+                                        pageReloadInterval = newInterval;
+                                        startTimer();
+                                    }
+
+                                    setTimeout(() => { // give DOM time to layout fully
+                                        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+                                    }, 100);
+                                }
+
+                                if (dataChunkingDone && configCount(checklistsConfig) === 0) BuildMoreLogs_Hyperlink.style.display = "none";
+                                else BuildMoreLogs_Hyperlink.style.display = "";
+
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                function configCount(config) {
+                    let count = 0;
+
+                    for (const checklist of Object.keys(config)) {
+                        for (const areaKey of Object.keys(config[checklist])) {
+                            count++;
+                        }
+                    }
+
+                    return count;
+                }
+
+                function BuildLogs(partitionedChecklistsConfig) {
+                    if (partitionedChecklistsConfig) {
+                        const checklistsArr = Object.keys(partitionedChecklistsConfig);
+                        const PastIssuesPanel = document.getElementById('<%= PastIssuesPanel.ClientID %>');
+
+                        for (const checklist of checklistsArr) {
+                            const checklistConfig = partitionedChecklistsConfig[checklist];
+                            const areaKeyArr = Object.keys(checklistConfig);
+
+                            if (cancelBuildOfLogs) return;
+
+                            for (const areaKey of areaKeyArr) {
+                                const areaKeyConfig = checklistConfig[areaKey];
+                                const Panel = document.createElement("div");
+                                const SubPanel = document.createElement("div");
+                                const IconPanel = document.createElement("div");
+                                const LogButton = document.createElement("input");
+                                const LogStatus = areaKeyConfig.LogStatus;
+                                const StripeColor = areaKeyConfig.StripeColor
+                                let CssStripedBackground = "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px);"
+
+                                Panel.setAttribute("style", "display: inline-block; border: 2px solid black; " + CssStripedBackground)
+                                SubPanel.setAttribute("style", "display: flex")
+                                LogButton.setAttribute("style", "width: 100%; border: none; cursor: pointer; " + CssStripedBackground)
+                                IconPanel.setAttribute("style", "display: flex; align-items: center; cursor: pointer;")
+
+                                IconPanel.id = "IconPanel_" + areaKey
+
+                                if (LogStatus !== "red" && LogStatus !== "pink")  //log has to be complete to receive icons
+                                {
+                                    const iconsList = JSON.parse(areaKeyConfig.iconsConfig);
+
+                                    iconsList.forEach(function (iconSrc) {
+                                        const icon = document.createElement("img");
+
+                                        icon.setAttribute("src", iconSrc);
+                                        icon.setAttribute("class", "ChecklistButtonIcon");
+                                        icon.addEventListener("click", function () {
+                                            redirect("Log.aspx?Key=" + areaKey);
+                                            satiSpinner.displaySpin();
+                                            cancelBuildOfLogs = true;
+                                        })
+
+                                        IconPanel.appendChild(icon);
+                                    });
+                                }
+
+                                LogButton.setAttribute("type", "button")
+                                LogButton.setAttribute("class", "ChecklistButton");
+                                LogButton.id = areaKey;
+                                LogButton.value = checklist;
+                                LogButton.addEventListener("click", function () {
+                                    redirect("Log.aspx?Key=" + areaKey);
+                                    satiSpinner.displaySpin();
+                                    cancelBuildOfLogs = true;
+                                })
+
+                                PastIssuesPanel.appendChild(Panel);
+
+                                Panel.appendChild(SubPanel);
+
+                                SubPanel.appendChild(LogButton);
+                                SubPanel.appendChild(IconPanel);
+                            }
+
+                        }
+
+                        //end loading effects for user to see past issues have been built
+
+                    }
+                }
+
+
+                function redirect(url) {
+                    window.location.href = url;
+                }
+
             </script>
 
             <style>
@@ -25,6 +227,7 @@
                     --UWhitespace: 0.5em;
                     --UFontSize: calc(var(--UWhitespace) * 1.5);
                     --ChecklistButtonWidth: calc(100vw / 5); /*5 so there is room for the 'special' (> monthly) checklists column*/
+                    --ChecklistButtonHeight: 50px;
                 }
 
                 .SectionPanel {
@@ -75,8 +278,12 @@
                 }
 
                 .ChecklistButton {
-                    height: 50px;
+                    height: var(--ChecklistButtonHeight);
                     text-overflow: ellipsis;
+                }
+
+                .ChecklistButtonIcon {
+                    height: calc(var(--ChecklistButtonHeight) * .5);
                 }
 
                 .ColorCodingMessages {
@@ -105,6 +312,46 @@
                 .TimeTravelCalendar td {
                     padding: .5em .75em;
                 }
+
+                /*================== 3 dot spinner =======================*/
+
+                .dots-spinner {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    height: 40px;
+                }
+
+                    .dots-spinner span {
+                        width: 10px;
+                        height: 10px;
+                        background-color: #333;
+                        border-radius: 50%;
+                        animation: bounce 0.6s infinite ease-in-out;
+                    }
+
+                        .dots-spinner span:nth-child(2) {
+                            animation-delay: 0.2s;
+                        }
+
+                        .dots-spinner span:nth-child(3) {
+                            animation-delay: 0.4s;
+                        }
+
+                @keyframes bounce {
+                    0%, 80%, 100% {
+                        transform: scale(0.6);
+                        opacity: 0.3;
+                    }
+
+                    40% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+
+                /*================== 3 dot spinner =======================*/
+
 
                 @media (min-width: 601px) {
                     .ColorCodingMessages {
@@ -221,11 +468,37 @@
                 <asp:Panel ID="AdminPanel" runat="server" Visible="False" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
                     <div class="PastIssuesHeader">
                         <asp:Label runat="server" CssClass="SectionLabel" Text="Past Issues"></asp:Label>
-                        <asp:Panel runat="server" ID="StampIndicatorLabelsPanel" CssClass="StampIndicators"></asp:Panel>
+                        <asp:Panel runat="server" ID="StampIndicatorLabelsPanel" CssClass="StampIndicators">
+                            <div style="display: flex; align-items: center;">
+                                <span>F&amp;M Manager =</span>
+                                <img src="../Color/wrench-fill.png" style="width: 20px; height: 20px;" />
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span>Q/SHE Manager =</span>
+                                <img src="../Color/list-checks-fill.png" style="width: 20px; height: 20px;" />
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span>F&amp;M Manager =</span>
+                                <img src="../Color/factory-fill.png" style="width: 20px; height: 20px;" />
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span>Maint Sup =</span>
+                                <img src="../Color/pipe-wrench-fill.png" style="width: 20px; height: 20px;" />
+                            </div>
+                        </asp:Panel>
                     </div>
 
                     <asp:Panel ID="PastIssuesPanel" runat="server" Style="">
                     </asp:Panel>
+
+                    <div style="display: flex; align-items: center;">
+                        <asp:LinkButton ID="BuildMoreLogs_Hyperlink" OnClientClick="build50Logs.call(this); return false;" Style="display: none;" Text="More..." runat="server" />
+                        <div class="dots-spinner">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
                 </asp:Panel>
 
                 <asp:Panel runat="server">

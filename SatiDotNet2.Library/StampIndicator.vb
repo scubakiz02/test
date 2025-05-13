@@ -10,8 +10,8 @@ Public Class StampIndicator
     Sub New()
     End Sub
 
-    Public Function Icons(T_LogDataKey As Integer) As List(Of String)
-        Dim IconsList As New List(Of String)
+    Public Function Icons(T_LogDataKey As Integer) As Dictionary(Of String, Dictionary(Of String, String))
+        Dim IconsHash As New Dictionary(Of String, Dictionary(Of String, String))
         Dim StatusBoardDS As Data.DataSet
         Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
 
@@ -23,7 +23,7 @@ Public Class StampIndicator
         If NumOfStamps(T_LogDataKey) < NumOfNeededStamps(T_LogDataKey) Then
             Dim RC As Integer
 
-            StatusBoardDS = GetMyDataSetParamQuery("SELECT SL.[Key] As StampKey, ST.Base64Icon
+            StatusBoardDS = GetMyDataSetParamQuery("SELECT SL.[Key] As StampKey, ST.Title, ST.Base64Icon, ST.IconImgFilePath
               FROM [ALTS].[dbo].[T_LogStampList] SL
               INNER JOIN [ALTS].[dbo].[T_LogStampTitle] ST ON SL.TitleKey=ST.[Key]  
               WHERE 
@@ -42,12 +42,17 @@ Public Class StampIndicator
                 QueryObject("@StampKey")("value") = StatusBoardDR("StampKey")
 
                 If GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogStamp] S WHERE StampKey=@StampKey AND DataRecordKey=@DataRecordKey", QueryObject, "Key") Is Nothing Then
-                    IconsList.Add(StatusBoardDR("Base64Icon"))
+                    Dim IconHash As New Dictionary(Of String, String)
+
+                    IconHash("Base64Icon") = StatusBoardDR("Base64Icon")
+                    IconHash("IconImgFilePath") = StatusBoardDR("IconImgFilePath")
+
+                    IconsHash(StatusBoardDR("Title")) = IconHash
                 End If
             Next
         End If
 
-        Return IconsList
+        Return IconsHash
     End Function
 
     Private Function NumOfNeededStamps(T_LogDataKey As Integer) As Integer
@@ -70,23 +75,15 @@ Public Class StampIndicator
         Return GetSingleDbField("SELECT COUNT(S.[Key]) As NumOfStamps FROM [ALTS].[dbo].[T_LogStamp] S INNER Join [ALTS].[dbo].[T_LogStampList] SL ON S.StampKey=SL.[Key] WHERE DataRecordKey=@DataRecordKey And S.Active = 1", QueryObject, "NumOfStamps")
     End Function
 
-    Public Function GetTitleIconHash() As Dictionary(Of String, String)
-        Dim CurrDS As New Data.DataSet
-
-        CurrDS = GetMyDataSetParamQuery("SELECT Title, Base64Icon FROM [ALTS].[dbo].[T_LogStampTitle]", New Dictionary(Of String, Dictionary(Of String, String)))
-        For Each CurrDR As DataRow In CurrDS.Tables(0).Rows
-            TitleToIcon(CurrDR("Title")) = CurrDR("Base64Icon")
-        Next
-
-        Return TitleToIcon
-    End Function
-
-    Function CreateIcons(ParentControl As Panel, T_LogDataKey As Integer, IconClick As Action(Of Integer), Optional AttachIcons As Boolean = True) As Panel
+    Function CreateIcons(ParentControl As Panel, T_LogDataKey As Integer) As Panel
         Dim Icon As ImageButton
         Dim DbKey As Integer = ParentControl.ID.Split("_")(1)
-        Dim SbUrls As List(Of String) = Icons(T_LogDataKey)
+        Dim SbUrls As New List(Of String)
+        Dim StatusBoardIconsHash As Dictionary(Of String, Dictionary(Of String, String)) = Icons(T_LogDataKey)
 
-        If AttachIcons = False Then Return ParentControl
+        For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In StatusBoardIconsHash
+            SbUrls.Add(kvp.Value("Base64Icon"))
+        Next
 
         If SbUrls.Count > 2 Then 'only add the css below when needed, to prevent excessive whitespace
             ParentControl.Attributes.Add("style", "grid-template-columns: 1fr 1fr;")
@@ -96,9 +93,7 @@ Public Class StampIndicator
             Icon = New ImageButton()
             Icon.ImageUrl = SbUrl
             Icon.Attributes.Add("style", StampIconCss)
-            AddHandler Icon.Click, Sub(sender As Object, e As EventArgs)
-                                       IconClick(T_LogDataKey)
-                                   End Sub
+            Icon.OnClientClick = "redirect('Log.aspx?Key=" & T_LogDataKey & "'); satiSpinner.displaySpin();" ' Log.aspx redirect is js driven, to prevent page events firing within StatusBoard.aspx, which should reduce overall redirect time
 
             ParentControl.Controls.Add(Icon)
         Next
