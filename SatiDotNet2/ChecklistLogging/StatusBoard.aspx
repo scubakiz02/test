@@ -45,7 +45,6 @@
 
                             function readChunk() {
                                 reader.read().then(({ done, value }) => {
-                                    const UNIQUE_SEPARATOR = '948ae0ab';
                                     let chunk = decoder.decode(value);
 
                                     if (done) {
@@ -55,30 +54,36 @@
                                         return;
                                     }
 
-                                    for (const checklistChunk of chunk.split(UNIQUE_SEPARATOR)) {
+                                    for (const checklistChunk of chunk.split("\n")) {
                                         let checklistChunkConfig = {};
-
-                                        if (checklistChunk === "") continue;
+                                        let checklist;
 
                                         try {
                                             checklistChunkConfig = JSON.parse(checklistChunk);
+                                            checklist = checklistChunkConfig.Value.Checklist;
+
+                                            if (!checklistsConfig.hasOwnProperty(checklist)) {
+                                                checklistsConfig[[checklist]] = {};
+                                            }
+
+                                            checklistsConfig[checklist][checklistChunkConfig.Key] = checklistChunkConfig.Value;
+
                                             console.log("successful parsing of JSON: \n" + checklistChunk)
                                         }
                                         catch {
-                                            console.error("error when parsing JSON: \n" + checklistChunk);
+                                            console.log("error when parsing JSON: \n" + checklistChunk);
                                         }
-
-                                        checklistsConfig = { ...checklistsConfig, ...checklistChunkConfig };
-
-                                        //must collect all data chunks from http response, but ALSO build exactly the 50 first received logs
-                                        if (configCount(checklistsConfig) >= 50 && !builtFirst50Logs) buildFirst50logs();
                                     }
+
+                                    //must collect all data chunks from http response, but ALSO build exactly the 50 first received logs
+                                    if (configCount(checklistsConfig) >= 50 && !builtFirst50Logs) buildFirst50logs();
 
                                     readChunk(); // Read the next chunk
                                 });
                             }
 
                             readChunk(); // Start reading chunks
+
                         })
                         .catch(error => {
                             console.error('Error fetching data:', error);

@@ -1,5 +1,6 @@
 ﻿
 Imports System.Text.Json
+Imports System.Text.Encodings.Web
 Imports SatiDotNet2.Library
 Imports System.Web.Services
 
@@ -28,7 +29,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
         Dim StampIndicatorLabels As New Dictionary(Of String, String)
 
-        Session("PastIssues") = New Func(Of Integer, String)(AddressOf BuildPastIssues)
+        Session("PastIssues") = New Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String))))(AddressOf BuildPastIssues)
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
@@ -374,7 +375,7 @@ Partial Class MR_OpenTicketStatusBoard
         Next
     End Sub
 
-    Public Function BuildPastIssues(AreaKey As Integer) As String
+    Public Function BuildPastIssues(AreaKey As Integer) As SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
         Dim ClientSideConfig As New SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
 
         If AdminPanel.Visible Then
@@ -403,6 +404,8 @@ Partial Class MR_OpenTicketStatusBoard
 
                 DR = DS.Tables(0).Rows(I)
 
+                IdConfig("Checklist") = DR("Area")
+
                 SetButtonBackground(DR)
                 IdConfig("LogStatus") = LogStatus
                 IdConfig("StripeColor") = StripeColor
@@ -421,7 +424,7 @@ Partial Class MR_OpenTicketStatusBoard
             Next
         End If
 
-        Return JsonSerializer.Serialize(ClientSideConfig)
+        Return ClientSideConfig
     End Function
 
     Public Function BuildLog(DR As Data.DataRow) As Tuple(Of Panel, Button)
