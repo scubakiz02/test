@@ -70,8 +70,8 @@
 
                                             console.log("successful parsing of JSON: \n" + checklistChunk)
                                         }
-                                        catch {
-                                            console.log("error when parsing JSON: \n" + checklistChunk);
+                                        catch (err) {
+                                            console.log("error when parsing JSON: \n\terror: " + err + "\n\tchunk:" + checklistChunk);
                                         }
                                     }
 

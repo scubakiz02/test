@@ -12,25 +12,28 @@ Public Class StreamData : Implements IHttpHandler, IReadOnlySessionState
         context.Response.Cache.SetCacheability(HttpCacheability.NoCache)
         context.Response.Buffer = False
 
-        Try 'in case there's errors with http request/response
-            Dim Config As New SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
-            Dim PastIssues As Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))) = CType(context.Session("PastIssues"), Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))))
+        Dim Config As New SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
+        Dim PastIssues As Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))) = CType(context.Session("PastIssues"), Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))))
 
-            For Each AreaKey In context.Session("AreaKeys")
-                If PastIssues IsNot Nothing Then
-                    'added hash to end of stringin case http data chunk contains json for several checklists
-                    Config = PastIssues.Invoke(AreaKey)
+        For Each AreaKey In context.Session("AreaKeys")
+            If PastIssues IsNot Nothing Then
+                'added hash to end of stringin case http data chunk contains json for several checklists
+                Config = PastIssues.Invoke(AreaKey)
 
-                    'streaming json return in chunks Using a 1KB Buffer
-                    'using a 1KB buffer rather than the standard of a 4KB Buffer to match production environment
-                    For Each PastIssuesControls As KeyValuePair(Of String, Dictionary(Of Integer, Dictionary(Of String, String))) In Config
+                'streaming json return in chunks Using a 1KB Buffer
+                'using a 1KB buffer rather than the standard of a 4KB Buffer to match production environment
+                For Each PastIssuesControls As KeyValuePair(Of String, Dictionary(Of Integer, Dictionary(Of String, String))) In Config
 
-                        'breaking data chunks into the smallest possible increments to ensure complete json objects are passed to the client
-                        For Each PastIssuesControl As KeyValuePair(Of Integer, Dictionary(Of String, String)) In PastIssuesControls.Value
-                            Dim JsonBytes() As Byte = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(PastIssuesControl) & vbLf) 'delimit increments by a newline (\n OR vbLf)
-                            Dim TotalLength As Integer = JsonBytes.Length
-                            Dim BufferSize As Integer = 1024
-                            Dim Offset As Integer = 0
+                    'breaking data chunks into the smallest possible increments to ensure complete json objects are passed to the client
+                    For Each PastIssuesControl As KeyValuePair(Of Integer, Dictionary(Of String, String)) In PastIssuesControls.Value
+                        Dim JsonBytes() As Byte
+                        Dim TotalLength As Integer
+                        Dim BufferSize As Integer = 1024
+                        Dim Offset As Integer = 0
+
+                        Try 'in case there's errors with a specific checklist
+                            JsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(PastIssuesControl) & vbLf) 'delimit increments by a newline (\n OR vbLf)
+                            TotalLength = JsonBytes.Length
 
                             While Offset < TotalLength
                                 Dim ChunkSize As Integer = Math.Min(BufferSize, TotalLength - Offset)
@@ -40,17 +43,17 @@ Public Class StreamData : Implements IHttpHandler, IReadOnlySessionState
 
                                 Offset += ChunkSize
                             End While
-                        Next
+
+                        Catch ex As Exception
+                            Continue For
+                        End Try
+
                     Next
+                Next
 
-                End If
+            End If
 
-            Next
-        Catch ex As HttpException
-            context.Response.End()
-        Finally
-            context.Response.End()
-        End Try
+        Next
     End Sub
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
