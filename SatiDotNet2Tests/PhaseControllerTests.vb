@@ -100,13 +100,11 @@ Public Class PhaseControllerTests
     Public Sub GetPhaseTest5()
         'all values for PhaseKey 1 & 2 are filled. return should be 3
         OgEnvironment()
-        PhaseStageConfig(595)("Value") = "1"
-        PhaseStageConfig(596)("Value") = "1"
-        PhaseStageConfig(597)("Value") = "1"
-        PhaseStageConfig(598)("Value") = "1"
-        PhaseStageConfig(599)("Value") = "1"
-        PhaseStageConfig(600)("Value") = "1"
-        PhaseStageConfig(603)("Value") = "1"
+
+        FillPhaseStageConfig()
+        PhaseStageConfig(602)("Value") = "0"
+        PhaseStageConfig(672)("Value") = "0"
+
         Instantiate()
         Assert.Equal(3, PhaseController.GetPhase())
     End Sub
@@ -120,15 +118,29 @@ Public Class PhaseControllerTests
         Assert.Equal(3, PhaseController.GetPhase())
     End Sub
 
-    Public Sub FillPhaseStageConfig()
-        PhaseStageConfig(595)("Value") = "1"
-        PhaseStageConfig(596)("Value") = "1"
-        PhaseStageConfig(597)("Value") = "1"
-        PhaseStageConfig(598)("Value") = "1"
-        PhaseStageConfig(599)("Value") = "1"
-        PhaseStageConfig(600)("Value") = "1"
-        PhaseStageConfig(603)("Value") = "1"
-        PhaseStageConfig(602)("Value") = "1"
+    Public Sub FillPhaseStageConfig(Optional AreaKey As Integer = -1)
+        Dim LabelKeysList As New List(Of Integer)
+        Dim DS As Data.DataSet
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        If AreaKey = -1 Then AreaKey = 82 'EDG Monthly
+
+        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+            {"value", AreaKey},
+            {"typeOf", "int"}
+        }
+        DS = GetMyDataSetParamQuery("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey", QueryConfig)
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            LabelKeysList.Add(DR("Key"))
+        Next
+
+        PhaseStageConfig.Clear()
+
+        For Each LabelKey As Integer In LabelKeysList
+            PhaseStageConfig(LabelKey) = New Dictionary(Of String, String) From {
+                {"Value", "1"}
+            }
+        Next
     End Sub
 
     <Fact>
@@ -146,6 +158,16 @@ Public Class PhaseControllerTests
         ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=3 WHERE [Key]=" & LabelKey, BlankConfig) 'return back to og
         Instantiate()
         Assert.Equal(3, PhaseController.GetPhases()(LabelKey)("PhaseOrder"))
+    End Sub
+
+    <Fact>
+    Private Sub ScissorLiftPmGetPhaseFunctionBug()
+        'Upon reaching 'Platform' phase within 'SCISSOR LIFT OPERATORS INSPECTION CHECKLIST' checklist, PhaseController.GetPhase() returns 3
+        'B/c of the return being 3, the 'Platform' phase continues to stay disabled
+        'this prevents the operator from filling out the checklist from 'Platform' phase onward
+        FillPhaseStageConfig(86)
+        PhaseController = New PhaseController(86, PhaseStageConfig)
+        Assert.Equal(Of Integer)(7, PhaseController.GetPhase())
     End Sub
 
     Private Sub AreaKey83Environment()

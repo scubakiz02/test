@@ -4,8 +4,9 @@ Imports SatiDotNet2.Library
 Imports System.Text.Json
 
 Public Class LabelOrderTests
+    Inherits Security
+
     Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
-    Dim Security = New Security()
 
     'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
     <Fact>
@@ -71,8 +72,11 @@ Public Class LabelOrderTests
     Public Sub LabelOrder6()
         'enusre LabelOrder for Label at bottom of Phase cannot be moved down, as PhaseOrder trumps LabelOrder
         Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
-        Dim LabelKey As Integer = 603 'top label in phase 3 for checklist
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
+        Dim LabelKey As Integer
+        Dim Res As Dictionary(Of String, String)
+
+        LabelKey = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE PhaseKey=2 AND LabelOrder=(SELECT MAX(LabelOrder) FROM [ALTS].[dbo].[T_LogLabel] WHERE PhaseKey=2)", New Dictionary(Of String, Dictionary(Of String, String)), "Key") 'bottom label in phase 2 for checklist
+        Res = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
 
         Assert.Equal(2, PhaseController.GetPhases()(LabelKey)("PhaseOrder")) 'baseline check. if this test fails, ensure value in LabelKey variable is the [Key] DB field value for the bottom most label in Phase 2 for EDG monthly checklist
         Assert.Equal("", Res("SqlQuery")) 'b/c T_LogLabel record 603 is the bottom most Label in Phase 2, it can NOT precede the LabelOrder of a record in another Phase

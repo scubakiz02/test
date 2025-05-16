@@ -688,10 +688,14 @@ Partial Class MR_OpenTicketStatusBoard
         End If
     End Sub
 
+    Private Function StripUnnecessaryChars(Str As String) As String
+        Return Str.Replace(vbTab, "")
+    End Function
+
     Protected Sub UpdateButton_onClick(sender As Object, e As EventArgs)
         If sender.ID.Contains("Area") Then
             QueryConfig("@Area") = New Dictionary(Of String, String) From {
-                {"value", sender.Parent.FindControl("AreaTextBox").Text},
+                {"value", StripUnnecessaryChars(sender.Parent.FindControl("AreaTextBox").Text)},
                 {"typeOf", "string"}
             }
             QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
@@ -701,7 +705,7 @@ Partial Class MR_OpenTicketStatusBoard
             Security.ExecuteSqlParamQuery("UPDATE [T_LogArea] SET Area=@Area WHERE [Key]=@AreaKey", QueryConfig)
         ElseIf sender.ID.Contains("Label") Then
             QueryConfig("@Label") = New Dictionary(Of String, String) From {
-                {"value", sender.Parent.FindControl("LabelTextBox").Text},
+                {"value", StripUnnecessaryChars(sender.Parent.FindControl("LabelTextBox").Text)},
                 {"typeOf", "string"}
             }
             QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
@@ -711,7 +715,7 @@ Partial Class MR_OpenTicketStatusBoard
             Security.ExecuteSqlParamQuery("UPDATE [T_LogLabel] SET Label=@Label WHERE [Key]=@LabelKey", QueryConfig)
         ElseIf sender.ID.Contains("Comment") Then
             QueryConfig("@Comment") = New Dictionary(Of String, String) From {
-                {"value", sender.Parent.FindControl("CommentTextBox").Text},
+                {"value", StripUnnecessaryChars(sender.Parent.FindControl("CommentTextBox").Text)},
                 {"typeOf", "string"}
             }
             QueryConfig("@CommentKey") = New Dictionary(Of String, String) From {

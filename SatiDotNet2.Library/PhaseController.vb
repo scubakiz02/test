@@ -1,7 +1,7 @@
 ﻿Public Class PhaseController
     Inherits Security
     Private GlobalAreaKey As Integer
-    Private PhaseOrderToLabels As Dictionary(Of Integer, List(Of Integer))
+    Private PhaseOrdersToLabels As SortedDictionary(Of Integer, List(Of Integer))
     Private LabelToPhaseInfo As Dictionary(Of Integer, Dictionary(Of String, String))
     Private GlobalPhaseOrder As Integer
     Private DS As Data.DataSet
@@ -19,9 +19,9 @@
     Private Sub CollectPhases(AreaKey As Integer)
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
-        PhaseOrderToLabels = New Dictionary(Of Integer, List(Of Integer))
+        PhaseOrdersToLabels = New SortedDictionary(Of Integer, List(Of Integer))
         LabelToPhaseInfo = New Dictionary(Of Integer, Dictionary(Of String, String))
-        GlobalPhaseOrder = 1
+        GlobalPhaseOrder = 1 '1 based indexing, to match associated primary key field value in DB
 
         GlobalAreaKey = AreaKey
 
@@ -47,11 +47,11 @@
                 Continue For
             End Try
 
-            If PhaseOrderToLabels.ContainsKey(PhaseOrder) = False Then
-                PhaseOrderToLabels(PhaseOrder) = New List(Of Integer)
+            If PhaseOrdersToLabels.ContainsKey(PhaseOrder) = False Then
+                PhaseOrdersToLabels(PhaseOrder) = New List(Of Integer)
             End If
 
-            PhaseOrderToLabels(PhaseOrder).Add(LabelKey)
+            PhaseOrdersToLabels(PhaseOrder).Add(LabelKey)
 
             PhaseInfo("Phase") = Phase
             PhaseInfo("PhaseOrder") = PhaseOrder
@@ -60,8 +60,15 @@
         Next
     End Sub
 
+    Private Function PhaseOrderForLabel(LabelKey As Integer) As Integer
+        'SetPhases() sub takes a dictionary as an argument
+        'The keys of the dictionary (LabelKeys) are not guarenteed to be ordered by PhaseOrder
+        'Therefore, this function will take a LabelKey as an argument, and return its PhaseOrder
+        Return LabelToPhaseInfo(LabelKey)("PhaseOrder")
+    End Function
+
     Private Sub SetPhases(Inputs As Dictionary(Of Integer, Dictionary(Of String, String)))
-        If PhaseOrderToLabels.Count = 0 Then 'this means checklist does NOT contain Phases
+        If PhaseOrdersToLabels.Count = 0 Then 'this means checklist does NOT contain Phases
             Exit Sub
         End If
 
@@ -71,17 +78,21 @@
             Dim InputValue As String = Input("Value")
 
             If String.IsNullOrEmpty(InputValue) = False Then
-                PhaseOrderToLabels(GlobalPhaseOrder).Remove(LabelKey)
+                PhaseOrdersToLabels(PhaseOrderForLabel(LabelKey)).Remove(LabelKey)
+            End If
+        Next
 
-                If PhaseOrderToLabels(GlobalPhaseOrder).Count = 0 Then
-                    GlobalPhaseOrder += 1
-                End If
+        'if GlobalPhaseOrder were to be incremented in the for loop above, it would be complex to track proper value for GlobalPhaseOrder
+        'therefore, iterating through PhaseOrdersToLabels, a SortedDictionary, to increment GlobalPhaseOrder in counting order (1, 2, 3, 4, etc.)
+        For Each PhaseOrderToLabels As KeyValuePair(Of Integer, List(Of Integer)) In PhaseOrdersToLabels
+            If PhaseOrderToLabels.Value.Count = 0 AndAlso GlobalPhaseOrder < PhaseOrdersToLabels.Count Then
+                GlobalPhaseOrder += 1
             End If
         Next
     End Sub
 
     Public Function GetPhase() As Integer
-        If PhaseOrderToLabels Is Nothing Then Return Nothing
+        If PhaseOrdersToLabels Is Nothing Then Return Nothing
         Return GlobalPhaseOrder
     End Function
 
