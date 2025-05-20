@@ -203,7 +203,6 @@ Partial Class MR_OpenTicketStatusBoard
             My_DR = My_DS.Tables("T_LogData").NewRow
             My_DR("AreaKey") = AreaKey
 
-            QueryConfig.Clear()
             QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                     {"value", AreaKey},
                     {"typeOf", "int"}
