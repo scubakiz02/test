@@ -33,7 +33,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
-            Response.Redirect("/ChecklistLogging/ChecklistLoggingMainMaint.aspx")
+            Response.Redirect("/MaintenanceDepartment/MD_Main.aspx")
         ElseIf Request.QueryString.Count > 0 Then
             Dim QsDepartment As String = Request.QueryString("Department")
             Dim QsView As String = Request.QueryString("View")
