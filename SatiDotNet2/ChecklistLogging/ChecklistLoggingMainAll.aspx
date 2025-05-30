@@ -11,7 +11,7 @@
         <asp:HyperLink ID="HyperLink7" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistReport.aspx">Report Checklist</asp:HyperLink><br />
         <br />
 
-        Status Board:<br />
+        PM Status Board:<br />
         <asp:HyperLink ID="HyperLink12" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=All&View=Focus">All Departments, Focused View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink2" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=All&View=Full">All Departments, Full View</asp:HyperLink><br />
         <asp:HyperLink ID="HyperLink3" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Production&View=Focus">Production, Focused View</asp:HyperLink><br />

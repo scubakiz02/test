@@ -1,7 +1,11 @@
 ﻿Imports System.Text
+Imports System.Collections.Generic
+Imports System.Text.Json
+Imports System.Text.Json.Serialization
 Imports Xunit
 Imports SatiDotNet2.Library
 Imports System.Threading
+Imports System.Linq
 
 Public Class SecurityTests
     Dim Security = New Security()
@@ -132,6 +136,25 @@ Public Class ExecuteSqlParamQueryTests
 
         Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET willitnull=@null WHERE id=@id", QueryObject))
     End Sub
+End Class
+
+Public Class GetParamVarHashTests
+    Inherits Security
+
+    <Theory>
+    <InlineData(2, "int")>
+    <InlineData("I'm going to cry", "string")>
+    <InlineData("your mom", "string")>
+    <InlineData(True, "bit")>
+    Public Sub SuccessfulTestCases(Value As String, DbType As String)
+        Dim ExpectedRes As New Dictionary(Of String, String) From {
+            {"value", Value},
+            {"typeOf", DbType}
+        }
+
+        Assert.Equal(JsonSerializer.Serialize(ExpectedRes), JsonSerializer.Serialize(GetParamVarHash(Value, DbType)))
+    End Sub
+
 End Class
 
 Public Class GetMyDataSetParamQueryTests

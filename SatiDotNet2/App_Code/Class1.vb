@@ -4,11 +4,11 @@ Imports System.Net.Mail
 Imports System.IO
 Imports System.Xml
 Imports System.Data
-
+Imports SatiDotNet2.Library
 
 Public Class Class1
     Inherits System.Web.UI.Page
-
+    Dim Security As New Security
 
     Sub OpenNewPage(ByVal MyUpdatePanel As UpdatePanel, ByVal TheWebPage As String)
 
@@ -966,8 +966,8 @@ Public Class Class1
 
     End Sub
 
-    Sub ModRecvingInv(ByVal Action As String, ByVal IDNote As String, ByVal NewWLNumber As String, ByVal PackingSlip As String, _
-    ByVal Carrier As String, ByVal WaferQty As String, ByVal Containment As String, _
+    Sub ModRecvingInv(ByVal Action As String, ByVal IDNote As String, ByVal NewWLNumber As String, ByVal PackingSlip As String,
+    ByVal Carrier As String, ByVal WaferQty As String, ByVal Containment As String,
     ByVal ContainmentQty As String, ByVal Notes As String, ByVal InvType As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -3983,7 +3983,7 @@ Public Class Class1
         Dim LabelRecordSelectCmd As New System.Data.SqlClient.SqlCommand
         With LabelRecordSelectCmd
             .CommandText = "Select LabelRecordNumber, Lot, LabelType, Wafers, Total_Qty, RecordNumber, SO_Key, Operator, EventTime, RFID, LotBoxNumber FROM dbo.LabelsMade WHERE (Lot = '0000-00000-0000')"
-                    .Connection = Connection
+            .Connection = Connection
         End With
         DA_LabelRecord.SelectCommand = LabelRecordSelectCmd
 
@@ -11886,7 +11886,7 @@ Public Class Class1
                 Flex.ActiveSheetByName = SlotBySlotSheetName
 
             Else
-                
+
                 Flex.ActiveSheetByName = SlotBySlotSheetName
 
             End If
@@ -13089,7 +13089,7 @@ Public Class Class1
                 sixCount = sixCount + 1
             End If
         Next
-       
+
         Flex.Recalc()
         'SlotBySlotSheetName = "Slot-by-Slot WRemoval"
 
@@ -14305,7 +14305,7 @@ Public Class Class1
         Using swPara As StreamWriter = File.CreateText(FILE_NAME)
             swPara.WriteLine("UNITID,UNITTYPE,PARTNUMBER,PARTDESC,PARTECLEVEL,SUPPLIER_NUM,DOX,PRODDATE,SUPPLIER_PLANTSITE,SUPPLIER_PLANT_LINE,SUBUNITID,SUBUNITTYPE,SUBUNIT_PRODDATE,TESTERID,TESTMETHOD,MEASUREMENT_TS,PARAMNAME,PARAMID,PARAMLISTID,PARAMTEXT,PARAMVALUE,PARAMUNIT,PARENTUNITID,PARENTUNITTYPE,PARAMSEMANTIC")
 
-            Dim StdLine As String = SHIPMENT_ID & ",SHIPMENT," & PartNumber & ",," & PartECLevel & "," & Supplier & ",," & ProDate & "," & PlantSite & "," & PlantLine & ",,,,,,,,"
+            Dim StdLine As String = SHIPMENT_ID & ",SHIPMENT," & PartNumber & ",," & PartECLevel & "," & Supplier & ",," & ProDate & "," & PlantSite & "," & PLANTLINE & ",,,,,,,,"
 
             'NUM_IN_UNIT
             swPara.WriteLine(StdLine & "NUM_IN_UNIT,,," & flex.GetCellValue(15, 2).ToString & ",#,,,S")
@@ -18761,13 +18761,13 @@ Public Class Class1
                             Exit Do
                         End If
 
-                Metalsloop = Metalsloop + 1
+                        Metalsloop = Metalsloop + 1
 
-                If Metalsloop = 200 Then
-                    Exit Do
-                End If
+                        If Metalsloop = 200 Then
+                            Exit Do
+                        End If
 
-            Loop
+                    Loop
 
                 End If
                 flex.ActiveSheetByName = "AllData"
@@ -20953,21 +20953,21 @@ Public Class Class1
 
 
                 If Swan = True Then
-                        Select Case RemoveSheet
-                            Case Is = "Analysis"
-                                flex.RecalcAndVerify()
-                                flex.ConvertFormulasToValues(True)
-                                loopcounter = loopcounter + 1
+                    Select Case RemoveSheet
+                        Case Is = "Analysis"
+                            flex.RecalcAndVerify()
+                            flex.ConvertFormulasToValues(True)
+                            loopcounter = loopcounter + 1
 
-                            Case Is = "CofC"
-                                flex.RecalcAndVerify()
-                                flex.ConvertFormulasToValues(True)
-                                loopcounter = loopcounter + 1
-                            Case Else
-                                flex.DeleteSheet(1)
+                        Case Is = "CofC"
+                            flex.RecalcAndVerify()
+                            flex.ConvertFormulasToValues(True)
+                            loopcounter = loopcounter + 1
+                        Case Else
+                            flex.DeleteSheet(1)
 
-                        End Select
-                    Else
+                    End Select
+                Else
 
 
 
@@ -24068,7 +24068,7 @@ Public Class Class1
         Pick_Shipping_UnitTable = "Good"
     End Function
 
-    Function ReceivatoryWafers(ByVal StartWL_or_WaferLogComplete As String, ByVal ID As String, ByVal WL As String, ByVal Qty As String, ByVal PackingSlip As String, _
+    Function ReceivatoryWafers(ByVal StartWL_or_WaferLogComplete As String, ByVal ID As String, ByVal WL As String, ByVal Qty As String, ByVal PackingSlip As String,
     ByVal Carrier As String, ByVal Note As String, ByVal ContainmentUnit As String, ByVal ContainmentQty As String, ByVal SatiUser As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -24357,6 +24357,220 @@ Public Class Class1
         DR_MRNote("SatiUser") = User.Identity.Name.ToString
         DS_MRNote.Tables("T_MR_TicketNotes").Rows.Add(DR_MRNote)
         DA_MRNote.Update(DS_MRNote, "T_MR_TicketNotes")
+        Connection.Close()
+
+    End Sub
+    Function ScheduledMaintenanceRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer) As String
+        ScheduledMaintenanceRequestTicket = 0
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+
+        Dim DA_SMRTicket As New Data.SqlClient.SqlDataAdapter
+        Dim DS_SMRTicket As New Data.DataSet
+        Dim DR_SMRTicket As Data.DataRow
+        '*****************************************************************
+        '************************Select***********************************
+        '*****************************************************************
+        Dim SMRTicketSelectCmd As New System.Data.SqlClient.SqlCommand
+        With SMRTicketSelectCmd
+            .CommandText = "SELECT SMR_Key, Tool, IssueDate, IssueUser, CloseDate, CloseUser, EstimatedHrs, EarliestStartTime, ScheduledStartTime FROM dbo.T_SMR_Tickets WHERE (SMR_Key = '" & Ticket & "')"
+            .Connection = Connection
+        End With
+        DA_SMRTicket.SelectCommand = SMRTicketSelectCmd
+
+        '*****************************************************************
+        '************************Insert***********************************
+        '*****************************************************************
+        Dim SMRTicketInsertCmd As New System.Data.SqlClient.SqlCommand
+        With SMRTicketInsertCmd
+            .CommandText = "INSERT INTO [dbo].[T_SMR_Tickets] ([Tool], [IssueDate], [IssueUser], [CloseDate], [CloseUser], [ReportOK]) VALUES (@Tool, @IssueDate, @IssueUser, @CloseDate, @CloseUser, 1); SELECT SMR_Key, Tool, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_SMR_Tickets WHERE (SMR_Key = SCOPE_IDENTITY())"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser")})
+        End With
+        DA_SMRTicket.InsertCommand = SMRTicketInsertCmd
+
+        '*****************************************************************
+        '************************Update***********************************
+        '*****************************************************************
+        Dim SMRTicketUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With SMRTicketUpdateCmd
+            .CommandText = "UPDATE [dbo].[T_SMR_Tickets] SET [Tool] = @Tool, [IssueDate] = @IssueDate, [IssueUser] = @IssueUser, [CloseDate] = @CloseDate, [CloseUser] = @CloseUser WHERE (([SMR_Key] = @Original_SMR_Key) AND ((@IsNull_Tool = 1 AND [Tool] IS NULL) OR ([Tool] = @Original_Tool)) AND ((@IsNull_IssueDate = 1 AND [IssueDate] IS NULL) OR ([IssueDate] = @Original_IssueDate)) AND ((@IsNull_IssueUser = 1 AND [IssueUser] IS NULL) OR ([IssueUser] = @Original_IssueUser)) AND ((@IsNull_CloseDate = 1 AND [CloseDate] IS NULL) OR ([CloseDate] = @Original_CloseDate)) AND ((@IsNull_CloseUser = 1 AND [CloseUser] IS NULL) OR ([CloseUser] = @Original_CloseUser))); SELECT SMR_Key, Tool, IssueDate, IssueUser, CloseDate, CloseUser FROM dbo.T_SMR_Tickets WHERE (SMR_Key = @SMR_Key)"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Tool", System.Data.SqlDbType.Int, 0, "Tool"), New System.Data.SqlClient.SqlParameter("@IssueDate", System.Data.SqlDbType.SmallDateTime, 0, "IssueDate"), New System.Data.SqlClient.SqlParameter("@IssueUser", System.Data.SqlDbType.VarChar, 0, "IssueUser"), New System.Data.SqlClient.SqlParameter("@CloseDate", System.Data.SqlDbType.SmallDateTime, 0, "CloseDate"), New System.Data.SqlClient.SqlParameter("@CloseUser", System.Data.SqlDbType.VarChar, 0, "CloseUser"), New System.Data.SqlClient.SqlParameter("@Original_SMR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "SMR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_Tool", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Tool", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_IssueUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_IssueUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "IssueUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_CloseUser", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_CloseUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "CloseUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@SMR_Key", System.Data.SqlDbType.Int, 4, "SMR_Key")})
+        End With
+        DA_SMRTicket.UpdateCommand = SMRTicketUpdateCmd
+
+        '*****************************************************************
+        '************************Genral***********************************
+        '*****************************************************************
+        DA_SMRTicket.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_SMR_Tickets", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("SMR_Key", "SMR_Key"), New System.Data.Common.DataColumnMapping("Tool", "Tool"), New System.Data.Common.DataColumnMapping("IssueDate", "IssueDate"), New System.Data.Common.DataColumnMapping("IssueUser", "IssueUser"), New System.Data.Common.DataColumnMapping("CloseDate", "CloseDate"), New System.Data.Common.DataColumnMapping("CloseUser", "CloseUser")})})
+        DA_SMRTicket.Fill(DS_SMRTicket)
+
+        Select Case Action
+            Case "New"
+                DR_SMRTicket = DS_SMRTicket.Tables("T_SMR_Tickets").NewRow
+                DR_SMRTicket("Tool") = Tool
+                DR_SMRTicket("IssueDate") = System.DateTime.Now.ToShortTimeString
+                DR_SMRTicket("IssueUser") = User.Identity.Name.ToString
+                DS_SMRTicket.Tables("T_SMR_Tickets").Rows.Add(DR_SMRTicket)
+                DA_SMRTicket.Update(DS_SMRTicket, "T_SMR_Tickets")
+                ScheduledMaintenanceRequestTicket = DR_SMRTicket("SMR_Key")
+
+            'Case "ModStatus"
+            '    DR_SMRTicket = DS_SMRTicket.Tables(0).Rows(0)
+            '    DR_SMRTicket.AcceptChanges()
+            '    DR_SMRTicket.BeginEdit()
+            '    DR_SMRTicket.EndEdit()
+            '    DA_SMRTicket.Update(DS_SMRTicket, "T_SMR_Tickets")
+
+
+            Case "Close"
+                '*****************************************************************
+                '** check to make sure they did not spam the close button ********
+                '*****************************************************************
+                Dim ds As Data.DataSet
+                Dim DR As Data.DataRow
+                Dim nullcheck As Boolean
+
+                ds = GetMyDataSet("SELECT CloseDate FROM dbo.T_SMR_Tickets WHERE (SMR_Key = " & Ticket & ")") 'SELECT CloseDate FROM dbo.T_SMR_Tickets WHERE (SMR_Key = 53868)
+                DR = ds.Tables(0).Rows(0)
+                nullcheck = IsDBNull(DR("CloseDate"))
+                If nullcheck = False Then
+                    Exit Function
+                End If
+
+                '*****************************************************************
+                '*****************************************************************
+
+                DR_SMRTicket = DS_SMRTicket.Tables(0).Rows(0)
+                DR_SMRTicket.AcceptChanges()
+                DR_SMRTicket.BeginEdit()
+                DR_SMRTicket("CloseDate") = System.DateTime.Now.ToShortTimeString
+                DR_SMRTicket("CloseUser") = User.Identity.Name.ToString
+                DR_SMRTicket.EndEdit()
+                DA_SMRTicket.Update(DS_SMRTicket, "T_SMR_Tickets")
+                ScheduledMaintenanceRequestTicket = 0
+
+                '**********************************
+                '*Sent Mail with Closed Ticket Info
+                '**********************************
+                '**********************************
+
+                ScheduledMaintenanceRequestCloseTest(Ticket)
+
+                '**********************************
+                '**********************************
+        End Select
+        Connection.Close()
+
+    End Function
+
+    Sub ScheduledMaintenanceRequestCloseTest(ByVal Ticket As String)
+        Dim DS As Data.DataSet
+        Dim DR As Data.DataRow
+        Dim Count As Integer
+        Dim SB As New StringBuilder
+        Dim I As Integer
+        Dim Subject As String = String.Empty
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        QueryConfig("@SMR_Key") = Security.GetParamVarHash(Ticket, "int")
+
+        DS = Security.GetMyDataSetParamQuery("SELECT TOP (100) PERCENT dbo.T_SMR_Tickets.SMR_Key, dbo.T_Tools.Department, dbo.T_Tools.Tool, dbo.T_SMR_Tickets.IssueDate, dbo.T_SMR_Tickets.IssueUser, dbo.T_SMR_Tickets.CloseDate, dbo.T_SMR_Tickets.CloseUser, dbo.T_SMR_TicketNotes.NoteType, dbo.T_SMR_TicketNotes.Note, dbo.T_SMR_TicketNotes.NoteDate, dbo.T_SMR_TicketNotes.SatiUser, dbo.T_SMR_TicketNotes.[Key] FROM dbo.T_SMR_Tickets INNER JOIN dbo.T_Tools ON dbo.T_SMR_Tickets.Tool = dbo.T_Tools.[Key] LEFT OUTER JOIN dbo.T_SMR_TicketNotes ON dbo.T_SMR_Tickets.SMR_Key = dbo.T_SMR_TicketNotes.SMR_Key GROUP BY dbo.T_SMR_Tickets.SMR_Key, dbo.T_Tools.Department, dbo.T_Tools.Tool, dbo.T_SMR_Tickets.IssueDate, dbo.T_SMR_Tickets.IssueUser, dbo.T_SMR_Tickets.CloseDate, dbo.T_SMR_Tickets.CloseUser, dbo.T_SMR_TicketNotes.NoteType, dbo.T_SMR_TicketNotes.Note, dbo.T_SMR_TicketNotes.NoteDate, dbo.T_SMR_TicketNotes.SatiUser, dbo.T_SMR_TicketNotes.[Key] HAVING (dbo.T_SMR_Tickets.SMR_Key=@SMR_Key) ORDER BY dbo.T_SMR_TicketNotes.[Key]", QueryConfig)
+        Count = DS.Tables(0).Rows.Count
+
+        If Count > 1 Then
+            SB.Append(<h1 style="color: #0000FF">Maintenance Request Closed</h1>)
+            SB.Append(<br/>)
+            For I = 0 To Count - 1
+                DR = DS.Tables(0).Rows(I)
+
+                If DR("NoteType") = "Org" Then
+                    Subject = "Ticket " & DR("SMR_Key").ToString & " for " & DR("Tool").ToString & " is Closed"
+                    SB.Append("<font size=5>Ticket: </font> &nbsp; <font size=5 color=red><b>" & DR("SMR_Key").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>Tool: </font> &nbsp; <font size=5 color=red><b>" & DR("Tool").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>Start Time: </font> &nbsp; <font size=5 color=red><b>" & DR("IssueDate").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append("<font size=5>From User " & DR("SatiUser").ToString & ": </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append(<br/>)
+                End If
+            Next
+            For I = 0 To Count - 1
+                DR = DS.Tables(0).Rows(I)
+                If DR("NoteType") = "Tech" Then
+                    SB.Append("<font size=5>Tech User: " & DR("SatiUser").ToString & " : </font> &nbsp; <font size=5 color=red><b>" & DR("Note").ToString & "</b></font>")
+                    SB.Append(<br/>)
+                    SB.Append(<br/>)
+                End If
+            Next
+            SB.Append("<font size=5>Close Time: </font> &nbsp; <font size=5 color=red><b>" & DR("CloseDate").ToString & "</b></font>")
+            SB.Append(<br/>)
+
+        End If
+
+        SendMail_HTML(SB.ToString, Subject, "szymon.tyburek@purewafer.com", "")
+    End Sub
+
+
+    Sub ScheduledMaintenanceRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
+
+        Dim Connection As New Data.SqlClient.SqlConnection
+        Connection.ConnectionString = Session("DBConnect")
+        Connection.Open()
+
+        Dim DA_SMRNote As New Data.SqlClient.SqlDataAdapter
+        Dim DS_SMRNote As New Data.DataSet
+        Dim DR_SMRNote As Data.DataRow
+        '*****************************************************************
+        '************************Select***********************************
+        '*****************************************************************
+        Dim SMRNoteSelectCmd As New System.Data.SqlClient.SqlCommand
+        With SMRNoteSelectCmd
+            '.CommandText = "SELECT [Key], SMR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_SMR_TicketNotes WHERE (SMR_Key = '" & Ticket & "')"
+            .CommandText = "SELECT [Key], SMR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_SMR_TicketNotes WHERE (SMR_Key = '0')"
+            .Connection = Connection
+        End With
+        DA_SMRNote.SelectCommand = SMRNoteSelectCmd
+
+        '*****************************************************************
+        '************************Insert***********************************
+        '*****************************************************************
+        Dim SMRNoteInsertCmd As New System.Data.SqlClient.SqlCommand
+        With SMRNoteInsertCmd
+            .CommandText = "INSERT INTO [dbo].[T_SMR_TicketNotes] ([SMR_Key], [NoteType], [Note], [NoteDate], [SatiUser]) VALUES (@SMR_Key, @NoteType, @Note, @NoteDate, @SatiUser); SELECT [Key], SMR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_SMR_TicketNotes WHERE ([Key] = SCOPE_IDENTITY())"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@SMR_Key", System.Data.SqlDbType.Int, 0, "SMR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser")})
+        End With
+        DA_SMRNote.InsertCommand = SMRNoteInsertCmd
+
+        '*****************************************************************
+        '************************Update***********************************
+        '*****************************************************************
+        Dim SMRNoteUpdateCmd As New System.Data.SqlClient.SqlCommand
+        With SMRNoteUpdateCmd
+            .CommandText = "UPDATE [dbo].[T_SMR_TicketNotes] SET [SMR_Key] = @SMR_Key, [NoteType] = @NoteType, [Note] = @Note, [NoteDate] = @NoteDate, [SatiUser] = @SatiUser WHERE (([Key] = @Original_Key) AND ([SMR_Key] = @Original_SMR_Key) AND ([NoteType] = @Original_NoteType) AND ([Note] = @Original_Note) AND ((@IsNull_NoteDate = 1 AND [NoteDate] IS NULL) OR ([NoteDate] = @Original_NoteDate)) AND ([SatiUser] = @Original_SatiUser)); SELECT [Key], SMR_Key, NoteType, Note, NoteDate, SatiUser FROM dbo.T_SMR_TicketNotes WHERE ([Key] = @Key)"
+            .Connection = Connection
+            .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@SMR_Key", System.Data.SqlDbType.Int, 0, "SMR_Key"), New System.Data.SqlClient.SqlParameter("@NoteType", System.Data.SqlDbType.VarChar, 0, "NoteType"), New System.Data.SqlClient.SqlParameter("@Note", System.Data.SqlDbType.VarChar, 0, "Note"), New System.Data.SqlClient.SqlParameter("@NoteDate", System.Data.SqlDbType.SmallDateTime, 0, "NoteDate"), New System.Data.SqlClient.SqlParameter("@SatiUser", System.Data.SqlDbType.VarChar, 0, "SatiUser"), New System.Data.SqlClient.SqlParameter("@Original_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_SMR_Key", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "SMR_Key", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_NoteType", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteType", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_Note", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "Note", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@IsNull_NoteDate", System.Data.SqlDbType.Int, 0, System.Data.ParameterDirection.Input, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, True, Nothing, "", "", ""), New System.Data.SqlClient.SqlParameter("@Original_NoteDate", System.Data.SqlDbType.SmallDateTime, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "NoteDate", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Original_SatiUser", System.Data.SqlDbType.VarChar, 0, System.Data.ParameterDirection.Input, False, CType(0, Byte), CType(0, Byte), "SatiUser", System.Data.DataRowVersion.Original, Nothing), New System.Data.SqlClient.SqlParameter("@Key", System.Data.SqlDbType.Int, 4, "Key")})
+        End With
+        DA_SMRNote.UpdateCommand = SMRNoteUpdateCmd
+
+        '*****************************************************************
+        '************************Genral***********************************
+        '*****************************************************************
+        DA_SMRNote.TableMappings.AddRange(New System.Data.Common.DataTableMapping() {New System.Data.Common.DataTableMapping("Table", "T_SMR_TicketNotes", New System.Data.Common.DataColumnMapping() {New System.Data.Common.DataColumnMapping("Key", "Key"), New System.Data.Common.DataColumnMapping("SMR_Key", "SMR_Key"), New System.Data.Common.DataColumnMapping("NoteType", "NoteType"), New System.Data.Common.DataColumnMapping("Note", "Note"), New System.Data.Common.DataColumnMapping("NoteDate", "NoteDate"), New System.Data.Common.DataColumnMapping("SatiUser", "SatiUser")})})
+        DA_SMRNote.Fill(DS_SMRNote)
+        DR_SMRNote = DS_SMRNote.Tables("T_SMR_TicketNotes").NewRow
+        DR_SMRNote("SMR_Key") = Ticket
+        DR_SMRNote("NoteType") = NoteType
+        DR_SMRNote("Note") = Note
+        DR_SMRNote("NoteDate") = System.DateTime.Now.ToShortTimeString
+        DR_SMRNote("SatiUser") = User.Identity.Name.ToString
+        DS_SMRNote.Tables("T_SMR_TicketNotes").Rows.Add(DR_SMRNote)
+        DA_SMRNote.Update(DS_SMRNote, "T_SMR_TicketNotes")
         Connection.Close()
 
     End Sub
@@ -28007,7 +28221,7 @@ Public Class Class1
 
         Select Case Diameter
             Case 200
-                Select Case Num
+                Select Case num
                     Case 1 '199.85
                         DiameterRandom = 199.85
                         Exit Function
@@ -28032,7 +28246,7 @@ Public Class Class1
                 End Select
 
             Case 300
-                Select Case Num
+                Select Case num
                     Case 1
                         Return 299.85
                         Exit Function

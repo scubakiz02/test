@@ -52,11 +52,11 @@ Public Class Security
         Return True
     End Function
 
-    Function GetSqlDbType(typeName As String) As SqlDbType
+    Private Function GetSqlDbType(typeName As String) As SqlDbType
         Select Case typeName.ToLower()
             Case "int", "integer"
                 Return SqlDbType.Int
-            Case "string"
+            Case "string", "varchar"
                 Return SqlDbType.VarChar
             Case "decimal"
                 Return SqlDbType.Decimal
@@ -71,6 +71,15 @@ Public Class Security
             Case Else
                 Return Nothing
         End Select
+    End Function
+
+    Public Function GetParamVarHash(Value As Object, DbType As String) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+
+        Res("value") = Value
+        Res("typeOf") = DbType
+
+        Return Res
     End Function
 
     'using parameterized queries with select sql statement to prevent SQL injection and improve security

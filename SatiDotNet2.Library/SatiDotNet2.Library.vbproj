@@ -105,6 +105,7 @@
     <Compile Include="Report.vb" />
     <Compile Include="General.vb" />
     <Compile Include="PhaseController.vb" />
+    <Compile Include="Part.vb" />
     <Compile Include="SampleClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
