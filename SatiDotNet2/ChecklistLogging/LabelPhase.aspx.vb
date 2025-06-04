@@ -12,7 +12,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DR As Data.DataRow
     Dim RC As Integer
     Private QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
-    Private ChecklistBuilder As New ChecklistBuilderAspxLibrary()
+    Private ChecklistBuilder As New MaintPM()
     Private Shared LabelPhaseAspx As New AspWebpage("/ChecklistLogging/LabelPhase.aspx", New List(Of String) From {"Area", "Phase"})
     Dim FormViewInsert As FormView = Nothing
 

@@ -2,27 +2,22 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <script defer type="text/javascript">
-        let ItemsPanel;
-        let CommentPanel;
-        let StampPanel;
-        let ScrollPanel;
         let PreviewPanel;
         let EditPreviewPanel;
         let PreviewPanel_iframe;
-        let iframeDoc;
         let toSyncArr = [];
         let idToSync;
         let yPosToSync;
 
         window.addEventListener("load", function () {
-            ItemsPanel = getAspControl("ItemsPanel");
-            CommentPanel = getAspControl("CommentPanel");
-            StampPanel = getAspControl("StampPanel");
-            iframeDoc = getAspControl("PreviewPanel_iframe").contentDocument || getAspControl("PreviewPanel_iframe").contentWindow.document; //get window within iframe
-            let labelDdl;
-            let labelDdlValue;
+            const openModalButtons = document.querySelectorAll('[data-modal-open]');
+            const closeModalButtons = document.querySelectorAll('[data-modal-close]');
+            let labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
+            let labelDdlIdx = labelDdl.selectedIndex;
+            let iframeDoc = getAspControl("PreviewPanel_iframe").contentDocument || getAspControl("PreviewPanel_iframe").contentWindow.document; //get window within iframe
+            const areaCloneCreateButton = document.getElementById("area-clone-create-button");
             let inputPanel;
-            let inputPos;
+            let ItemsPanel;
 
             document.getElementById("Overlay").style.display = "none"; //hide loading wheel overlay on PreviewPanel_iframe
 
@@ -30,24 +25,103 @@
 
             window.iframeEnabled = iframeEnabled;
 
-            labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
-            labelDdlValue = labelDdl.options[labelDdl.selectedIndex].text.split("|")[0].trim();
+            //hightlight and programmatically scroll to input end user is focusing on within Log.aspx iframe
             iterateChildren(function () {
-                if (this.id && this.id.includes("ItemsPanel")) {
+                const id = this.id;
+
+                if (id && id.includes("ItemsPanel")) {
                     ItemsPanel = this;
                     return;
                 }
-                else if (this.value && this.value === labelDdlValue) {
-                    inputPanel = this;
-                    return;
-                }
             }, iframeDoc);
+            inputPanel = ItemsPanel.querySelectorAll(".LogPanel")[labelDdlIdx]; //calling this function to account for phase/bunch titles
+            hightlightCurrInput(inputPanel);
             ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
+
+            //set event listeners relative to modal(s)
+            openModalButtons.forEach(button => {
+                button.addEventListener('click', e => {
+                    const modal = document.querySelector(button.dataset.modalOpen);
+
+                    if (modal == null) return;
+
+                    e.preventDefault(); // <-- stops the form submit/postback
+                    modal.classList.add('active');
+                    overlay.classList.add('active');
+
+                    document.body.style.overflow = "hidden"; //to prevent scrolling outside of modal
+                })
+            })
+
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const modal = button.closest('.modal');
+
+                    if (modal == null) return;
+                    modal.classList.remove('active');
+                    overlay.classList.remove('active');
+
+                    document.body.style.overflow = "visible"; //to re-enable scrolling outside of modal
+                })
+            })
+
+            areaCloneCreateButton.addEventListener("click", async function (e) {
+                e.preventDefault(); // <-- stops the form submit/postback, so async routine is NOT interrupted by postback
+                return await createClone();
+            })
         })
+
+        async function createClone() {
+            const areaDdl = document.getElementById("<%=AreaDropDownList.ClientID%>");
+            const areaCloneModalTextbox = document.getElementById("<%=AreaCloneNameTextBox.ClientID%>");
+            const area_key_to_clone = areaDdl[areaDdl.selectedIndex].value;
+            const new_area_name = areaCloneModalTextbox.value;
+
+            try {
+                const response = await fetch('ClonePM.ashx', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ areaKeyToClone: area_key_to_clone, newAreaName: new_area_name })
+                });
+                let result;
+                let cloneResults;
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                result = await response.json();
+                console.log('createClone() POST result with async/await:', result);
+
+                cloneResults = result["AreaTable"];
+                if (cloneResults["Success"].toLowerCase() === "false") {
+                    const errorLabel = document.getElementById("<%=AreaCloneErrorLabel.ClientID%>");
+                    errorLabel.innerText = cloneResults["Message"];
+                }
+                else {
+                    //redirect user to clone
+                    PageMethods.Area_Change(cloneResults["CloneKey"], function (newUrl) {
+                        window.location.href = newUrl;
+                    });
+
+                }
+            } catch (err) {
+                console.error('POST error:', err);
+            }
+        }
 
         function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
             callback.call(elem);
             for (const child of elem.children) iterateChildren(callback, child);
+        }
+
+        function hightlightCurrInput(inputContainer) {
+            //color background of entire input container to Sati blue
+            //color font of entire input container to white
+            iterateChildren(function () {
+                this.style.backgroundColor = "#80BEFD"; //Sati blue
+                this.style.color = "white";
+            }, inputContainer);
         }
 
         function getAspControl(id) {
@@ -88,6 +162,7 @@
                 PreviewPanel_iframe.style.origin = "unset";
             }
         }
+
     </script>
     <style>
         :root {
@@ -192,6 +267,120 @@
             opacity: .9;
         }
 
+        /* ======== #area-ddl-inline-container ========= */
+        #area-ddl-inline-container {
+            display: flex;
+            align-items: center;
+            gap: var(--UWhitespace);
+            width: var(--Width);
+        }
+
+        .area-ddl {
+            flex: 1 1 auto; /* grow to fill remaining space */
+            width: 0; /* allow shrinking below intrinsic width */
+            text-overflow: ellipsis;
+            text-wrap: nowrap;
+        }
+
+        /* ======= #area-clone-modal ============= */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            border: 1px solid black;
+            border-radius: 10px;
+            z-index: 10;
+            background-color: white;
+            font-size: calc(var(--UFontSize));
+            text-wrap: nowrap;
+            visibility: hidden; /* Keeps the box “out of flow” for clicks */
+            opacity: 0; /* Fully transparent */
+            transition: opacity 0.3s ease, /* Fade in/out over 0.3s */
+            visibility 0s 0.3s; /* Delay hiding until after opacity transition */
+        }
+
+            .modal.active {
+                transform: translate(-50%, -50%) scale(1);
+                visibility: visible; /* Make it “there” immediately */
+                opacity: 1; /* Fade to fully opaque */
+                transition: opacity 0.3s ease, /* Fade in over 0.3s */
+                visibility 0s 0s; /* No delay when showing—visibility becomes visible right away */
+            }
+
+        .modal-header {
+            padding: var(--UWhitespace);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid black;
+            font-weight: bold;
+        }
+
+            .modal-header .close-button {
+                cursor: pointer;
+                border: none;
+                outline: none;
+                background: none;
+                font-weight: bold;
+                font-size: 30px;
+            }
+
+        .modal-body {
+            padding: var(--UWhitespace);
+            border: none;
+        }
+
+        .modal-footer {
+            padding: 0 var(--UWhitespace);
+            margin-bottom: var(--UWhitespace);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--UWhitespace);
+            width: 100%;
+            box-sizing: border-box; /* padding is counted within 100% width */
+        }
+
+        #overlay {
+            position: fixed;
+            opacity: 0;
+            transition: 200ms ease-in-out;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, .5);
+            pointer-events: none;
+        }
+
+            #overlay.active {
+                opacity: 1;
+                z-index: 1;
+            }
+
+        .area-clone-modal-textbox {
+            border: 2px solid black;
+            width: var(--Width);
+        }
+
+        #area-clone-cancel-button {
+        }
+
+        #area-clone-create-button {
+            background-color: #80BEFD;
+            color: white;
+        }
+
+        .modal-footer-error-label {
+            color: red;
+        }
+
+        #modal-footer-buttons {
+            display: flex;
+            align-items: center;
+            gap: var(--UWhitespace);
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -252,14 +441,37 @@
 
                     </div>
 
-                    <asp:DropDownList ID="AreaDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
-                        DataSourceID="AreaDropDownList_SqlDataSource" DataTextField="Area"
-                        DataValueField="Key" OnSelectedIndexChanged="AreaDropDownList_SelectedIndexChanged"
-                        CssClass="Width">
-                        <asp:ListItem Selected="True">Select Checklist...</asp:ListItem>
-                    </asp:DropDownList>
-                    <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                        SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"></asp:SqlDataSource>
+                    <div id="area-ddl-inline-container">
+                        <asp:DropDownList ID="AreaDropDownList" CssClass="area-ddl" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
+                            DataSourceID="AreaDropDownList_SqlDataSource" DataTextField="Area"
+                            DataValueField="Key" OnSelectedIndexChanged="AreaDropDownList_SelectedIndexChanged">
+                            <asp:ListItem Selected="True">Select Checklist...</asp:ListItem>
+                        </asp:DropDownList>
+                        <asp:SqlDataSource ID="AreaDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                            SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"></asp:SqlDataSource>
+
+                        <div id="area-clone-container">
+                            <asp:Button ID="AreaCloneButton" Text="Clone" Enabled="False" data-modal-open="#area-clone-modal" runat="server" />
+                            <div class="modal" id="area-clone-modal">
+                                <div class="modal-header">
+                                    PM/Checklist Clone Name
+                                </div>
+                                <div class="modal-body">
+                                    <span id="area-clone-modal-name-label">Name:</span>
+                                    <asp:TextBox CssClass="area-clone-modal-textbox" ID="AreaCloneNameTextBox" runat="server" />
+                                </div>
+                                <div class="modal-footer">
+                                    <asp:Label ID="AreaCloneErrorLabel" CssClass="modal-footer-error-label" runat="server" />
+                                    <div id="modal-footer-buttons">
+                                        <asp:Button CssClass="area-clone-cancel-button" Text="Cancel" OnClick="CancelClone_onClick" runat="server" data-modal-close />
+                                        <button id="area-clone-create-button">Create</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="overlay"></div>
+                        </div>
+                        <asp:Button ID="DeleteCloneButton" Text="Delete" OnClick="DeleteButton_onClick" Enabled="False" runat="server" />
+                    </div>
 
                     <asp:FormView ID="AreaFormView" CssClass="Width" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
                         <EmptyDataTemplate>
@@ -420,7 +632,7 @@
                         </div>
                     </div>
 
-                    <asp:CheckBox Enabled="False" style="display: flex; flex-direction: row;" Text="Show/Hide Phases: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true"/>
+                    <asp:CheckBox Enabled="False" Style="display: flex; flex-direction: row;" Text="Show/Hide Phases: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true" />
                     <asp:Panel Visible="False" ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
                         <div style="display: flex; gap: var(--UWhitespace);">
                             <asp:Label runat="server" Text="Select Phase:"></asp:Label>

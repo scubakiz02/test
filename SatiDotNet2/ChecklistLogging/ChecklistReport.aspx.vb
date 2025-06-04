@@ -5,7 +5,7 @@ Imports System.Web.Services
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim CurrUser As New SatiUser(User.Identity.Name.ToString())
-    Dim ChecklistBuilder As New ChecklistBuilderAspxLibrary
+    Dim ChecklistBuilder As New MaintPM
     Dim Department As String = CurrUser.GetDepartment()
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))

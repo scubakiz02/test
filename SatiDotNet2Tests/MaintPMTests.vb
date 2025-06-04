@@ -6,7 +6,7 @@ Imports System.Text.Json
 Public Class LabelOrderTests
     Inherits Security
 
-    Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
+    Dim ChecklistBuilderAspx = New MaintPM()
 
     'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
     <Fact>
@@ -86,7 +86,7 @@ Public Class LabelOrderTests
 End Class
 
 Public Class CommentOrderTests
-    Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
+    Dim ChecklistBuilderAspx = New MaintPM()
     Dim Security = New Security()
 
     'USING R.O Daily AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
@@ -140,7 +140,7 @@ Public Class CommentOrderTests
 End Class
 
 Public Class PhaseOrderTests
-    Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
+    Dim ChecklistBuilderAspx = New MaintPM()
     Dim Security = New Security()
 
     'USING EDG Monthly Exercise PM (AreaKey 82) AS SAMPLE CHECKLIST. IF THE COMMENT ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
@@ -193,7 +193,7 @@ Public Class PhaseOrderTests
 End Class
 
 Public Class GetAreaDdlSelectCommandTests
-    Dim ChecklistBuilderAspx = New ChecklistBuilderAspxLibrary()
+    Dim ChecklistBuilderAspx = New MaintPM()
     Dim Security = New Security()
     Dim ExpectedQuery As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
     Dim ExpectedQueryWithDepartment As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL AND DepartmentKey=@DepartmentKey OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
@@ -232,4 +232,167 @@ Public Class GetAreaDdlSelectCommandTests
         Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 2)
         Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQueryWithDepartment)
     End Sub
+End Class
+
+Public Class MaintPMCloneTests
+    Inherits MaintPM
+    Private SqlParameters As New SqlParameters
+    Private Security As New Security()
+
+    Private Function GetRandAreaList(ModifyCasing As Boolean) As List(Of String)
+        Dim DbResults As New List(Of String)
+        Dim SqlQuery As String
+
+        For I As Integer = 0 To 20 '20 test cases!
+            If ModifyCasing Then
+                If I Mod 2 = 0 Then
+                    SqlQuery = "SELECT TOP 1 LOWER(Area) As Area FROM [ALTS].[dbo].[T_LogArea] ORDER BY NEWID();"
+                Else
+                    SqlQuery = "SELECT TOP 1 UPPER(Area) As Area FROM [ALTS].[dbo].[T_LogArea] ORDER BY NEWID();"
+                End If
+            Else
+                SqlQuery = "SELECT TOP 1 Area FROM [ALTS].[dbo].[T_LogArea] ORDER BY NEWID();"
+            End If
+
+            DbResults.Add(Security.GetSingleDbField(SqlQuery, New Dictionary(Of String, Dictionary(Of String, String)), "Area"))
+        Next
+
+        Return DbResults
+    End Function
+
+    <Fact>
+    Private Sub ExactMatchTestCases()
+        Dim RandAreaList As List(Of String) = GetRandAreaList(False)
+
+        For Each AreaName As String In RandAreaList
+            Assert.True(DoesPM_Exist(AreaName))
+        Next
+    End Sub
+
+    <Fact>
+    Private Sub SimilarMatchTestCases()
+        Dim RandAreaList As List(Of String) = GetRandAreaList(True)
+
+        For Each AreaName As String In RandAreaList
+            Assert.True(DoesPM_Exist(AreaName))
+        Next
+    End Sub
+
+    <Fact>
+    Private Sub DoesPM_Exist_ErrorSafeguardingIntegrationTests()
+        Dim RandAreaList As List(Of String) = GetRandAreaList(True)
+
+        For Each AreaName As String In RandAreaList
+            Dim Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(2, AreaName)
+            Assert.Equal("*Error: PM/Checklist already exists*", Res("AreaTable")("Message"))
+        Next
+    End Sub
+
+    <Theory>
+    <InlineData(Nothing)>
+    <InlineData("")>
+    Public Sub T_LogArea_AreaKeyEdgeCases(AreaKey As String)
+        'Nothing or an empty string for arg 1 (AreaKey) is an edgecase
+        'an empty string is the only edgecase for arg 2 (Area)
+        Dim AreaName As String = "your mom"
+        Dim Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, AreaName)
+
+        Assert.False(Res("AreaTable").ContainsKey("SqlQuery"))
+        Assert.False(Res("AreaTable").ContainsKey("QueryConfig"))
+        Assert.True(Res.Count = 1) 'T_LogArea should be the only key
+
+        Assert.False(Boolean.Parse(Res("AreaTable")("Success")))
+        Assert.Equal("*Error: missing PM/Checklist to clone*", Res("AreaTable")("Message"))
+    End Sub
+
+    <Theory>
+    <InlineData("")>
+    <InlineData(" ")>
+    Public Sub T_LogArea_AreaNameEdgeCases(NewAreaName As String)
+        'AreaName is an empty string is the edge case
+        Dim Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(2, NewAreaName)
+
+        Assert.False(Res("AreaTable").ContainsKey("SqlQuery"))
+        Assert.False(Res("AreaTable").ContainsKey("QueryConfig"))
+        Assert.True(Res.Count = 1) 'T_LogArea should be the only key
+
+        Assert.False(Boolean.Parse(Res("AreaTable")("Success")))
+        Assert.Equal("*Error: missing PM/Checklist name*", Res("AreaTable")("Message"))
+    End Sub
+
+    <Theory>
+    <InlineData(3, 4)>
+    <InlineData(235, 238)>
+    Public Sub T_LogAreaInsert(AreaKey As Integer, ClonedPM_Key As Integer)
+        Dim AreaName As String = "Tell Sandie I said hi!"
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, AreaName, ClonedPM_Key)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey},
+            {"Area", AreaName}
+        }
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res("AreaTable")))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, 0 FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);", ClonePM_Res("AreaTable")("SqlQuery"))
+    End Sub
+
+    <Theory>
+    <InlineData(6, 8)>
+    <InlineData(43, 48)>
+    Public Sub T_LogLabelInsert(AreaKey As Integer, ClonedPM_Key As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "Tell Tim he's awesome!", ClonedPM_Key)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey},
+            {"ClonedPM_Key", ClonedPM_Key}
+        }
+        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("LabelTable")
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) Select @ClonedPM_Key, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+    End Sub
+
+    <Theory>
+    <InlineData(6, 7)>
+    <InlineData(43, 48)>
+    Public Sub T_LogCommentListInsert(AreaKey As Integer, ClonedPM_Key As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "hahahahahahahah", ClonedPM_Key)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey},
+            {"ClonedPM_Key", ClonedPM_Key}
+        }
+        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("CommentTable")
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) Select @ClonedPM_Key, Comment, CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+    End Sub
+
+    <Theory>
+    <InlineData(6, 7)>
+    <InlineData(43, 48)>
+    Public Sub T_LogStampListInsert(AreaKey As Integer, ClonedPM_Key As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "i'm running out of ideas", ClonedPM_Key)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey},
+            {"ClonedPM_Key", ClonedPM_Key}
+        }
+        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("StampTable")
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, [Title], [TitleKey], [RoleID], Active) Select @ClonedPM_Key, [Title], [TitleKey], [RoleID], Active FROM [ALTS].[dbo].[T_LogStampList] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+    End Sub
+
+    <Theory>
+    <InlineData(6, 7)>
+    <InlineData(43, 48)>
+    Public Sub T_LogPhaseInsert(AreaKey As Integer, ClonedPM_Key As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "pew pew pew", ClonedPM_Key)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey},
+            {"ClonedPM_Key", ClonedPM_Key}
+        }
+        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("PhaseTable")
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) Select @ClonedPM_Key, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+    End Sub
+
 End Class

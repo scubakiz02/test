@@ -5,45 +5,6 @@ Imports System.Text.Json
 Imports System.Collections
 Imports System.Collections.Generic
 
-Public Class SqlParameters
-    Public Function ValidParameterizedValues(CreateArg As Dictionary(Of String, String), CreateFuncRes As Dictionary(Of String, String)) As Boolean
-        'this function ensures:
-        '1) parameterized values exists in sql query;
-        '2) content in CreateFuncRes("QueryConfig") is valid for arg 2 within Security.GetMyDataSetParamQuery
-        Dim QueryConfigDeserialized As Dictionary(Of String, Dictionary(Of String, String))
-        Dim ParameterizedKeys As List(Of String)
-        Dim Valid As Boolean = True
-
-        Try
-            QueryConfigDeserialized = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(CreateFuncRes("QueryConfig"))
-            ParameterizedKeys = CreateArg.Keys.ToList()
-
-            For Each ParameterizedKey As String In ParameterizedKeys
-                'intializing variables with 'Object' variable type, in case they are DBNull values
-                Dim ValueFromCreateFunc As String = QueryConfigDeserialized("@" & ParameterizedKey)("value")
-                Dim ValueFromCreateArg As String = CreateArg(ParameterizedKey)
-
-                'there is an exception where a mismatch in the 2 strings listed in the condition CAN be a valid parameterized value:
-                'an empty value from a textbox is an empty string. Empty value in DB is Null. This represented by ValueFromCreateArg being an empty string, and ValueFromCreateFunc is nothing
-                'that is the only exception that is valid
-                If ValueFromCreateArg = String.Empty Then
-                    If ValueFromCreateFunc IsNot Nothing Then
-                        Valid = False
-                        Exit For
-                    End If
-                ElseIf ValueFromCreateFunc <> ValueFromCreateArg Then
-                    Valid = False
-                    Exit For
-                End If
-            Next
-        Catch ex As Exception
-            Valid = False
-        End Try
-
-        Return Valid
-    End Function
-End Class
-
 Public Class PartClassAddPartFunctionTests
     Inherits Part
     Dim SqlParameters As New SqlParameters()

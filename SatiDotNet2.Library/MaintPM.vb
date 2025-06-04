@@ -2,7 +2,7 @@
 Imports SatiDotNet2.Library
 Imports System.Text.Json
 
-Public Class ChecklistBuilderAspxLibrary
+Public Class MaintPM
     Dim Sql As New Security
 
     Public Function ModifyOrder(Key As Integer, Action As String, Marker As String) As Dictionary(Of String, String)
@@ -210,11 +210,111 @@ Public Class ChecklistBuilderAspxLibrary
         End If
     End Function
 
-    Function GetAreaDdlSelectConfig(AreaIntervalKey As String, DepartmentKey As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
+    Public Function GetAreaDdlSelectConfig(AreaIntervalKey As String, DepartmentKey As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
         Dim Res As New Dictionary(Of String, String)
 
         Res("AreaIntervalKey") = If(AreaIntervalKey Is Nothing OrElse AreaIntervalKey = "All", -1, AreaIntervalKey)
         Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL" & If(DepartmentKey Is Nothing, String.Empty, " AND DepartmentKey=@DepartmentKey") & " OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+
+        Return Res
+    End Function
+
+    Private Sub PrepPmCloneConfig(PmCloneConfig As Dictionary(Of String, Dictionary(Of String, String)), Table As String, SqlQuery As String)
+        PmCloneConfig(Table) = New Dictionary(Of String, String)
+        PmCloneConfig(Table)("SqlQuery") = SqlQuery
+    End Sub
+
+    Private Function CloneTableRecords(TableConfig As Dictionary(Of String, String)) As String
+        Dim QueryConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(TableConfig("QueryConfig"))
+        Dim Res As String
+
+        Try
+            Res = Sql.ExecuteSqlParamQuery(TableConfig("SqlQuery"), QueryConfig)("PrimaryKey")
+        Catch ex As Exception
+            Res = String.Empty
+        End Try
+
+        Return Res
+    End Function
+
+    Private Sub RemoveInfoFromHttpRes(HttpRes As Dictionary(Of String, Dictionary(Of String, String)), Key As String)
+        'remove info that the client doesn't need to see
+        HttpRes(Key).Remove("QueryConfig")
+        HttpRes(Key).Remove("SqlQuery")
+    End Sub
+
+    Public Function DoesPM_Exist(NewAreaName As String) As Boolean
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@NewAreaName", Sql.GetParamVarHash(NewAreaName, "string")}
+        }
+
+        If Sql.GetSingleDbField("SELECT COUNT(Area) As MatchCount FROM [ALTS].[dbo].[T_LogArea] WHERE Area LIKE ('%' + @NewAreaName + '%')", QueryConfig, "MatchCount") > 0 Then
+            Return True
+        End If
+        Return False
+    End Function
+
+    Public Function ClonePM(AreaKey As String, AreaName As String, Optional TestClonedAreaKey As String = Nothing) As Dictionary(Of String, Dictionary(Of String, String))
+        Dim Res As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim CloneAreaKey As Integer
+
+        QueryConfig("@AreaKey") = Sql.GetParamVarHash(AreaKey, "int")
+        PrepPmCloneConfig(Res, "AreaTable", "INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, 0 FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);")
+
+        Try
+            If AreaKey Is Nothing OrElse AreaKey = String.Empty Then
+                Throw New Exception("*Error: missing PM/Checklist to clone*")
+            ElseIf Trim(AreaName) = String.Empty Then
+                Throw New Exception("*Error: missing PM/Checklist name*")
+            ElseIf DoesPM_Exist(AreaName) Then
+                Throw New Exception("*Error: PM/Checklist already exists*")
+            End If
+        Catch ex As Exception
+            RemoveInfoFromHttpRes(Res, "AreaTable")
+            Res("AreaTable")("Success") = False
+            Res("AreaTable")("Message") = ex.Message.ToString()
+            Return Res
+        End Try
+
+        PrepPmCloneConfig(Res, "LabelTable", "INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) Select @ClonedPM_Key, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey;")
+        PrepPmCloneConfig(Res, "CommentTable", "INSERT INTO [ALTS].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) Select @ClonedPM_Key, Comment, CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey;")
+        PrepPmCloneConfig(Res, "StampTable", "INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, [Title], [TitleKey], [RoleID], Active) Select @ClonedPM_Key, [Title], [TitleKey], [RoleID], Active FROM [ALTS].[dbo].[T_LogStampList] WHERE AreaKey=@AreaKey;")
+        PrepPmCloneConfig(Res, "PhaseTable", "INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) Select @ClonedPM_Key, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@AreaKey;")
+
+        'T_LogArea is a unique 1 off case
+        '1) there are multiple parameterized values
+        '2) there's an expected return using 'SCOPE_IDENTITY()'
+        'plus, this record needs to be executed first, b/c the other insert into sql queries depend on primary key from new record in T_LogArea
+        QueryConfig("@Area") = Sql.GetParamVarHash(AreaName, "string")
+        Res("AreaTable")("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+        If TestClonedAreaKey Is Nothing Then
+            CloneAreaKey = CloneTableRecords(Res("AreaTable"))
+
+            'remove info from 'Res' that the client doesn't need to see
+            RemoveInfoFromHttpRes(Res, "AreaTable")
+            Res("AreaTable")("Success") = "True"
+            Res("AreaTable")("CloneKey") = CloneAreaKey
+        Else
+            CloneAreaKey = TestClonedAreaKey
+        End If
+        QueryConfig.Remove("@Area") 'only needed for INSERT INTO query on T_LogArea
+
+        'iterate and execute clone queries on the other tables
+        QueryConfig("@ClonedPM_Key") = Sql.GetParamVarHash(CloneAreaKey, "int")
+        For Each TableConfig As KeyValuePair(Of String, Dictionary(Of String, String)) In Res
+            Dim TableName As String = TableConfig.Key
+
+            If TableName = "AreaTable" Then Continue For 'dealing with this scenario before this for loop
+
+            Res(TableName)("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+
+            If TestClonedAreaKey Is Nothing Then
+                CloneTableRecords(Res(TableName))
+                RemoveInfoFromHttpRes(Res, TableName)
+                Res(TableName)("Success") = True
+            End If
+        Next
 
         Return Res
     End Function

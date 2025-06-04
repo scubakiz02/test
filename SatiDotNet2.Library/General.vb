@@ -4,6 +4,7 @@ Imports System.Web
 Imports System.Text.RegularExpressions
 Imports System.IO
 Imports System.Globalization
+Imports System.Text.Json
 
 Public Class Security
     Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
@@ -111,12 +112,14 @@ Public Class Security
     End Function
 
     'using parameterized queries to execute non returning sql statements (insert into, update, delete, etc.) to prevent SQL injection and improve security
-    Function ExecuteSqlParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Boolean
-        Dim Success As Boolean = True
+    Function ExecuteSqlParamQuery(SqlQuery As String, QueryConfig As Dictionary(Of String, Dictionary(Of String, String))) As Dictionary(Of String, Object)
+        Dim Res As New Dictionary(Of String, Object)
 
         Try
             Using conn As New SqlConnection(connectionString)
                 Using cmd As New SqlCommand(SqlQuery, conn)
+                    Dim PrimaryKey As String
+
                     ' Add parameters
                     For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In QueryConfig
                         Dim paramValue As String = kvp.Key
@@ -127,14 +130,19 @@ Public Class Security
                     Next
 
                     conn.Open()
-                    cmd.ExecuteNonQuery()
+
+                    ' ExecuteScalar returns the first column of the first row in the result set,
+                    ' which is our newly generated identity value.
+                    PrimaryKey = cmd.ExecuteScalar()
+                    Res("PrimaryKey") = If(PrimaryKey IsNot Nothing, Convert.ToInt32(PrimaryKey), 0)
                 End Using
             End Using
+            Res("Success") = True
         Catch ex As Exception
-            Success = False
+            Res("Success") = False
         End Try
 
-        Return Success
+        Return Res
     End Function
 
     Function StripIllegalFileSysChars(ChecklistFolder As String, DatePeriodFolder As String) As String
@@ -162,6 +170,45 @@ Public Class Security
         End If
 
         Return Res.ToArray()
+    End Function
+End Class
+
+Public Class SqlParameters
+    Public Function ValidParameterizedValues(CreateArg As Dictionary(Of String, String), CreateFuncRes As Dictionary(Of String, String)) As Boolean
+        'this function ensures:
+        '1) parameterized values exists in sql query;
+        '2) content in CreateFuncRes("QueryConfig") is valid for arg 2 within Security.GetMyDataSetParamQuery
+        Dim QueryConfigDeserialized As Dictionary(Of String, Dictionary(Of String, String))
+        Dim ParameterizedKeys As List(Of String)
+        Dim Valid As Boolean = True
+
+        Try
+            QueryConfigDeserialized = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(CreateFuncRes("QueryConfig"))
+            ParameterizedKeys = CreateArg.Keys.ToList()
+
+            For Each ParameterizedKey As String In ParameterizedKeys
+                'intializing variables with 'Object' variable type, in case they are DBNull values
+                Dim ValueFromCreateFunc As String = QueryConfigDeserialized("@" & ParameterizedKey)("value")
+                Dim ValueFromCreateArg As String = CreateArg(ParameterizedKey)
+
+                'there is an exception where a mismatch in the 2 strings listed in the condition CAN be a valid parameterized value:
+                'an empty value from a textbox is an empty string. Empty value in DB is Null. This represented by ValueFromCreateArg being an empty string, and ValueFromCreateFunc is nothing
+                'that is the only exception that is valid
+                If ValueFromCreateArg = String.Empty Then
+                    If ValueFromCreateFunc IsNot Nothing Then
+                        Valid = False
+                        Exit For
+                    End If
+                ElseIf ValueFromCreateFunc <> ValueFromCreateArg Then
+                    Valid = False
+                    Exit For
+                End If
+            Next
+        Catch ex As Exception
+            Valid = False
+        End Try
+
+        Return Valid
     End Function
 End Class
 

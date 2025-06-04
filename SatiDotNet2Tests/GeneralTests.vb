@@ -53,12 +53,12 @@ Public Class SecurityTests
 End Class
 
 Public Class ExecuteSqlParamQueryTests
-    Dim Security = New Security()
+    Dim Security As New Security()
 
     <Fact>
     Public Sub ExecuteSqlParamQuery1()
         'blank sql statement, should return false
-        Assert.False(Security.ExecuteSqlParamQuery("", New Dictionary(Of String, Dictionary(Of String, String))))
+        Assert.False(Security.ExecuteSqlParamQuery("", New Dictionary(Of String, Dictionary(Of String, String)))("Success"))
     End Sub
 
     <Fact>
@@ -74,7 +74,7 @@ Public Class ExecuteSqlParamQueryTests
             {"typeOf", "string"}
         }
 
-        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject)("Success"))
     End Sub
 
     <Fact>
@@ -91,17 +91,18 @@ Public Class ExecuteSqlParamQueryTests
             {"typeOf", "string"}
         }
 
-        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject))
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET password=@password WHERE id=@id", QueryObject)("Success"))
     End Sub
 
     <Fact>
-    Public Sub ExecuteSqlParamQuery4()
-        Dim InsertIntoQuerySuccess As Boolean
+    Public Sub CreateThenDeleteRecord()
+        'execute insert into query to create record
+        'get primary key field value for newly created record from ExecuteSqlParamQuery() function return
+        'delete record using primary key field value returned from ExecuteSqlParamQuery()
         Dim DeleteQuerySuccess As Boolean
-
-        'insert into and delete query. should return true upon successful execution of both
-        'IF THIS UNIT TEST FAILS, GetMyDataSetParamQuery1 WILL ALSO FAIL, B/C IT TESTS THE TABLE FOR 4 TOTAL RECORDS, AND THE # OF RECORDS IN THE TABLE WILL NOT BE 4 IF THE DELETE QUERY FAILS
         Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim PrimaryKeyFromInsertIntoQuery As Integer
+
         QueryObject("@username") = New Dictionary(Of String, String) From {
             {"value", "cbacon"},
             {"typeOf", "string"}
@@ -115,10 +116,15 @@ Public Class ExecuteSqlParamQueryTests
             {"typeOf", "string"}
         }
 
-        InsertIntoQuerySuccess = Security.ExecuteSqlParamQuery("INSERT INTO [SatiTest].[dbo].[T_LogSqlInjectionPrevention] (username, password, fullname, willitnull) VALUES (@username, @password, @fullname, 'not null')", QueryObject)
-        DeleteQuerySuccess = Security.ExecuteSqlParamQuery("DELETE FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE username=@username AND password=@password AND fullname=@fullname", QueryObject)
+        PrimaryKeyFromInsertIntoQuery = Security.ExecuteSqlParamQuery("INSERT INTO [SatiTest].[dbo].[T_LogSqlInjectionPrevention] (username, password, fullname, willitnull) VALUES (@username, @password, @fullname, 'not null'); SELECT CAST(SCOPE_IDENTITY() AS INT);", QueryObject)("PrimaryKey")
 
-        Assert.True(If(InsertIntoQuerySuccess AndAlso DeleteQuerySuccess, True, False))
+        QueryObject.Clear()
+        QueryObject("@id") = Security.GetParamVarHash(PrimaryKeyFromInsertIntoQuery, "int")
+
+        DeleteQuerySuccess = Security.ExecuteSqlParamQuery("DELETE FROM [SatiTest].[dbo].[T_LogSqlInjectionPrevention] WHERE id=@id", QueryObject)("Success")
+
+        Assert.NotEqual(0, PrimaryKeyFromInsertIntoQuery)
+        Assert.True(DeleteQuerySuccess)
     End Sub
 
     <Fact>
@@ -134,7 +140,7 @@ Public Class ExecuteSqlParamQueryTests
             {"typeOf", "int"}
         }
 
-        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET willitnull=@null WHERE id=@id", QueryObject))
+        Assert.True(Security.ExecuteSqlParamQuery("UPDATE [SatiTest].[dbo].[T_LogSqlInjectionPrevention] SET willitnull=@null WHERE id=@id", QueryObject)("Success"))
     End Sub
 End Class
 

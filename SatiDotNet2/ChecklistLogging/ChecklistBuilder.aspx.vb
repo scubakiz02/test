@@ -1,11 +1,12 @@
 ﻿Imports System.Text.Json
 Imports SatiDotNet2.Library
+Imports System.Web.Services
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
     Dim CurrUser As New SatiUser(User.Identity.Name.ToString())
-    Dim ChecklistBuilder As New ChecklistBuilderAspxLibrary
+    Dim ChecklistBuilder As New MaintPM
     Dim Security As New Security
     Dim VisiblePanels As New List(Of Panel)
     Dim ValidTextBoxes As New List(Of TextBox)
@@ -33,6 +34,17 @@ Partial Class MR_OpenTicketStatusBoard
     Dim Department As String = CurrUser.GetDepartment()
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+    <WebMethod()>
+    Public Shared Function Area_Change(AreaKey As Integer) As String
+        Try 'in case code-behind throws an error
+            Dim AreaChange As AreaChangeDelegate = HttpContext.Current.Session("AreaChange")
+            Return AreaChange(AreaKey)
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+    Private Delegate Function AreaChangeDelegate(AreaKey As Integer) As String
 
     Private Sub Page_Init(sender As Object, e As EventArgs) Handles Me.Init
     End Sub
@@ -65,6 +77,9 @@ Partial Class MR_OpenTicketStatusBoard
         Dim IntervalDR As Data.DataRow
         Dim AreaIntervalSelectedValue As String = AreaIntervalDropDownList.SelectedValue
         Dim DbRange As String
+        Dim AreaChangeDelegate As AreaChangeDelegate = AddressOf AreaChange
+
+        Session("AreaChange") = AreaChangeDelegate
 
         If Not IsPostBack Then
             Dim AreaDdlSelectConfig As Dictionary(Of String, String)
@@ -80,6 +95,8 @@ Partial Class MR_OpenTicketStatusBoard
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
                 DepartmentInterfacePanel.Enabled = True
+                AreaCloneButton.Enabled = True
+                'DeleteCloneButton.Enabled = True
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                 {"value", AreaFromQueryString},
                 {"typeOf", "int"}
@@ -364,10 +381,6 @@ Partial Class MR_OpenTicketStatusBoard
 
     End Function
 
-    Function StripString(ByVal input As String) As String
-        Return Regex.Replace(input, "[^a-zA-Z0-9]", "").ToLower()
-    End Function
-
     Private Sub SetControlsEnabledProp(container As Control, EnabledValue As Boolean)
         For Each ctrl As Control In container.Controls
             If TypeOf ctrl Is WebControl Then
@@ -475,15 +488,19 @@ Partial Class MR_OpenTicketStatusBoard
         Return Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey ORDER BY LabelOrder", QueryConfig, "Key")
     End Function
 
-    Protected Sub AreaDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
-        AreaFromQueryString = AreaDropDownList.SelectedValue
+    Private Function AreaChange(NewAreaKey As Integer) As String
+        AreaFromQueryString = NewAreaKey
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
         }
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
-        RefreshPreview()
+        Return RefreshPreview()
+    End Function
+
+    Protected Sub AreaDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        AreaChange(AreaDropDownList.SelectedValue)
     End Sub
 
     Protected Sub LabelDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
@@ -569,9 +586,18 @@ Partial Class MR_OpenTicketStatusBoard
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled2", "iframeEnabled(true);", True)
     End Sub
 
-    Sub RefreshPreview()
-        Response.Redirect(WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing))
-    End Sub
+    Function RefreshPreview() As String
+        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing)
+
+        'try catch block in case WebMethod is invocating this function
+        'That way, url is returned as string and client can redirect
+        Try
+            Response.Redirect(NewUrl)
+        Catch ex As Exception
+            Return NewUrl
+        End Try
+
+    End Function
 
     Sub RefreshIframe()
         PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/Log.aspx?Area=" & AreaFromQueryString)
@@ -758,7 +784,7 @@ Partial Class MR_OpenTicketStatusBoard
                 DuplicateDR = DuplicateDS.Tables(0).Rows(J)
                 Dim Area As String = DuplicateDR("Area")
 
-                If StripString(UserInput) = StripString(Area) Then
+                If ChecklistBuilder.DoesPM_Exist(UserInput) Then
                     FormViewInsert = AreaFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
                     AreaErrorLabel.Text = "Error: '" & UserInput & "' checklist exists"
                     Exit Sub
@@ -864,6 +890,18 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub NewButton_onClick(sender As Object, e As EventArgs)
         SetEnabledProps(sender.ID, False)
+    End Sub
+
+    Protected Sub CancelClone_onClick(sender As Object, e As EventArgs) 'to prevent 'confirm form resubmission' alert
+        RefreshPreview()
+    End Sub
+
+    Protected Sub DeleteButton_onClick(sender As Object, e As EventArgs)
+        'ChecklistBuilder.DeletePM(AreaFromQueryString)
+        AreaFromQueryString = Nothing
+        LabelFromQueryString = Nothing
+        CommentFromQueryString = Nothing
+        RefreshPreview()
     End Sub
 
     Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)

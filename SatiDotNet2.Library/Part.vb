@@ -69,7 +69,7 @@ Public Class Part
     End Sub
 
     Private Sub ExecSqlWithSafeguards(ReturnDict As Dictionary(Of String, String), ErrorMessage As String)
-        Dim SqlSuccess As Boolean = ExecuteSqlParamQuery(ReturnDict("SqlQuery"), JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ReturnDict("QueryConfig")))
+        Dim SqlSuccess As Boolean = ExecuteSqlParamQuery(ReturnDict("SqlQuery"), JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ReturnDict("QueryConfig")))("Success")
         'Dim SqlSuccess As Boolean = False 'for client side regression tests regarding error handling 
         ReturnDict("Success") = SqlSuccess
 
