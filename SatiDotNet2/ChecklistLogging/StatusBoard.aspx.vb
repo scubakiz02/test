@@ -68,7 +68,7 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", Session("DepartmentFromQueryString")},
                 {"typeOf", "string"}
             }
-            AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area", QueryConfig)
+            AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Status='live' AND A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area", QueryConfig)
             AreaRC = AreaDS.Tables(0).Rows.Count
 
             Session("AreaKeys") = New List(Of Integer)

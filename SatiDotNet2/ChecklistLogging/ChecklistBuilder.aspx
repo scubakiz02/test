@@ -13,7 +13,7 @@
             const openModalButtons = document.querySelectorAll('[data-modal-open]');
             const closeModalButtons = document.querySelectorAll('[data-modal-close]');
             let labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
-            let labelDdlIdx = labelDdl.selectedIndex;
+            let labelDdlIdx = labelDdl ? labelDdl.selectedIndex : null; //using ternary operator b/c 'archived' status hides this control
             let iframeDoc = getAspControl("PreviewPanel_iframe").contentDocument || getAspControl("PreviewPanel_iframe").contentWindow.document; //get window within iframe
             const areaCloneCreateButton = document.getElementById("area-clone-create-button");
             let inputPanel;
@@ -24,19 +24,6 @@
             for (const toSync of toSyncArr) getAspControl(toSync.idToSync).scrollTo(0, toSync.yPosToSync);
 
             window.iframeEnabled = iframeEnabled;
-
-            //hightlight and programmatically scroll to input end user is focusing on within Log.aspx iframe
-            iterateChildren(function () {
-                const id = this.id;
-
-                if (id && id.includes("ItemsPanel")) {
-                    ItemsPanel = this;
-                    return;
-                }
-            }, iframeDoc);
-            inputPanel = ItemsPanel.querySelectorAll(".LogPanel")[labelDdlIdx]; //calling this function to account for phase/bunch titles
-            hightlightCurrInput(inputPanel);
-            ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
 
             //set event listeners relative to modal(s)
             openModalButtons.forEach(button => {
@@ -69,6 +56,20 @@
                 e.preventDefault(); // <-- stops the form submit/postback, so async routine is NOT interrupted by postback
                 return await createClone();
             })
+
+            //hightlight and programmatically scroll to input end user is focusing on within Log.aspx iframe
+            iterateChildren(function () {
+                const id = this.id;
+
+                if (id && id.includes("ItemsPanel")) {
+                    ItemsPanel = this;
+                    return;
+                }
+            }, iframeDoc);
+            inputPanel = ItemsPanel.querySelectorAll(".LogPanel")[labelDdlIdx]; //calling this function to account for phase/bunch titles
+            hightlightCurrInput(inputPanel);
+            ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
+
         })
 
         async function createClone() {
@@ -366,7 +367,7 @@
         #area-clone-cancel-button {
         }
 
-        #area-clone-create-button {
+        #area-clone-create-button, .remove-area-yes-button {
             background-color: #80BEFD;
             color: white;
         }
@@ -379,6 +380,25 @@
             display: flex;
             align-items: center;
             gap: var(--UWhitespace);
+        }
+
+        #edit-iframe-preview-section1-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--UWhitespace);
+        }
+
+        /* ========== remove-area-modal ===========*/
+        #remove-area-modal {
+            width: 300px;
+        }
+
+        #remove-area-modal-body {
+            text-wrap: auto;
+        }
+
+        #remove-area-modal-footer {
+            justify-content: right;
         }
 
         @keyframes spin {
@@ -402,12 +422,22 @@
         }
     </style>
 
+    <%--needed for modal functionality. only 1 is needed, even if multiple modals exist--%>
+    <div id="overlay"></div>
+
     <%--120px for header, 80.5px for footer (footer is actually 161px, so it's divided by 2 to reach desired effect)--%>
     <asp:Panel runat="server" Style="display: flex; justify-content: space-between; height: calc(100vh - (120px + 80.5px));">
         <asp:HiddenField ID="EditPreviewPanel_HiddenField" runat="server" Value="0" />
+
         <%--height is 95% to prevent weird overlap with footer--%>
         <asp:Panel ID="EditPreviewPanel" CssClass="EditPreviewPanel" onscroll="setScrollPos.call(this)" runat="server" Style="">
-            <div>
+            <div id="edit-iframe-preview-section1-container">
+                <section id="pm-status-radio-buttons-section">
+                    <span>PM/Checklist Status:</span>
+                    <asp:RadioButton ID="LivePMs_RadioButton" OnCheckedChanged="PmStatus_OnCheckedChanged" Text="Live" AutoPostBack="True" runat="server" />
+                    <asp:RadioButton ID="ArchivedPMs_RadioButton" OnCheckedChanged="PmStatus_OnCheckedChanged" Text="Archived" AutoPostBack="True" runat="server" />
+                </section>
+
                 <asp:Panel runat="server" BackColor="#FFA07A" ID="AreaInterfacePanel" CssClass="InterfacePanel" Style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
 
                     <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
@@ -437,8 +467,8 @@
                                 </svg>
                                 <p style="margin: 0">= missing requirements</p>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
 
                     <div id="area-ddl-inline-container">
@@ -451,6 +481,7 @@
                             SelectCommand="SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"></asp:SqlDataSource>
 
                         <div id="area-clone-container">
+                            <asp:Button ID="ReactivateStatusButton" Enabled="False" Visible="False" Text="Reactivate" runat="server" />
                             <asp:Button ID="AreaCloneButton" Text="Clone" Enabled="False" data-modal-open="#area-clone-modal" runat="server" />
                             <div class="modal" id="area-clone-modal">
                                 <div class="modal-header">
@@ -468,9 +499,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="overlay"></div>
                         </div>
-                        <asp:Button ID="DeleteCloneButton" Text="Delete" OnClick="DeleteButton_onClick" Enabled="False" runat="server" />
+
+                        <div class="modal" id="remove-area-modal">
+                            <div class="modal-header">
+                                *Warning*
+                            </div>
+                            <div id="remove-area-modal-body" class="modal-body">
+                                This is a destructive action. If you proceed, your access to the PM/Checklist will be removed. Do you wish to continue?
+                            </div>
+                            <div id="remove-area-modal-footer" class="modal-footer">
+                                <asp:Button CssClass="remove-area-no-button" Text="No" OnClick="CancelClone_onClick" runat="server" data-modal-close />
+                                <asp:Button CssClass="remove-area-yes-button" Text="Yes" OnClick="RemoveStatusButton_onClick" runat="server" />
+                            </div>
+                        </div>
+                        <asp:Button ID="RemoveStatusButton" Text="Remove" Visible="False" Enabled="False" data-modal-open="#remove-area-modal" runat="server" />
+                        <asp:Button ID="ArchiveStatusButton" Text="Archive" OnClick="ArchiveStatusButton_onClick" Visible="False" Enabled="False" runat="server" />
                     </div>
 
                     <asp:FormView ID="AreaFormView" CssClass="Width" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
@@ -817,7 +861,7 @@
                     <asp:Button Text="Edit" runat="server" OnClick="EditStampsButton_OnClick" OnClientClick="iframeEnabled(true);" />
                 </asp:Panel>
 
-                <div class="InterfacePanel" style="display: flex; flex-direction: column; gap: var(--UWhitespace); background-color: #FFFFCC;">
+                <asp:Panel runat="server" ID="DepartmentIntervalAssignPanel" class="InterfacePanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace); background-color: #FFFFCC;">
                     <asp:Panel runat="server" Enabled="false" ID="DepartmentInterfacePanel">
 
                         <div style="display: flex; align-items: center;">
@@ -898,7 +942,7 @@
 
                         </asp:Panel>
                     </asp:Panel>
-                </div>
+                </asp:Panel>
 
             </div>
 

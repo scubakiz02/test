@@ -193,50 +193,54 @@ Public Class PhaseOrderTests
 End Class
 
 Public Class GetAreaDdlSelectCommandTests
-    Dim ChecklistBuilderAspx = New MaintPM()
-    Dim Security = New Security()
-    Dim ExpectedQuery As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
-    Dim ExpectedQueryWithDepartment As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL AND DepartmentKey=@DepartmentKey OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+    Dim ChecklistBuilderAspx As New MaintPM()
+    Dim Security As New Security()
+    Const ExpectedQuery As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE Status='live' AND (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+    Const ExpectedQueryWithDepartment As String = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE Status='live' AND (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL AND DepartmentKey=@DepartmentKey OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
 
-    <Fact>
-    Public Sub GetAreaDdlSelectCommandTest1()
-        'pass in a null Area IntervalKey and 'All' Department (2nd arg). expect AreaIntervalKey return of -1 as well as the expected query
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(Nothing, Nothing)
-        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = ExpectedQuery)
+    <Theory>
+    <InlineData(Nothing)>
+    <InlineData("All")>
+    Private Sub Negative1AreaIntervalKey(AreaIntervalKey As String)
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(AreaIntervalKey, Nothing, "live")
+        Assert.True(Res("AreaIntervalKey") = -1)
+        Assert.Equal(ExpectedQuery, Res("SelectQuery"))
+    End Sub
+
+    <Theory>
+    <InlineData(Nothing, ExpectedQuery)>
+    <InlineData(1, ExpectedQueryWithDepartment)>
+    <InlineData(2, ExpectedQueryWithDepartment)>
+    Private Sub ValidArgsAndSelectQueryResponse(DepartmentKey As String, ExpectedSelectQuery As String)
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, DepartmentKey, "live")
+        Assert.True(Res("AreaIntervalKey") = 3)
+        Assert.Equal(ExpectedSelectQuery, Res("SelectQuery"))
     End Sub
 
     <Fact>
-    Public Sub GetAreaDdlSelectCommandTest2()
-        'pass in a 'All' Area IntervalKey and 'All' Department (2nd arg). expect AreaIntervalKey return of -1 as well as the expected query
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig("All", Nothing)
-        Assert.True(Res("AreaIntervalKey") = -1 AndAlso Res("SelectQuery") = ExpectedQuery)
+    Private Sub ViewFromQsIsNothing()
+        Dim ViewFromQs As String = Nothing
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 1, ViewFromQs)
+
+        Assert.True(Res("AreaIntervalKey") = 3)
+        Assert.Equal(ExpectedQueryWithDepartment, Res("SelectQuery"))
     End Sub
 
-    <Fact>
-    Public Sub GetAreaDdlSelectCommandTest3()
-        'pass in existing Area IntervalKey and 'All' Department (2nd arg). expect it back for AreaIntervalKey as well as the expected query
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, Nothing)
-        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQuery)
-    End Sub
+    <Theory>
+    <InlineData("live")>
+    <InlineData("archived")>
+    Private Sub ToggleViewFromQsArgValueTestCases(ViewFromQs As String)
+        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 1, ViewFromQs)
+        Dim ExpectedSelectQuery As String = ExpectedQueryWithDepartment.Replace("Status='live'", "Status='" & ViewFromQs & "'")
 
-    <Fact>
-    Public Sub GetAreaDdlSelectCommandTest4()
-        'pass in existing Area IntervalKey and a valid Department key (2nd arg). expect AreaIntervalKey as well as the expected query WITH department as a return
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 1)
-        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQueryWithDepartment)
-    End Sub
-
-    <Fact>
-    Public Sub GetAreaDdlSelectCommandTest5()
-        'pass in existing Area IntervalKey and a valid Department key (2nd arg). expect AreaIntervalKey as well as the expected query WITH department as a return
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.GetAreaDdlSelectConfig(3, 2)
-        Assert.True(Res("AreaIntervalKey") = 3 AndAlso Res("SelectQuery") = ExpectedQueryWithDepartment)
+        Assert.True(Res("AreaIntervalKey") = 3)
+        Assert.Equal(ExpectedSelectQuery, Res("SelectQuery"))
     End Sub
 End Class
 
 Public Class MaintPMCloneTests
     Inherits MaintPM
-    Private SqlParameters As New SqlParameters
+    Private SqlParameters As New SqlParameters()
     Private Security As New Security()
 
     Private Function GetRandAreaList(ModifyCasing As Boolean) As List(Of String)
@@ -332,7 +336,7 @@ Public Class MaintPMCloneTests
         }
 
         Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res("AreaTable")))
-        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, 0 FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);", ClonePM_Res("AreaTable")("SqlQuery"))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);", ClonePM_Res("AreaTable")("SqlQuery"))
     End Sub
 
     <Theory>
@@ -396,3 +400,91 @@ Public Class MaintPMCloneTests
     End Sub
 
 End Class
+
+Public Class ModifyPmStatusTests
+    Inherits MaintPM
+    Private SqlParameters As New SqlParameters()
+    Private AreaKeyThatDoesNotNorWillEverExist As Integer = 1
+
+    <Theory>
+    <InlineData(1)>
+    <InlineData(12)>
+    <InlineData(99)>
+    <InlineData(453)>
+    <InlineData(4034)>
+    Private Sub RemovePmTestCasesWithoutSqlExecution(AreaKey As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, String) = RemovePM(AreaKey, True)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey}
+        }
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res))
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogArea] SET Status='removed' WHERE [Key]=@AreaKey", ClonePM_Res("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Private Sub RemovePmTestCasesWithSqlExecution()
+        'using a [Key] field value that does not nor will ever exists
+        Dim ClonePM_Res As Dictionary(Of String, String) = RemovePM(AreaKeyThatDoesNotNorWillEverExist)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKeyThatDoesNotNorWillEverExist}
+        }
+
+        Assert.True(Boolean.Parse(ClonePM_Res("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(4)>
+    <InlineData(15)>
+    <InlineData(86)>
+    <InlineData(587)>
+    <InlineData(3409)>
+    Private Sub ArchivePmTestCasesWithoutSqlExecution(AreaKey As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, String) = ArchivePM(AreaKey, True)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey}
+        }
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res))
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogArea] SET Status='archived' WHERE [Key]=@AreaKey", ClonePM_Res("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Private Sub ArchivePmTestCasesWithSqlExecution()
+        'using a [Key] field value that does not nor will ever exists
+        Dim ClonePM_Res As Dictionary(Of String, String) = ArchivePM(AreaKeyThatDoesNotNorWillEverExist)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKeyThatDoesNotNorWillEverExist}
+        }
+
+        Assert.True(Boolean.Parse(ClonePM_Res("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(3)>
+    <InlineData(53)>
+    <InlineData(76)>
+    <InlineData(235)>
+    <InlineData(2389)>
+    Private Sub ReactivatePmTestCasesWithoutSqlExecution(AreaKey As Integer)
+        Dim ClonePM_Res As Dictionary(Of String, String) = ReactivatePM(AreaKey, True)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKey}
+        }
+
+        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res))
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogArea] SET Status='live' WHERE [Key]=@AreaKey", ClonePM_Res("SqlQuery"))
+    End Sub
+
+    <Fact>
+    Private Sub ReactivatePmTestCasesWithSqlExecution()
+        'using a [Key] field value that does not nor will ever exists
+        Dim ClonePM_Res As Dictionary(Of String, String) = ReactivatePM(AreaKeyThatDoesNotNorWillEverExist)
+        Dim CloneHash As New Dictionary(Of String, String) From {
+            {"AreaKey", AreaKeyThatDoesNotNorWillEverExist}
+        }
+
+        Assert.True(Boolean.Parse(ClonePM_Res("Success")))
+    End Sub
+End Class
+

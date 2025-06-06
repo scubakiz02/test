@@ -29,6 +29,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim AreaFromQueryString As String
     Dim LabelFromQueryString As String
     Dim CommentFromQueryString As String
+    Dim ViewFromQs As String
     Dim EditPreviewPanel_ScrollPos As String
     Dim FormViewInsert As FormView = Nothing
     Dim Department As String = CurrUser.GetDepartment()
@@ -67,6 +68,7 @@ Partial Class MR_OpenTicketStatusBoard
         MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval", "PC"}, Server)
         Me.MaintainScrollPositionOnPostBack = True
         AreaFromQueryString = Request.QueryString("Area")
+        ViewFromQs = Request.QueryString("View")
         LabelFromQueryString = Request.QueryString("Label")
         CommentFromQueryString = Request.QueryString("Comment")
         EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
@@ -79,14 +81,41 @@ Partial Class MR_OpenTicketStatusBoard
         Dim DbRange As String
         Dim AreaChangeDelegate As AreaChangeDelegate = AddressOf AreaChange
 
-        Session("AreaChange") = AreaChangeDelegate
+        Session("AreaChange") = AreaChangeDelegate 'PM Clone button functionality
 
         If Not IsPostBack Then
             Dim AreaDdlSelectConfig As Dictionary(Of String, String)
             ScriptManager.RegisterStartupScript(Me, Me.GetType(), "PlaceholderString", "syncScrollPos('EditPreviewPanel', " & EditPreviewPanel_ScrollPos & ");", True) 'set scrollbar positioning of EditPreviewPanel and ItemsPanel control
 
+            'ViewFromQs relates to T_LogArea Status field
+            'this field value is added dynamically to select query within AreaDropDownList_SqlDataSource
+            If ViewFromQs Is Nothing OrElse ViewFromQs = "Live" Then
+                ArchivedPMs_RadioButton.Checked = False
+                LivePMs_RadioButton.Checked = True
+
+                RemoveStatusButton.Visible = False
+                ArchiveStatusButton.Visible = True
+            Else
+                ArchivedPMs_RadioButton.Checked = True
+                LivePMs_RadioButton.Checked = False
+
+                RemoveStatusButton.Visible = True
+                ArchiveStatusButton.Visible = False
+
+                'hide page functionalities
+                AreaFormView.Visible = False
+
+                LabelInterfacePanel.Visible = False
+                CommentInterfacePanel.Visible = False
+                StampInterfacePanel.Visible = False
+                DepartmentIntervalAssignPanel.Visible = False
+
+                ReactivateStatusButton.Visible = True
+                AreaCloneButton.Visible = False
+            End If
+
             'AreaDropDownList_SqlDataSource.SelectCommand = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE " & If(Session("AreaIntervalKey") Is Nothing OrElse Session("AreaIntervalKey") = "All", String.Empty, " A.IntervalKey=" & Session("AreaIntervalKey") & " AND") & " OneTimeDate IS NULL OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
-            AreaDdlSelectConfig = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey)
+            AreaDdlSelectConfig = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey, ViewFromQs)
             AreaDropDownList_SqlDataSource.SelectCommand = AreaDdlSelectConfig("SelectQuery")
             AreaDropDownList_SqlDataSource.SelectParameters.Clear()
             AreaDropDownList_SqlDataSource.SelectParameters.Add("AreaIntervalKey", AreaDdlSelectConfig("AreaIntervalKey"))
@@ -94,13 +123,17 @@ Partial Class MR_OpenTicketStatusBoard
 
             If AreaFromQueryString IsNot Nothing Then
                 RefreshIframe()
+
                 DepartmentInterfacePanel.Enabled = True
                 AreaCloneButton.Enabled = True
-                'DeleteCloneButton.Enabled = True
+                ArchiveStatusButton.Enabled = True
+                RemoveStatusButton.Enabled = True
+                ReactivateStatusButton.Enabled = True
+
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-                {"value", AreaFromQueryString},
-                {"typeOf", "int"}
-            }
+                    {"value", AreaFromQueryString},
+                    {"typeOf", "int"}
+                }
                 'AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
                 AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=@AreaKey"
                 AreaFormView_SqlDataSource.SelectParameters.Clear()
@@ -587,7 +620,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Function RefreshPreview() As String
-        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing)
+        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing)
 
         'try catch block in case WebMethod is invocating this function
         'That way, url is returned as string and client can redirect
@@ -896,8 +929,23 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Protected Sub DeleteButton_onClick(sender As Object, e As EventArgs)
-        'ChecklistBuilder.DeletePM(AreaFromQueryString)
+    Protected Sub LiveStatusButton_OnClick(sender As Object, e As EventArgs) Handles ReactivateStatusButton.Click
+        ViewFromQs = "Live"
+        ChecklistBuilder.ReactivatePM(AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub ArchiveStatusButton_onClick(sender As Object, e As EventArgs)
+        ViewFromQs = "Archived"
+        ChecklistBuilder.ArchivePM(AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
+    Protected Sub RemoveStatusButton_onClick(sender As Object, e As EventArgs)
+        'What does it mean to 'Remove' a PM/Checklist?
+        'Great question!
+        'it means that the PM/Checklist is still in the DB, but is no longer visible by the end user
+        ChecklistBuilder.RemovePM(AreaFromQueryString)
         AreaFromQueryString = Nothing
         LabelFromQueryString = Nothing
         CommentFromQueryString = Nothing
@@ -905,8 +953,10 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
+        Dim Active As Boolean = If(sender.Text = "Disable", False, True)
+
         QueryConfig("@Active") = New Dictionary(Of String, String) From {
-            {"value", If(sender.Text = "Disable", False, True)},
+            {"value", Active},
             {"typeOf", "bit"}
         }
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
@@ -940,7 +990,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub AreaInterval_OnSelectedIndexChanged(sender As Object, e As EventArgs)
-        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey)
+        Dim AreaDdlSelectConfig As Dictionary(Of String, String) = ChecklistBuilder.GetAreaDdlSelectConfig(Session("AreaIntervalKey"), DepartmentKey, ViewFromQs)
         Dim SqlQuery As String = AreaDdlSelectConfig("SelectQuery")
 
         If SqlQuery.Contains("@DepartmentKey") Then
@@ -1190,5 +1240,17 @@ Partial Class MR_OpenTicketStatusBoard
     Protected Sub PhaseShowHide_OnCheckedChanged(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
         Session("PhaseShow") = PhaseShowHide_CheckBox.Checked
     End Sub
+
+    Protected Sub PmStatus_OnCheckedChanged(sender As Object, e As EventArgs)
+        If sender Is ArchivedPMs_RadioButton Then
+            ViewFromQs = "Archived"
+        Else
+            ViewFromQs = "Live"
+        End If
+
+        Response.Redirect(Request.Url.AbsolutePath & "?View=" & ViewFromQs) 'exclude querystrings
+    End Sub
 End Class
+
+
 

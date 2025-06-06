@@ -210,11 +210,22 @@ Public Class MaintPM
         End If
     End Function
 
-    Public Function GetAreaDdlSelectConfig(AreaIntervalKey As String, DepartmentKey As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
+    Public Function GetAreaDdlSelectConfig(AreaIntervalKey As String, DepartmentKey As String, View As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
         Dim Res As New Dictionary(Of String, String)
+        Dim SelectQuery As String
 
         Res("AreaIntervalKey") = If(AreaIntervalKey Is Nothing OrElse AreaIntervalKey = "All", -1, AreaIntervalKey)
-        Res("SelectQuery") = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND OneTimeDate IS NULL" & If(DepartmentKey Is Nothing, String.Empty, " AND DepartmentKey=@DepartmentKey") & " OR (OneTimeDate IS NOT NULL AND ((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) ORDER BY A.Area"
+
+        SelectQuery = "SELECT A.Area, A.[Key] FROM [ALTS].[dbo].[T_LogArea] A " &
+        "LEFT JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] " &
+        "WHERE Status='" & If(View Is Nothing, "live", View) & "' " &
+        "AND (A.IntervalKey=@AreaIntervalKey OR @AreaIntervalKey=-1 OR (A.IntervalKey IS NULL AND DATEDIFF(DAY, A.DateCreated, GETDATE()) = 0)) AND " &
+        "OneTimeDate IS NULL" & If(DepartmentKey Is Nothing, String.Empty, " AND DepartmentKey=@DepartmentKey") & " " &
+        "OR (OneTimeDate IS NOT NULL AND " &
+        "((SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key])=0 OR (SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=A.[Key]) IS NULL)) " &
+        "ORDER BY A.Area"
+
+        Res("SelectQuery") = SelectQuery
 
         Return Res
     End Function
@@ -260,7 +271,7 @@ Public Class MaintPM
         Dim CloneAreaKey As Integer
 
         QueryConfig("@AreaKey") = Sql.GetParamVarHash(AreaKey, "int")
-        PrepPmCloneConfig(Res, "AreaTable", "INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, 0 FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);")
+        PrepPmCloneConfig(Res, "AreaTable", "INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);")
 
         Try
             If AreaKey Is Nothing OrElse AreaKey = String.Empty Then
@@ -315,6 +326,39 @@ Public Class MaintPM
                 Res(TableName)("Success") = True
             End If
         Next
+
+        Return Res
+    End Function
+
+    Public Function RemovePM(AreaKey As String, Optional InvocateInTest As Boolean = False) As Dictionary(Of String, String)
+        Return ModifyPmStatus(AreaKey, "removed", InvocateInTest)
+    End Function
+
+    Public Function ArchivePM(AreaKey As String, Optional InvocateInTest As Boolean = False) As Dictionary(Of String, String)
+        Return ModifyPmStatus(AreaKey, "archived", InvocateInTest)
+    End Function
+
+    Public Function ReactivatePM(AreaKey As String, Optional InvocateInTest As Boolean = False) As Dictionary(Of String, String)
+        Return ModifyPmStatus(AreaKey, "live", InvocateInTest)
+    End Function
+
+    Private Function ModifyPmStatus(AreaKey As String, Status As String, Optional InvocateInTest As Boolean = False) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim SqlQuery As String = "UPDATE [ALTS].[dbo].[T_LogArea] SET Status='" & Status & "' WHERE [Key]=@AreaKey"
+
+        QueryConfig("@AreaKey") = Sql.GetParamVarHash(AreaKey, "int")
+
+        Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+        Res("SqlQuery") = SqlQuery
+
+        If InvocateInTest = False Then
+            Dim SqlResult As Dictionary(Of String, Object) = Sql.ExecuteSqlParamQuery(SqlQuery, QueryConfig)
+            Res.Remove("QueryConfig")
+            Res.Remove("SqlQuery")
+
+            Res("Success") = SqlResult("Success")
+        End If
 
         Return Res
     End Function
