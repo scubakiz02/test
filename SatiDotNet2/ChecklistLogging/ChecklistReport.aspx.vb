@@ -130,7 +130,7 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", GroupFromQueryString},
                 {"typeOf", "int"}
             }
-            AreasDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] As AreaKey, A.Area FROM [ALTS].[dbo].[T_LogArea] A WHERE GroupKey=@GroupKey ORDER BY A.Area", QueryConfig)
+            AreasDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] As AreaKey, A.Area FROM [ALTS].[dbo].[T_LogArea] A WHERE GroupKey=@GroupKey AND A.Status='live' ORDER BY A.Area", QueryConfig)
 
             Try 'in case AreaFromQueryString is null
                 AreasList = JsonSerializer.Deserialize(Of List(Of Integer))(AreaFromQueryString)
