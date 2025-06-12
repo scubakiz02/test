@@ -270,3 +270,376 @@ Public Class PhaseControllerTests
         Assert.Equal(Nothing, PhaseController2.GetPhases())
     End Sub
 End Class
+
+'Public Class PhaseControllerDeleteBatchTests
+'    Inherits PhaseController
+
+'    <Theory>
+'    <InlineData(Nothing, 2)>
+'    <InlineData(2, Nothing)>
+'    Public Sub NullEdgecases(AreaKey As String, BatchKey As String)
+'        Assert.False(Boolean.Parse(DeleteBatch(AreaKey, BatchKey)("Success")))
+'    End Sub
+'End Class
+
+Public Class PhaseControllerDeleteBatchTests
+    Inherits PhaseController
+    Private Rnd As New Random()
+
+    Private Function AreHashesEqual(Hash1 As Dictionary(Of Integer, String), Hash2 As Dictionary(Of Integer, String)) As Boolean
+        If Hash1.Count <> Hash2.Count Then
+            Return False
+        End If
+
+        ' Compare key-value pairs
+        For Each kvp As KeyValuePair(Of Integer, String) In Hash1
+            If Not Hash2.ContainsKey(kvp.Key) Then
+                Return False
+            End If
+
+            If Hash2(kvp.Key) <> kvp.Value Then
+                Return False
+            End If
+        Next
+
+        Return True
+    End Function
+
+    <Fact>
+    Public Sub NullEdgecase()
+        'if nothing is passed as arg, return blank SortedDictionary
+        Dim ExpectedRes As New Dictionary(Of Integer, String)
+        Assert.Equal(JsonSerializer.Serialize(ExpectedRes), JsonSerializer.Serialize(GetDetachedLabels(Nothing)))
+    End Sub
+
+    <Fact>
+    Public Sub BatchedPmTests()
+        Dim TestDS As New Data.DataSet()
+        Dim TestDT As New Data.DataTable()
+        Dim ExpectedRes As New Dictionary(Of Integer, String)
+
+        TestDT.Columns.Add("LabelKey", GetType(Integer))
+        TestDT.Columns.Add("Label", GetType(String))
+        TestDT.Columns.Add("PhaseKey", GetType(Integer))
+
+        For I As Integer = 0 To 5
+            Dim TestDR As Data.DataRow = TestDT.NewRow()
+            Dim PhaseKey As Object = If(Rnd.Next(0, 2) = 1, I, DBNull.Value)
+            Dim Label As String = "Label_" & I
+            Dim LabelKey As Integer = I
+
+            TestDR("LabelKey") = LabelKey
+            TestDR("Label") = Label
+            TestDR("PhaseKey") = PhaseKey
+
+            If IsDBNull(PhaseKey) Then
+                ExpectedRes(LabelKey) = Label
+            End If
+
+            TestDT.Rows.Add(TestDR)
+        Next
+
+        TestDS.Tables.Add(TestDT)
+        Assert.True(AreHashesEqual(ExpectedRes, GetDetachedLabels(45, TestDS)))
+    End Sub
+End Class
+
+Public Class AssignPhaseTests
+    Inherits PhaseController
+    Private SqlParameters As New SqlParameters()
+
+    <Fact>
+    Public Sub Arg1Null()
+        Assert.False(Boolean.Parse(AssignPhase(Nothing, 3)("Success")))
+    End Sub
+
+    <Fact>
+    Public Sub NullAssignPhaseTestCase()
+        Dim LabelKey As Integer = 23
+        Dim AssignPhaseRes As Dictionary(Of String, String) = AssignPhase(LabelKey, Nothing, True)
+        Dim AssignPhaseHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey},
+            {"PhaseKey", Nothing}
+        }
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=@PhaseKey WHERE [Key]=@LabelKey", AssignPhaseRes("SqlQuery"))
+        Assert.True(SqlParameters.ValidParameterizedValues(AssignPhaseHash, AssignPhaseRes))
+    End Sub
+
+    <Fact>
+    Public Sub NullAssignPhaseWithSqlExecutions()
+        'sql does NOT complain when an update query is ran on a record that doesn't exists in a table
+        'do just that, to ensure return is as expected
+        Dim LabelKey As Integer = 23
+        Dim AssignPhaseRes As Dictionary(Of String, String) = AssignPhase(LabelKey, Nothing)
+        Dim AssignPhaseHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey},
+            {"PhaseKey", Nothing}
+        }
+
+        Assert.False(AssignPhaseRes.ContainsKey("SqlQuery"))
+        Assert.False(AssignPhaseRes.ContainsKey("QueryConfig"))
+        Assert.True(Boolean.Parse(AssignPhaseRes("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(3, 4)>
+    <InlineData(235, 238)>
+    Public Sub AssignPhaseTestCases(LabelKey As Integer, PhaseKey As String)
+        Dim AssignPhaseRes As Dictionary(Of String, String) = AssignPhase(LabelKey, PhaseKey, True)
+        Dim AssignPhaseHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey},
+            {"PhaseKey", PhaseKey}
+        }
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=@PhaseKey WHERE [Key]=@LabelKey", AssignPhaseRes("SqlQuery"))
+        Assert.True(SqlParameters.ValidParameterizedValues(AssignPhaseHash, AssignPhaseRes))
+    End Sub
+
+    <Theory>
+    <InlineData(3, 4)>
+    <InlineData(235, 238)>
+    Public Sub AssignPhaseWithSqlExecutions(LabelKey As Integer, PhaseKey As Integer)
+        'sql does NOT complain when an update query is ran on a record that doesn't exists in a table
+        'do just that, to ensure return is as expected
+        Dim AssignPhaseRes As Dictionary(Of String, String) = AssignPhase(LabelKey, PhaseKey)
+        Dim AssignPhaseHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey},
+            {"PhaseKey", PhaseKey}
+        }
+
+        Assert.False(AssignPhaseRes.ContainsKey("SqlQuery"))
+        Assert.False(AssignPhaseRes.ContainsKey("QueryConfig"))
+        Assert.True(Boolean.Parse(AssignPhaseRes("Success")))
+    End Sub
+
+End Class
+
+Public Class GroupsOrPhasesInUseTests
+    Inherits PhaseController
+    Private Security As New Security()
+    Private PMsWithPhases As New List(Of Integer)
+
+    Sub New()
+        'the sql query below returns primary keys of records in T_LogArea where 1 or more relevant records in T_LogLabel where PhaseKey field contains a value other than NULL 
+        Dim PMsWithPhasesDS As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT DISTINCT(AreaKey) As AreaKey FROM [ALTS].[dbo].[T_LogLabel] GROUP BY PhaseKey, AreaKey HAVING PhaseKey IS NOT NULL ORDER BY AreaKey", New Dictionary(Of String, Dictionary(Of String, String)))
+
+        For Each PMsWithPhasesDR As Data.DataRow In PMsWithPhasesDS.Tables(0).Rows
+            PMsWithPhases.Add(PMsWithPhasesDR("AreaKey"))
+        Next
+    End Sub
+
+    <Fact>
+    Private Sub NothingAsArg()
+        Assert.False(GroupsOrPhasesInUse(Nothing))
+    End Sub
+
+    <Fact>
+    Private Sub TrueReturnTestCases()
+        For Each PMWithPhases As Integer In PMsWithPhases
+            Assert.True(GroupsOrPhasesInUse(PMWithPhases))
+        Next
+    End Sub
+
+    <Fact>
+    Private Sub FalseReturnTestCases()
+        Dim AreaDS As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT TOP(20) [Key] FROM [ALTS].[dbo].[T_LogArea]", New Dictionary(Of String, Dictionary(Of String, String)))
+
+        For Each AreaDR As Data.DataRow In AreaDS.Tables(0).Rows
+            Dim AreaKey As Integer = AreaDR("Key")
+
+            If PMsWithPhases.Contains(AreaKey) = False Then
+                Assert.False(GroupsOrPhasesInUse(AreaKey))
+            End If
+        Next
+
+    End Sub
+End Class
+
+Public Class DeleteBatchTests
+    Inherits PhaseController
+    Private Security As New Security()
+    Private SqlParameters As New SqlParameters()
+
+    <Fact>
+    Public Sub UnsuccessfulEdgecases()
+        Assert.False(Boolean.Parse(DeletePhaseOrGroup(Nothing)("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(4)>
+    <InlineData(238)>
+    Public Sub DeletePhaseOrGroupTestCases(PhaseOrGroupKey As String)
+        Dim DeletePhaseOrGroupRes As Dictionary(Of String, String) = DeletePhaseOrGroup(PhaseOrGroupKey, True)
+        Dim DeletePhaseOrGroupHash As New Dictionary(Of String, String) From {
+            {"PhaseOrGroupKey", PhaseOrGroupKey}
+        }
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=NULL WHERE PhaseKey=@PhaseOrGroupKey; DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", DeletePhaseOrGroupRes("SqlQuery"))
+        Assert.True(SqlParameters.ValidParameterizedValues(DeletePhaseOrGroupHash, DeletePhaseOrGroupRes))
+    End Sub
+
+    <Theory>
+    <InlineData(-1)>
+    <InlineData(0)>
+    Public Sub DeletePhaseOrGroupWithSqlExecutionsTestCases(PhaseOrGroupKey As String)
+        'sql does NOT complain when a sql query is ran on a record that doesn't exists in a table
+        'do just that, to ensure return is as expected
+        Dim DeletePhaseOrGroupRes As Dictionary(Of String, String) = DeletePhaseOrGroup(PhaseOrGroupKey)
+        Dim DeletePhaseOrGroupHash As New Dictionary(Of String, String) From {
+            {"PhaseOrGroupKey", PhaseOrGroupKey}
+        }
+
+        Assert.False(DeletePhaseOrGroupRes.ContainsKey("SqlQuery"))
+        Assert.False(DeletePhaseOrGroupRes.ContainsKey("QueryConfig"))
+        Assert.True(Boolean.Parse(DeletePhaseOrGroupRes("Success")))
+    End Sub
+
+End Class
+
+Public Class GetLabel_IdxTests
+    Inherits PhaseController
+    Private Security As New Security()
+    Private SomeLabelsHavePhasesTestDs As Data.DataSet
+    Private TestDsAndAllLabelsThatHavePhases As Data.DataSet
+    Private NoPhasesTestDs As Data.DataSet
+
+    Sub New()
+        SomeLabelsHavePhasesTestDs = BuildTestDsAndSomeLabelThatHavePhases()
+        NoPhasesTestDs = BuildNoPhasesTestDs()
+    End Sub
+
+    Private Sub AddDsRow(DT As Data.DataTable, RowConfig As Dictionary(Of String, Object))
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        DR("LabelKey") = RowConfig("LabelKey")
+        DR("PhaseKey") = RowConfig("PhaseKey")
+        DR("PhaseOrder") = RowConfig("PhaseOrder")
+        DR("LabelOrder") = RowConfig("LabelOrder")
+
+        DT.Rows.Add(DR)
+    End Sub
+
+    <Fact>
+    Public Sub NullArg()
+        Assert.Equal(-1, GetLabel_Idx(Nothing))
+    End Sub
+
+    <Fact>
+    Public Sub NullPhaseKeyAndSomeLabelsHavePhases()
+        '1) T_LogLabel PhaseKey field value is NULL and Phases for the associated PM/Checklist exist
+        Assert.Equal(1, GetLabel_Idx(593, SomeLabelsHavePhasesTestDs))
+    End Sub
+
+    <Fact>
+    Public Sub NonNullPhaseKeyAndSomeLabelsHavePhases()
+        '4) T_LogLabel PhaseKey field value is NOT NULL but not all associated records in T_LogLabel have a non null field value for PhaseKey field
+        Assert.Equal(5, GetLabel_Idx(589, SomeLabelsHavePhasesTestDs))
+    End Sub
+
+    Private Function BuildNoPhasesTestDs() As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        DT.Columns.Add("LabelKey", GetType(Integer))
+        DT.Columns.Add("PhaseKey", GetType(Integer))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+        DT.Columns.Add("LabelOrder", GetType(Integer))
+
+        'AreaKey 58
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 553},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 554},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 2}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 555},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 3}
+        })
+
+        DS.Tables.Add(DT)
+
+        Return DS
+
+    End Function
+
+    Private Function BuildTestDsAndSomeLabelThatHavePhases() As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        DT.Columns.Add("LabelKey", GetType(Integer))
+        DT.Columns.Add("PhaseKey", GetType(Integer))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+        DT.Columns.Add("LabelOrder", GetType(Integer))
+
+        'AreaKey 75
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 592},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 6}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 593},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 7}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 590},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 8}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 586},
+            {"PhaseKey", 109},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 586},
+            {"PhaseKey", 109},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 589},
+            {"PhaseKey", 109},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 5}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 588},
+            {"PhaseKey", 110},
+            {"PhaseOrder", 3},
+            {"LabelOrder", 2}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 587},
+            {"PhaseKey", 110},
+            {"PhaseOrder", 3},
+            {"LabelOrder", 3}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 591},
+            {"PhaseKey", 110},
+            {"PhaseOrder", 3},
+            {"LabelOrder", 4}
+        })
+
+        DS.Tables.Add(DT)
+
+        Return DS
+    End Function
+
+End Class

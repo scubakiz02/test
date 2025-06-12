@@ -14,6 +14,7 @@
             const closeModalButtons = document.querySelectorAll('[data-modal-close]');
             let labelDdl = document.getElementById("<%=LabelDropDownList.ClientID%>");
             let labelDdlIdx = labelDdl ? labelDdl.selectedIndex : null; //using ternary operator b/c 'archived' status hides this control
+            let batchDdl = document.getElementById("<%=PhaseDropDownList.ClientID%>");
             let iframeDoc = getAspControl("PreviewPanel_iframe").contentDocument || getAspControl("PreviewPanel_iframe").contentWindow.document; //get window within iframe
             const areaCloneCreateButton = document.getElementById("area-clone-create-button");
             let inputPanel;
@@ -58,18 +59,33 @@
             })
 
             //hightlight and programmatically scroll to input end user is focusing on within Log.aspx iframe
-            iterateChildren(function () {
+            iterateChildren(async function () {
                 const id = this.id;
 
-                if (id && id.includes("ItemsPanel")) {
+                if (!ItemsPanel && id && id.includes("ItemsPanel")) {
                     ItemsPanel = this;
-                    return;
+
+                    try {
+                        const response = await fetch('CurrInputIdx.ashx' + window.location.search); //window.location.search returns url querystring params
+                        let data;
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok for CurrLabelIdx.ashx');
+                        }
+
+                        data = await response.json();
+                        if (data["success"]) {
+                            inputPanel = ItemsPanel.querySelectorAll(".LogPanel")[data["idx"]];
+                            hightlightCurrInput(inputPanel);
+                            ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
+                        }
+
+                        return;
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                    }
                 }
             }, iframeDoc);
-            inputPanel = ItemsPanel.querySelectorAll(".LogPanel")[labelDdlIdx]; //calling this function to account for phase/bunch titles
-            hightlightCurrInput(inputPanel);
-            ItemsPanel.scrollTo(0, inputPanel.offsetTop - ItemsPanel.offsetTop);
-
         })
 
         async function createClone() {
@@ -79,7 +95,7 @@
             const new_area_name = areaCloneModalTextbox.value;
 
             try {
-                const response = await fetch('ClonePM.ashx', {
+                const response = await fetch('ClonePM.ashx' + window.location.search, { //pass querystring variables to http endpoint
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ areaKeyToClone: area_key_to_clone, newAreaName: new_area_name })
@@ -170,6 +186,32 @@
             --UWhitespace: 0.5em;
             --UFontSize: (calc(var(--UWhitespace) * 2));
             --Width: 400px;
+        }
+
+        .flexbox {
+            display: flex;
+        }
+
+        .no-wrap-label {
+            text-wrap: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .formview-template-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--UWhitespace);
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--UWhitespace);
+        }
+
+        .auto-fit {
+            flex: 1 1 auto; /* grows and shrinks as needed */
+            min-width: 0; /* important to allow shrinking below content size */
         }
 
         .Width {
@@ -266,6 +308,30 @@
             height: 100%;
             background-color: black;
             opacity: .9;
+        }
+
+        /* ============= area-section ================= */
+        #area-formview-itemtemplate-checkbox-container {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
+            text-wrap: nowrap;
+            gap: var(--UWhitespace);
+        }
+
+        #area-formview-itemtemplate-container {
+            display: flex;
+        }
+
+        #area-formview-emptytemplate-container {
+            background-color: #F7F6F3;
+            color: #333333;
+        }
+
+        #area-formview-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--UWhitespace);
         }
 
         /* ======== #area-ddl-inline-container ========= */
@@ -385,7 +451,6 @@
         #edit-iframe-preview-section1-container {
             display: flex;
             flex-direction: column;
-            gap: var(--UWhitespace);
         }
 
         /* ========== remove-area-modal ===========*/
@@ -399,6 +464,11 @@
 
         #remove-area-modal-footer {
             justify-content: right;
+        }
+
+        /* ======= label interface ======== */
+        .label-interface-phase-select  {
+
         }
 
         @keyframes spin {
@@ -517,46 +587,64 @@
                         <asp:Button ID="ArchiveStatusButton" Text="Archive" OnClick="ArchiveStatusButton_onClick" Visible="False" Enabled="False" runat="server" />
                     </div>
 
-                    <asp:FormView ID="AreaFormView" CssClass="Width" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
+                    <asp:FormView ID="AreaFormView" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
                         <EmptyDataTemplate>
-                            <asp:Panel runat="server" BackColor="#F7F6F3" ForeColor="#333333">
-                                Checklist: No data loaded yet...
-                            <br />
-                                <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Disable" />
-                                &nbsp;<asp:LinkButton ID="EmptyAreaNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
-                            </asp:Panel>
+                            <div id="area-formview-emptytemplate-container" class="formview-template-container">
+                                <span>Checklist: No data loaded yet...</span>
+
+                                <div id="area-formview-emptytemplate-hyperlinks">
+                                    <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                    <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Disable" />
+                                    <asp:LinkButton ID="EmptyAreaNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                </div>
+                            </div>
+
                         </EmptyDataTemplate>
                         <EditItemTemplate>
-                            Checklist:
-                    <asp:TextBox Style="width: 400px" ID="AreaTextBox" runat="server" Text='<%# Bind("Area") %>' />
-                            <br />
-                            <asp:LinkButton ID="AreaUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
-                            &nbsp;<asp:LinkButton ID="AreaUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                            <div id="area-formview-edittemplate-container" class="formview-template-container">
+                                <asp:TextBox ID="AreaTextBox" CssClass="auto-fit" runat="server" Text='<%# Bind("Area") %>' />
+
+                                <div id="area-formview-edittemplate-hyperlinks">
+                                    <asp:LinkButton ID="AreaUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
+                                    <asp:LinkButton ID="AreaUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                                </div>
+                            </div>
                         </EditItemTemplate>
                         <EditRowStyle BackColor="#999999" />
                         <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
                         <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
                         <InsertItemTemplate>
-                            Checklist:
-                    <asp:TextBox Style="width: 400px" ID="AreaTextBox" runat="server" Text='<%# Bind("Area") %>' />
-                            <br />
-                            <asp:LinkButton ID="AreaInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
-                            &nbsp;<asp:LinkButton ID="AreaInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                            <div id="area-formview-inserttemplate-container" class="formview-template-container">
+                                <asp:TextBox ID="AreaTextBox" runat="server" Text='<%# Bind("Area") %>' />
+
+                                <div id="area-formview-inserttemplate-hyperlinks">
+                                    <asp:LinkButton ID="AreaInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
+                                    <asp:LinkButton ID="AreaInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                                </div>
+                            </div>
                         </InsertItemTemplate>
                         <ItemTemplate>
-                            Checklist: 
-                        <asp:Label ID="AreaLabel" runat="server" Text='<%# Bind("Area") %>' />
-                            <br />
-                            <asp:LinkButton ID="AreaEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                            &nbsp;<asp:LinkButton ID="AreaDisableButton" OnClick="DisableButton_onClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Disable" />
-                            &nbsp;<asp:LinkButton ID="AreaNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                            <div id="area-formview-itemtemplate-container" class="Width">
+                                <div id="area-formview-container" class="auto-fit">
+                                    <asp:Label ID="AreaLabel" CssClass="no-wrap-label" runat="server" Text='<%# Bind("Area") %>' />
+
+                                    <div id="area-formview-itemtemplate-hyperlinks">
+                                        <asp:LinkButton ID="AreaEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                        <asp:LinkButton ID="AreaDisableButton" OnClick="DisableButton_onClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Disable" />
+                                        <asp:LinkButton ID="AreaNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                    </div>
+                                </div>
+
+                                <div id="area-formview-itemtemplate-checkbox-container">
+                                    <asp:CheckBox Style="display: flex; flex-direction: row;" Text="(Rare) Phasing: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true" />
+                                    <asp:CheckBox Enabled="False" Style="display: flex; flex-direction: row;" Text="Groups: " ID="EnableGroups_CheckBox" TextAlign="Left" runat="server" AutoPostBack="true" />
+                                </div>
+                            </div>
                         </ItemTemplate>
                         <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
                         <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
                     </asp:FormView>
                     <asp:Label ID="AreaErrorLabel" Text="" Style="color: red" runat="server" />
-
                     <%--InsertCommand value is a select query, because it's a workaround on the asp.net architecture to prevent empty TextBox values from creating a record in DB--%>
                     <%--DeleteCommand is placeholder so the assoociated click event can run underneath the asp.net architecture--%>
                     <asp:SqlDataSource ID="AreaFormView_SqlDataSource" runat="server" ConflictDetection="OverwriteChanges" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
@@ -575,6 +663,85 @@
                             <asp:Parameter Name="Area" Type="String" />
                         </UpdateParameters>
                     </asp:SqlDataSource>
+                </asp:Panel>
+
+                <asp:Panel Visible="False" ID="PhaseOrBundle_Panel" CssClass="InterfacePanel" Style="background-color: #FF69B4;" runat="server">
+                    <asp:Panel ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
+                        <asp:Label runat="server" Text="Select Phase:"></asp:Label>
+
+                        <asp:DropDownList
+                            ID="PhaseDropDownList"
+                            runat="server"
+                            DataSourceID="PhaseDropDownList_SqlDataSource"
+                            DataTextField="Phase"
+                            DataValueField="Key"
+                            CssClass="Width"
+                            AutoPostBack="True"
+                            OnSelectedIndexChanged="PhaseDropDownList_SelectedIndexChanged">
+                        </asp:DropDownList>
+                        <asp:SqlDataSource ID="PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
+
+                        <asp:FormView ID="PhaseFormView" runat="server" DataKeyNames="Key" DataSourceID="PhaseFormView_SqlDataSource" CellPadding="4" ForeColor="#333333" Style="width: calc(var(--Width) - 100px); margin: var(--UWhitespace) 0;">
+                            <EmptyDataTemplate>
+                                <asp:Panel runat="server" BackColor="#F7F6F3" ForeColor="#333333">
+                                    Phase: No data loaded yet...
+                                    <br />
+                                    <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                    <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
+                                    &nbsp;<asp:LinkButton ID="EmptyPhaseNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                </asp:Panel>
+                            </EmptyDataTemplate>
+
+                            <EditItemTemplate>
+                                Phase:
+                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                <br />
+                                <asp:LinkButton ID="PhaseUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
+                                &nbsp;<asp:LinkButton ID="PhaseUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                            </EditItemTemplate>
+                            <EditRowStyle BackColor="#999999" />
+                            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                            <InsertItemTemplate>
+                                Phase:
+                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                <br />
+                                <asp:LinkButton ID="PhaseInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
+                                &nbsp;<asp:LinkButton ID="PhaseInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+
+                            </InsertItemTemplate>
+                            <ItemTemplate>
+                                Phase:
+                    <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
+                                <br />
+                                <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                &nbsp;<asp:LinkButton ID="PhaseDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+
+                            </ItemTemplate>
+                            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                            <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                        </asp:FormView>
+
+                        <%--InsertCommand value is a select query, because it's a workaround on the asp.net architecture to prevent empty TextBox values from creating a record in DB--%>
+                        <asp:SqlDataSource ID="PhaseFormView_SqlDataSource" runat="server" ConflictDetection="OverwriteChanges" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                            DeleteCommand="DELETE FROM [T_LogPhase] WHERE [Key] = @original_Key"
+                            InsertCommand="SELECT * FROM T_LogPhase"
+                            SelectCommand=""
+                            UpdateCommand="UPDATE [T_LogPhase] SET [Phase] = @Phase WHERE [Key] = @original_Key">
+                            <DeleteParameters>
+                                <asp:Parameter Name="original_Key" Type="Int32" />
+                                <asp:Parameter Name="original_Phase" Type="String" />
+                            </DeleteParameters>
+                            <InsertParameters>
+                                <asp:Parameter Name="Phase" Type="String" />
+                            </InsertParameters>
+                            <UpdateParameters>
+                                <asp:Parameter Name="Phase" Type="String" />
+                            </UpdateParameters>
+                        </asp:SqlDataSource>
+
+                    </asp:Panel>
                 </asp:Panel>
 
                 <asp:Panel runat="server" BackColor="#90EE90" ID="LabelInterfacePanel" CssClass="InterfacePanel" Style="display: flex; flex-direction: column; align-items: baseline; gap: var(--UWhitespace);">
@@ -607,8 +774,7 @@
                             CssClass="Width">
                             <asp:ListItem Selected="True">Select Label...</asp:ListItem>
                         </asp:DropDownList>
-                        <asp:SqlDataSource ID="LabelDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                            SelectCommand="SELECT Label, [Key] FROM T_LogLabel"></asp:SqlDataSource>
+                        <asp:SqlDataSource ID="LabelDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
 
                         <div style="display: flex; align-items: center; justify-content: space-between;">
                             <asp:FormView ID="LabelFormView" Style="width: calc(var(--Width) - 100px); margin: var(--UWhitespace) 0;" runat="server" DataKeyNames="Key" DataSourceID="LabelFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
@@ -676,27 +842,24 @@
                         </div>
                     </div>
 
-                    <asp:CheckBox Enabled="False" Style="display: flex; flex-direction: row;" Text="Show/Hide Phases: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true" />
-                    <asp:Panel Visible="False" ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
-                        <div style="display: flex; gap: var(--UWhitespace);">
-                            <asp:Label runat="server" Text="Select Phase:"></asp:Label>
-                            <asp:Button Text="Edit" runat="server" OnClick="EditPhasesButton_OnClick" OnClientClick="iframeEnabled(true);" />
-                        </div>
-
-                        <asp:DropDownList
-                            ID="PhaseDropDownList"
-                            runat="server"
-                            DataSourceID="PhaseDropDownList_SqlDataSource"
-                            DataTextField="Phase"
-                            DataValueField="Key"
-                            CssClass="Width"
-                            AutoPostBack="True"
-                            OnSelectedIndexChanged="PhaseDropDownList_SelectedIndexChanged">
+                    <asp:Panel runat="server" Visible="False" ID="LabelInterface_PhaseDdlContainer" class="flexbox Width">
+                        <span id="label-interface-phase-select-title">Phase:</span>
+                        <asp:DropDownList ID="LabelInterface_PhaseDropDownList" CssClass="label-interface-phase-select auto-fit" runat="server"
+                            AppendDataBoundItems="True" AutoPostBack="True"
+                            DataSourceID="LabelInterface_PhaseDropDownList_SqlDataSource" DataTextField="Phase"
+                            DataValueField="Key" OnSelectedIndexChanged="LabelInterface_PhaseDropDownList_SelectedIndexChanged">
+                            <asp:ListItem Text="None" Value="" />
                         </asp:DropDownList>
-                        <asp:SqlDataSource ID="PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
+                        <asp:SqlDataSource ID="LabelInterface_PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                            SelectCommand="SELECT [Key], Phase FROM [T_LogPhase] WHERE AreaKey=@AreaKey">
+                            <SelectParameters>
+                                <asp:QueryStringParameter Name="AreaKey" QueryStringField="Area" Type="Int32" DefaultValue="0" />
+                            </SelectParameters>
+                        </asp:SqlDataSource>
                     </asp:Panel>
 
-                    <div style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
+                    <asp:CheckBox Enabled="False" Style="display: flex; flex-direction: row;" Text="Show Range: " ID="LabelRangeShowHide_CheckBox" OnCheckedChanged="LabelRangeShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true" />
+                    <asp:Panel Visible="False" ID="RangeAndUnitInterfaceContainer" runat="server">
                         <asp:Panel runat="server" ID="RangeOrderInterfacePanel" Enabled="false" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
                             <asp:Label runat="server" ID="RangeOrderLabel" Text="Range Order:"></asp:Label>
                             <asp:Panel ID="RangeOrderMenu" runat="server" Style="display: flex; gap: var(--UWhitespace);">
@@ -749,9 +912,6 @@
                                 <asp:ImageButton ID="ResetRangeButton" OnClick="ResetRangeButton_onClick" Enabled="False" runat="server" Style="width: 25px; position: absolute; top: var(--UWhitespace); right: var(--UWhitespace); gap: var(--UWhitespace);" ImageUrl="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAjFJREFUWEft1surzVEUwPHPnTFRGBlIUfKakGQkikIGniPySCkppQhFXoWUKBIpURgg/4ABJQPkkYiBvPKYSJSJEb+ldXTucR6/c0/d3+Su2p1z9llr7+9ea++1Vp+Kpa/i/Q0BDMQDi7AWEzEqxy9cxy3cwfeyoS0LMAa7sRRjOyz+Cadz/OwEUg9wO5XnNRgtwdHihFNz/iYe40mOmJ6eYwaWp96LhDjbDqIe4Hcq1s/tK+b25/wr7MWNDqdaiUOYlHrbcLKVTTuAY9iRhhewB186ubTu/wjZ4fy9AReb2bYCiBhuSYOdCJiByGacScMI09PGRZoBXMK6VNyIOH0vEiFbkWGIcPSTZgCh8BUL8aiXndN2Mu7xN+mFF97Vr9kKoHHfeNuNr6MbtstYnRf6QCuAeIZzW6zaK8AuHMEVrGkF0M2JutWdn1nyPmZXATACP/ANo6sAmFC4/jU+YFwVAMsQKfxqXsZ/DGWLUbcxb9SPdB5pfWsRglNVeCBOH16Yg7uDDRDFKXqFj4ik1K9ED0YIXmZl3I7j7VJxr3FuZl+riA8xq5lCJw9swrm8ONGUfO6Csr4Sji8K3NuBAKzCtTR8k53R+Q4QEedoSKIChkTurzU1/5l28kAYRBo9UXRC09I6Gs/nRev1DJFaowcM985MncUYmc3perxvB1wGIOyH42Bxg+MilZHSTUxZgNqmC/IpTcnPcPcwPMgRly2+h1dKSbcApRbtRmkIoHIP/AFn7WAh9AkzDQAAAABJRU5ErkJggg==" />
                             </asp:Panel>
                         </asp:Panel>
-
-                    </div>
-                    <div>
                         <asp:Panel runat="server" Enabled="false" ID="UnitInterfacePanel">
                             <asp:Label runat="server" Text="Select Unit:"></asp:Label>&nbsp;
                         <br />
@@ -767,8 +927,7 @@
                             <asp:SqlDataSource ID="UnitDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
                                 SelectCommand="SELECT Unit, [Key] FROM [ALTS].[dbo].[T_LogUnit] WHERE Unit IS NOT NULL ORDER BY Unit"></asp:SqlDataSource>
                         </asp:Panel>
-                    </div>
-
+                    </asp:Panel>
                 </asp:Panel>
 
             </div>

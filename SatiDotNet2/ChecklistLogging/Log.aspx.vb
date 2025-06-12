@@ -328,9 +328,9 @@ Partial Class MR_OpenTicketStatusBoard
         For I = 0 To RC - 1
             Dim myPanel As Panel = CType(UpdatePanel.FindControl("Panel" & I), Panel)
             Dim Cbx As CheckBox
+            Dim InputParent As Panel
             DR = DS.Tables(0).Rows(I)
             LabelKey = DR("LabelKey")
-            'Range = If(IsDBNull(DR("Range")), String.Empty, DR("Range"))
             Range = LogAspx.GetRange(Request.QueryString("Key"), LogDR, DR)
             Unit = If(IsDBNull(DR("Unit")), String.Empty, DR("Unit"))
 
@@ -349,18 +349,28 @@ Partial Class MR_OpenTicketStatusBoard
                     ItemsPanel.Controls.Add(PhaseLabel)
 
                     PhasePanel.ID = PhasePanelID
-                    PhasePanel.Attributes.Add("style", "display: grid; grid-template-columns: 49% 49%; justify-content: space-between; gap: var(--UWhitespace);")
+                    PhasePanel.Attributes.Add("style", "")
+                    PhasePanel.CssClass = "LabelSection grid" 'used for ChecklistBuilder.aspx sati blue input highlighting when batching is present
 
                     ItemsPanel.Controls.Add(PhasePanel)
                 End If
-
-                PhasePanel.Controls.Add(myPanel)
-                ItemsPanel.Attributes("style") = "display: flex; flex-direction: column; gap: var(--UWhitespace); overflow: auto;"
+                InputParent = PhasePanel
 
                 If PhaseConfig(LabelKey)("PhaseOrder") > CurrPhaseOrder AndAlso Request.QueryString("Key") IsNot Nothing Then
                     PhasePanel.Enabled = False
                 End If
+            Else
+                InputParent = ItemsPanel.FindControl("NonBatchedPanels")
+
+                If InputParent Is Nothing Then
+                    InputParent = New Panel()
+                    InputParent.ID = "NonBatchedPanels"
+                    InputParent.CssClass = "LabelSection grid"
+                    ItemsPanel.Controls.Add(InputParent)
+                End If
             End If
+
+            InputParent.Controls.Add(myPanel)
 
             myPanel.Visible = True
 

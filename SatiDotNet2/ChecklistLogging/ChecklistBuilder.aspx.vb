@@ -29,12 +29,15 @@ Partial Class MR_OpenTicketStatusBoard
     Dim AreaFromQueryString As String
     Dim LabelFromQueryString As String
     Dim CommentFromQueryString As String
+    Dim PhaseFromQs As String
     Dim ViewFromQs As String
+    Dim PhasePanelShowFromQs As String
     Dim EditPreviewPanel_ScrollPos As String
     Dim FormViewInsert As FormView = Nothing
     Dim Department As String = CurrUser.GetDepartment()
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+    Private PhaseController As New PhaseController()
 
     <WebMethod()>
     Public Shared Function Area_Change(AreaKey As Integer) As String
@@ -51,16 +54,15 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Private Sub MR_OpenTicketStatusBoard_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
-        Dim PhaseShow As Boolean = Session("PhaseShow")
+        Dim LabelRangeShow As Boolean = Session("LabelRangeShow")
 
-        If PhaseShow Then
-            PhaseDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [AreaKey]=@Area ORDER BY PhaseOrder"
-            PhaseDropDownList_SqlDataSource.SelectParameters.Clear()
-            PhaseDropDownList_SqlDataSource.SelectParameters.Add("Area", AreaFromQueryString)
+        If LabelRangeShow Then
+            UnitDropDownList_SqlDataSource.SelectCommand = "SELECT Unit, [Key] FROM [ALTS].[dbo].[T_LogUnit] WHERE Unit IS NOT NULL ORDER BY Unit"
+            UnitDropDownList_SqlDataSource.DataBind()
         End If
 
-        PhaseShowHide_CheckBox.Checked = PhaseShow
-        PhaseInterfacePanel.Visible = PhaseShow
+        LabelRangeShowHide_CheckBox.Checked = LabelRangeShow
+        RangeAndUnitInterfaceContainer.Visible = LabelRangeShow
     End Sub
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -68,12 +70,15 @@ Partial Class MR_OpenTicketStatusBoard
         MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval", "PC"}, Server)
         Me.MaintainScrollPositionOnPostBack = True
         AreaFromQueryString = Request.QueryString("Area")
+        PhaseFromQs = Request.QueryString("Phase")
+        PhasePanelShowFromQs = Request.QueryString("PhasePanelShow")
         ViewFromQs = Request.QueryString("View")
         LabelFromQueryString = Request.QueryString("Label")
         CommentFromQueryString = Request.QueryString("Comment")
         EditPreviewPanel_ScrollPos = Request.QueryString("EPP_ScrollPos")
         Dim Unit As String
         Dim FieldType As String
+        Dim PhaseKey As String
         Dim IntervalKey As String
         Dim Interval As String
         Dim IntervalDR As Data.DataRow
@@ -130,6 +135,7 @@ Partial Class MR_OpenTicketStatusBoard
                 RemoveStatusButton.Enabled = True
                 ReactivateStatusButton.Enabled = True
 
+                '======== AREA INTERFACE ==============
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                     {"value", AreaFromQueryString},
                     {"typeOf", "int"}
@@ -155,71 +161,108 @@ Partial Class MR_OpenTicketStatusBoard
                     AreaDropDownList.Items.RemoveAt(0)
                 End If
 
-                'label interface
-                If LabelFromQueryString Is Nothing Then
-                    LabelFromQueryString = SetLabelFromQueryString()
-                End If
+                '======== PHASE INTERFACE ==============
+                QueryConfig("@PhaseKey") = Security.GetParamVarHash(PhaseFromQs, "string")
 
-                'LabelDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [AreaKey]=@AreaKey ORDER BY LabelOrder"
-                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT L.[Key], [Label] FROM [T_LogLabel] L LEFT JOIN [T_LogPhase] P ON L.PhaseKey=P.[Key] WHERE L.[AreaKey]=@AreaKey ORDER BY P.PhaseOrder, L.LabelOrder"
-                LabelDropDownList_SqlDataSource.SelectParameters.Clear()
-                LabelDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
+                PhaseDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [AreaKey]=@Area ORDER BY PhaseOrder"
+                PhaseDropDownList_SqlDataSource.SelectParameters.Clear()
+                PhaseDropDownList_SqlDataSource.SelectParameters.Add("Area", AreaFromQueryString)
+
+                PhaseDropDownList.Items.Clear()
+                PhaseDropDownList.DataBind()
+                PhaseDropDownList.SelectedValue = Security.GetSingleDbField("SELECT [Key] From [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey", QueryConfig, "Key")
+
+                ''enable associated functionalities
+                'LabelDropDownList.Enabled = True
+                'PhaseOrBundle_Panel.Enabled = True
+                'LabelOrderInterfacePanel.Enabled = True
+                'UnitInterfacePanel.Enabled = True
+                'FieldType_DropDownList.Enabled = True
+                'RangeOrderInterfacePanel.Enabled = True
+
+                PhaseFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Phase] FROM [T_LogPhase] WHERE [Key]=@PhaseKey"
+                PhaseFormView_SqlDataSource.SelectParameters.Clear()
+                PhaseFormView_SqlDataSource.SelectParameters.Add("PhaseKey", PhaseFromQs)
+                PhaseFormView_SqlDataSource.DataBind()
+
+                '======== LABEL INTERFACE ==============
+                QueryConfig.Clear()
+                QueryConfig("@LabelKey") = Security.GetParamVarHash(LabelFromQueryString, "int")
 
                 LabelDropDownList.Items.Clear()
+                LabelDropDownList_SqlDataSource.SelectCommand = "SELECT L.[Key], [Label] FROM [T_LogLabel] L LEFT JOIN [T_LogPhase] P ON L.PhaseKey=P.[Key] WHERE L.[AreaKey]=@AreaKey ORDER BY P.PhaseOrder, L.LabelOrder"
+                LabelDropDownList_SqlDataSource.SelectParameters.Clear()
+
+                If PhaseFromQs IsNot Nothing Then
+                    'create ListItems controls for relevant T_LogLabel records that have a NULL PhaseKey field value
+                    'Dim DetachedLabels As Dictionary(Of Integer, String) = PhaseController.GetDetachedLabels(AreaFromQueryString)
+                    'For Each DetachedLabel As KeyValuePair(Of Integer, String) In DetachedLabels
+                    '    Dim DdlOption As New ListItem(DetachedLabel.Value, DetachedLabel.Key)
+
+                    '    DdlOption.Attributes("style") = "color: #FF0000;"
+
+                    '    LabelDropDownList.Items.Add(DdlOption)
+                    'Next
+
+                    LabelDropDownList_SqlDataSource.SelectCommand = LabelDropDownList_SqlDataSource.SelectCommand.Replace("WHERE", "WHERE L.PhaseKey=@PhaseKey AND")
+                    LabelDropDownList_SqlDataSource.SelectParameters.Add("PhaseKey", PhaseFromQs)
+                End If
+                LabelDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
+
                 LabelDropDownList.DataBind()
+                LabelDropDownList.SelectedValue = Security.GetSingleDbField("SELECT [Key] From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Key")
 
-                If LabelFromQueryString IsNot Nothing Then
-                    QueryConfig.Clear()
-                    QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                        {"value", LabelFromQueryString},
-                        {"typeOf", "int"}
-                    }
-                    FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
-                    DbRange = Security.GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Range")
-                    Unit = Security.GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=@LabelKey", QueryConfig, "Key")
+                FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
+                PhaseKey = Security.GetSingleDbField("SELECT PhaseKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "PhaseKey")
+                DbRange = Security.GetSingleDbField("SELECT Range From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "Range")
+                Unit = Security.GetSingleDbField("SELECT U.[Key] FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogUnit] U ON L.UnitKey=U.[Key] WHERE L.[Key]=@LabelKey", QueryConfig, "Key")
 
-                    'enable associated functionalities
-                    LabelDropDownList.Enabled = True
-                    PhaseInterfacePanel.Enabled = True
-                    LabelOrderInterfacePanel.Enabled = True
-                    UnitInterfacePanel.Enabled = True
-                    FieldType_DropDownList.Enabled = True
-                    RangeOrderInterfacePanel.Enabled = True
-                    PhaseShowHide_CheckBox.Enabled = True
+                'enable associated functionalities
+                LabelDropDownList.Enabled = True
+                PhaseOrBundle_Panel.Enabled = True
+                LabelOrderInterfacePanel.Enabled = True
+                UnitInterfacePanel.Enabled = True
+                FieldType_DropDownList.Enabled = True
+                RangeOrderInterfacePanel.Enabled = True
 
-                    UnitDropDownList.SelectedValue = Unit
+                LabelRangeShowHide_CheckBox.Enabled = True
 
-                    LabelDropDownList.SelectedValue = LabelFromQueryString
+                'UnitDropDownList contains a static ListItem control to represent DB NULL field value
+                'Thus, do NOT clear items for UnitDropDownList
+                UnitDropDownList.DataBind()
+                UnitDropDownList.SelectedValue = Unit
 
-                    'LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
-                    LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=@LabelKey"
-                    LabelFormView_SqlDataSource.SelectParameters.Clear()
-                    LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
-                    LabelFormView_SqlDataSource.DataBind()
+                'LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=" & LabelFromQueryString
+                LabelFormView_SqlDataSource.SelectCommand = "SELECT [Key], [Label] FROM [T_LogLabel] WHERE [Key]=@LabelKey"
+                LabelFormView_SqlDataSource.SelectParameters.Clear()
+                LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
+                LabelFormView_SqlDataSource.DataBind()
 
-                    'set field type
-                    FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
+                'set field type
+                FieldType_DropDownList.SelectedValue = If(FieldType Is Nothing, "", FieldType)
 
-                    RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel, & enable 'Set' button in bottom right)
-                    If FieldType = "STC" Then
-                        RangeOrderMenu.Style("visibility") = "hidden"
-                        RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
-                        DiffPanel.Visible = True
-                        DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
-                    ElseIf FieldType = "DP" Then
-                        Dim DpNums As String() = If(DbRange Is Nothing, Nothing, DbRange.Split("&"))
-                        RangeOrderLabel.Text = "Pump #'s"
-                        RangeOrderMenu.Style("visibility") = "hidden"
-                        RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
-                        DpPanel.Visible = True
-                        Pump1TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(0)), String.Empty)
-                        Pump2TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(1)), String.Empty)
-                    Else
-                        SetRangeOrder(DbRange)
-                    End If
+                RangeOrderMenu_onClick(New Button(), EventArgs.Empty) 'reset range order (enable all menu buttons, hide any interface within DynamicRangeBoxPanel, & enable 'Set' button in bottom right)
+                If FieldType = "STC" Then
+                    RangeOrderMenu.Style("visibility") = "hidden"
+                    RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
+                    DiffPanel.Visible = True
+                    DiffTextbox.Text = If(DbRange IsNot Nothing AndAlso DbRange.Contains("+/-"), DbRange.Split(" ")(1), String.Empty)
+                ElseIf FieldType = "DP" Then
+                    Dim DpNums As String() = If(DbRange Is Nothing, Nothing, DbRange.Split("&"))
+                    RangeOrderLabel.Text = "Pump #'s"
+                    RangeOrderMenu.Style("visibility") = "hidden"
+                    RangeOrderMenu.Style("height") = "0" 'to remove whitespace between RangeOrderLabel & DpPanel
+                    DpPanel.Visible = True
+                    Pump1TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(0)), String.Empty)
+                    Pump2TextBox.Text = If(DpNums IsNot Nothing, Trim(DpNums(1)), String.Empty)
+                Else
+                    SetRangeOrder(DbRange)
                 End If
 
-                'comment interface
+                'configure label interface phase ddl
+                LabelInterface_PhaseDropDownList.SelectedValue = PhaseKey
+
+                '======== COMMENT INTERFACE ==============
                 'CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=" & AreaFromQueryString & " ORDER BY CommentOrder"
                 CommentDropDownList_SqlDataSource.SelectCommand = "SELECT [Key], [Comment] FROM [T_LogCommentList] WHERE [AreaKey]=@AreaKey ORDER BY CommentOrder"
                 CommentDropDownList_SqlDataSource.SelectParameters.Clear()
@@ -241,10 +284,10 @@ Partial Class MR_OpenTicketStatusBoard
                     CommentFormView_SqlDataSource.DataBind()
                 End If
 
-                'stamp interface
+                '======== STAMP INTERFACE ==============
                 StampInterfacePanel.Enabled = True
 
-                'Department interface
+                '======== DEPARTMENT INTERFACE ==============
                 QueryConfig.Clear()
                 QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
                     {"value", AreaFromQueryString},
@@ -262,7 +305,7 @@ Partial Class MR_OpenTicketStatusBoard
                     IntervalInterfacePanel.Enabled = True
                 End If
 
-                'interval interface
+                '======== INTERVAL INTERFACE ==============
                 Try 'in case selected checklist does NOT have a set interval
                     IntervalDR = Security.GetMyDataSetParamQuery("SELECT A.OneTimeDate, A.Assignee, I.[Key], I.Interval, I.DisplayOrder FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=@AreaKey", QueryConfig).Tables(0).Rows(0)
                     IntervalKey = IntervalDR("Key")
@@ -351,12 +394,6 @@ Partial Class MR_OpenTicketStatusBoard
         Dim ListItemStylesDR As Data.DataRow
         Dim AreaListItem As ListItem
 
-        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-                {"value", LabelFromQueryString},
-                {"typeOf", "string"}
-            }
-        PhaseDropDownList.SelectedValue = Security.GetSingleDbField("SELECT PhaseKey From [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "PhaseKey")
-
         'write routine that gets the checklists in AreaDropDownList w/ no labels, interval, or department. Make the ForeColor of the associated ListItem control red
         For I = 0 To ListItemStylesRC
             ListItemStylesDR = ListItemStylesDS.Tables(0).Rows(I)
@@ -383,15 +420,16 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub PhaseDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
-        QueryConfig("@PhaseKey") = New Dictionary(Of String, String) From {
-            {"value", PhaseDropDownList.SelectedValue},
-            {"typeOf", "int"}
-        }
-        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-            {"value", LabelFromQueryString},
-            {"typeOf", "int"}
-        }
-        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=@PhaseKey WHERE [Key]=@LabelKey", QueryConfig)
+        Dim NewPhaseKey As String = PhaseDropDownList.SelectedValue
+
+        If NewPhaseKey = String.Empty Then
+            PhaseFromQs = Nothing
+            LabelFromQueryString = SetLabelFromQueryString()
+        Else
+            PhaseFromQs = NewPhaseKey
+            LabelFromQueryString = SetLabelFromQueryString(True)
+        End If
+
         RefreshPreview()
     End Sub
 
@@ -517,8 +555,18 @@ Partial Class MR_OpenTicketStatusBoard
         Return Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey ORDER BY CommentOrder", QueryConfig, "Key")
     End Function
 
-    Function SetLabelFromQueryString() As String
-        Return Security.GetSingleDbField("SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey ORDER BY LabelOrder", QueryConfig, "Key")
+    Function SetLabelFromQueryString(Optional Batching As Boolean = False) As String
+        Dim SqlQuery As String = "SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey AND PhaseKey IS NULL ORDER BY LabelOrder" 'ignore PhaseKey until 'Batching' arg is true
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")}
+        }
+
+        If Batching Then
+            SqlConfig("@PhaseKey") = Security.GetParamVarHash(PhaseFromQs, "int")
+            SqlQuery = SqlQuery.Replace("PhaseKey IS NULL", "PhaseKey=@PhaseKey")
+        End If
+
+        Return Security.GetSingleDbField(SqlQuery, SqlConfig, "Key")
     End Function
 
     Private Function AreaChange(NewAreaKey As Integer) As String
@@ -527,6 +575,8 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", AreaFromQueryString},
             {"typeOf", "int"}
         }
+        PhaseFromQs = Nothing
+        PhasePanelShowFromQs = Nothing
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
         Return RefreshPreview()
@@ -536,6 +586,35 @@ Partial Class MR_OpenTicketStatusBoard
         AreaChange(AreaDropDownList.SelectedValue)
     End Sub
 
+    Protected Sub AreaFormView_DataBound(sender As Object, e As EventArgs) Handles AreaFormView.DataBound
+        If AreaFormView.CurrentMode = FormViewMode.ReadOnly Then
+            Dim PhaseShowHide_CheckBox As CheckBox
+            Dim PhaseShow As Boolean = If(PhasePanelShowFromQs = "True", True, False)
+
+            'using try catch block in case PhaseShowHide_CheckBox Is null
+            Try
+                PhaseShowHide_CheckBox = DirectCast(AreaFormView.FindControl("PhaseShowHide_CheckBox"), CheckBox)
+
+                If PhaseShowHide_CheckBox Is Nothing Then Throw New Exception()
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+            'GroupsOrPhasesInUse detects if 1 or more labels for a pm/checklist has an associated Phase
+            'if it returns true, then disable PhaseShowHide_CheckBox
+            If PhaseController.GroupsOrPhasesInUse(AreaFromQueryString) Then
+                PhasePanelShowFromQs = True
+                PhaseShow = True
+                PhaseShowHide_CheckBox.Enabled = False
+            End If
+
+            If PhaseShow Then LabelInterface_PhaseDdlContainer.Visible = True
+
+            PhaseShowHide_CheckBox.Checked = PhaseShow
+            PhaseOrBundle_Panel.Visible = PhaseShow
+        End If
+    End Sub
+
     Protected Sub LabelDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", AreaFromQueryString},
@@ -543,6 +622,19 @@ Partial Class MR_OpenTicketStatusBoard
         }
         LabelFromQueryString = sender.SelectedValue
         CommentFromQueryString = SetCommentFromQueryString()
+        RefreshPreview()
+    End Sub
+
+    Protected Sub LabelInterface_PhaseDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim NewLabelPhaseKey As String = If(LabelInterface_PhaseDropDownList.SelectedValue = String.Empty, Nothing, LabelInterface_PhaseDropDownList.SelectedValue)
+
+        PhaseController.AssignPhase(LabelFromQueryString, NewLabelPhaseKey)
+
+        'if Phase ddl option is all and this event runs:
+        'Phase ddl option stays at 'All'
+        'OTHERWISE, phase ddl option is th newly assigned phase for the label
+        If PhaseFromQs IsNot Nothing Then PhaseFromQs = NewLabelPhaseKey
+
         RefreshPreview()
     End Sub
 
@@ -613,14 +705,9 @@ Partial Class MR_OpenTicketStatusBoard
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled", "iframeEnabled(true);", True)
     End Sub
 
-    Protected Sub EditPhasesButton_OnClick(sender As Object, e As EventArgs)
-        'Response.Redirect(StampSelectPage & "?" & Request.RawUrl.Split("?")(1)) 'add querystrings from current url to webpage listed within StampSelectPage
-        PreviewPanel_iframe.Attributes.Add("src", "/ChecklistLogging/LabelPhase.aspx?Area=" & AreaFromQueryString)
-        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "iframeEnabled2", "iframeEnabled(true);", True)
-    End Sub
-
     Function RefreshPreview() As String
-        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing)
+        '#TO DO: 'use AspWebpage Class to configure arg to pass to Response.Redirect()
+        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(PhaseFromQs IsNot Nothing, "&Phase=" & PhaseFromQs, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing & If(PhasePanelShowFromQs IsNot Nothing, "&PhasePanelShow=" & PhasePanelShowFromQs, Nothing))
 
         'try catch block in case WebMethod is invocating this function
         'That way, url is returned as string and client can redirect
@@ -724,7 +811,7 @@ Partial Class MR_OpenTicketStatusBoard
         CommentOrderInterface.Enabled = EnabledValue
         IntervalInterfacePanel.Enabled = EnabledValue
         DepartmentInterfacePanel.Enabled = EnabledValue
-        PhaseShowHide_CheckBox.Enabled = EnabledValue
+        LabelRangeShowHide_CheckBox.Enabled = EnabledValue
     End Sub
 
     Protected Sub EditButton_OnClick(sender As Object, e As EventArgs)
@@ -736,13 +823,24 @@ Partial Class MR_OpenTicketStatusBoard
         AreaKeyFromDropDownList = AreaDropDownList.SelectedValue
         AreaFormView_SqlDataSource.SelectCommand = "Select [Key], [Area] FROM [T_LogArea] WHERE [Key]=" & AreaFromQueryString
 
+        If PhaseFromQs IsNot Nothing Then
+            PhaseFormView_SqlDataSource.SelectCommand = "Select [Key], Phase From T_LogPhase WHERE [Key]=@PhaseKey"
+            PhaseFormView_SqlDataSource.SelectParameters.Clear()
+            PhaseFormView_SqlDataSource.SelectParameters.Add("PhaseKey", PhaseFromQs)
+            PhaseFormView_SqlDataSource.DataBind()
+        End If
+
         If LabelFromQueryString IsNot Nothing Then
-            LabelFormView_SqlDataSource.SelectCommand = "Select [Key], Label From T_LogLabel WHERE [Key]=" & LabelFromQueryString
+            LabelFormView_SqlDataSource.SelectCommand = "Select [Key], Label From T_LogLabel WHERE [Key]=@LabelKey"
+            LabelFormView_SqlDataSource.SelectParameters.Clear()
+            LabelFormView_SqlDataSource.SelectParameters.Add("LabelKey", LabelFromQueryString)
             LabelFormView_SqlDataSource.DataBind()
         End If
 
         If CommentFromQueryString IsNot Nothing Then
-            CommentFormView_SqlDataSource.SelectCommand = "Select [Key], Comment From T_LogCommentList WHERE [Key]=" & CommentFromQueryString
+            CommentFormView_SqlDataSource.SelectCommand = "Select [Key], Comment From T_LogCommentList WHERE [Key]=@CommentKey"
+            CommentFormView_SqlDataSource.SelectParameters.Clear()
+            CommentFormView_SqlDataSource.SelectParameters.Add("CommentKey", CommentFromQueryString)
             CommentFormView_SqlDataSource.DataBind()
         End If
     End Sub
@@ -762,6 +860,10 @@ Partial Class MR_OpenTicketStatusBoard
                 {"typeOf", "int"}
             }
             Security.ExecuteSqlParamQuery("UPDATE [T_LogArea] SET Area=@Area WHERE [Key]=@AreaKey", QueryConfig)
+        ElseIf sender.ID.Contains("Phase") Then
+            QueryConfig("@Phase") = Security.GetParamVarHash(StripUnnecessaryChars(sender.Parent.FindControl("PhaseTextBox").Text), "string")
+            QueryConfig("@PhaseKey") = Security.GetParamVarHash(PhaseDropDownList.SelectedValue, "int")
+            Security.ExecuteSqlParamQuery("UPDATE [T_LogPhase] SET Phase=@Phase WHERE [Key]=@PhaseKey", QueryConfig)
         ElseIf sender.ID.Contains("Label") Then
             QueryConfig("@Label") = New Dictionary(Of String, String) From {
                 {"value", StripUnnecessaryChars(sender.Parent.FindControl("LabelTextBox").Text)},
@@ -789,6 +891,15 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub UpdateCancelButton_OnClick(sender As Object, e As EventArgs)
         SetEnabledProps(sender.ID, True) 'enable currently disabled FormView and DropDownList controls
+        RefreshPreview()
+    End Sub
+
+    Protected Sub FormViewDeleteHyperlink_OnClick(sender As Object, e As EventArgs)
+        If sender.ID.Contains("Phase") Then
+            PhaseController.DeletePhaseOrGroup(PhaseFromQs)
+            PhaseFromQs = Nothing
+        End If
+
         RefreshPreview()
     End Sub
 
@@ -836,7 +947,7 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", DepartmentKey},
                 {"typeOf", "int"}
             }
-            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, DepartmentKey, Active) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, @DepartmentKey, 1);", QueryConfig)
+            Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, DepartmentKey, Active, Status) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, @DepartmentKey, 0, 'live');", QueryConfig)
 
             QueryConfig.Remove("@Date")
             QueryConfig.Remove("@DepartmentKey")
@@ -866,6 +977,31 @@ Partial Class MR_OpenTicketStatusBoard
             If AreaErrorLabel.Text <> "" Then
                 AreaErrorLabel.Text = ""
             End If
+        ElseIf sender.ID.Contains("Phase") Then
+            Dim NewPhaseOrder As Integer
+
+            UserInput = sender.Parent.FindControl("PhaseTextBox").Text
+
+            If String.IsNullOrEmpty(UserInput) Then
+                FormViewInsert = PhaseFormView 'Page_PreRenderComplete will ensure FormView stays in Insert mode
+                Exit Sub
+            End If
+
+            QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
+                {"value", AreaFromQueryString},
+                {"typeOf", "int"}
+            }
+            NewPhaseOrder = Security.GetSingleDbField("SELECT TOP(1) PhaseOrder FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@AreaKey ORDER BY [Key] DESC", QueryConfig, "PhaseOrder") + 1
+
+            QueryConfig("@UserInput") = New Dictionary(Of String, String) From {
+                {"value", UserInput},
+                {"typeOf", "string"}
+            }
+            QueryConfig("@PhaseOrder") = New Dictionary(Of String, String) From {
+                {"value", NewPhaseOrder},
+                {"typeOf", "int"}
+            }
+            PhaseFromQs = Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, Phase, PhaseOrder) VALUES (@AreaKey, @UserInput, @PhaseOrder); SELECT CAST(SCOPE_IDENTITY() As INT);", QueryConfig)("PrimaryKey")
         ElseIf sender.ID.Contains("Label") Then
             UserInput = sender.Parent.FindControl("LabelTextBox").Text
             If String.IsNullOrEmpty(UserInput) Then
@@ -1233,12 +1369,17 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub PhaseDropDownList_DataBound(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
-        PhaseDropDownList.Items.Insert(0, New ListItem("Select Phase...", ""))
+        PhaseDropDownList.Items.Insert(0, New ListItem("All", String.Empty))
         PhaseDropDownList.SelectedIndex = 0
     End Sub
 
-    Protected Sub PhaseShowHide_OnCheckedChanged(sender As Object, e As EventArgs) Handles PhaseDropDownList.DataBound
-        Session("PhaseShow") = PhaseShowHide_CheckBox.Checked
+    Protected Sub PhaseShowHide_OnCheckedChanged(sender As Object, e As EventArgs)
+        PhasePanelShowFromQs = sender.Checked.ToString()
+        RefreshPreview()
+    End Sub
+
+    Protected Sub LabelRangeShowHide_OnCheckedChanged(sender As Object, e As EventArgs)
+        Session("LabelRangeShow") = LabelRangeShowHide_CheckBox.Checked
     End Sub
 
     Protected Sub PmStatus_OnCheckedChanged(sender As Object, e As EventArgs)

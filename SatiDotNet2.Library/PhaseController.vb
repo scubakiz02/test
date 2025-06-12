@@ -1,4 +1,6 @@
-﻿Public Class PhaseController
+﻿Imports System.Text.Json
+
+Public Class PhaseController
     Inherits Security
     Private GlobalAreaKey As Integer
     Private PhaseOrdersToLabels As SortedDictionary(Of Integer, List(Of Integer))
@@ -6,6 +8,10 @@
     Private GlobalPhaseOrder As Integer
     Private DS As Data.DataSet
     Private RC As Integer
+
+    Sub New()
+
+    End Sub
 
     Sub New(AreaKey As Integer)
         CollectPhases(AreaKey)
@@ -99,5 +105,126 @@
     Public Function GetPhases() As Dictionary(Of Integer, Dictionary(Of String, String))
         If LabelToPhaseInfo.Count = 0 Then Return Nothing
         Return LabelToPhaseInfo
+    End Function
+
+    Public Function GetDetachedLabels(AreaKey As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of Integer, String)
+        'what does 'Detached' mean?
+        'Great question!
+        'it's an input (record in T_LogLabel) with a NULL PhaseKey field value of a PM/Checklist that has bundled inputs
+        Dim InputsDS As Data.DataSet
+        Dim Res As New Dictionary(Of Integer, String)
+
+        If AreaKey IsNot Nothing Then
+            If TestDS Is Nothing Then
+                Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@AreaKey", GetParamVarHash(AreaKey, "int")}
+            }
+                InputsDS = GetMyDataSetParamQuery("SELECT L.[Key] As LabelKey, Label, PhaseKey FROM [ALTS].[dbo].[T_LogLabel] L LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON L.PhaseKey=P.[Key] WHERE L.AreaKey=@AreaKey ORDER BY P.PhaseOrder, LabelOrder", QueryConfig)
+            Else
+
+                InputsDS = TestDS
+            End If
+
+            For Each InputsDR As Data.DataRow In InputsDS.Tables(0).Rows
+                If IsDBNull(InputsDR("PhaseKey")) Then
+                    Res(InputsDR("LabelKey")) = InputsDR("Label")
+                End If
+            Next
+        End If
+
+        Return Res
+    End Function
+
+    Public Function DeletePhaseOrGroup(PhaseOrGroupKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
+        '1) Delete relevant record in T_LogPhase;
+        '2) Update PhaseKey field values to NULL for relevant records in T_LogLabel
+        Dim Res As New Dictionary(Of String, String)
+        Dim SqlQuery As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        If PhaseOrGroupKey Is Nothing Then
+            Res("Success") = False
+            Return Res
+        End If
+
+        QueryConfig("@PhaseOrGroupKey") = GetParamVarHash(PhaseOrGroupKey, "int")
+        SqlQuery = "UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=NULL WHERE PhaseKey=@PhaseOrGroupKey; DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;"
+
+        If InvocateAsTest Then
+            Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+            Res("SqlQuery") = SqlQuery
+            Res("Success") = True
+        Else
+            Res("Success") = If(ExecuteSqlParamQuery(SqlQuery, QueryConfig) Is Nothing, False, True)
+        End If
+
+        Return Res
+    End Function
+
+    Public Function AssignPhase(LabelKey As String, PhaseKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+        Dim SqlQuery As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        If LabelKey Is Nothing OrElse Object.ReferenceEquals(PhaseKey, String.Empty) Then 'using Object.ReferenceEquals so when PhaseKey is nothing, the comparison return false
+            Res("Success") = False
+            Return Res
+        End If
+
+        QueryConfig("@LabelKey") = GetParamVarHash(LabelKey, "int")
+        QueryConfig("@PhaseKey") = GetParamVarHash(PhaseKey, "int")
+        SqlQuery = "UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=@PhaseKey WHERE [Key]=@LabelKey"
+
+        If InvocateAsTest Then
+            Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+            Res("SqlQuery") = SqlQuery
+            Res("Success") = True
+        Else
+            Res("Success") = If(ExecuteSqlParamQuery(SqlQuery, QueryConfig) Is Nothing, False, True)
+        End If
+
+
+        Return Res
+    End Function
+
+    Public Function GroupsOrPhasesInUse(AreaKey As String) As Boolean
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim LabelsWithPhaseCount As String
+
+        If AreaKey Is Nothing Then Return False
+
+        QueryConfig("@AreaKey") = GetParamVarHash(AreaKey, "int")
+        LabelsWithPhaseCount = GetSingleDbField("SELECT COUNT(*) As LabelsWithNullPhaseCount FROM [ALTS].[dbo].[T_LogLabel] GROUP BY PhaseKey, AreaKey HAVING PhaseKey IS NOT NULL And AreaKey=@AreaKey", QueryConfig, "LabelsWithNullPhaseCount")
+
+        If LabelsWithPhaseCount IsNot Nothing Then Return True
+
+        Return False
+    End Function
+
+    Public Function GetLabel_Idx(LabelKey As String, Optional TestDS As Data.DataSet = Nothing) As Integer
+        Dim Idx As Integer = -1
+        Dim DS As Data.DataSet
+
+        If LabelKey Is Nothing Then Return Idx
+
+        If TestDS Is Nothing Then
+            Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@LabelKey", GetParamVarHash(LabelKey, "int")}
+            }
+            DS = GetMyDataSetParamQuery("SELECT L.[Key] As LabelKey, Label, P.[Key] As PhaseKey, Phase, PhaseOrder, LabelOrder FROM [ALTS].[dbo].[T_LogLabel] L LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] WHERE L.AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey) ORDER BY P.PhaseOrder, L.LabelOrder", QueryConfig)
+        Else
+            DS = TestDS
+        End If
+
+        For I As Integer = 0 To DS.Tables(0).Rows.Count
+            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
+
+            If DR("LabelKey") = LabelKey Then
+                Idx = I
+                Exit For
+            End If
+        Next
+
+        Return Idx
     End Function
 End Class
