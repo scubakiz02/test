@@ -67,7 +67,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
-        MenuAuthenication.CheckGroupsAuthenication(New String() {"FMManagerApproval", "QSHEManagerApproval", "PC"}, Server)
+        MenuAuthenication.CheckGroupAuthenication("PmChecklistBuild", Server)
         Me.MaintainScrollPositionOnPostBack = True
         AreaFromQueryString = Request.QueryString("Area")
         PhaseFromQs = Request.QueryString("Phase")
