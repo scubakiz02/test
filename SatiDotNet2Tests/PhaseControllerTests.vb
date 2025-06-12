@@ -8,6 +8,7 @@ Public Class PhaseControllerTests
     Inherits Security
     Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
     Dim TestDummyPhaseController As New PhaseController(75) 'dummy checklist
+    Private LogAspx As New LogAspxLibrary()
     Private T_LogDataInputs As String
     Dim PhaseStageConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
     Dim OgPhaseStageConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
@@ -230,7 +231,7 @@ Public Class PhaseControllerTests
         Dim GetPhasesExpected As New Dictionary(Of Integer, Dictionary(Of String, String))
         Dim Inputs As String = "{""586"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""587"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""588"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""589"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""590"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""591"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""592"":{""Date"":"""",""Operator"":"""",""Value"":""""}, ""593"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
 
-        DS = GetMyDataSetParamQuery("SELECT L.[Key] As LabelKey, P.Phase, P.PhaseOrder FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogPhase] P ON P.[Key]=L.PhaseKey WHERE L.AreaKey=75 ORDER BY P.PhaseOrder", QueryConfig)
+        DS = GetMyDataSetParamQuery("SELECT L.[Key] As LabelKey, P.Phase, P.PhaseOrder FROM [ALTS].[dbo].[T_LogLabel] L LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON P.[Key]=L.PhaseKey WHERE L.AreaKey=75 ORDER BY P.PhaseOrder", QueryConfig)
         RC = DS.Tables(0).Rows.Count
 
         For I As Integer = 0 To RC - 1
@@ -240,11 +241,12 @@ Public Class PhaseControllerTests
             Try 'in case Phase is NULL
                 SubHash("Phase") = DR("Phase")
                 SubHash("PhaseOrder") = DR("PhaseOrder")
-
-                GetPhasesExpected(DR("LabelKey")) = SubHash
             Catch ex As Exception
-                Continue For
+                SubHash("Phase") = String.Empty
+                SubHash("PhaseOrder") = 0
             End Try
+
+            GetPhasesExpected(DR("LabelKey")) = SubHash
         Next
 
         OgEnvironment()
@@ -259,15 +261,44 @@ Public Class PhaseControllerTests
     <Fact>
     Public Sub GetPhasesTest4()
         'execute GetPhases() on PhaseController with a Checklist that does NOT contain Phases (Nitrogen Daily) and contains values on input(s) (bug existed with these conditions)
-        PhaseController = New PhaseController(48, JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))("{""388"":{""Date"":"""",""Operator"":"""",""Value"":""12""},""389"":{""Date"":"""",""Operator"":"""",""Value"":""32""},""390"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"))
-        Assert.Equal(Nothing, PhaseController.GetPhases())
+        Dim ExpectedRes As New Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim HardCodedRes As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))("{""388"":{""Date"":"""",""Operator"":"""",""Value"":""12""},""389"":{""Date"":"""",""Operator"":"""",""Value"":""32""},""390"":{""Date"":"""",""Operator"":"""",""Value"":""""}}")
+        Dim LabelKeys As List(Of Integer)
+
+        PhaseController = New PhaseController(48, HardCodedRes)
+        LabelKeys = HardCodedRes.Keys.ToList()
+        For Each LabelKey As Integer In LabelKeys
+            ExpectedRes(LabelKey) = New Dictionary(Of String, String) From {
+                {"Phase", String.Empty},
+                {"PhaseOrder", 0}
+            }
+        Next
+
+        Assert.Equal(Of Dictionary(Of Integer, Dictionary(Of String, String)))(ExpectedRes, PhaseController.GetPhases())
     End Sub
 
-
     <Fact>
-    Public Sub NoPhasesTest1()
-        'test GetPhase() function against instantiation of class with T_LogData AreaKey 61, which does NOT contain phases
-        Assert.Equal(Nothing, PhaseController2.GetPhases())
+    Public Sub PmWithPhasesAndSomeNonPhasedLabels()
+        'http://pwi-40:81/ChecklistLogging/Log.aspx?Key=1031
+        Dim InputsFake As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim PhaseController As PhaseController
+        Dim DT As New Data.DataTable
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        DT.Columns.Add("Inputs", GetType(String))
+        DT.Columns.Add("Operator", GetType(String))
+        DT.Columns.Add("Date", GetType(Date))
+
+        DR("Inputs") = "{""586"":{""Date"":"""",""Operator"":"""",""Value"":""""},""587"":{""Date"":"""",""Operator"":"""",""Value"":""""},""588"":{""Date"":"""",""Operator"":"""",""Value"":""""},""589"":{""Date"":"""",""Operator"":"""",""Value"":""""},""590"":{""Date"":"""",""Operator"":"""",""Value"":""""},""591"":{""Date"":"""",""Operator"":"""",""Value"":""""},""592"":{""Date"":"""",""Operator"":"""",""Value"":""""},""593"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
+        DR("Operator") = DBNull.Value
+        DR("Date") = "2025-06-12 00:00:00"
+
+        InputsFake = LogAspx.GetInputs(DR)
+        PhaseController = New PhaseController(75, InputsFake)
+
+        'phasing enable/disable logic starts at index 1
+        'thus, even though the non phased labels are NOT all filled out, the return should be 1
+        Assert.Equal(1, PhaseController.GetPhase())
     End Sub
 End Class
 

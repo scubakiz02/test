@@ -27,7 +27,6 @@ Public Class PhaseController
 
         PhaseOrdersToLabels = New SortedDictionary(Of Integer, List(Of Integer))
         LabelToPhaseInfo = New Dictionary(Of Integer, Dictionary(Of String, String))
-        GlobalPhaseOrder = 1 '1 based indexing, to match associated primary key field value in DB
 
         GlobalAreaKey = AreaKey
 
@@ -50,7 +49,11 @@ Public Class PhaseController
                 PhaseOrder = DR("PhaseOrder")
                 Phase = DR("Phase")
             Catch ex As Exception
-                Continue For
+                '1 based indexing, to match associated primary key field value in DB
+                'Thus, the question arises, what does phase 0 represent?
+                'Phase 0 depicts labels that are not tied to a phase
+                PhaseOrder = 0
+                Phase = String.Empty
             End Try
 
             If PhaseOrdersToLabels.ContainsKey(PhaseOrder) = False Then
@@ -78,6 +81,8 @@ Public Class PhaseController
             Exit Sub
         End If
 
+        GlobalPhaseOrder = PhaseOrdersToLabels.Keys.First()
+
         For Each LabelInput As KeyValuePair(Of Integer, Dictionary(Of String, String)) In Inputs
             Dim LabelKey As Integer = LabelInput.Key
             Dim Input As Dictionary(Of String, String) = LabelInput.Value
@@ -98,8 +103,19 @@ Public Class PhaseController
     End Sub
 
     Public Function GetPhase() As Integer
-        If PhaseOrdersToLabels Is Nothing Then Return Nothing
-        Return GlobalPhaseOrder
+        Dim Res As Integer
+
+        If PhaseOrdersToLabels Is Nothing Then
+            Return Nothing
+        ElseIf GlobalPhaseOrder = 0 Then
+            'phasing enable/disable logic starts at index 1
+            'thus, even though the non phased labels are NOT all filled out, the return should be 1
+            Res += 1
+        Else
+            Res = GlobalPhaseOrder
+        End If
+
+        Return Res
     End Function
 
     Public Function GetPhases() As Dictionary(Of Integer, Dictionary(Of String, String))
