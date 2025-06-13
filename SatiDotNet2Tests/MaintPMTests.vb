@@ -3,88 +3,6 @@ Imports Xunit
 Imports SatiDotNet2.Library
 Imports System.Text.Json
 
-Public Class LabelOrderTests
-    Inherits Security
-
-    Dim ChecklistBuilderAspx = New MaintPM()
-
-    'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
-    <Fact>
-    Public Sub LabelOrder1()
-        'moving label 1 up on Nitrogen Daily checklist
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("388", "up", "Label")
-        Assert.Equal("", Res("SqlQuery"))
-    End Sub
-
-    <Fact>
-    Public Sub LabelOrder2()
-        'moving label 2 up on Nitrogen Daily checklist
-        Dim LabelKey As Integer = 389
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "up", "Label")
-        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-
-        Assert.Equal(1, ParameterizedValuesConfig("@Order1")("value"))
-        Assert.Equal(LabelKey, ParameterizedValuesConfig("@Key1")("value"))
-
-        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
-        Assert.Equal(388, ParameterizedValuesConfig("@Key2")("value"))
-
-        Assert.Contains("T_LogLabel", ModifyOrderRes("SqlQuery"))
-        Assert.Contains("LabelOrder", ModifyOrderRes("SqlQuery"))
-    End Sub
-
-    <Fact>
-    Public Sub LabelOrder3()
-        'moving label 3 down on Nitrogen Daily checklist
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("390", "down", "Label")
-        Assert.Equal("", Res("SqlQuery"))
-    End Sub
-
-    <Fact>
-    Public Sub LabelOrder4()
-        'moving label 2 down on Nitrogen Daily checklist
-        Dim LabelKey As Integer = 389
-        Dim ModifyOrderRes As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
-        Dim ParameterizedValuesConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("ParameterizedValues"))
-
-        Assert.Equal(3, ParameterizedValuesConfig("@Order1")("value"))
-        Assert.Equal(LabelKey, ParameterizedValuesConfig("@Key1")("value"))
-
-        Assert.Equal(2, ParameterizedValuesConfig("@Order2")("value"))
-        Assert.Equal(390, ParameterizedValuesConfig("@Key2")("value"))
-
-        Assert.Contains("T_LogLabel", ModifyOrderRes("SqlQuery"))
-        Assert.Contains("LabelOrder", ModifyOrderRes("SqlQuery"))
-    End Sub
-
-    <Fact>
-    Public Sub LabelOrder5()
-        'enusre LabelOrder for Label at top of Phase stack cannot be moved up, as PhaseOrder trumps LabelOrder
-        Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
-        Dim LabelKey As Integer = 602 'top label in phase 3 for checklist
-        Dim Res As Dictionary(Of String, String) = ChecklistBuilderAspx.ModifyOrder("602", "up", "Label")
-
-        Assert.Equal(3, PhaseController.GetPhases()(LabelKey)("PhaseOrder")) 'baseline check. if this test fails, ensure value in LabelKey variable is the [Key] DB field value for the top most label in Phase 3 for EDG monthly checklist
-        Assert.Equal("", Res("SqlQuery")) 'b/c T_LogLabel record 602 is the top most Label in Phase 3, it can NOT precede the LabelOrder of a record in another Phase
-    End Sub
-
-    <Fact>
-    Public Sub LabelOrder6()
-        'enusre LabelOrder for Label at bottom of Phase cannot be moved down, as PhaseOrder trumps LabelOrder
-        Dim PhaseController As New PhaseController(82) 'EDG monthly checklist
-        Dim LabelKey As Integer
-        Dim Res As Dictionary(Of String, String)
-
-        LabelKey = GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE PhaseKey=2 AND LabelOrder=(SELECT MAX(LabelOrder) FROM [ALTS].[dbo].[T_LogLabel] WHERE PhaseKey=2)", New Dictionary(Of String, Dictionary(Of String, String)), "Key") 'bottom label in phase 2 for checklist
-        Res = ChecklistBuilderAspx.ModifyOrder(LabelKey, "down", "Label")
-
-        Assert.Equal(2, PhaseController.GetPhases()(LabelKey)("PhaseOrder")) 'baseline check. if this test fails, ensure value in LabelKey variable is the [Key] DB field value for the bottom most label in Phase 2 for EDG monthly checklist
-        Assert.Equal("", Res("SqlQuery")) 'b/c T_LogLabel record 603 is the bottom most Label in Phase 2, it can NOT precede the LabelOrder of a record in another Phase
-    End Sub
-
-    'USING NITROGEN DAILY AS SAMPLE CHECKLIST. IF THE LABEL ORDER HAS CHANGED, THESE TESTS WILL FAIL!!!!!!!!!
-End Class
-
 Public Class CommentOrderTests
     Dim ChecklistBuilderAspx = New MaintPM()
     Dim Security = New Security()
@@ -486,5 +404,217 @@ Public Class ModifyPmStatusTests
 
         Assert.True(Boolean.Parse(ClonePM_Res("Success")))
     End Sub
+End Class
+
+Public Class LabelOrderFunctionalityTests
+    Inherits MaintPM
+
+    <Fact>
+    Public Sub StandardLabelOrderUpChange()
+        Dim LabelKey As Integer = 554 '3 labels total, this one is the middle one (index 1)
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "up", GetPmWithNoPhasesDs())
+        Dim QueryConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("QueryConfig"))
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@LabelOrder WHERE [Key]=@SiblingLabelKey; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@SiblingLabelOrder WHERE [Key]=@LabelKey;", ModifyOrderRes("SqlQuery"))
+
+        Assert.Equal(LabelKey, QueryConfig("@LabelKey")("value"))
+        Assert.Equal(1, QueryConfig("@SiblingLabelOrder")("value"))
+
+        Assert.Equal(553, QueryConfig("@SiblingLabelKey")("value"))
+        Assert.Equal(2, QueryConfig("@LabelOrder")("value"))
+    End Sub
+
+    <Fact>
+    Public Sub LabelOrderUpWithScatteredLabelOrders()
+        Dim LabelKey As Integer = 554 '3 labels total, this one is the middle one (index 1)
+        Dim LabelKeyLabelOrder As Decimal = 0.5
+        Dim PmWithNoPhasesDS As Data.DataSet = GetPmWithNoPhasesDs()
+        Dim ModifyOrderRes As Dictionary(Of String, String)
+        Dim QueryConfig As Dictionary(Of String, Dictionary(Of String, String))
+
+        'LabelKey 553 (top most label) has a label order of 1
+        'LabelKey 554 (middle label) has a label order of 2
+        'what if LabelKey 553 had a label order differential not equal to 1 from LabelKey 554?
+        'that's what this test figures out
+        PmWithNoPhasesDS.Tables(0).Rows(0)("LabelOrder") = LabelKeyLabelOrder
+
+        ModifyOrderRes = ModifyLabelOrderNew(LabelKey, "up", PmWithNoPhasesDS)
+        QueryConfig = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("QueryConfig"))
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@LabelOrder WHERE [Key]=@SiblingLabelKey; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@SiblingLabelOrder WHERE [Key]=@LabelKey;", ModifyOrderRes("SqlQuery"))
+
+        Assert.Equal(LabelKey, QueryConfig("@LabelKey")("value"))
+        Assert.Equal(LabelKeyLabelOrder, QueryConfig("@SiblingLabelOrder")("value"))
+
+        Assert.Equal(553, QueryConfig("@SiblingLabelKey")("value"))
+        Assert.Equal(2, QueryConfig("@LabelOrder")("value"))
+    End Sub
+
+    <Fact>
+    Public Sub TopmostLabelOrderUpChange()
+        Dim LabelKey As Integer = 553 '3 labels total, this one is the top most one (index 0)
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "up", GetPmWithNoPhasesDs())
+
+        Assert.Equal(Of Dictionary(Of String, String))(New Dictionary(Of String, String), ModifyOrderRes)
+    End Sub
+
+    <Fact>
+    Public Sub StandardLabelOrderDownChange()
+        Dim LabelKey As Integer = 554 '3 labels total, this one is the middle one (index 1)
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "down", GetPmWithNoPhasesDs())
+        Dim QueryConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderRes("QueryConfig"))
+
+        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@LabelOrder WHERE [Key]=@SiblingLabelKey; UPDATE [ALTS].[dbo].[T_LogLabel] SET LabelOrder=@SiblingLabelOrder WHERE [Key]=@LabelKey;", ModifyOrderRes("SqlQuery"))
+
+        Assert.Equal(LabelKey, QueryConfig("@LabelKey")("value"))
+        Assert.Equal(3, QueryConfig("@SiblingLabelOrder")("value"))
+
+        Assert.Equal(555, QueryConfig("@SiblingLabelKey")("value"))
+        Assert.Equal(2, QueryConfig("@LabelOrder")("value"))
+    End Sub
+
+    <Fact>
+    Public Sub DownmostLabelOrderUpChange()
+        Dim LabelKey As Integer = 555 '3 labels total, this one is the bottom most one (index 2)
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "down", GetPmWithNoPhasesDs())
+
+        Assert.Equal(Of Dictionary(Of String, String))(New Dictionary(Of String, String), ModifyOrderRes)
+    End Sub
+
+    <Fact>
+    Public Sub TopmostLabelWithinPhaseOrderUp()
+        Dim LabelKey As Integer = 587
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "up", GetPmWithSomeLabelsThatHavePhasesDs())
+
+        Assert.Equal(Of Dictionary(Of String, String))(New Dictionary(Of String, String), ModifyOrderRes)
+    End Sub
+
+    <Fact>
+    Public Sub BottomostLabelWithinPhaseOrderDown()
+        Dim LabelKey As Integer = 590
+        Dim ModifyOrderRes As Dictionary(Of String, String) = ModifyLabelOrderNew(LabelKey, "down", GetPmWithSomeLabelsThatHavePhasesDs())
+
+        Assert.Equal(Of Dictionary(Of String, String))(New Dictionary(Of String, String), ModifyOrderRes)
+    End Sub
+
+    Private Sub AddDsRow(DT As Data.DataTable, RowConfig As Dictionary(Of String, Object))
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        DR("LabelKey") = RowConfig("LabelKey")
+        DR("PhaseKey") = RowConfig("PhaseKey")
+        DR("PhaseOrder") = RowConfig("PhaseOrder")
+        DR("LabelOrder") = RowConfig("LabelOrder")
+
+        DT.Rows.Add(DR)
+    End Sub
+
+    Private Function GetPmWithNoPhasesDs() As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        DT.Columns.Add("LabelKey", GetType(Integer))
+        DT.Columns.Add("PhaseKey", GetType(Integer))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+        DT.Columns.Add("LabelOrder", GetType(Decimal))
+
+        'AreaKey 58
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 553},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 554},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 2}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 555},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 3}
+        })
+
+        DS.Tables.Add(DT)
+
+        Return DS
+
+    End Function
+
+    Private Function GetPmWithSomeLabelsThatHavePhasesDs() As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        DT.Columns.Add("LabelKey", GetType(Integer))
+        DT.Columns.Add("PhaseKey", GetType(Integer))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+        DT.Columns.Add("LabelOrder", GetType(Decimal))
+
+        '592 label 7	NULL	NULL	NULL	7
+        '590 Label 5	NULL	NULL	NULL	8
+        '586 label 1	111	phase 1	1	1
+        '588 label 3.124	111	phase 1	1	2
+        '591 label 64	111	phase 1	1	4
+        '587 label 2.2	112	phase 2	2	3
+        '589 Label 2	112	phase 2	2	5
+        '593 label 8	112	phase 2	2	6
+
+        'AreaKey 75
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 592},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 7}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 590},
+            {"PhaseKey", DBNull.Value},
+            {"PhaseOrder", DBNull.Value},
+            {"LabelOrder", 8}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 586},
+            {"PhaseKey", 111},
+            {"PhaseOrder", 1},
+            {"LabelOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 588},
+            {"PhaseKey", 111},
+            {"PhaseOrder", 1},
+            {"LabelOrder", 2}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 591},
+            {"PhaseKey", 111},
+            {"PhaseOrder", 1},
+            {"LabelOrder", 4}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 587},
+            {"PhaseKey", 112},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 3}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 589},
+            {"PhaseKey", 112},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 5}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 593},
+            {"PhaseKey", 112},
+            {"PhaseOrder", 2},
+            {"LabelOrder", 7}
+        })
+
+        DS.Tables.Add(DT)
+
+        Return DS
+    End Function
+
 End Class
 
