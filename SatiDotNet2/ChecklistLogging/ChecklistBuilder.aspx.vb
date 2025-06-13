@@ -556,14 +556,14 @@ Partial Class MR_OpenTicketStatusBoard
     End Function
 
     Function SetLabelFromQueryString(Optional Batching As Boolean = False) As String
-        Dim SqlQuery As String = "SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey AND PhaseKey IS NULL ORDER BY LabelOrder" 'ignore PhaseKey until 'Batching' arg is true
+        Dim SqlQuery As String = "SELECT TOP(1) L.[Key] FROM [ALTS].[dbo].[T_LogLabel] L LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON L.PhaseKey=P.[Key] WHERE L.AreaKey=@AreaKey ORDER BY PhaseOrder, LabelOrder"
         Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")}
         }
 
         If Batching Then
             SqlConfig("@PhaseKey") = Security.GetParamVarHash(PhaseFromQs, "int")
-            SqlQuery = SqlQuery.Replace("PhaseKey IS NULL", "PhaseKey=@PhaseKey")
+            SqlQuery = SqlQuery.Replace("WHERE", "WHERE PhaseKey=@PhaseKey AND")
         End If
 
         Return Security.GetSingleDbField(SqlQuery, SqlConfig, "Key")
