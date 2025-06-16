@@ -674,3 +674,89 @@ Public Class GetLabel_IdxTests
     End Function
 
 End Class
+
+Public Class GetSectionTypeTests
+    Inherits PhaseController
+    Private Security As New Security()
+
+    <Fact>
+    Public Sub NullArg()
+        Assert.Equal("none", GetSectionType(Nothing))
+    End Sub
+
+    <Theory>
+    <InlineData("none")>
+    <InlineData("phase")>
+    <InlineData("group")>
+    Public Sub SectionTypeTestsWithFakeData(SectionType As String)
+        'get 20 records with:
+        '1) random primary key values from T_LogArea as AreaKey
+        '2) arg passed to this invocation as the 'SectionType' field value
+        Dim RandomChecklistsDS As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT TOP(20) [Key] As AreaKey, '" & SectionType & "' As SectionType FROM [ALTS].[dbo].[T_LogArea] ORDER BY NEWID();", New Dictionary(Of String, Dictionary(Of String, String)))
+
+        For Each RandomChecklistsDR As Data.DataRow In RandomChecklistsDS.Tables(0).Rows
+            Dim DrSectionType As String = RandomChecklistsDR("SectionType")
+
+            Assert.Equal(SectionType, DrSectionType)
+            Assert.Equal(DrSectionType, GetSectionType(RandomChecklistsDR("AreaKey"), RandomChecklistsDR))
+        Next
+    End Sub
+
+    <Fact>
+    Public Sub SectionTypeTestsWithRealData()
+        'get 20 records LIVE records
+        Dim RandomChecklistsDS As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT TOP(20) [Key] As AreaKey, SectionType FROM [ALTS].[dbo].[T_LogArea] ORDER BY NEWID();", New Dictionary(Of String, Dictionary(Of String, String)))
+
+        For Each RandomChecklistsDR As Data.DataRow In RandomChecklistsDS.Tables(0).Rows
+            Dim DrSectionType As String = RandomChecklistsDR("SectionType")
+            Assert.Equal(DrSectionType, GetSectionType(RandomChecklistsDR("AreaKey")))
+        Next
+    End Sub
+
+End Class
+
+Public Class SetSectionTypeTests
+    Inherits PhaseController
+    Private SqlQuery As String = "UPDATE [ALTS].[dbo].[T_LogArea] SET SectionType=@SectionType WHERE [Key]=@AreaKey"
+
+    <Fact>
+    Public Sub NullArg()
+        Dim SetTypeRes As Dictionary(Of String, String) = SetSectionType(Nothing, "none")
+
+        Assert.False(Boolean.Parse(SetTypeRes("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(34, "none")>
+    <InlineData(46, "none")>
+    <InlineData(34, "group")>
+    <InlineData(23, "group")>
+    <InlineData(3434, "phase")>
+    <InlineData(23, "phase")>
+    Public Sub SetSectionTypeWithFakeData(AreaKey As String, SectionType As String)
+        Dim SetTypeRes As Dictionary(Of String, String) = SetSectionType(AreaKey, SectionType, True)
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", GetParamVarHash(AreaKey, "int")},
+            {"@SectionType", GetParamVarHash(SectionType, "int")}
+        }
+        Dim SqlConfigFromRes As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(SetTypeRes("QueryConfig"))
+
+        Assert.Equal(SqlQuery, SetTypeRes("SqlQuery"))
+        Assert.Equal(Of Dictionary(Of String, Dictionary(Of String, String)))(SqlConfig, SqlConfigFromRes)
+    End Sub
+
+    <Theory>
+    <InlineData(0, "none")>
+    <InlineData(0, "group")>
+    <InlineData(0, "phase")>
+    Public Sub SetSectionTypeWithRealData(AreaKey As String, SectionType As String)
+        Dim SetTypeRes As Dictionary(Of String, String) = SetSectionType(AreaKey, SectionType)
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", GetParamVarHash(AreaKey, "int")},
+            {"@SectionType", GetParamVarHash(SectionType, "int")}
+        }
+
+        Assert.True(SetTypeRes.Count = 1)
+        Assert.True(Boolean.Parse(SetTypeRes("Success")))
+    End Sub
+End Class

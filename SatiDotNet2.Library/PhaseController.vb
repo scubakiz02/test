@@ -243,4 +243,48 @@ Public Class PhaseController
 
         Return Idx
     End Function
+
+    Public Function GetSectionType(AreaKey As String, Optional TestDR As Data.DataRow = Nothing) As String
+        Dim DR As Data.DataRow
+
+        Try
+            If TestDR Is Nothing Then
+                Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@AreaKey", GetParamVarHash(AreaKey, "int")}
+            }
+                DR = GetMyDataSetParamQuery("SELECT SectionType FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", SqlConfig).Tables(0).Rows(0)
+            Else
+                DR = TestDR
+            End If
+
+            Return DR("SectionType")
+        Catch ex As Exception
+            Return "none"
+        End Try
+    End Function
+
+    Public Function SetSectionType(AreaKey As String, SectionType As String, Optional InvokeAsTest As Boolean = False) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+        Dim SqlQuery As String = "UPDATE [ALTS].[dbo].[T_LogArea] SET SectionType=@SectionType WHERE [Key]=@AreaKey"
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        Try
+            If AreaKey Is Nothing Then Throw New Exception()
+
+            QueryConfig("@AreaKey") = GetParamVarHash(AreaKey, "int")
+            QueryConfig("@SectionType") = GetParamVarHash(SectionType, "string")
+
+            If InvokeAsTest Then
+                Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+                Res("SqlQuery") = SqlQuery
+                Res("Success") = True
+            Else
+                Res("Success") = If(ExecuteSqlParamQuery(SqlQuery, QueryConfig) Is Nothing, False, True)
+            End If
+        Catch ex As Exception
+            Res("Success") = False
+        End Try
+
+        Return Res
+    End Function
 End Class

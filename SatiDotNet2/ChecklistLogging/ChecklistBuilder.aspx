@@ -204,6 +204,11 @@
             gap: var(--UWhitespace);
         }
 
+        .vertical-align-asp-checkbox {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
         .grid {
             display: grid;
             gap: var(--UWhitespace);
@@ -467,8 +472,7 @@
         }
 
         /* ======= label interface ======== */
-        .label-interface-phase-select  {
-
+        .label-interface-phase-select {
         }
 
         @keyframes spin {
@@ -636,8 +640,8 @@
                                 </div>
 
                                 <div id="area-formview-itemtemplate-checkbox-container">
-                                    <asp:CheckBox Style="display: flex; flex-direction: row;" Text="(Rare) Phasing: " ID="PhaseShowHide_CheckBox" OnCheckedChanged="PhaseShowHide_OnCheckedChanged" TextAlign="Left" runat="server" AutoPostBack="true" />
-                                    <asp:CheckBox Enabled="False" Style="display: flex; flex-direction: row;" Text="Groups: " ID="EnableGroups_CheckBox" TextAlign="Left" runat="server" AutoPostBack="true" />
+                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="Grouping: " ID="GroupingCheckBox" OnCheckedChanged="PhaseOrGroup_OnCheckedChanged" runat="server" AutoPostBack="true" />
+                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="(Rare) Phasing: " ID="PhasingCheckBox" OnCheckedChanged="PhaseOrGroup_OnCheckedChanged" runat="server" AutoPostBack="true" />
                                 </div>
                             </div>
                         </ItemTemplate>
@@ -667,7 +671,11 @@
 
                 <asp:Panel Visible="False" ID="PhaseOrBundle_Panel" CssClass="InterfacePanel" Style="background-color: #FF69B4;" runat="server">
                     <asp:Panel ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
-                        <asp:Label runat="server" Text="Select Phase:"></asp:Label>
+
+                        <div id="phase-interface-label-container">
+                            <span id="phase-interface-label-part1">Select </span>
+                            <asp:Label ID="PhaseInterfaceLabelPart2" runat="server"></asp:Label>
+                        </div>
 
                         <asp:DropDownList
                             ID="PhaseDropDownList"
@@ -684,7 +692,7 @@
                         <asp:FormView ID="PhaseFormView" runat="server" DataKeyNames="Key" DataSourceID="PhaseFormView_SqlDataSource" CellPadding="4" ForeColor="#333333" Style="width: calc(var(--Width) - 100px); margin: var(--UWhitespace) 0;">
                             <EmptyDataTemplate>
                                 <asp:Panel runat="server" BackColor="#F7F6F3" ForeColor="#333333">
-                                    Phase: No data loaded yet...
+                                    No data loaded yet...
                                     <br />
                                     <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
                                     <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
@@ -693,8 +701,7 @@
                             </EmptyDataTemplate>
 
                             <EditItemTemplate>
-                                Phase:
-                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
                                 <br />
                                 <asp:LinkButton ID="PhaseUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
                                 &nbsp;<asp:LinkButton ID="PhaseUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
@@ -703,16 +710,14 @@
                             <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
                             <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
                             <InsertItemTemplate>
-                                Phase:
-                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
                                 <br />
                                 <asp:LinkButton ID="PhaseInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
                                 &nbsp;<asp:LinkButton ID="PhaseInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
 
                             </InsertItemTemplate>
                             <ItemTemplate>
-                                Phase:
-                    <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
+                                <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
                                 <br />
                                 <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
                                 &nbsp;<asp:LinkButton ID="PhaseDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />

@@ -31,7 +31,6 @@ Partial Class MR_OpenTicketStatusBoard
     Dim CommentFromQueryString As String
     Dim PhaseFromQs As String
     Dim ViewFromQs As String
-    Dim PhasePanelShowFromQs As String
     Dim EditPreviewPanel_ScrollPos As String
     Dim FormViewInsert As FormView = Nothing
     Dim Department As String = CurrUser.GetDepartment()
@@ -71,7 +70,6 @@ Partial Class MR_OpenTicketStatusBoard
         Me.MaintainScrollPositionOnPostBack = True
         AreaFromQueryString = Request.QueryString("Area")
         PhaseFromQs = Request.QueryString("Phase")
-        PhasePanelShowFromQs = Request.QueryString("PhasePanelShow")
         ViewFromQs = Request.QueryString("View")
         LabelFromQueryString = Request.QueryString("Label")
         CommentFromQueryString = Request.QueryString("Comment")
@@ -576,7 +574,6 @@ Partial Class MR_OpenTicketStatusBoard
             {"typeOf", "int"}
         }
         PhaseFromQs = Nothing
-        PhasePanelShowFromQs = Nothing
         LabelFromQueryString = SetLabelFromQueryString()
         CommentFromQueryString = SetCommentFromQueryString()
         Return RefreshPreview()
@@ -588,29 +585,39 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub AreaFormView_DataBound(sender As Object, e As EventArgs) Handles AreaFormView.DataBound
         If AreaFormView.CurrentMode = FormViewMode.ReadOnly Then
-            Dim PhaseShowHide_CheckBox As CheckBox
-            Dim PhaseShow As Boolean = If(PhasePanelShowFromQs = "True", True, False)
+            Dim GroupingCheckBox As CheckBox
+            Dim SectionType As String = PhaseController.GetSectionType(AreaFromQueryString)
+            Dim PhaseShow As Boolean = If(SectionType = "none", False, True)
 
-            'using try catch block in case PhaseShowHide_CheckBox Is null
+            'using try catch block in case GroupingCheckBox or GroupingCheckBox are null
             Try
-                PhaseShowHide_CheckBox = DirectCast(AreaFormView.FindControl("PhaseShowHide_CheckBox"), CheckBox)
+                Dim GroupingCheckBoxID As String
 
-                If PhaseShowHide_CheckBox Is Nothing Then Throw New Exception()
+                If SectionType = "phase" Then
+                    GroupingCheckBoxID = "PhasingCheckBox"
+                    PhaseInterfaceLabelPart2.Text = "Phase"
+                ElseIf SectionType = "group" Then
+                    GroupingCheckBoxID = "GroupingCheckBox"
+                    PhaseInterfaceLabelPart2.Text = "Group"
+                Else
+                    Throw New Exception()
+                End If
+                GroupingCheckBox = DirectCast(AreaFormView.FindControl(GroupingCheckBoxID), CheckBox)
+
+                If GroupingCheckBox Is Nothing Then Throw New Exception()
             Catch ex As Exception
                 Exit Sub
             End Try
 
             'GroupsOrPhasesInUse detects if 1 or more labels for a pm/checklist has an associated Phase
-            'if it returns true, then disable PhaseShowHide_CheckBox
+            'if it returns true, then disable PhasingCheckBox
             If PhaseController.GroupsOrPhasesInUse(AreaFromQueryString) Then
-                PhasePanelShowFromQs = True
                 PhaseShow = True
-                PhaseShowHide_CheckBox.Enabled = False
             End If
 
             If PhaseShow Then LabelInterface_PhaseDdlContainer.Visible = True
 
-            PhaseShowHide_CheckBox.Checked = PhaseShow
+            GroupingCheckBox.Checked = PhaseShow
             PhaseOrBundle_Panel.Visible = PhaseShow
         End If
     End Sub
@@ -707,7 +714,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Function RefreshPreview() As String
         '#TO DO: 'use AspWebpage Class to configure arg to pass to Response.Redirect()
-        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(PhaseFromQs IsNot Nothing, "&Phase=" & PhaseFromQs, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing & If(PhasePanelShowFromQs IsNot Nothing, "&PhasePanelShow=" & PhasePanelShowFromQs, Nothing))
+        Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(PhaseFromQs IsNot Nothing, "&Phase=" & PhaseFromQs, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing)
 
         'try catch block in case WebMethod is invocating this function
         'That way, url is returned as string and client can redirect
@@ -1369,8 +1376,27 @@ Partial Class MR_OpenTicketStatusBoard
         PhaseDropDownList.SelectedIndex = 0
     End Sub
 
-    Protected Sub PhaseShowHide_OnCheckedChanged(sender As Object, e As EventArgs)
-        PhasePanelShowFromQs = sender.Checked.ToString()
+    Protected Sub PhaseOrGroup_OnCheckedChanged(sender As Object, e As EventArgs)
+        Dim PhasingCheckBox As CheckBox = TryCast(AreaFormView.FindControl("PhasingCheckBox"), CheckBox)
+        Dim GroupingCheckBox As CheckBox = TryCast(AreaFormView.FindControl("GroupingCheckBox"), CheckBox)
+
+        If PhasingCheckBox IsNot Nothing AndAlso GroupingCheckBox IsNot Nothing Then
+            Dim SectionType As String = String.Empty
+
+            'only allow user to uncheck Phasing or Group Checkbox when no labels are tied to a phase
+            If sender.Checked = False AndAlso PhaseController.GroupsOrPhasesInUse(AreaFromQueryString) = False Then
+                SectionType = "none"
+            Else
+                If PhasingCheckBox Is sender Then
+                    SectionType = "phase"
+                ElseIf GroupingCheckBox Is sender Then
+                    SectionType = "group"
+                End If
+            End If
+
+            PhaseController.SetSectionType(AreaFromQueryString, SectionType)
+        End If
+
         RefreshPreview()
     End Sub
 

@@ -356,8 +356,10 @@ Partial Class MR_OpenTicketStatusBoard
                 End If
                 InputParent = PhasePanel
 
-                If PhaseConfig(LabelKey)("PhaseOrder") > CurrPhaseOrder AndAlso Request.QueryString("Key") IsNot Nothing Then
-                    PhasePanel.Enabled = False
+                If PhaseController.GetSectionType(AreaFromQueryString) = "phase" Then
+                    If PhaseConfig(LabelKey)("PhaseOrder") > CurrPhaseOrder AndAlso Request.QueryString("Key") IsNot Nothing Then
+                        PhasePanel.Enabled = False
+                    End If
                 End If
             Else
                 InputParent = ItemsPanel.FindControl("NonBatchedPanels")
