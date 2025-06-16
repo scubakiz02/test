@@ -737,7 +737,7 @@ Public Class SetSectionTypeTests
         Dim SetTypeRes As Dictionary(Of String, String) = SetSectionType(AreaKey, SectionType, True)
         Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", GetParamVarHash(AreaKey, "int")},
-            {"@SectionType", GetParamVarHash(SectionType, "int")}
+            {"@SectionType", GetParamVarHash(SectionType, "string")}
         }
         Dim SqlConfigFromRes As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(SetTypeRes("QueryConfig"))
 
