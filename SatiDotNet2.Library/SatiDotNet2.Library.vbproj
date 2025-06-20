@@ -100,6 +100,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivePm.vb" />
     <Compile Include="MaintPM.vb" />
     <Compile Include="ChecklistLogging\LogAspxLibrary.vb" />
     <Compile Include="Report.vb" />

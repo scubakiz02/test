@@ -5,6 +5,25 @@ Imports System.Data
 Imports System.IO
 Imports System.Text.RegularExpressions
 
+'#TO DO: remove unnecessary code after Log.aspx UI/UX & page focues refinements are in production and stable
+'what does that include you may ask?
+'great question! here's a starter list
+
+'Log.aspx code-behind
+'1) Anything to do with T_LogData KeyOfLastLabel field
+'2) WebMethod functions related to updating Label inputs as they're entered
+'3) ModifyInput() function 
+'4) ValidateInput() function
+'5) code related to these variables: 1) DBConnections; 2) STC_TbxOverlays; 3) DP_TbxOverlay; 4) DateFieldType
+'6) code that updates T_LogData Inputs or OutOfRange field values
+'7) etc.
+
+'Log.aspx:
+'1) delete 'Check if correct' asp (built dynamically with js now)
+'2) fieldtypes with textbox controls (number, text, and date) should call to http RecordInput.ashx endpoint on every keystroke (be wary of Enter keypress postbacks occuring when working on this)
+'3) delete js functions that are no longer used (
+
+
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
@@ -101,7 +120,8 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         ClientScript.RegisterStartupScript(Me.GetType(), "SetHoverEffect", "syncScrollPos('ItemsPanel', " & ItemsPanel_ScrollPos & "); setFooterAtBottom(); " & JsFunctionCalls, True)
-        ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay + DateFieldType, True)
+        'ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DBConnections + STC_TbxOverlays + DP_TbxOverlay + DateFieldType, True)
+        'ClientScript.RegisterStartupScript(Me.GetType(), "SetDBConnections", DateFieldType, True)
 
         If Session("DisplayError") Then
             MessageUserLabel.Text = "Error: red or yellow logs present. Add a comment to proceed."
@@ -405,6 +425,8 @@ Partial Class MR_OpenTicketStatusBoard
                 If TypeOf ctrl Is TextBox Then
                     myTextBox = CType(ctrl, TextBox)
 
+                    myTextBox.CssClass = "LogTextBox activeInput"
+
                     If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
                         Dim TbxId As String = "TextBox_" & LabelKey
                         Dim LabelKeyInput As New Dictionary(Of String, String)
@@ -484,7 +506,10 @@ Partial Class MR_OpenTicketStatusBoard
                     If FieldType IsNot Nothing AndAlso MalleableCtrl.Attributes(FieldType) IsNot Nothing Then 'if FieldType is null, it is a standard textbox
                         MalleableCtrl.Attributes(FieldType) = True
                         MalleableCtrl.Visible = True
+                        MalleableCtrl.CssClass = If(MalleableCtrl.CssClass <> "", " ", "") & "activeInput"
+
                         myTextBox.Style("display") = "none"
+                        myTextBox.CssClass = "LogTextBox" 'strip 'activeInput' class from textbox control
 
                         Dim InputCtrl As Control = ctrl.Controls(1)
                         Dim InputCtrlID As String
@@ -578,9 +603,9 @@ Partial Class MR_OpenTicketStatusBoard
             Next
             VisiblePanels.Add(myPanel)
 
-            If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
-                ValidateInput(myPanel.ID, myTextBox.Text)
-            End If
+            'If Request.QueryString("Key") IsNot Nothing Then 'this means user is logging inputs
+            '    ValidateInput(myPanel.ID, myTextBox.Text)
+            'End If
         Next
 
         BuildDynamicAsp()
