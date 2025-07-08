@@ -12,6 +12,7 @@ Public Class StreamData
     Private Format As New Format()
     Private LogAspx As New LogAspxLibrary()
     Private ActivePm As New ActivePm()
+    Private PmInput As New PmInput()
     Private KeyFromQueryString As Integer
 
     Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
@@ -202,52 +203,7 @@ Public Class StreamData
                     Return Res
             End Select
         Else 'use range to validate input
-            'regression test with labelkey 587
-            Dim UserInputDec As Decimal
-            Dim InRange As Boolean = True
-            Dim LowerBound As Decimal
-            Dim UpperBound As Decimal
-            Dim DelimitArr() As String
-            Dim Diff As Boolean = False
-
-            'validate user input before considering the range
-            If Not Range.Contains("+/-") And Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
-                Res("state") = "invalid"
-                Res("endUserMessage") = "*ERROR: NOT A NUMBER*"
-                Return Res
-            End If
-
-            'validate user input using the range
-            If Range.Contains("-") Then
-                DelimitArr = Range.Split("-")
-                UserInputDec = Decimal.Parse(UserInput)
-
-                Decimal.TryParse(Trim(DelimitArr(0)), LowerBound)
-                Decimal.TryParse(Trim(DelimitArr(1)), UpperBound)
-
-                If UserInputDec < LowerBound Or UserInputDec > UpperBound Then
-                    InRange = False
-                End If
-            ElseIf Range.Contains("<") Then
-                If UserInputDec >= Decimal.Parse(Trim(Range.Replace("<", ""))) Then
-                    InRange = False
-                End If
-            ElseIf Range.Contains(">") Then
-                If UserInputDec <= Decimal.Parse(Trim(Range.Replace(">", ""))) Then
-                    InRange = False
-                End If
-            End If
-
-            If InRange = False Then
-                Res("state") = "outOfScope"
-                Res("endUserMessage") = "*CAUTION: OUT OF RANGE*"
-                Return Res
-            Else
-                Res("state") = "valid"
-                Res("endUserMessage") = ""
-                Return Res
-            End If
-
+            Return PmInput.ReportValidity("number", Range, UserInput)
         End If
 
         Return Res

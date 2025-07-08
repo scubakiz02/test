@@ -766,7 +766,6 @@
                                     <asp:ListItem Text="Solution Temp Comp" Value="STC" />
                                     <asp:ListItem Text="Text" Value="Text" />
                                     <asp:ListItem Text="HOA" Value="HOA" />
-                                    <asp:ListItem Text="Distribution Pumps" Value="DP" />
                                     <asp:ListItem Text="Date" Value="Date" />
                                 </asp:DropDownList>
                             </div>

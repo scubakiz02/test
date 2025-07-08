@@ -838,125 +838,12 @@ Partial Class MR_OpenTicketStatusBoard
 
             If TypeOf ctrl Is TextBox Then
                 TextBox = CType(ctrl, TextBox)
-                If UserInput Is Nothing Then UserInput = SqlProofSingleQuotes(TextBox.Text)
                 LabelKey = TextBox.ID.Split("_")(1)
                 QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
                     {"value", LabelKey},
                     {"typeOf", "int"}
                 }
                 FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
-                Range = TbxToRange(LabelKey)
-
-                If FieldType IsNot Nothing Then
-                    Select Case FieldType 'search for cases where the input would be valid
-                        Case "Checkbox"
-                            If UserInput = "1" Then Exit For
-                        Case "HOA"
-                            If Not UserInput.Contains("...") Then Exit For
-                        Case "Text"
-                            If Not String.IsNullOrEmpty(UserInput) Then Exit For
-                        Case "Date"
-                            Dim Res As String = LogAspx.ValidDate(UserInput)
-
-                            If String.IsNullOrEmpty(Res) = False Then
-                                SetPanelBackColor(System.Drawing.Color.Red, Res, Pnl)
-                                DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
-                                Valid = False
-                                Continue For
-                            Else
-                                Exit For
-                            End If
-                        Case "STC"
-                            Dim Temps As String() = UserInput.Split("/")
-                            Dim BackPanelColor As System.Drawing.Color
-                            Dim Temp1 As Decimal
-                            Dim Temp2 As Decimal
-
-                            Try 'in case user types in invlaid characters
-                                Temp1 = Decimal.Parse(Temps(0))
-                                Temp2 = Decimal.Parse(Temps(1))
-                            Catch ex As Exception
-                                Exit Select
-                            End Try
-
-                            If Math.Abs(Temp1 - Temp2) > Decimal.Parse(Range.Split(" ")(1)) Then
-                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#E6E600")
-                                SetPanelBackColor(BackPanelColor, "*CAUTION: OUT OF SPEC*", Pnl)
-                            Else
-                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
-                                SetPanelBackColor(BackPanelColor, "", Pnl)
-                            End If
-
-                            DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = BackPanelColor
-                            Continue For
-                        Case "DP"
-                            Dim DPs As String() = UserInput.Split("/")
-                            Dim BackPanelColor As System.Drawing.Color
-                            Dim DP1 As Decimal
-                            Dim DP2 As Decimal
-
-                            Try 'in case user types in invlaid characters
-                                DP1 = Decimal.Parse(DPs(0))
-                                DP2 = Decimal.Parse(DPs(1))
-                            Catch ex As Exception
-                                Exit Select
-                            End Try
-
-                            If DP1 = 1 OrElse DP2 = 1 Then
-                                BackPanelColor = System.Drawing.ColorTranslator.FromHtml("#F5F5F5")
-                                SetPanelBackColor(BackPanelColor, "", Pnl)
-                                Continue For
-                            End If
-                    End Select
-
-                    'if here, input is NOT valid
-                    SetPanelBackColor(System.Drawing.Color.Red, "", Pnl)
-                    DirectCast(FindOverlayControl(FieldType, Pnl), WebControl).BackColor = System.Drawing.Color.Red
-                    Valid = False
-                    Continue For
-
-                Else 'use range to validate input
-                    InRange = True
-
-                    'validate user input before considering the range
-                    If Not Range.Contains("+/-") And Not Decimal.TryParse(UserInput, UserInputDec) Then 'check if value is a number
-                        SetPanelBackColor(System.Drawing.Color.Red, "*ERROR: NOT A NUMBER*", Pnl)
-                        Valid = False
-                        Continue For
-                    End If
-
-                    'validate user input using the range
-                    If Range.Contains("-") Then
-                        DelimitArr = Range.Split("-")
-                        UserInputDec = Decimal.Parse(UserInput)
-
-                        Decimal.TryParse(Trim(DelimitArr(0)), LowerBound)
-                        Decimal.TryParse(Trim(DelimitArr(1)), UpperBound)
-
-                        If UserInputDec < LowerBound Or UserInputDec > UpperBound Then
-                            InRange = False
-                        End If
-                    ElseIf Range.Contains("<") Then
-                        If UserInputDec >= Decimal.Parse(Trim(Range.Replace("<", ""))) Then
-                            InRange = False
-                        End If
-                    ElseIf Range.Contains(">") Then
-                        If UserInputDec <= Decimal.Parse(Trim(Range.Replace(">", ""))) Then
-                            InRange = False
-                        End If
-                    End If
-
-                    If Not InRange Then
-                        If FieldType Is Nothing Then 'make sure FieldType is 'Number'
-                            SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#E6E600"), "*CAUTION: OUT OF RANGE*", Pnl)
-                            Continue For
-                        End If
-                    End If
-
-                End If
-
-                'if here, value is valid and in range
-                SetPanelBackColor(System.Drawing.ColorTranslator.FromHtml("#F5F5F5"), "", Pnl)
             End If
         Next
         Session("LabelInputMap")(LabelKey)("Value") = UserInput

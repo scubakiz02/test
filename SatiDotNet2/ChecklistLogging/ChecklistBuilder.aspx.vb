@@ -223,7 +223,13 @@ Partial Class MR_OpenTicketStatusBoard
                 FieldType_DropDownList.Enabled = True
                 RangeOrderInterfacePanel.Enabled = True
 
-                LabelRangeShowHide_CheckBox.Enabled = True
+                If FieldType = "DP" Then
+                    FieldType_DropDownList.Enabled = False
+                    FieldType_DropDownList.SelectedItem.Text = String.Empty
+                    LabelRangeShowHide_CheckBox.Enabled = False
+                Else
+                    LabelRangeShowHide_CheckBox.Enabled = True
+                End If
 
                 'UnitDropDownList contains a static ListItem control to represent DB NULL field value
                 'Thus, do NOT clear items for UnitDropDownList
@@ -1118,6 +1124,8 @@ Partial Class MR_OpenTicketStatusBoard
             {"value", LabelDropDownList.SelectedValue},
             {"typeOf", "int"}
         }
+
+        '#TO DO: T_LogLabel FieldType cannot be null. 'number' is the new default value. account for this DB change where it is needed (here, FieldType Class, etc.)
         If String.IsNullOrEmpty(FieldType) = False Then
             QueryConfig("@FieldType") = New Dictionary(Of String, String) From {
                 {"value", FieldType},
