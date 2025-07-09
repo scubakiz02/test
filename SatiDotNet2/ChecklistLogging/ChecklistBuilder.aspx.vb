@@ -223,13 +223,16 @@ Partial Class MR_OpenTicketStatusBoard
                 FieldType_DropDownList.Enabled = True
                 RangeOrderInterfacePanel.Enabled = True
 
-                If FieldType = "DP" Then
-                    FieldType_DropDownList.Enabled = False
-                    FieldType_DropDownList.SelectedItem.Text = String.Empty
-                    LabelRangeShowHide_CheckBox.Enabled = False
-                Else
-                    LabelRangeShowHide_CheckBox.Enabled = True
-                End If
+                'if FieldType is 'DP' & 'STC', disable and devalue FieldType Ddl and Range functionalities
+                Select Case FieldType
+                    Case "DP"
+                    Case "STC"
+                        FieldType_DropDownList.Enabled = False
+                        FieldType_DropDownList.SelectedItem.Text = String.Empty
+                        LabelRangeShowHide_CheckBox.Enabled = False
+                    Case Else
+                        LabelRangeShowHide_CheckBox.Enabled = True
+                End Select
 
                 'UnitDropDownList contains a static ListItem control to represent DB NULL field value
                 'Thus, do NOT clear items for UnitDropDownList

@@ -763,7 +763,6 @@
                                 <asp:DropDownList ID="FieldType_DropDownList" Enabled="False" runat="server" AutoPostBack="True" OnSelectedIndexChanged="FieldType_OnSelectedIndexChanged">
                                     <asp:ListItem Text="Number" Value="" Selected="True" />
                                     <asp:ListItem Text="Checkbox" Value="Checkbox" />
-                                    <asp:ListItem Text="Solution Temp Comp" Value="STC" />
                                     <asp:ListItem Text="Text" Value="Text" />
                                     <asp:ListItem Text="HOA" Value="HOA" />
                                     <asp:ListItem Text="Date" Value="Date" />
@@ -868,7 +867,8 @@
                             <asp:Label runat="server" ID="RangeOrderLabel" Text="Range Order:"></asp:Label>
                             <asp:Panel ID="RangeOrderMenu" runat="server" Style="display: flex; gap: var(--UWhitespace);">
                                 <asp:Button Text="? - ?" ID="RangePickButton" InterfacePanel="RangePanel" OnClick="RangeOrderMenu_onClick" runat="server" />
-                                <asp:Button Text="+/- ?" ID="DiffButton" InterfacePanel="DiffPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
+                                <%--Hide the differential range option (asp Button control below), since it is an incredibly rare option and can be set manually through the DB--%>
+                                <asp:Button Visible="False" Text="+/- ?" ID="DiffButton" InterfacePanel="DiffPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                                 <asp:Button Text="Less Than (<)" ID="LessThanPickButton" InterfacePanel="LessThanPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                                 <asp:Button Text="Greater Than (>)" ID="GreaterThanPickButton" InterfacePanel="GreaterThanPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                             </asp:Panel>
