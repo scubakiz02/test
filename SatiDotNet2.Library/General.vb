@@ -260,7 +260,7 @@ Public Class SatiUser
 
         If Roles.Contains("admin") Then
             Res = "All"
-        ElseIf Roles.Contains("FMManagerApproval") OrElse Roles.Contains("QSHEManagerApproval") Then
+        ElseIf Roles.Contains("FMManagerApproval") OrElse Roles.Contains("QSHEManagerApproval") OrElse Roles.Contains("PmChecklistBuild") Then
             Res = "Maintenance"
         ElseIf Roles.Contains("PC") Then
             Res = "Production"

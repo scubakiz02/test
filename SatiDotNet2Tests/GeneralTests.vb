@@ -393,6 +393,17 @@ Public Class GetDepartmentTests
         'if user does NOT exist, expect Nothing
         Assert.Equal(Nothing, SungJinwoo.GetDepartment())
     End Sub
+
+    <Fact>
+    Public Sub PmChecklistBuildRole_GetDepartmentFunctionResult()
+        'not all people with access to ChecklistBuilder.aspx are managers
+        'maintenance techs can have access as well
+        'to accommodate this demand, birth was give to a new role: PmChecklistBuild
+        'calling SatiUser Class GetDepartment function should return 'Maintenance' for sati users that have the PmChecklistBuild role 
+
+        Dim AndyWilliams = New SatiUser("andrew williams")  'Andy Williams is a maintenance tech with PmChecklistBuild role at the time of writing this test (07/09/2025)
+        Assert.Equal("Maintenance", AndyWilliams.GetDepartment())
+    End Sub
 End Class
 
 Public Class GetDepartmentKeyTests
