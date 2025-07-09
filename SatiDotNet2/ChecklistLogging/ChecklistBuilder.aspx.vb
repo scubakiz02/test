@@ -225,8 +225,7 @@ Partial Class MR_OpenTicketStatusBoard
 
                 'if FieldType is 'DP' & 'STC', disable and devalue FieldType Ddl and Range functionalities
                 Select Case FieldType
-                    Case "DP"
-                    Case "STC"
+                    Case "DP", "STC"
                         FieldType_DropDownList.Enabled = False
                         FieldType_DropDownList.SelectedItem.Text = String.Empty
                         LabelRangeShowHide_CheckBox.Enabled = False
