@@ -1,7 +1,34 @@
-﻿Public Class PmInput
+﻿Imports System.Text.Json
+
+Public Class PmInput
+    Inherits Security
+
     Sub New()
 
     End Sub
+
+    Public Function Delete(LabelKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
+        'Delete relevant record in T_LogLabel
+        Dim Res As New Dictionary(Of String, String)
+        Dim SqlQuery As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
+        If LabelKey Is Nothing Then
+            Res("Success") = False
+            Return Res
+        End If
+
+        QueryConfig("@LabelKey") = GetParamVarHash(LabelKey, "int")
+        SqlQuery = "DELETE FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey;"
+
+        If InvocateAsTest Then
+            Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+            Res("SqlQuery") = SqlQuery
+        End If
+        Res("Success") = If(ExecuteSqlParamQuery(SqlQuery, QueryConfig) Is Nothing, False, True)
+
+        Return Res
+    End Function
 
     Public Function ReportValidity(FieldType As String, Range As String, Value As String) As Dictionary(Of String, Object)
         Dim Res As New Dictionary(Of String, Object)

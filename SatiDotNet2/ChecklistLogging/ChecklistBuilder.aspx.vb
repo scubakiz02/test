@@ -37,6 +37,7 @@ Partial Class MR_OpenTicketStatusBoard
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Private PhaseController As New PhaseController()
+    Private PmInput As New PmInput()
 
     <WebMethod()>
     Public Shared Function Area_Change(AreaKey As Integer) As String
@@ -600,17 +601,20 @@ Partial Class MR_OpenTicketStatusBoard
             'using try catch block in case GroupingCheckBox or GroupingCheckBox are null
             Try
                 Dim GroupingCheckBoxID As String
+                Dim Text As String
 
                 If SectionType = "phase" Then
+                    Text = "Phase: "
                     GroupingCheckBoxID = "PhasingCheckBox"
-                    PhaseInterfaceLabelPart2.Text = "Phase"
                 ElseIf SectionType = "group" Then
+                    Text = "Group: "
                     GroupingCheckBoxID = "GroupingCheckBox"
-                    PhaseInterfaceLabelPart2.Text = "Group"
                 Else
                     Throw New Exception()
                 End If
                 GroupingCheckBox = DirectCast(AreaFormView.FindControl(GroupingCheckBoxID), CheckBox)
+                PhaseInterfaceLabelPart2.Text = Text
+                LabelInterface_PhaseDdl_Label.Text = Text
 
                 If GroupingCheckBox Is Nothing Then Throw New Exception()
             Catch ex As Exception
@@ -913,6 +917,24 @@ Partial Class MR_OpenTicketStatusBoard
         If sender.ID.Contains("Phase") Then
             PhaseController.DeletePhaseOrGroup(PhaseFromQs)
             PhaseFromQs = Nothing
+        ElseIf sender.ID.Contains("Label") Then
+            '#TO DO: TDD PmInput.Delete() function
+            'why you may ask? Great question!
+            'in the future, we're planning to run reports on logs
+            'That means it is crucial for labels to keep their DB [Key] (primary key) field value
+            PmInput.Delete(LabelFromQueryString)
+            LabelFromQueryString = SetLabelFromQueryString()
+        ElseIf sender.ID.Contains("Comment") Then
+            Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@CommentKey", Security.GetParamVarHash(CommentFromQueryString, "int")}
+            }
+            Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogCommentList] WHERE [Key]=@CommentKey;", SqlConfig)
+
+            'for whatever reason, global variable 'QueryConfig' is empty when invoking 'SetCommentFromQueryString' 
+            'set AreaKey field value, then remove it after calling function, to return QueryConfig back to its orignal state
+            QueryConfig("@AreaKey") = Security.GetParamVarHash(AreaFromQueryString, "int")
+            CommentFromQueryString = SetCommentFromQueryString()
+            QueryConfig.Remove("@AreaKey")
         End If
 
         RefreshPreview()

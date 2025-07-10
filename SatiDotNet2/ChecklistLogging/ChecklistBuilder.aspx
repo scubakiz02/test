@@ -786,8 +786,8 @@
                                         Label: No data loaded yet...
                                     <br />
                                         <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                        <%--                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
-                                        &nbsp;<asp:LinkButton ID="EmptyLabelNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                     </asp:Panel>
                                 </EmptyDataTemplate>
 
@@ -813,7 +813,7 @@
                     <asp:Label ID="LabelLabel" runat="server" Text='<%# Bind("Label") %>' />
                                     <br />
                                     <asp:LinkButton ID="LabelEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                    <%--                                    &nbsp;<asp:LinkButton ID="LabelDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
+                                    &nbsp;<asp:LinkButton ID="LabelDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
                                     &nbsp;<asp:LinkButton ID="LabelNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                 </ItemTemplate>
                                 <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
@@ -846,7 +846,7 @@
                     </div>
 
                     <asp:Panel runat="server" Visible="False" ID="LabelInterface_PhaseDdlContainer" class="flexbox Width">
-                        <span id="label-interface-phase-select-title">Phase:</span>
+                        <asp:Label ID="LabelInterface_PhaseDdl_Label" Text="Phase:" runat="server" />
                         <asp:DropDownList ID="LabelInterface_PhaseDropDownList" CssClass="label-interface-phase-select auto-fit" runat="server"
                             AppendDataBoundItems="True" AutoPostBack="True"
                             DataSourceID="LabelInterface_PhaseDropDownList_SqlDataSource" DataTextField="Phase"
@@ -956,8 +956,8 @@
                                     Comment: No data loaded yet...
                                     <br />
                                     <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                    <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
-                                    &nbsp;<asp:LinkButton ID="EmptyCommentNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                 </asp:Panel>
                             </EmptyDataTemplate>
 
@@ -984,7 +984,7 @@
                     <asp:Label ID="CommentLabel" runat="server" Text='<%# Bind("Comment") %>' />
                                 <br />
                                 <asp:LinkButton ID="CommentEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                <%--                                &nbsp;<asp:LinkButton ID="CommentDeleteButton" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
+                                &nbsp;<asp:LinkButton ID="CommentDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
                                 &nbsp;<asp:LinkButton ID="CommentNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
                             </ItemTemplate>

@@ -68,3 +68,44 @@ Public Class NumberPmInputTests
     End Sub
 
 End Class
+
+Public Class DeletePmInputTests
+    Inherits PmInput
+    Private Security As New Security()
+    Private SqlParameters As New SqlParameters()
+
+    <Fact>
+    Public Sub PassNullAsArg()
+        Assert.False(Boolean.Parse(Delete(Nothing)("Success")))
+    End Sub
+
+    <Theory>
+    <InlineData(4)>
+    <InlineData(238)>
+    Public Sub DeleteWithoutSqlExecutionTestCases(LabelKey As String)
+        Dim DeleteRes As Dictionary(Of String, String) = Delete(LabelKey, True)
+        Dim DeleteHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey}
+        }
+
+        Assert.Equal("DELETE FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey;", DeleteRes("SqlQuery"))
+        Assert.True(SqlParameters.ValidParameterizedValues(DeleteHash, DeleteRes))
+    End Sub
+
+    <Theory>
+    <InlineData(-1)>
+    <InlineData(0)>
+    Public Sub DeleteWithSqlExecutionsTestCases(LabelKey As String)
+        'sql does NOT complain when a sql query is ran on a record that doesn't exists in a table
+        'do just that, to ensure return from function after executing sql delete query is as expected
+        Dim DeleteRes As Dictionary(Of String, String) = Delete(LabelKey)
+        Dim DeleteHash As New Dictionary(Of String, String) From {
+            {"LabelKey", LabelKey}
+        }
+
+        Assert.False(DeleteRes.ContainsKey("SqlQuery"))
+        Assert.False(DeleteRes.ContainsKey("QueryConfig"))
+        Assert.True(Boolean.Parse(DeleteRes("Success")))
+    End Sub
+
+End Class
