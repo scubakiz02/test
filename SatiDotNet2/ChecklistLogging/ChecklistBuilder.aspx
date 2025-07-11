@@ -787,7 +787,7 @@
                                     <br />
                                         <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
                                         &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
-                                        &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                        &nbsp;<asp:LinkButton ID="EmptyLabelNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                     </asp:Panel>
                                 </EmptyDataTemplate>
 
@@ -957,7 +957,7 @@
                                     <br />
                                     <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
                                     &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
-                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                    &nbsp;<asp:LinkButton ID="EmptyCommentNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
                                 </asp:Panel>
                             </EmptyDataTemplate>
 

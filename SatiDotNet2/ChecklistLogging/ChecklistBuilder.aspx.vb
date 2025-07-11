@@ -1445,6 +1445,22 @@ Partial Class MR_OpenTicketStatusBoard
 
         Response.Redirect(Request.Url.AbsolutePath & "?View=" & ViewFromQs) 'exclude querystrings
     End Sub
+
+    Protected Sub CommentFormView_DataBound(sender As Object, e As EventArgs) Handles CommentFormView.DataBound
+        FindAndDisableFormViewControl(CommentFormView, "EmptyCommentNewButton")
+    End Sub
+
+    Protected Sub LabelFormView_DataBound(sender As Object, e As EventArgs) Handles LabelFormView.DataBound
+        FindAndDisableFormViewControl(LabelFormView, "EmptyLabelNewButton")
+    End Sub
+
+    Private Sub FindAndDisableFormViewControl(ParentCtrl As FormView, ChildCtrlId As String)
+        'if AreaFromQueryString is null, that means EmptyDataTemplate will be shown
+        If ParentCtrl.CurrentMode = FormViewMode.ReadOnly AndAlso AreaFromQueryString Is Nothing Then
+            Dim ChildCtrl As LinkButton = CType(ParentCtrl.FindControl(ChildCtrlId), LinkButton)
+            If ChildCtrl IsNot Nothing Then ChildCtrl.Enabled = False
+        End If
+    End Sub
 End Class
 
 
