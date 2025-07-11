@@ -17,10 +17,27 @@
 
         .md-main-list {
             margin: 0;
-            list-style: circle;
+            list-style: none;
         }
 
-            .md-main-list li {
+        .redirect-btn-container {
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .sati-blue-fancy-btn {
+            text-decoration: none;
+            color: white;
+            background-color: #0000FF;
+            padding: 12px;
+            transition: .25s all;
+        }
+
+            .sati-blue-fancy-btn:hover {
+                background-color: #80befd;
             }
     </style>
     <section id="maintenance-hyperlink-section">
@@ -40,11 +57,9 @@
                 <li>
                     <asp:HyperLink ID="HyperLink6" runat="server" NavigateUrl="~/ChecklistLogging/ChecklistReport.aspx">Report PM</asp:HyperLink>
                 </li>
-                <li>
-                    <asp:HyperLink ID="HyperLink7" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Focus">PM Status Board, Focus View</asp:HyperLink>
-                </li>
-                <li>
-                    <asp:HyperLink ID="HyperLink8" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Full">PM Status Board, Full View</asp:HyperLink>
+                <li class="redirect-btn-container">
+                    <asp:HyperLink CssClass="sati-blue-fancy-btn" ID="HyperLink7" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Focus">PM Status Board, Focus View</asp:HyperLink>
+                    <asp:HyperLink CssClass="sati-blue-fancy-btn" ID="HyperLink8" runat="server" NavigateUrl="~/ChecklistLogging/StatusBoard.aspx?Department=Maintenance&View=Full">PM Status Board, Full View</asp:HyperLink>
                 </li>
             </ul>
 
