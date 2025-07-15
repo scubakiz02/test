@@ -254,22 +254,7 @@ Public Class MaintPMCloneTests
         }
 
         Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_Res("AreaTable")))
-        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);", ClonePM_Res("AreaTable")("SqlQuery"))
-    End Sub
-
-    <Theory>
-    <InlineData(6, 8)>
-    <InlineData(43, 48)>
-    Public Sub T_LogLabelInsert(AreaKey As Integer, ClonedPM_Key As Integer)
-        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "Tell Tim he's awesome!", ClonedPM_Key)
-        Dim CloneHash As New Dictionary(Of String, String) From {
-            {"AreaKey", AreaKey},
-            {"ClonedPM_Key", ClonedPM_Key}
-        }
-        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("LabelTable")
-
-        Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
-        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) Select @ClonedPM_Key, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, SectionType, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, SectionType, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);", ClonePM_Res("AreaTable")("SqlQuery"))
     End Sub
 
     <Theory>
@@ -303,20 +288,91 @@ Public Class MaintPMCloneTests
     End Sub
 
     <Theory>
-    <InlineData(6, 7)>
+    <InlineData(6, 8)>
     <InlineData(43, 48)>
-    Public Sub T_LogPhaseInsert(AreaKey As Integer, ClonedPM_Key As Integer)
-        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "pew pew pew", ClonedPM_Key)
+    Public Sub T_LogLabelInsert(AreaKey As Integer, FakeClonedPmAreaKey As Integer)
+        'copy relevant records (insert into sql query) in T_LogLabel after retreiving primary key of created record in T_LogPhase (batched copying)
+        Dim ClonePM_Res As Dictionary(Of String, Dictionary(Of String, String)) = ClonePM(AreaKey, "Tell Tim Hughes he's awesome!", FakeClonedPmAreaKey)
         Dim CloneHash As New Dictionary(Of String, String) From {
             {"AreaKey", AreaKey},
-            {"ClonedPM_Key", ClonedPM_Key}
+            {"ClonedPM_Key", FakeClonedPmAreaKey}
         }
-        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("PhaseTable")
+        Dim ClonePM_TableRes As Dictionary(Of String, String) = ClonePM_Res("LabelTable")
 
         Assert.True(SqlParameters.ValidParameterizedValues(CloneHash, ClonePM_TableRes))
-        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) Select @ClonedPM_Key, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@AreaKey;", ClonePM_TableRes("SqlQuery"))
+        Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) " +
+                     "Select @ClonedPM_Key, UnitKey, @ClonedPhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey AND PhaseKey IS NULL",
+                     ClonePM_TableRes("SqlQuery"))
     End Sub
 
+    <Theory>
+    <InlineData(6, 23)>
+    <InlineData(43, 222)>
+    Public Sub T_LogPhaseInsertsWithoutSqlExecution(CurrentAreaKey As String, ClonedAreaKey As String)
+        Dim FakeDS As Data.DataSet = T_LogPhaseSelectDS(CurrentAreaKey)
+        Dim FakeDS_RowCount As Integer = FakeDS.Tables(0).Rows.Count - 1
+        Dim T_LogPhase_InsertIntoQueries As List(Of Dictionary(Of String, String)) = GetSectionCloneQueries(CurrentAreaKey, ClonedAreaKey, FakeDS) 'pass mock DS of T_LogPhase select query as arg 2
+
+        'make sure return from GetSectionCloneQueries is not blank
+        Assert.NotEqual(New List(Of Dictionary(Of String, String)), T_LogPhase_InsertIntoQueries)
+
+        'test insert into sql query for each new record in T_LogPhase individually
+        For I As Integer = 0 To FakeDS_RowCount
+            Dim FakeDR As Data.DataRow = FakeDS.Tables(0).Rows(I)
+            Dim CloneSectionHash As New Dictionary(Of String, String) From {
+                {"CurrentAreaKey", FakeDR("AreaKey")},
+                {"ClonedAreaKey", ClonedAreaKey},
+                {"PhaseKey", FakeDR("Key")}
+            }
+            Dim T_LogPhase_InsertIntoQuery As Dictionary(Of String, String) = T_LogPhase_InsertIntoQueries(I)
+
+            Assert.True(SqlParameters.ValidParameterizedValues(CloneSectionHash, T_LogPhase_InsertIntoQuery))
+            Assert.Equal("INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) " +
+                     "Select @ClonedAreaKey, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey;" +
+                     "SELECT CAST(SCOPE_IDENTITY() As INT);",
+                     T_LogPhase_InsertIntoQuery("SqlQuery"))
+        Next
+    End Sub
+
+    Private Function T_LogPhaseSelectDS(AreaKey As String) As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        'mock schema of T_LogPhase
+        DT.Columns.Add("Key", GetType(Integer))
+        DT.Columns.Add("AreaKey", GetType(Integer))
+        DT.Columns.Add("Phase", GetType(String))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+
+        'add fake data to fake dataset
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"Key", 234},
+            {"AreaKey", AreaKey},
+            {"Phase", "phase 1"},
+            {"PhaseOrder", 1}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"Key", 236},
+            {"AreaKey", AreaKey},
+            {"Phase", "phase 2"},
+            {"PhaseOrder", 2}
+        })
+
+        DS.Tables.Add(DT)
+
+        Return DS
+    End Function
+
+    Private Sub AddDsRow(DT As Data.DataTable, RowConfig As Dictionary(Of String, Object))
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        DR("Key") = RowConfig("Key")
+        DR("AreaKey") = RowConfig("AreaKey")
+        DR("Phase") = RowConfig("Phase")
+        DR("PhaseOrder") = RowConfig("PhaseOrder")
+
+        DT.Rows.Add(DR)
+    End Sub
 End Class
 
 Public Class ModifyPmStatusTests

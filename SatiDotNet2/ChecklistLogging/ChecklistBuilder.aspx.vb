@@ -918,7 +918,7 @@ Partial Class MR_OpenTicketStatusBoard
             PhaseController.DeletePhaseOrGroup(PhaseFromQs)
             PhaseFromQs = Nothing
         ElseIf sender.ID.Contains("Label") Then
-            '#TO DO: TDD PmInput.Delete() function
+            'created InputPM.Delete() using TDD (that means tests are involved!)
             'why you may ask? Great question!
             'in the future, we're planning to run reports on logs
             'That means it is crucial for labels to keep their DB [Key] (primary key) field value

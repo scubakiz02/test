@@ -3,6 +3,7 @@ Imports SatiDotNet2.Library
 Imports System.Text.Json
 
 Public Class MaintPM
+    Inherits Security
     Dim Sql As New Security
 
     Public Function ModifyOrder(Key As Integer, Action As String, Marker As String) As Dictionary(Of String, String)
@@ -254,13 +255,85 @@ Public Class MaintPM
         Return False
     End Function
 
+    Public Function GetSectionCloneQueries(CurrentAreaKey As String, ClonedAreaKey As String, Optional FakeDS As Data.DataSet = Nothing) As List(Of Dictionary(Of String, String))
+        'what is a 'Section'? Great question!
+        'a section is a grouping of inputs, listed in ALTS DB T_LogPhase Table
+        'at the time of writing this function (07/11/2025), there are 3 states or types of sections:
+        '1) group
+        '2) phase
+        '3) none
+
+        'so why configure queries in this section?
+        'B/C each record needs to be cloned individually. Why you may ask?
+        'Here's the explaination:
+        '   when cloning a pm/checklist that has sections (groups or phases), the records for the pm/checklist copy in T_LogLabel need to have the correct PhaseKey field value
+        '   What is the 'correct' PhaseKey field value you may ask? Great question!
+        '   the 'correct' PhaseKey field values are not the same as the original pm/checklist that is going to be copied
+        '   the 'correct' PhaseKey field values are the primary key field values for the created rows in T_LogPhase
+        '   for these reasons, this unit tests evaluates the insert into sql queries for both T_LogPhase and T_LogLabel
+
+        Dim Res As New List(Of Dictionary(Of String, String))
+        Dim DS As Data.DataSet
+        Dim SqlQuery As String = "INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) " +
+                     "Select @ClonedAreaKey, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey;" +
+                     "SELECT CAST(SCOPE_IDENTITY() As INT);"
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@CurrentAreaKey", GetParamVarHash(CurrentAreaKey, "int")},
+            {"@ClonedAreaKey", GetParamVarHash(ClonedAreaKey, "int")}
+        }
+
+        If FakeDS Is Nothing Then
+            'what production code executes (get relevant records from T_LogPhase table)
+            DS = GetMyDataSetParamQuery("SELECT [Key], AreaKey, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@CurrentAreaKey", SqlConfig)
+        Else
+            'what tests execute (fake dataset provided as a param to this function invocation)
+            DS = FakeDS
+        End If
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            Dim SectionHash As New Dictionary(Of String, String)
+
+            SqlConfig("@PhaseKey") = GetParamVarHash(DR("Key"), "int")
+
+            SectionHash("QueryConfig") = JsonSerializer.Serialize(SqlConfig)
+            SectionHash("SqlQuery") = SqlQuery
+
+            Res.Add(SectionHash)
+        Next
+
+        Return Res
+    End Function
+
+    Private Function CreateSectionClones(CurrentAreaKey As String, ClonedAreaKey As String) As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim QueriesToExecute As List(Of Dictionary(Of String, String)) = GetSectionCloneQueries(CurrentAreaKey, ClonedAreaKey)
+        Dim Res As New Dictionary(Of Integer, Dictionary(Of String, String))
+
+        For I As Integer = 0 To QueriesToExecute.Count - 1
+            Dim QueryToExecute As Dictionary(Of String, String) = QueriesToExecute(I)
+            Dim QueryConfig As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(QueryToExecute("QueryConfig"))
+
+            Try 'in case sql query fails for whatever reason
+                Dim PrimaryKey As String = ExecuteSqlParamQuery(QueryToExecute("SqlQuery"), QueryConfig)("PrimaryKey")
+                Dim PhaseKeysHash As New Dictionary(Of String, String) From {
+                    {"@ClonedPhaseKey", PrimaryKey},
+                    {"@OldPhaseKey", QueryConfig("@PhaseKey")("value")}
+                }
+                Res(I) = PhaseKeysHash
+            Catch ex As Exception
+                Continue For
+            End Try
+        Next
+
+        Return Res
+    End Function
+
     Public Function ClonePM(AreaKey As String, AreaName As String, Optional TestClonedAreaKey As String = Nothing) As Dictionary(Of String, Dictionary(Of String, String))
         Dim Res As New Dictionary(Of String, Dictionary(Of String, String))
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         Dim CloneAreaKey As Integer
 
         QueryConfig("@AreaKey") = Sql.GetParamVarHash(AreaKey, "int")
-        PrepPmCloneConfig(Res, "AreaTable", "INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);")
+        PrepPmCloneConfig(Res, "AreaTable", "INSERT INTO [ALTS].[dbo].[T_LogArea] (GroupKey, DepartmentKey, IntervalKey, Area, SectionType, OneTimeDate, DateCreated, Assignee, Active, Status) SELECT GroupKey, DepartmentKey, IntervalKey, @Area, SectionType, OneTimeDate, DateCreated, Assignee, Active, Status FROM [ALTS].[dbo].[T_LogArea] WHERE [Key] = @AreaKey; Select CAST(SCOPE_IDENTITY() As INT);")
 
         Try
             If AreaKey Is Nothing OrElse AreaKey = String.Empty Then
@@ -277,10 +350,12 @@ Public Class MaintPM
             Return Res
         End Try
 
-        PrepPmCloneConfig(Res, "LabelTable", "INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) Select @ClonedPM_Key, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey;")
+        'Prepping and Cloning of records in T_LogPhase is handled within CreateSectionClones!!!
+        PrepPmCloneConfig(Res, "LabelTable",
+                     "INSERT INTO [ALTS].[dbo].[T_LogLabel] (AreaKey, UnitKey, PhaseKey, [Label], [Range], LabelOrder, FieldType) " +
+                     "Select @ClonedPM_Key, UnitKey, @ClonedPhaseKey, [Label], [Range], LabelOrder, FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey AND PhaseKey IS NULL") 'non grouped/phased inputs
         PrepPmCloneConfig(Res, "CommentTable", "INSERT INTO [ALTS].[dbo].[T_LogCommentList] (AreaKey, Comment, CommentOrder) Select @ClonedPM_Key, Comment, CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] WHERE AreaKey=@AreaKey;")
         PrepPmCloneConfig(Res, "StampTable", "INSERT INTO [ALTS].[dbo].[T_LogStampList] (AreaKey, [Title], [TitleKey], [RoleID], Active) Select @ClonedPM_Key, [Title], [TitleKey], [RoleID], Active FROM [ALTS].[dbo].[T_LogStampList] WHERE AreaKey=@AreaKey;")
-        PrepPmCloneConfig(Res, "PhaseTable", "INSERT INTO [ALTS].[dbo].[T_LogPhase] (AreaKey, [Phase], [PhaseOrder]) Select @ClonedPM_Key, [Phase], [PhaseOrder] FROM [ALTS].[dbo].[T_LogPhase] WHERE AreaKey=@AreaKey;")
 
         'T_LogArea is a unique 1 off case
         '1) there are multiple parameterized values
@@ -307,14 +382,47 @@ Public Class MaintPM
 
             If TableName = "AreaTable" Then Continue For 'dealing with this scenario before this for loop
 
+            'keep these lines outside of the if statement below since tests don't run that code 
+            QueryConfig("@ClonedPhaseKey") = Sql.GetParamVarHash(Nothing, "int")
             Res(TableName)("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
 
-            If TestClonedAreaKey Is Nothing Then
+            If TestClonedAreaKey Is Nothing Then 'function is invocated in live codebase (and not within a test)
+                'regression test cases:
+                '   1) PMs with no grouped/phased inputs
+                '   2) PMs with some grouped/phased inputs
+                '   3) PMS with all grouped/phased inputs
+
+                'clone T_LogLabel records with PhaseKey field value of NULL
                 CloneTableRecords(Res(TableName))
+
+                'Cloning of records within T_LogLabel table is an edgecase (done by batches according to PhaseKey field value)
+                If TableName = "LabelTable" Then 'edgecase
+                    Dim NewSectionKeys As Dictionary(Of Integer, Dictionary(Of String, String)) = CreateSectionClones(AreaKey, CloneAreaKey)
+                    Dim NotDBNullPhaseKeyRecordsQuery As String = Res(TableName)("SqlQuery").Replace("PhaseKey IS NULL", "PhaseKey=@OldPhaseKey")
+
+                    'configure environment to clone records that are not tied to a group or phase
+                    QueryConfig.Remove("@OldPhaseKey")
+                    Res(TableName)("SqlQuery") = NotDBNullPhaseKeyRecordsQuery
+
+                    'iterate and clone appropriate records
+                    For Each NewSectionKey As KeyValuePair(Of Integer, Dictionary(Of String, String)) In NewSectionKeys
+                        'configuration for CloneTableRecords invocation (b/c sql queries are executed by batches)
+                        Dim BatchHash As Dictionary(Of String, String) = NewSectionKey.Value
+                        QueryConfig("@ClonedPhaseKey") = GetParamVarHash(BatchHash("@ClonedPhaseKey"), "int")
+                        QueryConfig("@OldPhaseKey") = GetParamVarHash(BatchHash("@OldPhaseKey"), "int")
+                        Res(TableName)("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+
+                        'invocation after configuration
+                        CloneTableRecords(Res(TableName))
+                    Next
+                End If
+
+                'set return to send within http response
                 RemoveInfoFromHttpRes(Res, TableName)
                 Res(TableName)("Success") = True
             End If
         Next
+
 
         Return Res
     End Function
