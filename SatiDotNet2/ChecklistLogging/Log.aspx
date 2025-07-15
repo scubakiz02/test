@@ -64,7 +64,7 @@
 
                             if (activeInput.getAttribute("text")) {
                                 dbConnectionConfig.elem = activeInput.querySelector("input[type='text']");
-                                dbConnectionConfig.eventListener = "keydown";
+                                dbConnectionConfig.eventListeners = ["keydown", "blur"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     return elem.value;
                                 };
@@ -79,35 +79,35 @@
 
                                 //keydown event (call http routine on Enter keydown)
                                 dbConnectionConfig.elem = dateTbx;
-                                dbConnectionConfig.eventListener = "keydown";
+                                dbConnectionConfig.eventListeners = ["keydown", "blur"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     return elem.value;
                                 };
                             }
                             else if ((activeInput.tagName === "INPUT" && activeInput.type === "text")) { //number field type
                                 dbConnectionConfig.elem = activeInput;
-                                dbConnectionConfig.eventListener = "keydown";
+                                dbConnectionConfig.eventListeners = ["keydown", "blur"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     return elem.value;
                                 };
                             }
                             else if (activeInput.getAttribute("checkbox")) {
                                 dbConnectionConfig.elem = activeInput.querySelector("input[type='checkbox']");
-                                dbConnectionConfig.eventListener = "change";
+                                dbConnectionConfig.eventListeners = ["change"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     return elem.checked ? 1 : 0;
                                 };
                             }
                             else if (activeInput.getAttribute("hoa")) {
                                 dbConnectionConfig.elem = activeInput.querySelector("select");
-                                dbConnectionConfig.eventListener = "change";
+                                dbConnectionConfig.eventListeners = ["change"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     return elem.value;
                                 };
                             }
                             else if (activeInput.getAttribute("dp")) {
                                 dbConnectionConfig.elem = activeInput;
-                                dbConnectionConfig.eventListener = "change";
+                                dbConnectionConfig.eventListeners = ["change"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
                                     const checkboxElems = activeInput.querySelectorAll("input[type='checkbox']");
                                     const cbx1Value = checkboxElems[0].checked ? 1 : 0;
@@ -171,34 +171,55 @@
                     window.location.reload(); //cause a full postback
                 })
 
+                function isHttpTrigger(eventListener, e) {
+                    switch (eventListener) {
+                        case "keydown":
+                            if (e.key === "Enter" || e.key === "Tab") return true;
+                            return false;
+                        default:
+                            return true;
+                    }
+                }
+
+                function isOutOfScopeValueVerified(valueConfig) {
+                    //if input value is out of range AND 'check if correct' checkbox has NOT been checked, do NOT call setCursorFocus
+                    if (valueConfig.state === 'outOfScope' && !valueConfig.valueVerified) return false;
+                    return true;
+                }
+
                 async function configDbConnection(config) {
-                    const { elem, eventListener, getValueCallback, LogPanel, LogPanels } = config;
+                    const { elem, eventListeners, getValueCallback, LogPanel, LogPanels } = config;
 
-                    elem.addEventListener(eventListener, async function (e) {
-                        let value = getValueCallback(elem);
-                        let httpRes = {};
-                        let controlInfo = {};
+                    for (const eventListener of eventListeners) {
+                        elem.addEventListener(eventListener, async function (e) {
+                            let value = getValueCallback(elem);
+                            let httpRes = {};
+                            let controlInfo = {};
 
-                        //avoid running event listener if element is a textbox and another key besides 'Enter' was pressed
-                        if (this.tagName === "INPUT" && this.type === "text" && e.key !== "Enter") return;
+                            if (isHttpTrigger(eventListener, e)) e.preventDefault(); //prevent postback (going to send http request)
+                            else return;
 
-                        value = getValueCallback(this);
+                            // run invocation of recordInput() function within a timer
+                            // doing this to ensure http request sent to OutOfScopeValue.ashx executes before http request sent to RecordInput.ashx
+                            // this is important for out of range input process flow
+                            // if there is a bug in the flow, the 1st thing to look at is the setTimeout delay
+                            // If the network speed has slowed down, will need to increase setTimeout delay
+                            setTimeout(async () => {
+                                httpRes = await recordInput(this, value);
+                                controlInfo = httpRes["input"];
+                                modifyInput(httpRes, LogPanel);
 
-                        //call preventDefault before invocating recordInput(), or else postback issues will occur on Enter keydown
-                        e.preventDefault(); //prevent postback
-
-                        httpRes = await recordInput(this, value);
-                        controlInfo = httpRes["input"];
-                        modifyInput(httpRes, LogPanel);
-
-                        //if input value is out of range AND 'check if correct' checkbox has NOT been checked, do NOT call setCursorFocus
-                        if (controlInfo.state === 'outOfScope' && !controlInfo.valueVerified) {
-
-                        }
-                        else {
-                            setCursorFocus(this, LogPanels);
-                        }
-                    });
+                                if (isOutOfScopeValueVerified(controlInfo)) {
+                                    //programmatically set cursor focus to next control unless event listener is blur
+                                    //always let end user cursor focus take priority over the programmatic configuration of the cursor
+                                    if (eventListener !== "blur") {
+                                        setCursorFocus(this, LogPanels);
+                                    }
+                                }
+                                else elem.focus(); //block all end user actions until out of scope value is verified
+                            }, 100); //100ms = 0.1 seconds (if network speeds slow, will need to increase)
+                        });
+                    }
 
                     //trigger http api request to configure backcolor for inputs on page load
                     modifyInput(await recordInput(elem, getValueCallback(elem)), LogPanel);
