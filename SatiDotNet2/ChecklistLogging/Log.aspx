@@ -182,7 +182,6 @@
                 }
 
                 function isOutOfScopeValueVerified(valueConfig) {
-                    //if input value is out of range AND 'check if correct' checkbox has NOT been checked, do NOT call setCursorFocus
                     if (valueConfig.state === 'outOfScope' && !valueConfig.valueVerified) return false;
                     return true;
                 }
@@ -199,25 +198,21 @@
                             if (isHttpTrigger(eventListener, e)) e.preventDefault(); //prevent postback (going to send http request)
                             else return;
 
-                            // run invocation of recordInput() function within a timer
-                            // doing this to ensure http request sent to OutOfScopeValue.ashx executes before http request sent to RecordInput.ashx
-                            // this is important for out of range input process flow
-                            // if there is a bug in the flow, the 1st thing to look at is the setTimeout delay
-                            // If the network speed has slowed down, will need to increase setTimeout delay
-                            setTimeout(async () => {
-                                httpRes = await recordInput(this, value);
-                                controlInfo = httpRes["input"];
-                                modifyInput(httpRes, LogPanel);
+                            //default out of range verification to false on value change
+                            await setOutOfScopeVerifyValue(this, false);
 
-                                if (isOutOfScopeValueVerified(controlInfo)) {
-                                    //programmatically set cursor focus to next control unless event listener is blur
-                                    //always let end user cursor focus take priority over the programmatic configuration of the cursor
-                                    if (eventListener !== "blur") {
-                                        setCursorFocus(this, LogPanels);
-                                    }
+                            httpRes = await recordInput(this, value);
+                            controlInfo = httpRes["input"];
+                            modifyInput(httpRes, LogPanel);
+
+                            if (isOutOfScopeValueVerified(controlInfo)) {
+                                //programmatically set cursor focus to next control unless event listener is blur
+                                //always let end user cursor focus take priority over the programmatic configuration of the cursor
+                                if (eventListener !== "blur") {
+                                    setCursorFocus(this, LogPanels);
                                 }
-                                else elem.focus(); //block all end user actions until out of scope value is verified
-                            }, 100); //100ms = 0.1 seconds (if network speeds slow, will need to increase)
+                            }
+                            else elem.focus(); //block all end user actions until out of scope value is verified
                         });
                     }
 
@@ -297,35 +292,7 @@
                                     cbx.name = "out-of-scope-cbx";
                                     cbx.checked = res.input.valueVerified;
                                     cbx.addEventListener("change", async function (e) {
-                                        const params = new URLSearchParams(window.location.search);
-                                        const activeTbx = this.closest(".LogPanel").querySelector(".activeInput");
-                                        let dataKey;
-                                        let data;
-
-                                        dataKey = params.get("Key");
-
-                                        const response = await fetch("OutOfScopeValue.ashx", {
-                                            method: "POST",
-                                            headers: {
-                                                "Content-Type": "application/json"
-                                            },
-                                            body: JSON.stringify({
-                                                dataId: dataKey,
-                                                labelId: getLabelId(activeTbx),
-                                                value: this.checked
-                                            })
-                                        });
-
-                                        if (!response.ok) {
-                                            //undo checked status if http api call was unsuccessful
-                                            this.checked = !this.checked;
-                                        }
-
-                                        data = await response.json();
-
-                                        if (data.success) setCursorFocus(this, document.querySelectorAll(".LogPanel"));
-                                        else this.checked = !this.checked; //reverse checked status to hopefully alert end user
-
+                                        await setOutOfScopeVerifyValue(this, this.checked);
                                         e.preventDefault(); //prevent postback
                                     })
 
@@ -342,6 +309,40 @@
                         this.style.backgroundColor = backcolor;
 
                     }, LogPanel)
+                }
+
+                async function setOutOfScopeVerifyValue(activeInputElem, verifyValue) {
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTbx = activeInputElem.closest(".LogPanel").querySelector(".activeInput");
+                    const label_id = getLabelId(activeTbx)
+                    let dataKey = params.get("Key");
+                    let data;
+
+                    //if result from getLabelId() call is null, do not make http request
+                    //getLabelId() will return null when fieldtype of control is anything other than number
+                    if (!label_id) return;
+
+                    const response = await fetch("OutOfScopeValue.ashx", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            dataId: dataKey,
+                            labelId: label_id,
+                            value: verifyValue
+                        })
+                    });
+
+                    if (!response.ok) {
+                        //undo checked status if http api call was unsuccessful
+                        verifyValue = !verifyValue;
+                    }
+
+                    data = await response.json();
+
+                    if (data.success && verifyValue === true) setCursorFocus(activeTbx, document.querySelectorAll(".LogPanel"));
+                    else verifyValue = !verifyValue; //reverse checked status to hopefully alert end user
                 }
 
                 let count = 0;
@@ -373,13 +374,21 @@
 
                 function getLabelId(activeInput) {
                     let control = activeInput;
+                    let res;
 
                     if (!control.id) {
                         //'dp' fieldtype edgecase
                         control = activeInput.querySelector("input[type='checkbox']");
                     }
 
-                    return parseInt(control.id.split("_")[3]);;
+                    try {
+                        res = parseInt(control.id.split("_")[3]);
+                    }
+                    catch (err) {
+                        res = null;
+                    }
+
+                    return res;
                 }
 
                 function addNoteToLog() {
