@@ -7,6 +7,14 @@ Public Class PmInput
 
     End Sub
 
+    Public Function GetArea(LabelKey As String) As Integer
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@LabelKey", GetParamVarHash(LabelKey, "int")}
+        }
+
+        Return GetSingleDbField("SELECT AreaKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "AreaKey")
+    End Function
+
     Public Function Delete(LabelKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
         'Delete relevant record in T_LogLabel
         Dim Res As New Dictionary(Of String, String)

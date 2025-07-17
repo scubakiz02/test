@@ -95,7 +95,8 @@
                                 dbConnectionConfig.elem = activeInput.querySelector("input[type='checkbox']");
                                 dbConnectionConfig.eventListeners = ["change"];
                                 dbConnectionConfig.getValueCallback = function (elem) {
-                                    return elem.checked ? 1 : 0;
+                                    //if control has checkbox fieldtype and it is not select, value is an empty string rather than 0
+                                    return elem.checked ? 1 : "";
                                 };
                             }
                             else if (activeInput.getAttribute("hoa")) {
@@ -118,6 +119,12 @@
 
                             await configDbConnection(dbConnectionConfig);
                         }
+
+                        //call recordInput with no args to get phaseLevel without recording an input
+                        const httpRes = await recordInput();
+
+                        //setPhasingBehavior(0);
+                        setPhasingBehavior(httpRes.phaseLevel);
                     }
 
 
@@ -202,6 +209,10 @@
                             await setOutOfScopeVerifyValue(this, false);
 
                             httpRes = await recordInput(this, value);
+
+                            //setPhasingBehavior(setPhasingBehaviorFakeData());
+                            setPhasingBehavior(httpRes.phaseLevel);
+
                             controlInfo = httpRes["input"];
                             modifyInput(httpRes, LogPanel);
 
@@ -216,8 +227,9 @@
                         });
                     }
 
-                    //trigger http api request to configure backcolor for inputs on page load
-                    modifyInput(await recordInput(elem, getValueCallback(elem)), LogPanel);
+                    //page load configuration
+                    let httpRes = await recordInput(elem, getValueCallback(elem));
+                    modifyInput(httpRes, LogPanel); // 1) configure backcolor for inputs
                 }
 
                 function setCursorFocus(currControl, LogPanels) {
@@ -347,6 +359,41 @@
 
                 let count = 0;
 
+
+                function setPhasingBehavior(phaseLevel) {
+                    //NOTE: phaseLevel arg is an integer that follow 0 based indexing
+                    const labelSections = document.querySelectorAll(".LabelSection");
+
+                    //NOTE: disabled class is applied to phases by default
+                    for (let i = 0; i < labelSections.length; i++) {
+                        const labelSection = labelSections[i];
+
+                        //remove 'disabledPhase' css class as needed to match phaseLevel
+                        if (i <= phaseLevel && labelSection.classList.contains("disabledPhase")) {
+                            // Add fadeOut to start opacity transition
+                            labelSection.classList.add('fadeOut');
+
+                            // Wait for the transition to finish, then remove both classes
+                            // NOTE: match your CSS transition duration
+                            setTimeout(() => {
+                                labelSection.classList.remove('disabledPhase', 'fadeOut');
+                            }, 500);
+                        }
+                    }
+                }
+
+                //#TO DO: 
+                // 1) removing 'disabledPhase' css class causes taco cats to run (horizontal scrolling animation)
+                // 2) do a bomb overlay, and removing 'disabledPhase' css class cause an explosion animation ? !? !? !? !? !!? !?
+
+                //#TO DO: delete setPhasingBehaviorFakeData function once backend code is complete and stable for a few published (1st publish with this is v2.8.8)
+                function setPhasingBehaviorFakeData() {
+                    const res = {
+                        phaseLevel: 1
+                    }
+                    return res.phaseLevel;
+                }
+
                 async function recordInput(activeInput, value) {
                     const params = new URLSearchParams(window.location.search);
                     const data_id = params.get("Key");
@@ -369,6 +416,7 @@
                     }
 
                     data = await response.json();
+
                     return data;
                 }
 
@@ -376,12 +424,12 @@
                     let control = activeInput;
                     let res;
 
-                    if (!control.id) {
-                        //'dp' fieldtype edgecase
-                        control = activeInput.querySelector("input[type='checkbox']");
-                    }
-
                     try {
+                        if (!control.id) {
+                            //'dp' fieldtype edgecase
+                            control = activeInput.querySelector("input[type='checkbox']");
+                        }
+
                         res = parseInt(control.id.split("_")[3]);
                     }
                     catch (err) {
@@ -874,6 +922,34 @@
                     --UFontSize: (calc(var(--UWhitespace) * 3.25));
                     --AddButtonWidth: 50px;
                 }
+
+                .disabledPhase {
+                    pointer-events: none;
+                    user-select: none;
+                    position: relative;
+                }
+
+                    .disabledPhase::after {
+                        content: '';
+                        background-image: url('../Color/icons/taco-cat.jpg');
+                        background-size: 100px 100px; /*dimensions of each image*/
+                        background-repeat: repeat;
+                        background-position: center;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        z-index: 1;
+                        /* css properties related to fade out transition */
+                        opacity: 1;
+                        transition: opacity 0.5s ease-out;
+                    }
+
+                    /* Fading state */
+                    .disabledPhase.fadeOut::after {
+                        opacity: 0;
+                    }
 
                 .LogTextBox {
                     width: 100%; /*textbox control takes as much space as it can WITHOUT causing weird css behavior*/

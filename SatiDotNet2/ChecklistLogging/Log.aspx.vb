@@ -65,7 +65,10 @@ Partial Class MR_OpenTicketStatusBoard
     Dim VirtualDirectory As String
     Dim Directory As String
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
     Private Format As New Format()
+    Private PmInput As New PmInput()
+
     Private PhaseController As PhaseController
 
     Public Delegate Sub DeleteNoteDelegate(ID As String)
@@ -147,7 +150,6 @@ Partial Class MR_OpenTicketStatusBoard
         Dim PhotoRC As Integer
         Dim ImageUrl As String
         Dim PhaseConfig As Dictionary(Of Integer, Dictionary(Of String, String))
-        Dim CurrPhaseOrder As Integer
 
         MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
@@ -341,19 +343,19 @@ Partial Class MR_OpenTicketStatusBoard
 
         QueryConfig.Clear()
 
-        PhaseController = New PhaseController(AreaFromQueryString, Session("LabelInputMap"))
+        PhaseController = New PhaseController(AreaFromQueryString)
         PhaseConfig = PhaseController.GetPhases()
-        CurrPhaseOrder = PhaseController.GetPhase()
 
         For I = 0 To RC - 1
             Dim myPanel As Panel = CType(UpdatePanel.FindControl("Panel" & I), Panel)
             Dim Cbx As CheckBox
-            Dim InputParent As Panel
             DR = DS.Tables(0).Rows(I)
             LabelKey = DR("LabelKey")
             Range = LogAspx.GetRange(Request.QueryString("Key"), LogDR, DR)
             Unit = If(IsDBNull(DR("Unit")), String.Empty, DR("Unit"))
 
+            'refactor html for phasing/grouping
+            Dim InputParent As Panel
             If PhaseConfig IsNot Nothing AndAlso PhaseConfig.ContainsKey(LabelKey) Then
                 Dim Phase As String = PhaseConfig(LabelKey)("Phase")
                 Dim PhasePanelID As String = Phase.Replace(" ", "-") & "_Panel"
@@ -370,17 +372,23 @@ Partial Class MR_OpenTicketStatusBoard
 
                     PhasePanel.ID = PhasePanelID
                     PhasePanel.Attributes.Add("style", "")
-                    PhasePanel.CssClass = "LabelSection grid" 'used for ChecklistBuilder.aspx sati blue input highlighting when batching is present
+
+                    If Request.QueryString("Key") IsNot Nothing AndAlso I > 0 AndAlso PhaseController.GetSectionType(AreaFromQueryString) = "phase" Then
+                        'user is logging inputs within Log.aspx and phase level > 0
+                        'why the 2nd condition in the if? great question!
+                        'never apply disabledPhase to phase level 0
+                        'this ensures non grouped/phased pms never see the effect disabledPhase class bring
+                        'T_LogArea SectionType field value must also be 'phase' for disabledPhase css class to be applied 
+                        PhasePanel.CssClass = "LabelSection grid disabledPhase"
+                    Else
+                        'user is previewing wihtin ChecklistBuilder.aspx
+                        'this ensures pm build preview never sees effect disabledPhase css class causes!!!!!!!!!!!!
+                        PhasePanel.CssClass = "LabelSection grid"
+                    End If
 
                     ItemsPanel.Controls.Add(PhasePanel)
                 End If
                 InputParent = PhasePanel
-
-                If PhaseController.GetSectionType(AreaFromQueryString) = "phase" Then
-                    If PhaseConfig(LabelKey)("PhaseOrder") > CurrPhaseOrder AndAlso Request.QueryString("Key") IsNot Nothing Then
-                        PhasePanel.Enabled = False
-                    End If
-                End If
             Else
                 InputParent = ItemsPanel.FindControl("NonBatchedPanels")
 

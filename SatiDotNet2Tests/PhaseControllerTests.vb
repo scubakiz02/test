@@ -302,16 +302,213 @@ Public Class PhaseControllerTests
     End Sub
 End Class
 
-'Public Class PhaseControllerDeleteBatchTests
-'    Inherits PhaseController
+Public Class PhaseControllerStatelessGetPhaseFunctionTests
+    Inherits PhaseController
 
-'    <Theory>
-'    <InlineData(Nothing, 2)>
-'    <InlineData(2, Nothing)>
-'    Public Sub NullEdgecases(AreaKey As String, BatchKey As String)
-'        Assert.False(Boolean.Parse(DeleteBatch(AreaKey, BatchKey)("Success")))
-'    End Sub
-'End Class
+    Private Security As New Security()
+    Private FakeInputsFieldValueShell As String = "{""1691"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1692"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1693"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1694"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
+
+    Private Function CloneShell(Optional FakeInputsFieldValue As String = Nothing) As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim FakeInputsFieldValueShellAsJson As Dictionary(Of Integer, Dictionary(Of String, String))
+        Dim StringToJsonParse As String
+
+        If FakeInputsFieldValue Is Nothing Then
+            StringToJsonParse = FakeInputsFieldValueShell
+        Else
+            StringToJsonParse = FakeInputsFieldValue
+        End If
+
+        FakeInputsFieldValueShellAsJson = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(StringToJsonParse)
+
+        Return FakeInputsFieldValueShellAsJson.ToDictionary(
+                Function(outer) outer.Key,
+                Function(outer) outer.Value.ToDictionary(
+                    Function(inner) inner.Key,
+                    Function(inner) inner.Value
+                )
+            )
+    End Function
+
+    Private Function GetFakeDS(InputsFieldValue As String) As Data.DataSet
+        Dim DS As New Data.DataSet()
+        Dim DT As New Data.DataTable()
+
+        DT.Columns.Add("LabelKey", GetType(Integer))
+        DT.Columns.Add("PhaseOrder", GetType(Integer))
+        DT.Columns.Add("DataInputs", GetType(String))
+
+        'add fake data to fake dataset
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 1691},
+            {"PhaseOrder", 1},
+            {"DataInputs", InputsFieldValue}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 1692},
+            {"PhaseOrder", 2},
+            {"DataInputs", InputsFieldValue}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 1693},
+            {"PhaseOrder", 2},
+            {"DataInputs", InputsFieldValue}
+        })
+        AddDsRow(DT, New Dictionary(Of String, Object) From {
+            {"LabelKey", 1694},
+            {"PhaseOrder", 3},
+            {"DataInputs", InputsFieldValue}
+        })
+        DS.Tables.Add(DT)
+
+        Return DS
+    End Function
+
+    Private Sub AddDsRow(DT As Data.DataTable, RowConfig As Dictionary(Of String, Object))
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        DR("LabelKey") = RowConfig("LabelKey")
+        DR("PhaseOrder") = RowConfig("PhaseOrder")
+        DR("DataInputs") = RowConfig("DataInputs")
+
+        DT.Rows.Add(DR)
+    End Sub
+
+    <Fact>
+    Public Sub AllEmptyPmInputs()
+        Dim FakeDataKey As Integer = 0
+        Dim FakeLabelKey As Integer = 1691
+        Assert.Equal(0, GetPhase(FakeDataKey, GetFakeDS(FakeInputsFieldValueShell)))
+    End Sub
+
+    <Theory>
+    <InlineData("12")>
+    <InlineData("Do you understand the words that are comming out of my mouth!?")> 'This is a line from the movie 'Rush Hour'. If you haven't seen it, watch it!
+    Public Sub Phase0PmInputsComplete(FakeUserInput As String)
+        Dim FakeDataKey As Integer = 0
+        Dim Phase0LabelKey As Integer = 1691
+        Dim FakeInputsHash As Dictionary(Of Integer, Dictionary(Of String, String)) = CloneShell()
+
+        FakeInputsHash(Phase0LabelKey)("Value") = FakeUserInput
+
+        Assert.Equal(1, GetPhase(FakeDataKey, GetFakeDS(JsonSerializer.Serialize(FakeInputsHash))))
+    End Sub
+
+    <Theory>
+    <InlineData("e")>
+    <InlineData("12.2")>
+    Public Sub Phase0And1PmInputsComplete(FakeUserInput As String)
+        Dim FakeDataKey As Integer = 0
+        Dim Phase0LabelKey As Integer = 1691
+        Dim Phase1LabelKey1 As Integer = 1692
+        Dim Phase1LabelKey2 As Integer = 1693
+        Dim FakeInputsHash As Dictionary(Of Integer, Dictionary(Of String, String)) = CloneShell()
+
+        FakeInputsHash(Phase0LabelKey)("Value") = FakeUserInput
+        FakeInputsHash(Phase1LabelKey1)("Value") = FakeUserInput
+        FakeInputsHash(Phase1LabelKey2)("Value") = FakeUserInput
+
+        Assert.Equal(2, GetPhase(FakeDataKey, GetFakeDS(JsonSerializer.Serialize(FakeInputsHash))))
+    End Sub
+
+    <Theory>
+    <InlineData("e")>
+    <InlineData("12.2")>
+    Public Sub Phase0CompletePhase1PartiallyIncomplete(FakeUserInput As String)
+        Dim FakeDataKey As Integer = 0
+        Dim Phase0LabelKey As Integer = 1691
+        Dim Phase1LabelKey1 As Integer = 1692
+        Dim FakeInputsHash As Dictionary(Of Integer, Dictionary(Of String, String)) = CloneShell()
+
+        FakeInputsHash(Phase0LabelKey)("Value") = FakeUserInput
+        FakeInputsHash(Phase1LabelKey1)("Value") = FakeUserInput
+
+        Assert.Equal(1, GetPhase(FakeDataKey, GetFakeDS(JsonSerializer.Serialize(FakeInputsHash))))
+    End Sub
+
+    <Theory>
+    <InlineData("e")>
+    <InlineData("12.2")>
+    Public Sub NonPhasedInputsInPhasedPm(FakeUserInput As String)
+        'phase 0 should visible even when non phased/grouped inputs exists within pm/checklist
+        Dim FakeDataKey As Integer = 0
+        Dim NullPhaseLabelKey As Integer = 1690
+
+        'add NullPhaseLabelKey to top of FakeInputsHash
+        Dim FakeInputsFieldValueShellWithNullPhaseLabelKey As String = "{""1690"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1691"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1692"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1693"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1694"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
+        Dim FakeInputsHash As Dictionary(Of Integer, Dictionary(Of String, String)) = CloneShell(FakeInputsFieldValueShellWithNullPhaseLabelKey)
+        Dim FakeInputsHashStringified As String = JsonSerializer.Serialize(FakeInputsHash)
+        Dim FakeDS As Data.DataSet = GetFakeDS(FakeInputsHashStringified)
+
+        'create 'NullPhaseLabelKey' DR within FakeDS
+        AddDsRow(FakeDS.Tables(0), New Dictionary(Of String, Object) From {
+            {"LabelKey", NullPhaseLabelKey},
+            {"PhaseOrder", DBNull.Value},
+            {"DataInputs", FakeInputsHashStringified}
+        })
+
+        'move 'NullPhaseLabelKey' DR within FakeDS from the last row to the first position
+        Dim DT As DataTable = FakeDS.Tables(0)
+
+        If DT.Rows.Count > 1 Then
+            Dim lastRow As DataRow = DT.Rows(DT.Rows.Count - 1)
+            Dim newRow As DataRow = DT.NewRow()
+
+            newRow.ItemArray = lastRow.ItemArray.Clone()
+
+            DT.Rows.InsertAt(newRow, 0)
+            DT.Rows.RemoveAt(DT.Rows.Count - 1)
+        End If
+
+        Assert.Equal(1, GetPhase(FakeDataKey, FakeDS)) 'return 1, even though we're on phase 0 b/c non-phased inputs section acts as phase 0
+    End Sub
+
+    <Theory>
+    <InlineData("e")>
+    <InlineData("12.2")>
+    Public Sub NonPhasedInputsInPhasedPm2(FakeUserInput As String)
+        'environment: in a pm/checklist that has non phased inputs. End User has filled out all inputs in first phase, but not all of the non-phased inputs. Even so, 2nd phase should be visible
+        Dim FakeDataKey As Integer = 0
+        Dim NullPhaseLabelKey As Integer = 1690
+        Dim Phase0LabelKey As Integer = 1691
+
+        'add NullPhaseLabelKey to top of FakeInputsHash
+        Dim FakeInputsFieldValueShellWithNullPhaseLabelKey As String = "{""1690"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1691"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1692"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1693"":{""Date"":"""",""Operator"":"""",""Value"":""""},""1694"":{""Date"":"""",""Operator"":"""",""Value"":""""}}"
+        Dim FakeInputsHash As Dictionary(Of Integer, Dictionary(Of String, String)) = CloneShell(FakeInputsFieldValueShellWithNullPhaseLabelKey)
+        Dim FakeInputsHashStringified As String
+        Dim FakeDS As Data.DataSet
+
+        'user input is received for all inputs within 1st phase. Non phased inputs are empty
+        FakeInputsHash(Phase0LabelKey)("Value") = FakeUserInput
+
+        FakeInputsHashStringified = JsonSerializer.Serialize(FakeInputsHash)
+        FakeDS = GetFakeDS(FakeInputsHashStringified)
+
+        'create 'NullPhaseLabelKey' DR within FakeDS
+        AddDsRow(FakeDS.Tables(0), New Dictionary(Of String, Object) From {
+            {"LabelKey", NullPhaseLabelKey},
+            {"PhaseOrder", DBNull.Value},
+            {"DataInputs", FakeInputsHashStringified}
+        })
+
+        'move 'NullPhaseLabelKey' DR within FakeDS from the last row to the first position
+        Dim DT As DataTable = FakeDS.Tables(0)
+
+        If DT.Rows.Count > 1 Then
+            Dim lastRow As DataRow = DT.Rows(DT.Rows.Count - 1)
+            Dim newRow As DataRow = DT.NewRow()
+
+            newRow.ItemArray = lastRow.ItemArray.Clone()
+
+            DT.Rows.InsertAt(newRow, 0)
+            DT.Rows.RemoveAt(DT.Rows.Count - 1)
+        End If
+
+        Assert.Equal(2, GetPhase(FakeDataKey, FakeDS)) 'return 2, even though we're on phase 1 b/c non-phased inputs section acts as phase 0
+    End Sub
+
+    '#TO DO: create test to replicate bug
+    'environment: all inputs are phased. Once phase 0 is complete, stateless GetPhase() function return jumps to phase 2 rather than 1
+End Class
 
 Public Class PhaseControllerDeleteBatchTests
     Inherits PhaseController

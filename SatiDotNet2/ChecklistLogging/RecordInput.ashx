@@ -13,12 +13,14 @@ Public Class StreamData
     Private LogAspx As New LogAspxLibrary()
     Private ActivePm As New ActivePm()
     Private PmInput As New PmInput()
+
     Private KeyFromQueryString As Integer
 
     Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
         Dim Res As Dictionary(Of String, Object)
         Dim JsonString As String
         Dim Json As New Dictionary(Of String, Object)
+        Dim PhaseController As New PhaseController()
 
         context.Response.ContentType = "application/json"
 
@@ -28,8 +30,9 @@ Public Class StreamData
         Json = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(JsonString)
         KeyFromQueryString = Json("dataId").ToString()
 
-        Try 'in case sql update query in ModifyInput continues to fail
+        Try 'in case sql update query in ModifyInput continues to fail or http req body is missing data
             Res = ModifyInput(KeyFromQueryString, Json("labelId").ToString(), Json("value").ToString(), HttpContext.Current.User.Identity.Name.ToString())
+
             Res("dbUpdateSuccess") = True
         Catch ex As Exception
             Res = New Dictionary(Of String, Object)
@@ -40,6 +43,9 @@ Public Class StreamData
 
             Res("dbUpdateSuccess") = False
         End Try
+
+        'return accurate phaseLevel even when only the dataId is passed to http endpoint
+        Res("phaseLevel") = PhaseController.GetPhase(KeyFromQueryString)
 
         context.Response.Write(JsonSerializer.Serialize(Res))
     End Sub

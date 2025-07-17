@@ -118,6 +118,42 @@ Public Class PhaseController
         Return Res
     End Function
 
+    'stateless version of original GetPhase Function
+    Public Function GetPhase(DataKey As String, Optional TestDS As Data.DataSet = Nothing) As Integer
+        Dim DS As Data.DataSet
+        Dim PhaseOrdersEncountered As New HashSet(Of Object) 'use a HashSet so duplicates do not exist
+
+        If TestDS Is Nothing Then
+            Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@DataKey", GetParamVarHash(DataKey, "int")}
+            }
+
+            'ORDER BY PhaseOrder has to be in the select query for the logic in the For Each loop below to work!!!!
+            DS = GetMyDataSetParamQuery("SELECT L.[Key] As LabelKey, P.PhaseOrder, D.Inputs As DataInputs FROM [ALTS].[dbo].[T_LogData] D " +
+                "INNER JOIN [ALTS].[dbo].[T_LogLabel] L ON D.AreaKey=L.AreaKey " +
+                "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P ON L.PhaseKey=P.[Key] " +
+                "WHERE D.[Key]=@DataKey " +
+                "ORDER BY P.PhaseOrder", QueryConfig)
+        Else
+            DS = TestDS
+        End If
+
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            'NOTE: DR("DataInputs") is the same for each row in the dataset
+            Dim T_LogDataInputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(DR("DataInputs"))
+            Dim UserInput As String = T_LogDataInputs(DR("LabelKey"))("Value")
+            Dim PhaseOrder As Object = DR("PhaseOrder")
+
+            PhaseOrdersEncountered.Add(PhaseOrder)
+
+            If IsDBNull(PhaseOrder) = False AndAlso String.IsNullOrEmpty(UserInput) Then
+                Exit For
+            End If
+        Next
+
+        Return PhaseOrdersEncountered.Count - 1
+    End Function
+
     Public Function GetPhases() As Dictionary(Of Integer, Dictionary(Of String, String))
         If LabelToPhaseInfo.Count = 0 Then Return Nothing
         Return LabelToPhaseInfo
