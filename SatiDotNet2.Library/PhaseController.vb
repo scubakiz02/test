@@ -187,6 +187,7 @@ Public Class PhaseController
         Return Res
     End Function
 
+    '#TO DO: add foreign key ties to T_LogPhase records within T_LogLabel (to ensure records in T_LogPhase cannot be deleted if they have inputs attached to them)
     Public Function DeletePhaseOrGroup(PhaseOrGroupKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
         '1) Delete relevant record in T_LogPhase;
         '2) Update PhaseKey field values to NULL for relevant records in T_LogLabel

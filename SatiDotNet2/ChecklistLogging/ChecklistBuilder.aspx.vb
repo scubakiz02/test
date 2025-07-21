@@ -914,6 +914,7 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub FormViewDeleteHyperlink_OnClick(sender As Object, e As EventArgs)
+        '#TO DO: after client side is calling PhaseController.DeletePhaseOrGroup(), delete if condition related to it
         If sender.ID.Contains("Phase") Then
             PhaseController.DeletePhaseOrGroup(PhaseFromQs)
             PhaseFromQs = Nothing

@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="" Language="VB" MaintainScrollPositionOnPostback="true" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="ChecklistBuilder.aspx.vb" Inherits="MR_OpenTicketStatusBoard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <script src="../scripts/WebComponents/sati-alert.js"></script>
     <script defer type="text/javascript">
         let PreviewPanel;
         let EditPreviewPanel;
@@ -180,6 +181,12 @@
             }
         }
 
+        async function deletePhase() {
+            return { success: false, message: "detach inputs to delete phase" }
+            //return { success: true, message: "" }
+
+            //#TO DO: link functionality to PmInputDelete.ashx
+        }
     </script>
     <style>
         :root {
@@ -505,6 +512,7 @@
 
         <%--height is 95% to prevent weird overlap with footer--%>
         <asp:Panel ID="EditPreviewPanel" CssClass="EditPreviewPanel" onscroll="setScrollPos.call(this)" runat="server" Style="">
+
             <div id="edit-iframe-preview-section1-container">
                 <section id="pm-status-radio-buttons-section">
                     <span>PM/Checklist Status:</span>
@@ -670,6 +678,9 @@
                 </asp:Panel>
 
                 <asp:Panel Visible="False" ID="PhaseOrBundle_Panel" CssClass="InterfacePanel" Style="background-color: #FF69B4;" runat="server">
+
+                    <sati-alert id="phase-interface-alert" message=""></sati-alert>
+
                     <asp:Panel ID="PhaseInterfacePanel" runat="server" Style="display: flex; flex-direction: column;">
 
                         <div id="phase-interface-label-container">
@@ -720,9 +731,35 @@
                                 <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
                                 <br />
                                 <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                <%--&nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                 &nbsp;<asp:LinkButton ID="PhaseDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
                                 &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
+                                <%--adding script tag here to allow async/await invocation of deletePhase() function (needed for http req/res process flow)--%>
+                                <script type="module">
+                                    const phaseDeleteButton = document.querySelector(".phase-delete-hyperlink");
+
+                                    phaseDeleteButton.addEventListener("click", async function () {
+                                        const phaseInterfaceAlert = document.getElementById("phase-interface-alert");
+                                        const httpRes = await deletePhase();
+
+                                        if (!httpRes.success) {
+                                            phaseInterfaceAlert.setAttribute("message", httpRes.message);
+                                            phaseInterfaceAlert.show();
+                                        }
+                                        else {
+                                            //remove Phase key from querystring and refresh window if return from http request indicates success
+                                            const url = new URL(window.location.href);
+
+                                            //delete querystring 'Phase' key value pair
+                                            url.searchParams.delete('Phase');
+                                            window.history.replaceState(null, '', url.toString());
+
+                                            //reload browser
+                                            window.location.reload();
+                                        }
+                                    })
+                                </script>
                             </ItemTemplate>
                             <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
                             <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
