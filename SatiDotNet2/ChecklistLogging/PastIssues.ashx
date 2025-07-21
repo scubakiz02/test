@@ -31,19 +31,17 @@ Public Class StreamData : Implements IHttpHandler, IReadOnlySessionState
                         Dim BufferSize As Integer = 1024
                         Dim Offset As Integer = 0
 
-                        Try 'in case there's errors with a specific checklist
+                        Try
+                            Dim ChunkSize As Integer
+
                             JsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(PastIssuesControl) & vbLf) 'delimit increments by a newline (\n OR vbLf)
                             TotalLength = JsonBytes.Length
+                            ChunkSize = Math.Min(BufferSize, TotalLength - Offset)
 
-                            While Offset < TotalLength
-                                Dim ChunkSize As Integer = Math.Min(BufferSize, TotalLength - Offset)
+                            context.Response.OutputStream.Write(JsonBytes, Offset, ChunkSize)
+                            context.Response.Flush() ' send chunk
 
-                                context.Response.OutputStream.Write(JsonBytes, Offset, ChunkSize)
-                                context.Response.Flush() ' send chunk
-
-                                Offset += ChunkSize
-                            End While
-
+                            Offset += ChunkSize
                         Catch ex As Exception
                             Continue For
                         End Try

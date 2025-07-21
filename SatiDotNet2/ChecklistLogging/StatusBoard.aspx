@@ -36,6 +36,7 @@
                         .then(response => {
                             const reader = response.body.getReader();
                             const decoder = new TextDecoder();
+                            let logCount = 0; //for debugging/troubleshooting
 
                             function buildFirst50logs() {
                                 build50Logs();
@@ -58,6 +59,10 @@
                                         let checklistChunkConfig = {};
                                         let checklist;
 
+                                        if (checklistChunk === "") continue;
+
+                                        logCount++;
+
                                         try {
                                             checklistChunkConfig = JSON.parse(checklistChunk);
                                             checklist = checklistChunkConfig.Value.Checklist;
@@ -68,7 +73,7 @@
 
                                             checklistsConfig[checklist][checklistChunkConfig.Key] = checklistChunkConfig.Value;
 
-                                            console.log("successful parsing of JSON: \n" + checklistChunk)
+                                            console.log(logCount + ": successful parsing of JSON: \n" + checklistChunk)
                                         }
                                         catch (err) {
                                             console.log("error when parsing JSON: \n\terror: " + err + "\n\tchunk:" + checklistChunk);
@@ -127,6 +132,7 @@
                                     }, 100);
                                 }
 
+                                //#TO DO: if # of logs needed in PastIssuesPanel is exactly 50, 'More...' hyperlink is visible. It shouldn't be. Fix this!!!!
                                 if (dataChunkingDone && configCount(checklistsConfig) === 0) BuildMoreLogs_Hyperlink.style.display = "none";
                                 else BuildMoreLogs_Hyperlink.style.display = "";
 
