@@ -703,7 +703,7 @@ Public Class DeleteBatchTests
             {"PhaseOrGroupKey", PhaseOrGroupKey}
         }
 
-        Assert.Equal("UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=NULL WHERE PhaseKey=@PhaseOrGroupKey; DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", DeletePhaseOrGroupRes("SqlQuery"))
+        Assert.Equal("DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", DeletePhaseOrGroupRes("SqlQuery"))
         Assert.True(SqlParameters.ValidParameterizedValues(DeletePhaseOrGroupHash, DeletePhaseOrGroupRes))
     End Sub
 

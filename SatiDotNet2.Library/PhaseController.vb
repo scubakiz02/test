@@ -187,10 +187,7 @@ Public Class PhaseController
         Return Res
     End Function
 
-    '#TO DO: add foreign key ties to T_LogPhase records within T_LogLabel (to ensure records in T_LogPhase cannot be deleted if they have inputs attached to them)
     Public Function DeletePhaseOrGroup(PhaseOrGroupKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
-        '1) Delete relevant record in T_LogPhase;
-        '2) Update PhaseKey field values to NULL for relevant records in T_LogLabel
         Dim Res As New Dictionary(Of String, String)
         Dim SqlQuery As String
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
@@ -201,14 +198,28 @@ Public Class PhaseController
         End If
 
         QueryConfig("@PhaseOrGroupKey") = GetParamVarHash(PhaseOrGroupKey, "int")
-        SqlQuery = "UPDATE [ALTS].[dbo].[T_LogLabel] SET PhaseKey=NULL WHERE PhaseKey=@PhaseOrGroupKey; DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;"
+        SqlQuery = "DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;"
 
         If InvocateAsTest Then
             Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
             Res("SqlQuery") = SqlQuery
             Res("Success") = True
         Else
-            Res("Success") = If(ExecuteSqlParamQuery(SqlQuery, QueryConfig) Is Nothing, False, True)
+            Dim SqlResult As Dictionary(Of String, Object) = ExecuteSqlParamQuery(SqlQuery, QueryConfig)
+            Dim Success As Boolean = SqlResult("Success")
+            Dim Message As String = String.Empty
+
+            'return message when delete query fails (assuming the reason for failure is a foreign key relationship)
+            If Success = False Then
+                Dim AreaKey As Integer = GetSingleDbField("SELECT AreaKey FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", QueryConfig, "AreaKey")
+                Dim SectionType As String = GetSectionType(AreaKey)
+
+                'tailor message to T_LogArea SectionType field value (phases or groups)
+                Message = "detach inputs to delete " & SectionType
+            End If
+
+            Res("message") = Message
+            Res("Success") = Success
         End If
 
         Return Res

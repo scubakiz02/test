@@ -181,11 +181,33 @@
             }
         }
 
+        //#TO DO: remove 'deletePhase' function once pm phase delete functionality is linked to api endpoint
         async function deletePhase() {
             return { success: false, message: "detach inputs to delete phase" }
             //return { success: true, message: "" }
+        }
 
-            //#TO DO: link functionality to PmInputDelete.ashx
+        async function httpPost(url = '', data = {}) {
+            try {
+                let res;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                res = await response.json();
+                return res;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
     </script>
     <style>
@@ -731,8 +753,7 @@
                                 <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
                                 <br />
                                 <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                <%--&nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
-                                &nbsp;<asp:LinkButton ID="PhaseDeleteButton" OnClick="FormViewDeleteHyperlink_OnClick" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                &nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
                                 &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
                                 <%--adding script tag here to allow async/await invocation of deletePhase() function (needed for http req/res process flow)--%>
@@ -741,16 +762,15 @@
 
                                     phaseDeleteButton.addEventListener("click", async function () {
                                         const phaseInterfaceAlert = document.getElementById("phase-interface-alert");
-                                        const httpRes = await deletePhase();
-
+                                        const url = new URL(window.location.href);
+                                        const urlOrigin = url.origin; // Protocol + domain (and port, if not 80/443)
+                                        const httpRes = await httpPost(urlOrigin + "/api/pm-phase/delete.ashx", { phaseKey: url.searchParams.get("Phase") });
+                                        
                                         if (!httpRes.success) {
                                             phaseInterfaceAlert.setAttribute("message", httpRes.message);
                                             phaseInterfaceAlert.show();
                                         }
                                         else {
-                                            //remove Phase key from querystring and refresh window if return from http request indicates success
-                                            const url = new URL(window.location.href);
-
                                             //delete querystring 'Phase' key value pair
                                             url.searchParams.delete('Phase');
                                             window.history.replaceState(null, '', url.toString());

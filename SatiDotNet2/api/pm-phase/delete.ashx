@@ -27,13 +27,12 @@ Public Class StreamData
 
         If PhaseDeleteRes("Success") = "True" Then
             HttpRes("success") = True
-            HttpRes("message") = ""
         Else
             HttpRes("success") = False
-            HttpRes("message") = "detach inputs to delete phase"
         End If
+        HttpRes("message") = PhaseDeleteRes("message")
 
-        context.Response.Write(JsonSerializer.Serialize(PhaseDeleteRes))
+        context.Response.Write(JsonSerializer.Serialize(HttpRes))
     End Sub
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable

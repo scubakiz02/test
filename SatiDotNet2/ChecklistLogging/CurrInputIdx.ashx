@@ -15,15 +15,19 @@ Public Class StreamData
 
         context.Response.ContentType = "application/json"
 
-        LabelKey = context.Request.QueryString("Label").ToString()
-        ResIdx = GetLabel_Idx(LabelKey)
+        Try 'in case 'Label' key value pair is not passed to http req body
+            LabelKey = context.Request.QueryString("Label").ToString()
+            ResIdx = GetLabel_Idx(LabelKey)
 
-        If ResIdx >= 0 Then
-            Res("success") = True
-        Else
+            If ResIdx >= 0 Then
+                Res("success") = True
+            Else
+                Throw New Exception()
+            End If
+            Res("idx") = ResIdx
+        Catch ex As Exception
             Res("success") = False
-        End If
-        Res("idx") = ResIdx
+        End Try
 
         context.Response.Write(JsonSerializer.Serialize(Res))
     End Sub
