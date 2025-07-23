@@ -344,6 +344,14 @@
             opacity: .9;
         }
 
+        /* formview section(s) classes */
+        .up-and-down-functionality-section {
+            display: flex;
+            flex-direction: column;
+            align-items: normal;
+            gap: var(--UWhitespace);
+        }
+
         /* ============= area-section ================= */
         #area-formview-itemtemplate-checkbox-container {
             display: flex;
@@ -722,87 +730,93 @@
                         </asp:DropDownList>
                         <asp:SqlDataSource ID="PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"></asp:SqlDataSource>
 
-                        <asp:FormView ID="PhaseFormView" runat="server" DataKeyNames="Key" DataSourceID="PhaseFormView_SqlDataSource" CellPadding="4" ForeColor="#333333" Style="width: calc(var(--Width) - 100px); margin: var(--UWhitespace) 0;">
-                            <EmptyDataTemplate>
-                                <asp:Panel runat="server" BackColor="#F7F6F3" ForeColor="#333333">
-                                    No data loaded yet...
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <asp:FormView ID="PhaseFormView" runat="server" DataKeyNames="Key" DataSourceID="PhaseFormView_SqlDataSource" CellPadding="4" ForeColor="#333333" Style="width: calc(var(--Width) - 100px); margin: var(--UWhitespace) 0;">
+                                <EmptyDataTemplate>
+                                    <asp:Panel runat="server" BackColor="#F7F6F3" ForeColor="#333333">
+                                        No data loaded yet...
                                     <br />
-                                    <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                    <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
+                                        <asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                        <%--                                    &nbsp;<asp:LinkButton Enabled="False" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />--%>
                                     &nbsp;<asp:LinkButton ID="EmptyPhaseNewButton" OnClick="NewButton_onClick" Enabled="True" runat="server" CausesValidation="False" CommandName="New" Text="New" />
-                                </asp:Panel>
-                            </EmptyDataTemplate>
+                                    </asp:Panel>
+                                </EmptyDataTemplate>
 
-                            <EditItemTemplate>
-                                <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
-                                <br />
-                                <asp:LinkButton ID="PhaseUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
-                                &nbsp;<asp:LinkButton ID="PhaseUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
-                            </EditItemTemplate>
-                            <EditRowStyle BackColor="#999999" />
-                            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                            <InsertItemTemplate>
-                                <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
-                                <br />
-                                <asp:LinkButton ID="PhaseInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
-                                &nbsp;<asp:LinkButton ID="PhaseInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                                <EditItemTemplate>
+                                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                    <br />
+                                    <asp:LinkButton ID="PhaseUpdateButton" OnClick="UpdateButton_onClick" runat="server" CausesValidation="True" CommandName="Update" Text="Update" />
+                                    &nbsp;<asp:LinkButton ID="PhaseUpdateCancelButton" OnClick="UpdateCancelButton_OnClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
+                                </EditItemTemplate>
+                                <EditRowStyle BackColor="#999999" />
+                                <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                                <InsertItemTemplate>
+                                    <asp:TextBox Style="width: 400px" ID="PhaseTextBox" runat="server" Text='<%# Bind("Phase") %>' />
+                                    <br />
+                                    <asp:LinkButton ID="PhaseInsertButton" OnClick="InsertButton_onClick" runat="server" CausesValidation="True" CommandName="Insert" Text="Insert" />
+                                    &nbsp;<asp:LinkButton ID="PhaseInsertCancelButton" OnClick="InsertCancelButton_onClick" runat="server" CausesValidation="False" CommandName="Cancel" Text="Cancel" />
 
-                            </InsertItemTemplate>
-                            <ItemTemplate>
-                                <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
-                                <br />
-                                <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
-                                &nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
-                                &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
+                                </InsertItemTemplate>
+                                <ItemTemplate>
+                                    <asp:Label ID="PhaseLabel" runat="server" Text='<%# Bind("Phase") %>' />
+                                    <br />
+                                    <asp:LinkButton ID="PhaseEditButton" OnClick="EditButton_OnClick" runat="server" CausesValidation="False" CommandName="Edit" Text="Edit" />
+                                    &nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
+                                    &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
-                                <%--adding script tag here to allow async/await invocation of deletePhase() function (needed for http req/res process flow)--%>
-                                <script type="module">
-                                    const phaseDeleteButton = document.querySelector(".phase-delete-hyperlink");
+                                    <%--adding script tag here to allow async/await invocation of deletePhase() function (needed for http req/res process flow)--%>
+                                    <script type="module">
+                                        const phaseDeleteButton = document.querySelector(".phase-delete-hyperlink");
 
-                                    phaseDeleteButton.addEventListener("click", async function () {
-                                        const phaseInterfaceAlert = document.getElementById("phase-interface-alert");
-                                        const url = new URL(window.location.href);
-                                        const urlOrigin = url.origin; // Protocol + domain (and port, if not 80/443)
-                                        const httpRes = await httpPost(urlOrigin + "/api/pm-phase/delete.ashx", { phaseKey: url.searchParams.get("Phase") });
-                                        
-                                        if (!httpRes.success) {
-                                            phaseInterfaceAlert.setAttribute("message", httpRes.message);
-                                            phaseInterfaceAlert.show();
-                                        }
-                                        else {
-                                            //delete querystring 'Phase' key value pair
-                                            url.searchParams.delete('Phase');
-                                            window.history.replaceState(null, '', url.toString());
+                                        phaseDeleteButton.addEventListener("click", async function () {
+                                            const phaseInterfaceAlert = document.getElementById("phase-interface-alert");
+                                            const url = new URL(window.location.href);
+                                            const urlOrigin = url.origin; // Protocol + domain (and port, if not 80/443)
+                                            const httpRes = await httpPost(urlOrigin + "/api/pm-phase/delete.ashx", { phaseKey: url.searchParams.get("Phase") });
 
-                                            //reload browser
-                                            window.location.reload();
-                                        }
-                                    })
-                                </script>
-                            </ItemTemplate>
-                            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
-                            <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
-                        </asp:FormView>
+                                            if (!httpRes.success) {
+                                                phaseInterfaceAlert.setAttribute("message", httpRes.message);
+                                                phaseInterfaceAlert.show();
+                                            }
+                                            else {
+                                                //delete querystring 'Phase' key value pair
+                                                url.searchParams.delete('Phase');
+                                                window.history.replaceState(null, '', url.toString());
 
-                        <%--InsertCommand value is a select query, because it's a workaround on the asp.net architecture to prevent empty TextBox values from creating a record in DB--%>
-                        <asp:SqlDataSource ID="PhaseFormView_SqlDataSource" runat="server" ConflictDetection="OverwriteChanges" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                            DeleteCommand="DELETE FROM [T_LogPhase] WHERE [Key] = @original_Key"
-                            InsertCommand="SELECT * FROM T_LogPhase"
-                            SelectCommand=""
-                            UpdateCommand="UPDATE [T_LogPhase] SET [Phase] = @Phase WHERE [Key] = @original_Key">
-                            <DeleteParameters>
-                                <asp:Parameter Name="original_Key" Type="Int32" />
-                                <asp:Parameter Name="original_Phase" Type="String" />
-                            </DeleteParameters>
-                            <InsertParameters>
-                                <asp:Parameter Name="Phase" Type="String" />
-                            </InsertParameters>
-                            <UpdateParameters>
-                                <asp:Parameter Name="Phase" Type="String" />
-                            </UpdateParameters>
-                        </asp:SqlDataSource>
+                                                //reload browser
+                                                window.location.reload();
+                                            }
+                                        })
+                                    </script>
+                                </ItemTemplate>
+                                <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                                <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                            </asp:FormView>
 
+                            <%--InsertCommand value is a select query, because it's a workaround on the asp.net architecture to prevent empty TextBox values from creating a record in DB--%>
+                            <asp:SqlDataSource ID="PhaseFormView_SqlDataSource" runat="server" ConflictDetection="OverwriteChanges" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                                DeleteCommand="DELETE FROM [T_LogPhase] WHERE [Key] = @original_Key"
+                                InsertCommand="SELECT * FROM T_LogPhase"
+                                SelectCommand=""
+                                UpdateCommand="UPDATE [T_LogPhase] SET [Phase] = @Phase WHERE [Key] = @original_Key">
+                                <DeleteParameters>
+                                    <asp:Parameter Name="original_Key" Type="Int32" />
+                                    <asp:Parameter Name="original_Phase" Type="String" />
+                                </DeleteParameters>
+                                <InsertParameters>
+                                    <asp:Parameter Name="Phase" Type="String" />
+                                </InsertParameters>
+                                <UpdateParameters>
+                                    <asp:Parameter Name="Phase" Type="String" />
+                                </UpdateParameters>
+                            </asp:SqlDataSource>
+
+                            <asp:Panel ID="PhaseOrderInterfacePanel" CssClass="up-and-down-functionality-section" Enabled="false" runat="server">
+                                <asp:Button ID="UpInOrderPhaseButton" OnClick="PhaseOrderInterface_onClick" Text="up" runat="server" />
+                                <asp:Button ID="DownInOrderPhaseButton" OnClick="PhaseOrderInterface_onClick" Text="down" runat="server" />
+                            </asp:Panel>
+                        </div>
                     </asp:Panel>
                 </asp:Panel>
 
@@ -895,7 +909,7 @@
                                 </UpdateParameters>
                             </asp:SqlDataSource>
 
-                            <asp:Panel ID="LabelOrderInterfacePanel" Enabled="false" runat="server" Style="display: flex; flex-direction: column; align-items: normal; gap: var(--UWhitespace);">
+                            <asp:Panel ID="LabelOrderInterfacePanel" CssClass="up-and-down-functionality-section" Enabled="false" runat="server">
                                 <asp:Button ID="UpInOrderLabelButton" OnClick="LabelOrderInterface_onClick" Text="up" runat="server" />
                                 <asp:Button ID="DownInOrderLabelButton" OnClick="LabelOrderInterface_onClick" Text="down" runat="server" />
                             </asp:Panel>
@@ -911,7 +925,7 @@
                             <asp:ListItem Text="None" Value="" />
                         </asp:DropDownList>
                         <asp:SqlDataSource ID="LabelInterface_PhaseDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                            SelectCommand="SELECT [Key], Phase FROM [T_LogPhase] WHERE AreaKey=@AreaKey">
+                            SelectCommand="SELECT [Key], Phase FROM [T_LogPhase] WHERE AreaKey=@AreaKey ORDER BY PhaseOrder">
                             <SelectParameters>
                                 <asp:QueryStringParameter Name="AreaKey" QueryStringField="Area" Type="Int32" DefaultValue="0" />
                             </SelectParameters>
@@ -1067,7 +1081,7 @@
                             </UpdateParameters>
                         </asp:SqlDataSource>
 
-                        <asp:Panel ID="CommentOrderInterface" Enabled="false" runat="server" Style="display: flex; flex-direction: column; align-items: normal; gap: var(--UWhitespace);">
+                        <asp:Panel ID="CommentOrderInterface" CssClass="up-and-down-functionality-section" Enabled="false" runat="server">
                             <asp:Button ID="UpInOrderCommentButton" OnClick="CommentOrderInterface_onClick" Text="up" runat="server" />
                             <asp:Button ID="DownInOrderCommentButton" OnClick="CommentOrderInterface_onClick" Text="down" runat="server" />
                         </asp:Panel>

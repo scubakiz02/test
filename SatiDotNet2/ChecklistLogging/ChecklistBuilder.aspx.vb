@@ -193,18 +193,10 @@ Partial Class MR_OpenTicketStatusBoard
                 LabelDropDownList_SqlDataSource.SelectParameters.Clear()
 
                 If PhaseFromQs IsNot Nothing Then
-                    'create ListItems controls for relevant T_LogLabel records that have a NULL PhaseKey field value
-                    'Dim DetachedLabels As Dictionary(Of Integer, String) = PhaseController.GetDetachedLabels(AreaFromQueryString)
-                    'For Each DetachedLabel As KeyValuePair(Of Integer, String) In DetachedLabels
-                    '    Dim DdlOption As New ListItem(DetachedLabel.Value, DetachedLabel.Key)
-
-                    '    DdlOption.Attributes("style") = "color: #FF0000;"
-
-                    '    LabelDropDownList.Items.Add(DdlOption)
-                    'Next
-
                     LabelDropDownList_SqlDataSource.SelectCommand = LabelDropDownList_SqlDataSource.SelectCommand.Replace("WHERE", "WHERE L.PhaseKey=@PhaseKey AND")
                     LabelDropDownList_SqlDataSource.SelectParameters.Add("PhaseKey", PhaseFromQs)
+
+                    PhaseOrderInterfacePanel.Enabled = True
                 End If
                 LabelDropDownList_SqlDataSource.SelectParameters.Add("AreaKey", AreaFromQueryString)
 
@@ -1199,9 +1191,8 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub CommentOrderInterface_onClick(sender As Object, e As EventArgs)
-        Dim Action As String
-        Dim UpdateQuery As String
-        Dim ModifyOrderConfig As New Dictionary(Of String, String)
+        Dim Action As String = String.Empty
+        Dim Table As String = "T_LogCommentList"
 
         Select Case sender.ID
             Case "UpInOrderCommentButton"
@@ -1210,16 +1201,12 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ModifyOrderConfig = ChecklistBuilder.ModifyOrder(CommentFromQueryString, Action, "Comment")
-        UpdateQuery = ModifyOrderConfig("SqlQuery")
-        If String.IsNullOrEmpty(UpdateQuery) = False Then
-            Security.ExecuteSqlParamQuery(UpdateQuery, JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(ModifyOrderConfig("ParameterizedValues")))
-            RefreshPreview()
-        End If
+        ChecklistBuilder.ModifyOrder(CommentFromQueryString, Action, Table)
+        RefreshPreview()
     End Sub
+
     Protected Sub LabelOrderInterface_onClick(sender As Object, e As EventArgs)
         Dim Action As String = String.Empty
-        Dim UpdateQuery As String
         Dim ModifyOrderConfig As New Dictionary(Of String, String)
 
         Select Case sender.ID
@@ -1229,7 +1216,21 @@ Partial Class MR_OpenTicketStatusBoard
                 Action = "down"
         End Select
 
-        ChecklistBuilder.ModifyOrder(LabelFromQueryString, Action, "Label")
+        ChecklistBuilder.ModifyOrder(LabelFromQueryString, Action, "T_LogLabel")
+        RefreshPreview()
+    End Sub
+
+    Protected Sub PhaseOrderInterface_onClick(sender As Object, e As EventArgs)
+        Dim Action As String = String.Empty
+
+        Select Case sender.ID
+            Case "UpInOrderPhaseButton"
+                Action = "up"
+            Case "DownInOrderPhaseButton"
+                Action = "down"
+        End Select
+
+        ChecklistBuilder.ModifyOrder(PhaseFromQs, Action, "T_LogPhase")
         RefreshPreview()
     End Sub
 

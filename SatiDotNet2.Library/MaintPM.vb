@@ -6,103 +6,7 @@ Public Class MaintPM
     Inherits Security
     Dim Sql As New Security
 
-    Public Function ModifyOrder(Key As Integer, Action As String, Marker As String) As Dictionary(Of String, String)
-        Dim Res As New Dictionary(Of String, String)
-        Dim ParameterizedValuesConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim Table As String = "[ALTS].[dbo]."
-        Dim FieldOfInterest As String
-
-        Select Case Marker
-            Case "Label"
-                Return ModifyLabelOrderNew(Key, Action)
-            Case "Phase"
-                Table += "[T_LogPhase]"
-                FieldOfInterest = "PhaseOrder"
-            Case Else
-                Table += "[T_LogCommentList]"
-                FieldOfInterest = "CommentOrder"
-        End Select
-
-        Dim UpdateQueryTemplate As String = "UPDATE " & Table & " SET " & FieldOfInterest & "="
-        Dim SqlQuery As String = UpdateQueryTemplate & "@Order1 WHERE [Key]=@Key1; " & UpdateQueryTemplate & "@Order2 WHERE [Key]=@Key2"
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        QueryConfig("@Key") = New Dictionary(Of String, String) From {
-            {"value", Key},
-            {"typeOf", "int"}
-        }
-        Dim KeyDS As Data.DataSet = Sql.GetMyDataSetParamQuery("SELECT (SELECT TOP(1) [Key] FROM " & Table & " Frst WHERE Frst.AreaKey=Curr.AreaKey ORDER BY Frst." & FieldOfInterest & ") As FirstKey, (SELECT TOP(1) [Key] FROM " & Table & " Prev WHERE Prev.AreaKey=Curr.AreaKey AND Prev." & FieldOfInterest & " < Curr." & FieldOfInterest & " ORDER BY Prev." & FieldOfInterest & " DESC) As PrevKey, (SELECT TOP(1) [Key] FROM " & Table & " Nxt WHERE Nxt.AreaKey=Curr.AreaKey AND " & FieldOfInterest & " > Curr." & FieldOfInterest & " ORDER BY Nxt." & FieldOfInterest & ") As NextKey, (SELECT TOP(1) [Key] FROM " & Table & " Lst WHERE Lst.AreaKey=Curr.AreaKey ORDER BY Lst." & FieldOfInterest & " DESC) As LastKey FROM " & Table & " Curr WHERE [Key]=@Key GROUP BY " & FieldOfInterest & ", [Key], AreaKey", QueryConfig)
-        Dim KeyDR As Data.DataRow = KeyDS.Tables(0).Rows(0)
-        Dim FirstKey As Integer = KeyDR("FirstKey")
-        Dim PrevKey As Integer = If(IsDBNull(KeyDR("PrevKey")), -1, KeyDR("PrevKey")) 'ternary operator in case value is DBNull
-        Dim NextKey As Integer = If(IsDBNull(KeyDR("NextKey")), -1, KeyDR("NextKey")) 'ternary operator in case value is DBNull
-        Dim LastKey As Integer = KeyDR("LastKey")
-        Dim FirstOrder As Integer
-        Dim PrevOrder As String 'string variable type in case PrevKey is -1, which would mean this variable could be null (Nothing)
-        Dim Order As Integer
-        Dim NextOrder As String 'string variable type in case NextKey is -1, which would mean this variable could be null (Nothing)
-        Dim LastOrder As Integer
-
-        QueryConfig("@Key")("value") = FirstKey
-        FirstOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
-
-        QueryConfig("@Key")("value") = PrevKey
-        PrevOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
-
-        QueryConfig("@Key")("value") = Key
-        Order = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
-
-        QueryConfig("@Key")("value") = NextKey
-        NextOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
-
-        QueryConfig("@Key")("value") = LastKey
-        LastOrder = Sql.GetSingleDbField("SELECT " & FieldOfInterest & " FROM " & Table & " WHERE [Key]=@Key", QueryConfig, FieldOfInterest)
-
-        If Action = "up" Then
-            If PrevKey = -1 Then 'if true, this means the label is already the top/up most label
-                SqlQuery = ""
-            Else
-                ParameterizedValuesConfig("@Order1") = New Dictionary(Of String, String) From {
-                    {"value", PrevOrder},
-                    {"typeOf", "int"}
-                }
-                ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
-                    {"value", PrevKey},
-                    {"typeOf", "int"}
-                }
-            End If
-        Else
-            If NextKey = -1 Then 'if true, this means the label is already the bottom/down most label
-                SqlQuery = ""
-            Else
-                ParameterizedValuesConfig("@Order1") = New Dictionary(Of String, String) From {
-                    {"value", NextOrder},
-                    {"typeOf", "int"}
-                }
-                ParameterizedValuesConfig("@Key2") = New Dictionary(Of String, String) From {
-                    {"value", NextKey},
-                    {"typeOf", "int"}
-                }
-            End If
-        End If
-
-        If String.IsNullOrEmpty(SqlQuery) = False Then 'these 2 key value pairs always keep the same value, hence why they're not in the if statement above
-            ParameterizedValuesConfig("@Key1") = New Dictionary(Of String, String) From {
-                {"value", Key},
-                {"typeOf", "int"}
-            }
-            ParameterizedValuesConfig("@Order2") = New Dictionary(Of String, String) From {
-                {"value", Order},
-                {"typeOf", "int"}
-            }
-        End If
-
-        Res("ParameterizedValues") = JsonSerializer.Serialize(ParameterizedValuesConfig)
-        Res("SqlQuery") = SqlQuery
-
-        Return Res
-    End Function
-
-    Public Function ModifyLabelOrderNew(Key As Integer, Action As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
+    Private Function ModifyLabelOrder(Key As Integer, Action As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
         Dim Res As New Dictionary(Of String, String)
         Dim LabelOrderTracking As New Dictionary(Of Integer, Dictionary(Of String, Object))
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
@@ -129,7 +33,7 @@ Public Class MaintPM
                 Dim SiblingLabelOrder As Double
 
                 'using a try catch block to throw errors when moving labels to a non existing slot
-                'Ex: moving top most label up, moving bottom most label down
+                'Ex: moving top most label up
                 Try
                     Dim SiblingDR As Data.DataRow
                     Dim DrPhaseOrder As Object
@@ -166,11 +70,153 @@ Public Class MaintPM
             }
         Next
 
-        'execute sql update queries this function is invoked WITHOUT optional arg
+        'execute sql update queries if this function is invoked WITHOUT optional arg
         If TestDS Is Nothing Then Sql.GetMyDataSetParamQuery(SqlQuery, QueryConfig)
 
         Res("SqlQuery") = SqlQuery
         Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+
+        Return Res
+    End Function
+
+    Private Function ModifyCommentOrder(Key As Integer, Action As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim DS As Data.DataSet
+        Dim SqlQuery As String = "UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=@CommentOrder WHERE [Key]=@SiblingCommentKey; UPDATE [ALTS].[dbo].[T_LogCommentList] SET CommentOrder=@SiblingCommentOrder WHERE [Key]=@CommentKey;"
+
+        If TestDS Is Nothing Then
+            Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@CommentKey", Sql.GetParamVarHash(Key, "int")}
+            }
+
+            DS = Sql.GetMyDataSetParamQuery("SELECT [Key] As CommentKey, CommentOrder FROM [ALTS].[dbo].[T_LogCommentList] " &
+                                            "WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogCommentList] WHERE [Key]=@CommentKey) " &
+                                            "ORDER BY CommentOrder", SqlConfig)
+        Else
+            DS = TestDS
+        End If
+
+        For I As Integer = 0 To DS.Tables(0).Rows.Count
+            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
+            Dim CommentKey As Integer = DR("CommentKey")
+            Dim CommentOrder As Integer = DR("CommentOrder")
+
+            If CommentKey = Key Then
+                Dim SiblingCommentKey As Integer
+                Dim SiblingCommentOrder As Double
+
+                'using a try catch block to throw errors when moving labels to a non existing slot
+                'Ex: moving top most label up
+                Try
+                    Dim SiblingDR As Data.DataRow
+                    'Dim DrPhaseOrder As Object
+
+                    If Action = "up" Then
+                        SiblingDR = DS.Tables(0).Rows(I - 1)
+                    Else 'Action = "down"
+                        SiblingDR = DS.Tables(0).Rows(I + 1)
+                    End If
+
+                    SiblingCommentOrder = SiblingDR("CommentOrder")
+                    SiblingCommentKey = SiblingDR("CommentKey")
+                Catch ex As Exception
+                    Return Res 'return blank dictionary
+                End Try
+
+                QueryConfig("@CommentKey") = Sql.GetParamVarHash(CommentKey, "int")
+                QueryConfig("@SiblingCommentKey") = Sql.GetParamVarHash(SiblingCommentKey, "int")
+                QueryConfig("@CommentOrder") = Sql.GetParamVarHash(CommentOrder, "int")
+                QueryConfig("@SiblingCommentOrder") = Sql.GetParamVarHash(SiblingCommentOrder, "int")
+
+                Exit For
+            End If
+        Next
+
+        'execute sql update queries if this function is invoked WITHOUT optional arg
+        If TestDS Is Nothing Then Sql.GetMyDataSetParamQuery(SqlQuery, QueryConfig)
+
+        Res("SqlQuery") = SqlQuery
+        Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+
+        Return Res
+    End Function
+
+    Private Function ModifyPhaseOrder(Key As Integer, Action As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim DS As Data.DataSet
+        Dim SqlQuery As String = "UPDATE [ALTS].[dbo].[T_LogPhase] SET PhaseOrder=@PhaseOrder WHERE [Key]=@SiblingPhaseKey; " &
+            "UPDATE [ALTS].[dbo].[T_LogPhase] SET PhaseOrder=@SiblingPhaseOrder WHERE [Key]=@PhaseKey;"
+
+        If TestDS Is Nothing Then
+            Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@PhaseKey", Sql.GetParamVarHash(Key, "int")}
+            }
+
+            DS = Sql.GetMyDataSetParamQuery("SELECT [Key] As PhaseKey, PhaseOrder FROM [ALTS].[dbo].[T_LogPhase] " &
+                                            "WHERE AreaKey=(SELECT AreaKey FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseKey) " &
+                                            "ORDER BY PhaseOrder", SqlConfig)
+        Else
+            DS = TestDS
+        End If
+
+        For I As Integer = 0 To DS.Tables(0).Rows.Count
+            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
+            Dim PhaseKey As Integer = DR("PhaseKey")
+            Dim PhaseOrder As Integer = DR("PhaseOrder")
+
+            If PhaseKey = Key Then
+                Dim SiblingPhaseKey As Integer
+                Dim SiblingPhaseOrder As Double
+
+                'using a try catch block to throw errors when moving labels to a non existing slot
+                'Ex: moving top most label up
+                Try
+                    Dim SiblingDR As Data.DataRow
+
+                    If Action = "up" Then
+                        SiblingDR = DS.Tables(0).Rows(I - 1)
+                    Else 'Action = "down"
+                        SiblingDR = DS.Tables(0).Rows(I + 1)
+                    End If
+
+                    SiblingPhaseOrder = SiblingDR("PhaseOrder")
+                    SiblingPhaseKey = SiblingDR("PhaseKey")
+                Catch ex As Exception
+                    Return Res 'return blank dictionary
+                End Try
+
+                QueryConfig("@PhaseKey") = Sql.GetParamVarHash(PhaseKey, "int")
+                QueryConfig("@SiblingPhaseKey") = Sql.GetParamVarHash(SiblingPhaseKey, "int")
+                QueryConfig("@PhaseOrder") = Sql.GetParamVarHash(PhaseOrder, "int")
+                QueryConfig("@SiblingPhaseOrder") = Sql.GetParamVarHash(SiblingPhaseOrder, "int")
+
+                Exit For
+            End If
+        Next
+
+        'execute sql update queries if this function is invoked WITHOUT optional arg
+        If TestDS Is Nothing Then Sql.GetMyDataSetParamQuery(SqlQuery, QueryConfig)
+
+        Res("SqlQuery") = SqlQuery
+        Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
+
+        Return Res
+    End Function
+
+    Public Function ModifyOrder(Key As Integer, Action As String, Table As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
+        Dim Res As New Dictionary(Of String, String)
+
+        Select Case Table
+            Case "T_LogPhase"
+                Res = ModifyPhaseOrder(Key, Action, TestDS)
+            Case "T_LogCommentList"
+                Res = ModifyCommentOrder(Key, Action, TestDS)
+            Case "T_LogLabel"
+                'Label up and down functionality calls a seperate function due to the logic being dependent upon label order and phase order
+                Res = ModifyLabelOrder(Key, Action, TestDS)
+        End Select
 
         Return Res
     End Function
