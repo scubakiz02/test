@@ -1,6 +1,7 @@
 ﻿Imports System.Text.Json
 Imports SatiDotNet2.Library
-Imports System.Web.Services
+Imports System.Security.Cryptography
+Imports System.Text
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -20,6 +21,7 @@ Partial Class MR_OpenTicketStatusBoard
     Private Shared Security As New Security()
     Private Shared Format As New Format()
     Private SatiCode As New Class1()
+    Private MaintPM As New MaintPM()
     Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -555,11 +557,78 @@ Partial Class MR_OpenTicketStatusBoard
         Flex.SetColWidth(5, GetMaxFieldVals("InputOperator").Length * 256)
 
         SaveDir = "\\PWI-40\SATI_Upload_Pics$\$ChecklistReports\"
-        FileName = Session("AspWebpage").GetUrl().Split("?")(1).Replace("&Admin=True", "").Replace("/", "-") & ".xls" 'strip Admin querystring key value pair if it exists
+        FileName = GenerateSpreadsheetName(Session("AreasToInclude"), User.Identity.Name.ToString())
         Flex.Save(SaveDir & FileName)
 
         If SendMailCheckBox.Checked Then SatiCode.SendMailWithFile("Checklist Report From " & User.Identity.Name.ToString, "SATI.Net Checklist Report", EmailUserNameTextBox.Text & "@purewafer.com", SaveDir & FileName)
     End Sub
+
+    Private Function StripIllegalFileSystemChars(Str As String) As String
+        Dim IllegalCharMatches As Match = Regex.Match(Str, "[% < > : / \ | ? *]")
+        Dim Res As String = Str
+
+        Do While IllegalCharMatches.Success
+            Dim Key As String = IllegalCharMatches.Value
+            Res = Res.Replace(Key, String.Empty)
+            IllegalCharMatches = IllegalCharMatches.NextMatch()
+        Loop
+
+        Return Res
+    End Function
+
+    Private Function CombineStrings(StringsToCombine As List(Of String)) As String
+        Dim LongestStringToCombine As Integer
+        Dim CombineRes As New StringBuilder()
+
+        'weave elements from StringsToCombine into a single string
+        LongestStringToCombine = StringsToCombine.Max(Function(s) s.Length)
+        For i = 0 To LongestStringToCombine - 1
+            For Each Str As String In StringsToCombine
+                If i < Str.Length Then
+                    CombineRes.Append(Str(i))
+                End If
+            Next
+        Next
+        Return CombineRes.ToString()
+    End Function
+
+    Private Function HashString(Str As String) As String
+        Using sha256 As SHA256 = SHA256.Create()
+            Dim Bytes = Encoding.UTF8.GetBytes(Str)
+            Dim Hash = sha256.ComputeHash(Bytes)
+            Return BitConverter.ToString(Hash).Replace("-", "").ToLowerInvariant()
+        End Using
+    End Function
+
+    Private Function GenerateSpreadsheetName(ReportAreaKeys As List(Of Integer), SatiUsername As String) As String
+        Dim CombinedString As String = String.Empty
+        Dim HashedCombinedString As String
+        Dim Route As String
+        Dim Res As String
+
+        If ReportAreaKeys Is Nothing Then Return String.Empty
+
+        'combine all strings that are going to be weaved into a List data structure
+        For Each ReportAreaKey As String In ReportAreaKeys
+            Dim PmOrChecklistName As String = MaintPM.GetPmOrChecklistName(ReportAreaKey)
+            CombinedString += PmOrChecklistName
+        Next
+        CombinedString += SatiUsername
+        CombinedString += DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") 'include seconds and milliseconds. This in combination with sati username ensures there is never a match
+
+        HashedCombinedString = HashString(CombinedString)
+
+        'If 1 pm/checklist is in the report, initialize Route with Pm/Checklist Name
+        'Otherwise, initialize Route with Pm/Checklist Group
+        If ReportAreaKeys.Count = 1 Then
+            Route = MaintPM.GetPmOrChecklistName(ReportAreaKeys(0))
+        Else
+            Route = MaintPM.GetGroup(ReportAreaKeys(0))
+        End If
+
+        Res = (StripIllegalFileSystemChars(Route) & "--" & HashedCombinedString).Replace(" ", String.Empty) & ".xls"
+        Return Res
+    End Function
 
     Private Sub ReportGridView_PreRender(sender As Object, e As EventArgs) Handles ReportGridView.PreRender
 

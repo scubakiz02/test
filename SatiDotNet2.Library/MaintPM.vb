@@ -6,6 +6,22 @@ Public Class MaintPM
     Inherits Security
     Dim Sql As New Security
 
+    Public Function GetPmOrChecklistName(AreaKey As Integer) As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", GetParamVarHash(AreaKey, "int")}
+        }
+
+        Return GetSingleDbField("SELECT Area FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey", QueryConfig, "Area")
+    End Function
+
+    Public Function GetGroup(AreaKey As Integer) As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", GetParamVarHash(AreaKey, "int")}
+        }
+
+        Return GetSingleDbField("SELECT [Group] FROM [ALTS].[dbo].[T_LogGroup] WHERE [Key]=(SELECT GroupKey FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=@AreaKey)", QueryConfig, "Group")
+    End Function
+
     Private Function ModifyLabelOrder(Key As Integer, Action As String, Optional TestDS As Data.DataSet = Nothing) As Dictionary(Of String, String)
         Dim Res As New Dictionary(Of String, String)
         Dim LabelOrderTracking As New Dictionary(Of Integer, Dictionary(Of String, Object))
