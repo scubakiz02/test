@@ -225,6 +225,31 @@ Public Class PhaseController
         Return Res
     End Function
 
+    Public Function SamePhase(LabelKey1 As Object, LabelKey2 As Object) As Boolean
+        Dim PhaseQuery As String = "SELECT PhaseKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey"
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From
+        {
+            {"@LabelKey", New Dictionary(Of String, String) From {
+                {"value", String.Empty},
+                {"typeOf", "string"}
+            }}
+        }
+        Dim PhaseKey1 As Integer
+        Dim PhaseKey2 As Integer
+
+        QueryConfig("@LabelKey")("value") = LabelKey1
+        PhaseKey1 = GetSingleDbField(PhaseQuery, QueryConfig, "PhaseKey")
+
+        QueryConfig("@LabelKey")("value") = LabelKey2
+        PhaseKey2 = GetSingleDbField(PhaseQuery, QueryConfig, "PhaseKey")
+
+        If PhaseKey1 = PhaseKey2 Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
     Public Function AssignPhase(LabelKey As String, PhaseKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
         Dim Res As New Dictionary(Of String, String)
         Dim SqlQuery As String

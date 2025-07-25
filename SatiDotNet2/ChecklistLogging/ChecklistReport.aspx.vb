@@ -1,7 +1,9 @@
 ﻿Imports System.Text.Json
 Imports SatiDotNet2.Library
 Imports System.Security.Cryptography
+Imports FlexCel.Core
 Imports System.Text
+
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -22,6 +24,7 @@ Partial Class MR_OpenTicketStatusBoard
     Private Shared Format As New Format()
     Private SatiCode As New Class1()
     Private MaintPM As New MaintPM()
+    Private PhaseController As New PhaseController()
     Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
@@ -462,6 +465,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim Value As String
         Dim FieldType As Object
         Dim Area As String = String.Empty
+        Dim Phase As Object = String.Empty
         Dim Label As String = String.Empty
         Dim RowOffset As Integer = 0
         Dim FieldIdxHash As New Dictionary(Of String, Integer) From {
@@ -515,6 +519,27 @@ Partial Class MR_OpenTicketStatusBoard
                 'by default, increment RowOffset every iteration of this if else statement
 
                 RowOffset += 1
+            End If
+
+            'upon initial discovery of a group/phase title in dataset, add it to spreadsheet
+            If IsDBNull(DR_Final("Phase")) = False Then
+                If Phase <> DR_Final("Phase") Then
+                    Dim BoldFormat As TFlxFormat = Flex.GetDefaultFormat
+                    Dim BoldFormatId As Integer
+                    Dim ColumnIdx As Integer = 1
+                    Dim RowIdx As Integer
+
+                    Phase = DR_Final("Phase") 'signal to environment that a new phase/group has been discovered
+
+                    RowOffset += 2
+                    RowIdx = 4 + RowOffset
+
+                    BoldFormat.Font.Style = TFlxFontStyles.Bold
+                    BoldFormatId = Flex.AddFormat(BoldFormat)
+
+                    Flex.SetCellValue(RowIdx, ColumnIdx, Phase)
+                    Flex.SetCellFormat(RowIdx, ColumnIdx, BoldFormatId)
+                End If
             End If
 
             If Label <> DR_Final("Label") Then

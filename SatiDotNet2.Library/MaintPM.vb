@@ -237,31 +237,6 @@ Public Class MaintPM
         Return Res
     End Function
 
-    Private Function SamePhase(LabelKey1, LabelKey2) As Boolean
-        Dim PhaseQuery As String = "SELECT PhaseKey FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey"
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From
-        {
-            {"@LabelKey", New Dictionary(Of String, String) From {
-                {"value", String.Empty},
-                {"typeOf", "int"}
-            }}
-        }
-        Dim PhaseKey1 As Integer
-        Dim PhaseKey2 As Integer
-
-        QueryConfig("@LabelKey")("value") = LabelKey1
-        PhaseKey1 = Sql.GetSingleDbField(PhaseQuery, QueryConfig, "PhaseKey")
-
-        QueryConfig("@LabelKey")("value") = LabelKey2
-        PhaseKey2 = Sql.GetSingleDbField(PhaseQuery, QueryConfig, "PhaseKey")
-
-        If PhaseKey1 = PhaseKey2 Then
-            Return True
-        Else
-            Return False
-        End If
-    End Function
-
     Public Function GetAreaDdlSelectConfig(AreaIntervalKey As String, DepartmentKey As String, View As String) As Dictionary(Of String, String) 'this query is used in several areas, but needs to use the current value in Session("AreaIntervalKey"). That is why it in a function
         Dim Res As New Dictionary(Of String, String)
         Dim SelectQuery As String

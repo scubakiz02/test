@@ -349,8 +349,8 @@
                         SelectCommand="SELECT G.[Group], G.[Key] FROM [ALTS].[dbo].[T_LogGroup] G ORDER BY G.[Group]"></asp:SqlDataSource>
                 </div>
 
-                <asp:Button Enabled="False" ID="FilterChecklists_Button" Text="Filter Checklists" data-modal-target="#checklistModal" runat="server" OnClientClick="return false;" />
-                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Labels" data-modal-target="#labelModal" runat="server" OnClientClick="return false;" />
+                <asp:Button Enabled="False" ID="FilterChecklists_Button" Text="Filter PMs/Checklists" data-modal-target="#checklistModal" runat="server" OnClientClick="return false;" />
+                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Items" data-modal-target="#labelModal" runat="server" OnClientClick="return false;" />
             </div>
 
             <div class="modal" id="labelModal">

@@ -5,7 +5,18 @@ Public Class Report
 
     Private GroupDS As Data.DataSet
     Private EmptyGroupDS As New Data.DataSet()
-    Private ConstructorQuery As String = "SELECT A.[Key] As AreaKey, A.Area, A.[Key] As AreaKey, D.[Key] As DataKey, D.Operator, L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As StartDate, '' As InputDate, '' As InputOperator FROM [ALTS].[dbo].[T_LogLabel] L INNER JOIN [ALTS].[dbo].[T_LogArea] A On L.AreaKey=A.[Key] RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] WHERE (A.[Key]=@AreaKey0 OR @AreaKey0=0) AND (A.GroupKey=@GroupKey OR (@GroupKey=0 AND A.GroupKey IS NOT NULL)) ORDER BY A.Area, L.LabelOrder, D.Date"
+    Private ConstructorQuery As String = "SELECT A.[Key] As AreaKey, A.Area, A.[Key] As AreaKey, " &
+        "D.[Key] As DataKey, D.Operator, " &
+        "L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
+        "P.Phase, " &
+        "FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As StartDate, '' As InputDate, '' As InputOperator " &
+        "FROM [ALTS].[dbo].[T_LogLabel] L " &
+        "INNER JOIN [ALTS].[dbo].[T_LogArea] A On L.AreaKey=A.[Key] " &
+        "RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey " &
+        "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
+        "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] " &
+        "WHERE (A.[Key]=@AreaKey0 Or @AreaKey0=0) And (A.GroupKey=@GroupKey Or (@GroupKey=0 And A.GroupKey Is Not NULL)) " &
+        "ORDER BY A.Area, P.PhaseOrder, L.LabelOrder, D.Date"
     Private MaxFieldVals As New Dictionary(Of String, String)
     Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Dim LogAspx As New LogAspxLibrary
