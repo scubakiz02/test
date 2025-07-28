@@ -20,7 +20,7 @@ Imports System.Text.RegularExpressions
 
 'Log.aspx:
 '1) delete 'Check if correct' asp (built dynamically with js now)
-'2) fieldtypes with textbox controls (number, text, and date) should call to http RecordInput.ashx endpoint on every keystroke (be wary of Enter keypress postbacks occuring when working on this)
+'2) fieldtypes with textbox controls (number, text, and date) should call to http pm-input.ashx endpoint on every keystroke (be wary of Enter keypress postbacks occuring when working on this)
 '3) delete js functions that are no longer used (
 
 

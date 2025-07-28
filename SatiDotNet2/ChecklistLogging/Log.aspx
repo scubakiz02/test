@@ -23,6 +23,7 @@
 
         <ContentTemplate>
             <script src="../scripts/WebComponents/Spinner.js"></script>
+            <script src="../scripts/common.js"></script>
             <script type="text/javascript" src="../scripts/ChecklistLogging/LogAspx.js"> </script>
             <script type="text/javascript">
                 let labels;
@@ -120,10 +121,8 @@
                             await configDbConnection(dbConnectionConfig);
                         }
 
-                        //call recordInput with no args to get phaseLevel without recording an input
-                        const httpRes = await recordInput();
-
-                        //setPhasingBehavior(0);
+                        //call getInputData on any control to get phaseLevel without recording an input
+                        const httpRes = await getInputData(LogPanels[0].querySelector(".activeInput"));
                         setPhasingBehavior(httpRes.phaseLevel);
                     }
 
@@ -228,7 +227,7 @@
                     }
 
                     //page load configuration
-                    let httpRes = await recordInput(elem, getValueCallback(elem));
+                    let httpRes = await getInputData(elem);
                     modifyInput(httpRes, LogPanel); // 1) configure backcolor for inputs
                 }
 
@@ -328,32 +327,20 @@
                     const activeTbx = activeInputElem.closest(".LogPanel").querySelector(".activeInput");
                     const label_id = getLabelId(activeTbx)
                     let dataKey = params.get("Key");
-                    let data;
+                    let httpPostRes;
 
                     //if result from getLabelId() call is null, do not make http request
                     //getLabelId() will return null when fieldtype of control is anything other than number
                     if (!label_id) return;
 
-                    const response = await fetch("OutOfScopeValue.ashx", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            dataId: dataKey,
-                            labelId: label_id,
-                            value: verifyValue
-                        })
+                    httpPostRes = await httpPost("OutOfScopeValue.ashx", {
+                        dataId: dataKey,
+                        labelId: label_id,
+                        value: verifyValue
                     });
 
-                    if (!response.ok) {
-                        //undo checked status if http api call was unsuccessful
-                        verifyValue = !verifyValue;
-                    }
-
-                    data = await response.json();
-
-                    if (data.success && verifyValue === true) setCursorFocus(activeTbx, document.querySelectorAll(".LogPanel"));
+                    //debugger;
+                    if (httpPostRes.success && verifyValue === true) setCursorFocus(activeTbx, document.querySelectorAll(".LogPanel"));
                     else verifyValue = !verifyValue; //reverse checked status to hopefully alert end user
                 }
 
@@ -382,42 +369,26 @@
                     }
                 }
 
-                //#TO DO: 
-                // 1) removing 'disabledPhase' css class causes taco cats to run (horizontal scrolling animation)
-                // 2) do a bomb overlay, and removing 'disabledPhase' css class cause an explosion animation ? !? !? !? !? !!? !?
-
-                //#TO DO: delete setPhasingBehaviorFakeData function once backend code is complete and stable for a few published (1st publish with this is v2.8.8)
-                function setPhasingBehaviorFakeData() {
-                    const res = {
-                        phaseLevel: 1
-                    }
-                    return res.phaseLevel;
-                }
-
                 async function recordInput(activeInput, value) {
                     const params = new URLSearchParams(window.location.search);
                     const data_id = params.get("Key");
-                    let data;
-
-                    const response = await fetch("RecordInput.ashx", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            dataId: data_id,
-                            labelId: getLabelId(activeInput),
-                            value: value
-                        })
+                    const httpPostRes = await httpPost("pm-input.ashx", {
+                        dataId: data_id,
+                        labelId: getLabelId(activeInput),
+                        value: value
                     });
 
-                    if (!response.ok) {
-                        throw new Error("HTTP error " + response.status);
-                    }
+                    //debugger;
+                    return httpPostRes;
+                }
 
-                    data = await response.json();
+                async function getInputData(activeInput) {
+                    const params = new URLSearchParams(window.location.search);
+                    const data_id = params.get("Key");
+                    const httpGetRes = await httpGet("pm-input.ashx?dataId=" + data_id + "&labelId=" + getLabelId(activeInput));
 
-                    return data;
+                    //debugger;
+                    return httpGetRes;
                 }
 
                 function getLabelId(activeInput) {

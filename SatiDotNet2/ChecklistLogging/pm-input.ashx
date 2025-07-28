@@ -13,40 +13,56 @@ Public Class StreamData
     Private LogAspx As New LogAspxLibrary()
     Private ActivePm As New ActivePm()
     Private PmInput As New PmInput()
+    Private PhaseController As New PhaseController()
 
-    Private KeyFromQueryString As Integer
+    Private DataKey As Integer
 
     Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
-        Dim Res As Dictionary(Of String, Object)
-        Dim JsonString As String
-        Dim Json As New Dictionary(Of String, Object)
-        Dim PhaseController As New PhaseController()
+        Dim method As String = context.Request.HttpMethod.ToUpperInvariant()
+        Dim Res As New Dictionary(Of String, Object)
+
+        If method = "GET" Then
+            Dim LabelKey As String = context.Request.QueryString("labelId")
+            Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
+            Dim RecordedValue As String
+
+            DataKey = context.Request.QueryString("dataId")
+            InputsJson = GetInputs(DataKey, LabelKey)
+            RecordedValue = InputsJson(LabelKey)("Value")
+
+            Res("input") = GetInputInfo(DataKey, LabelKey, RecordedValue)
+            Res("dbUpdateSuccess") = True
+        ElseIf method = "POST" Then
+            Dim JsonString As String
+            Dim Json As Dictionary(Of String, Object)
+
+            Using reader As New StreamReader(context.Request.InputStream)
+                JsonString = reader.ReadToEnd()
+            End Using
+            Json = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(JsonString)
+            DataKey = Json("dataId").ToString()
+
+            Try 'in case sql update query in ModifyInput continues to fail or http req body is missing data
+                Res = ModifyInput(DataKey, Json("labelId").ToString(), Json("value").ToString())
+
+                Res("dbUpdateSuccess") = True
+            Catch ex As Exception
+                Res = New Dictionary(Of String, Object)
+
+                Res("input") = New Dictionary(Of String, String)
+                Res("input")("state") = "invalid"
+                Res("input")("endUserMessage") = "*ERROR: COULD NOT SAVE. TRY AGAIN*"
+
+                Res("dbUpdateSuccess") = False
+            End Try
+        Else
+            context.Response.StatusCode = 405 ' Method Not Allowed
+            context.Response.End()
+        End If
+
+        Res("phaseLevel") = PhaseController.GetPhase(DataKey)
 
         context.Response.ContentType = "application/json"
-
-        Using reader As New StreamReader(context.Request.InputStream)
-            JsonString = reader.ReadToEnd()
-        End Using
-        Json = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(JsonString)
-        KeyFromQueryString = Json("dataId").ToString()
-
-        Try 'in case sql update query in ModifyInput continues to fail or http req body is missing data
-            Res = ModifyInput(KeyFromQueryString, Json("labelId").ToString(), Json("value").ToString(), HttpContext.Current.User.Identity.Name.ToString())
-
-            Res("dbUpdateSuccess") = True
-        Catch ex As Exception
-            Res = New Dictionary(Of String, Object)
-
-            Res("input") = New Dictionary(Of String, String)
-            Res("input")("state") = "invalid"
-            Res("input")("endUserMessage") = "*ERROR: COULD NOT SAVE. TRY AGAIN*"
-
-            Res("dbUpdateSuccess") = False
-        End Try
-
-        'return accurate phaseLevel even when only the dataId is passed to http endpoint
-        Res("phaseLevel") = PhaseController.GetPhase(KeyFromQueryString)
-
         context.Response.Write(JsonSerializer.Serialize(Res))
     End Sub
 
@@ -56,52 +72,39 @@ Public Class StreamData
         End Get
     End Property
 
-    Private Function ModifyInput(DataKey As String, LabelKey As String, Value As String, SatiUser As String) As Dictionary(Of String, Object)
-        Dim InputOfInterestString As String
-        Dim InputOfInterest As Dictionary(Of String, String)
-        Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
-        Dim PrevValue As String
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
-             {"@DataKey", GetParamVarHash(DataKey, "int")}
-        }
-        Dim InputInfo As Dictionary(Of String, Object)
+    Private Function ModifyInput(DataKey As String, LabelKey As String, Value As String) As Dictionary(Of String, Object)
         Dim Res As New Dictionary(Of String, Object)
+        Dim RecordedUser As String = HttpContext.Current.User.Identity.Name.ToString()
+        Dim RecordedDate As String = Format.DateField(System.DateTime.Now.ToString())
+        Dim RecordedValue As String = Value
+        Dim InputInfo As Dictionary(Of String, Object) = GetInputInfo(DataKey, LabelKey, Value)
+        Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
+        Dim InputOfInterest As Dictionary(Of String, String)
 
-        InputOfInterestString = GetSingleDbField("SELECT Inputs FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@DataKey", QueryConfig, "Inputs")
-        InputsJson = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(InputOfInterestString)
+        Res("input") = InputInfo
+
+        'update stringified JSON that holds datetime, operator, and value for the log (T_LogData Inputs field value)
+        If InputInfo("state") = "invalid" Then
+            'reset recorded values for input when value is invalid
+            RecordedValue = String.Empty
+            RecordedDate = String.Empty
+            RecordedUser = String.Empty
+        End If
+
+        InputsJson = GetInputs(DataKey, LabelKey)
         InputOfInterest = InputsJson(LabelKey)
-        PrevValue = InputOfInterest("Value")
-
-        'Session("DisplayError") = False 'What is this used for??????
-
-        InputOfInterest("Operator") = SatiUser
-        InputOfInterest("Value") = Value
-        InputOfInterest("Date") = Format.DateField(System.DateTime.Now.ToString())
-        InputsJson(LabelKey) = InputOfInterest
+        InputOfInterest("Operator") = RecordedUser
+        InputOfInterest("Date") = RecordedDate
+        InputOfInterest("Value") = RecordedValue
+        InputsJson(LabelKey) = InputOfInterest 'update input within Inputs field value
 
         'in case of db upload failure, closing code below in a try catch block
         'if db update query fails, try it again
         Try
-            UploadToDataTable(SatiUser, JsonSerializer.Serialize(InputsJson))
+            UploadToDataTable(RecordedUser, JsonSerializer.Serialize(InputsJson))
         Catch ex As Exception
-            UploadToDataTable(SatiUser, JsonSerializer.Serialize(InputsJson))
+            UploadToDataTable(RecordedUser, JsonSerializer.Serialize(InputsJson))
         End Try
-
-        InputInfo = GetInputValidity(LabelKey, Value)
-        If InputInfo("state") = "outOfScope" Then
-            Dim OutOfRangeJson As Dictionary(Of String, Object) = ActivePm.GetOutOfRange(DataKey)
-            Dim ValueVerified As Boolean
-
-            'in case OutOfRangeJson(LabelKey) is null
-            Try
-                ValueVerified = Boolean.Parse(OutOfRangeJson(LabelKey).ToString())
-            Catch ex As Exception
-                ValueVerified = False
-            End Try
-
-            InputInfo("valueVerified") = ValueVerified
-        End If
-        Res("input") = InputInfo
 
         Return Res
     End Function
@@ -196,7 +199,7 @@ Public Class StreamData
                         DP1 = Decimal.Parse(DPs(0))
                         DP2 = Decimal.Parse(DPs(1))
                     Catch ex As Exception
-                        Exit Select
+                        Res("state") = "invalid"
                     End Try
 
                     If DP1 = 1 OrElse DP2 = 1 Then
@@ -210,6 +213,37 @@ Public Class StreamData
             End Select
         Else 'use range to validate input
             Return PmInput.ReportValidity("number", Range, UserInput)
+        End If
+
+        Return Res
+    End Function
+
+    Private Function GetInputs(DataKey As String, LabelKey As String) As Dictionary(Of String, Dictionary(Of String, String))
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@DataKey", GetParamVarHash(DataKey, "int")}
+        }
+        Dim InputsStringified As String = GetSingleDbField("SELECT Inputs FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@DataKey", QueryConfig, "Inputs")
+        Dim InputsAsJson As Dictionary(Of String, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of String, Dictionary(Of String, String)))(InputsStringified)
+
+        Return InputsAsJson
+    End Function
+
+    Private Function GetInputInfo(DataKey As String, LabelKey As String, Value As String) As Dictionary(Of String, Object)
+        Dim Res As Dictionary(Of String, Object)
+
+        Res = GetInputValidity(LabelKey, Value)
+        If Res("state") = "outOfScope" Then
+            Dim OutOfRangeJson As Dictionary(Of String, Object) = ActivePm.GetOutOfRange(DataKey)
+            Dim ValueVerified As Boolean
+
+            'in case OutOfRangeJson(LabelKey) is null
+            Try
+                ValueVerified = Boolean.Parse(OutOfRangeJson(LabelKey).ToString())
+            Catch ex As Exception
+                ValueVerified = False
+            End Try
+
+            Res("valueVerified") = ValueVerified
         End If
 
         Return Res
@@ -231,7 +265,7 @@ Public Class StreamData
         With MySelectCmd
             .CommandText = "SELECT Top(1) * FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey ORDER BY Date DESC" 'same query used to get MostRecRecordKey
             .Connection = Connection
-            .Parameters.Add("@T_LogDataKey", SqlDbType.Int).Value = KeyFromQueryString
+            .Parameters.Add("@T_LogDataKey", SqlDbType.Int).Value = DataKey
         End With
         My_DA.SelectCommand = MySelectCmd
 
@@ -251,7 +285,7 @@ Public Class StreamData
         '*****************************************************************
         Dim MyUpdateCmd As New System.Data.SqlClient.SqlCommand
         With MyUpdateCmd
-            .CommandText = "UPDATE T_LogData SET [Inputs] = @Inputs, [OutOfRange] = @OutOfRange, [Operator] = @Operator WHERE [Key]=@DataLogKey; SELECT TOP(1) * FROM T_LogData WHERE [Key]=" & KeyFromQueryString & " ORDER BY Date DESC;"
+            .CommandText = "UPDATE T_LogData SET [Inputs] = @Inputs, [OutOfRange] = @OutOfRange, [Operator] = @Operator WHERE [Key]=@DataLogKey; SELECT TOP(1) * FROM T_LogData WHERE [Key]=" & DataKey & " ORDER BY Date DESC;"
             .Connection = Connection
             .Parameters.AddRange(New System.Data.SqlClient.SqlParameter() {New System.Data.SqlClient.SqlParameter("@Inputs", System.Data.SqlDbType.VarChar, 0, "Inputs"), New System.Data.SqlClient.SqlParameter("@OutOfRange", System.Data.SqlDbType.VarChar, 0, "OutOfRange"), New System.Data.SqlClient.SqlParameter("@Operator", System.Data.SqlDbType.VarChar, 0, "Operator"), New System.Data.SqlClient.SqlParameter("@DataLogKey", System.Data.SqlDbType.Int, 0, "Key")})
         End With
@@ -266,7 +300,7 @@ Public Class StreamData
         My_DR = My_DS.Tables(0).Rows(0)
         My_DR.AcceptChanges()
         My_DR.BeginEdit()
-        My_DR("Operator") = LogOperator
+        My_DR("Operator") = DBNull.Value 'start phasing this field out. Eventually, delete this column from T_LogData
         My_DR("Inputs") = InputsFieldValue
         My_DR("OutOfRange") = My_DR("OutOfRange")
         'My_DR("Date") = System.DateTime.Now.ToShortTimeString
