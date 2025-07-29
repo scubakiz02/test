@@ -69,13 +69,13 @@ Public Class PmInput
             End If
 
             Res("state") = "valid"
-            Res("endUserMessage") = ""
+            Res("message") = ""
         Catch ex As ArgumentOutOfRangeException 'if 'Value' is out of range (determined by code above)
             Res("state") = "outOfScope"
-            Res("endUserMessage") = "*CAUTION: OUT OF RANGE*"
+            Res("message") = "*CAUTION: OUT OF RANGE*"
         Catch ex As FormatException 'if 'Value' arg is Not a number
             Res("state") = "invalid"
-            Res("endUserMessage") = "*ERROR: NOT A NUMBER*"
+            Res("message") = "*ERROR: NOT A NUMBER*"
         End Try
 
         Return Res

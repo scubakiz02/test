@@ -1,7 +1,6 @@
 ﻿<%@ Page Title="" Language="VB" MaintainScrollPositionOnPostback="true" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="Log.aspx.vb" Inherits="MR_OpenTicketStatusBoard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-
     <%--    Select Area:&nbsp;
                 <br />
     <asp:DropDownList ID="LogAreasDropDownList" runat="server" AppendDataBoundItems="True"
@@ -23,6 +22,7 @@
 
         <ContentTemplate>
             <script src="../scripts/WebComponents/Spinner.js"></script>
+            <script src="../scripts/WebComponents/sati-alert.js"></script>
             <script src="../scripts/common.js"></script>
             <script type="text/javascript" src="../scripts/ChecklistLogging/LogAspx.js"> </script>
             <script type="text/javascript">
@@ -42,6 +42,7 @@
                 let EditPreviewPanel;
                 let AddNoteCounter;
                 let WebpageSpinner;
+                let pmLogAlert;
 
                 Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                     setItemsPanel(); // Ensure setItemsPanel function is called after every partial postback
@@ -50,6 +51,7 @@
                 window.addEventListener("load", async function () {
                     const fileUpload = document.getElementById('<%= Uploader.ClientID %>');
                     const inIframe = window !== window.parent;
+                    pmLogAlert = document.getElementById("pm-log-alert");
 
                     //do NOT color inputs if displaying pm/checklist in iframe within ChecklistBuilder.aspx
                     if (!inIframe) {
@@ -119,11 +121,19 @@
                             }
 
                             await configDbConnection(dbConnectionConfig);
+
+                            // getInputData is invocated in 1 place to configure each input and the phaseLevel of the log
+                            let httpRes;
+                            try {
+                                httpRes = await getInputData(dbConnectionConfig.elem);
+                                configureInput(httpRes, LogPanel);
+                                setPhasingBehavior(httpRes.phaseLevel); //configure phaseLevel for log
+                            }
+                            catch (err) {
+                                continue;
+                            }
                         }
 
-                        //call getInputData on any control to get phaseLevel without recording an input
-                        const httpRes = await getInputData(LogPanels[0].querySelector(".activeInput"));
-                        setPhasingBehavior(httpRes.phaseLevel);
                     }
 
 
@@ -199,7 +209,6 @@
                         elem.addEventListener(eventListener, async function (e) {
                             let value = getValueCallback(elem);
                             let httpRes = {};
-                            let controlInfo = {};
 
                             if (isHttpTrigger(eventListener, e)) e.preventDefault(); //prevent postback (going to send http request)
                             else return;
@@ -207,28 +216,28 @@
                             //default out of range verification to false on value change
                             await setOutOfScopeVerifyValue(this, false);
 
-                            httpRes = await recordInput(this, value);
+                            //in case http request within recordInput() function responds with error
+                            try {
+                                httpRes = await recordInput(this, value);
+                                configureInput(httpRes, LogPanel);
+                                setPhasingBehavior(httpRes.phaseLevel);
 
-                            //setPhasingBehavior(setPhasingBehaviorFakeData());
-                            setPhasingBehavior(httpRes.phaseLevel);
-
-                            controlInfo = httpRes["input"];
-                            modifyInput(httpRes, LogPanel);
-
-                            if (isOutOfScopeValueVerified(controlInfo)) {
-                                //programmatically set cursor focus to next control unless event listener is blur
-                                //always let end user cursor focus take priority over the programmatic configuration of the cursor
-                                if (eventListener !== "blur") {
-                                    setCursorFocus(this, LogPanels);
+                                if (isOutOfScopeValueVerified(httpRes)) {
+                                    //programmatically set cursor focus to next control unless event listener is blur
+                                    //always let end user cursor focus take priority over the programmatic configuration of the cursor
+                                    if (eventListener !== "blur") {
+                                        setCursorFocus(this, LogPanels);
+                                    }
                                 }
+                                else elem.focus(); //block all end user actions until out of scope value is verified
                             }
-                            else elem.focus(); //block all end user actions until out of scope value is verified
+                            catch (err) {
+                                pmLogAlert.setAttribute("message", err.endUserMessage);
+                                pmLogAlert.show();
+                                return;
+                            }
                         });
                     }
-
-                    //page load configuration
-                    let httpRes = await getInputData(elem);
-                    modifyInput(httpRes, LogPanel); // 1) configure backcolor for inputs
                 }
 
                 function setCursorFocus(currControl, LogPanels) {
@@ -261,9 +270,9 @@
                     }
                 }
 
-                function modifyInput(res, LogPanel) {
+                function configureInput(res, LogPanel) {
                     //change background color for all html elements of the relevant input panel
-                    const endUserMessage = res.input.endUserMessage;
+                    const message = res.message;
                     const cbxContainerClass = "value-out-of-scope-container";
                     let cbxContainer = LogPanel.querySelector("." + cbxContainerClass);
 
@@ -276,7 +285,7 @@
                     iterateChildren(function () {
                         let backcolor;
 
-                        switch (res.input.state) {
+                        switch (res.state) {
                             case "valid":
                                 backcolor = "#FFFFFF";
                                 break;
@@ -301,7 +310,7 @@
 
                                     cbx.type = "checkbox";
                                     cbx.name = "out-of-scope-cbx";
-                                    cbx.checked = res.input.valueVerified;
+                                    cbx.checked = res.valueVerified;
                                     cbx.addEventListener("change", async function (e) {
                                         await setOutOfScopeVerifyValue(this, this.checked);
                                         e.preventDefault(); //prevent postback
@@ -314,7 +323,7 @@
                         }
 
                         if (this.getAttribute("colorblindmessage")) {
-                            this.innerText = endUserMessage;
+                            this.innerText = message;
                         }
 
                         this.style.backgroundColor = backcolor;
@@ -385,7 +394,9 @@
                 async function getInputData(activeInput) {
                     const params = new URLSearchParams(window.location.search);
                     const data_id = params.get("Key");
-                    const httpGetRes = await httpGet("pm-input.ashx?dataId=" + data_id + "&labelId=" + getLabelId(activeInput));
+                    const labelId = getLabelId(activeInput);
+                    if (!labelId) debugger;
+                    const httpGetRes = await httpGet("pm-input.ashx?dataId=" + data_id + "&labelId=" + labelId);
 
                     //debugger;
                     return httpGetRes;
@@ -1078,6 +1089,7 @@
             </style>
 
             <sati-spinner id="WebpageSpinner"></sati-spinner>
+            <sati-alert id="pm-log-alert" message=""></sati-alert>
 
             <div style="display: flex; flex-direction: column;">
                 <asp:Panel ID="HeaderPanel" Style="display: flex; flex-direction: column; gap: var(--UWhitespace);" runat="server">

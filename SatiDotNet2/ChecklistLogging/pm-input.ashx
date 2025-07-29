@@ -21,44 +21,40 @@ Public Class StreamData
         Dim method As String = context.Request.HttpMethod.ToUpperInvariant()
         Dim Res As New Dictionary(Of String, Object)
 
-        If method = "GET" Then
-            Dim LabelKey As String = context.Request.QueryString("labelId")
-            Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
-            Dim RecordedValue As String
+        Try
+            If method = "GET" Then
+                Dim LabelKey As String = context.Request.QueryString("labelId")
+                Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
+                Dim RecordedValue As String
 
-            DataKey = context.Request.QueryString("dataId")
-            InputsJson = GetInputs(DataKey, LabelKey)
-            RecordedValue = InputsJson(LabelKey)("Value")
+                DataKey = context.Request.QueryString("dataId")
+                InputsJson = GetInputs(DataKey, LabelKey)
+                RecordedValue = InputsJson(LabelKey)("Value")
 
-            Res("input") = GetInputInfo(DataKey, LabelKey, RecordedValue)
-            Res("dbUpdateSuccess") = True
-        ElseIf method = "POST" Then
-            Dim JsonString As String
-            Dim Json As Dictionary(Of String, Object)
+                Res = GetInputInfo(DataKey, LabelKey, RecordedValue)
+                Res("success") = True
+            ElseIf method = "POST" Then
+                Dim JsonString As String
+                Dim Json As Dictionary(Of String, Object)
 
-            Using reader As New StreamReader(context.Request.InputStream)
-                JsonString = reader.ReadToEnd()
-            End Using
-            Json = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(JsonString)
-            DataKey = Json("dataId").ToString()
+                Using reader As New StreamReader(context.Request.InputStream)
+                    JsonString = reader.ReadToEnd()
+                End Using
+                Json = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(JsonString)
+                DataKey = Json("dataId").ToString()
 
-            Try 'in case sql update query in ModifyInput continues to fail or http req body is missing data
                 Res = ModifyInput(DataKey, Json("labelId").ToString(), Json("value").ToString())
-
-                Res("dbUpdateSuccess") = True
-            Catch ex As Exception
-                Res = New Dictionary(Of String, Object)
-
-                Res("input") = New Dictionary(Of String, String)
-                Res("input")("state") = "invalid"
-                Res("input")("endUserMessage") = "*ERROR: COULD NOT SAVE. TRY AGAIN*"
-
-                Res("dbUpdateSuccess") = False
-            End Try
-        Else
-            context.Response.StatusCode = 405 ' Method Not Allowed
-            context.Response.End()
-        End If
+                Res("success") = True
+            End If
+        Catch KeyNotFoundException As KeyNotFoundException
+            Res = New Dictionary(Of String, Object)
+            Res("message") = "*ERROR: FAILED TO RETRIEVE DATA*"
+            context.Response.StatusCode = 400
+        Catch Exception As Exception
+            Res = New Dictionary(Of String, Object)
+            Res("message") = "*ERROR: DID NOT SAVE USER INPUT*"
+            context.Response.StatusCode = 406
+        End Try
 
         Res("phaseLevel") = PhaseController.GetPhase(DataKey)
 
@@ -73,15 +69,12 @@ Public Class StreamData
     End Property
 
     Private Function ModifyInput(DataKey As String, LabelKey As String, Value As String) As Dictionary(Of String, Object)
-        Dim Res As New Dictionary(Of String, Object)
         Dim RecordedUser As String = HttpContext.Current.User.Identity.Name.ToString()
         Dim RecordedDate As String = Format.DateField(System.DateTime.Now.ToString())
         Dim RecordedValue As String = Value
         Dim InputInfo As Dictionary(Of String, Object) = GetInputInfo(DataKey, LabelKey, Value)
         Dim InputsJson As Dictionary(Of String, Dictionary(Of String, String))
         Dim InputOfInterest As Dictionary(Of String, String)
-
-        Res("input") = InputInfo
 
         'update stringified JSON that holds datetime, operator, and value for the log (T_LogData Inputs field value)
         If InputInfo("state") = "invalid" Then
@@ -106,7 +99,7 @@ Public Class StreamData
             UploadToDataTable(RecordedUser, JsonSerializer.Serialize(InputsJson))
         End Try
 
-        Return Res
+        Return InputInfo
     End Function
 
     Private Function SqlProofSingleQuotes(Text As String) As String
@@ -137,7 +130,7 @@ Public Class StreamData
                     Else
                         Res("state") = "invalid"
                     End If
-                    Res("endUserMessage") = ""
+                    Res("message") = ""
 
                     Return Res
                 Case "HOA"
@@ -146,7 +139,7 @@ Public Class StreamData
                     Else
                         Res("state") = "valid"
                     End If
-                    Res("endUserMessage") = ""
+                    Res("message") = ""
 
                     Return Res
                 Case "Text"
@@ -155,7 +148,7 @@ Public Class StreamData
                     Else
                         Res("state") = "valid"
                     End If
-                    Res("endUserMessage") = ""
+                    Res("message") = ""
 
                     Return Res
                 Case "Date"
@@ -166,7 +159,7 @@ Public Class StreamData
                     Else
                         Res("state") = "invalid"
                     End If
-                    Res("endUserMessage") = ResMessage
+                    Res("message") = ResMessage
 
                     Return Res
                 Case "STC"
@@ -186,7 +179,7 @@ Public Class StreamData
                     Else
                         Res("state") = "valid"
                     End If
-                    Res("endUserMessage") = ""
+                    Res("message") = ""
 
                     Return Res
 
@@ -207,7 +200,7 @@ Public Class StreamData
                     Else
                         Res("state") = "invalid"
                     End If
-                    Res("endUserMessage") = ""
+                    Res("message") = ""
 
                     Return Res
             End Select

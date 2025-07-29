@@ -1,4 +1,35 @@
-﻿async function httpGet(url) {
+﻿// ============== http request/response flow related functions =============== 
+
+async function prepHttpError(httpRes) {
+    let endUserMessage = '';
+    try {
+        const errorData = await httpRes.json();
+        endUserMessage = errorData?.message || JSON.stringify(errorData);
+    } catch {
+        endUserMessage = await response.text();
+    }
+
+    throw {
+        devMessage: `GET request failed: ${httpRes.status} ${httpRes.statusText}`,
+        endUserMessage: endUserMessage || 'No message from server'
+    };
+}
+
+function throwHttpError(catchErr) {
+    //return detailed object when throwing error
+    if (typeof catchErr === 'object' && catchErr.devMessage) {
+        // Re-throw structured error
+        throw catchErr;
+    } else {
+        // Catch unexpected errors (e.g., network failure)
+        throw {
+            devMessage: `GET request failed: ${httpRes.status} ${httpRes.statusText}`,
+            endUserMessage: error.message || 'Unexpected error'
+        };
+    }
+}
+
+async function httpGet(url) {
     try {
         const response = await fetch(url, {
             method: 'GET',
@@ -8,13 +39,12 @@
         });
 
         if (!response.ok) {
-            throw new Error(`GET request failed: ${response.status} ${response.statusText}`);
+           await prepHttpError(response);
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error in httpGet:', error);
-        throw error;
+        throwHttpError(error);
     }
 }
 
@@ -30,12 +60,11 @@ async function httpPost(url, data) {
         });
 
         if (!response.ok) {
-            throw new Error(`POST request failed: ${response.status} ${response.statusText}`);
+            await prepHttpError(response);
         }
 
         return await response.json();
     } catch (error) {
-        console.error('Error in httpPost:', error);
-        throw error;
+        throwHttpError(error);
     }
 }

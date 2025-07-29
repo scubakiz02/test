@@ -8,11 +8,11 @@ Public Class NumberPmInputTests
     Private NumberFieldTypeDbValue As Object = "number" 'DB field value for 'number' fieldtype is currently NULL, but it should be 'number'
     Private OutOfScopeExpectedRes As New Dictionary(Of String, Object) From {
         {"state", "outOfScope"},
-        {"endUserMessage", "*CAUTION: OUT OF RANGE*"}
+        {"message", "*CAUTION: OUT OF RANGE*"}
     }
     Dim ValidExpectedRes As New Dictionary(Of String, Object) From {
         {"state", "valid"},
-        {"endUserMessage", ""}
+        {"message", ""}
     }
 
     <Theory>
@@ -21,7 +21,7 @@ Public Class NumberPmInputTests
     Private Sub InvalidUserInputs(UserInput As String)
         Dim ExpectedRes As New Dictionary(Of String, Object) From {
             {"state", "invalid"},
-            {"endUserMessage", "*ERROR: NOT A NUMBER*"}
+            {"message", "*ERROR: NOT A NUMBER*"}
         }
         Assert.Equal(Of Dictionary(Of String, Object))(ExpectedRes, ReportValidity(NumberFieldTypeDbValue, String.Empty, UserInput))
     End Sub
