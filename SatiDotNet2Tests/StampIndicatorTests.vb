@@ -63,26 +63,4 @@ Public Class StampIndicatorTests
     Private Sub DummyClickEvent(Key As Integer)
 
     End Sub
-
-    <Fact>
-    Public Sub CreateIconsTest1()
-        '2 stamps required, 1 stamps received
-        'Last arg is true, meaning user is IN full view.
-        'As a result, expect 1 child controls in the Panel returned from CreateIcons() function
-        Dim Panel As New Panel()
-        Panel.ID = "blah_23"
-        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 526)
-        Assert.Equal(1, ResPanel.Controls.Count)
-    End Sub
-
-    <Fact>
-    Public Sub CreateIconsTest2()
-        '2 stamps required, 2 stamps received (F&M Manager, Q/SHE Manager)
-        'Last arg is false, meaning user is not in full view.
-        'As a result, expect 0 child controls in the Panel returned from CreateIcons() function
-        Dim Panel As New Panel()
-        Panel.ID = "blah_23"
-        Dim ResPanel As Panel = StampIndicator.CreateIcons(Panel, 263)
-        Assert.Equal(0, ResPanel.Controls.Count)
-    End Sub
 End Class

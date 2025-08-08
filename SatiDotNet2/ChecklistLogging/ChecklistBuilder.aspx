@@ -181,12 +181,6 @@
             }
         }
 
-        //#TO DO: remove 'deletePhase' function once pm phase delete functionality is linked to api endpoint
-        async function deletePhase() {
-            return { success: false, message: "detach inputs to delete phase" }
-            //return { success: true, message: "" }
-        }
-
         async function httpPost(url = '', data = {}) {
             try {
                 let res;
@@ -765,7 +759,7 @@
                                     &nbsp;<asp:LinkButton ID="PhaseDeleteButton" CssClass="phase-delete-hyperlink" OnClientClick="return false; //return false to prevent postback" runat="server" CausesValidation="False" CommandName="Delete" Text="Delete" />
                                     &nbsp;<asp:LinkButton ID="PhaseNewButton" OnClick="NewButton_onClick" runat="server" CausesValidation="False" CommandName="New" Text="New" />
 
-                                    <%--adding script tag here to allow async/await invocation of deletePhase() function (needed for http req/res process flow)--%>
+                                    <%--adding script tag here to allow async/await http req/res process flow--%>
                                     <script type="module">
                                         const phaseDeleteButton = document.querySelector(".phase-delete-hyperlink");
 

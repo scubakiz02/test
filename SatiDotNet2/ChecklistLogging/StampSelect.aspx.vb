@@ -12,6 +12,8 @@ Partial Class MR_OpenTicketStatusBoard
     Dim RC As Integer
     Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
 
+    Private _ActivePmCache As New ActivePmCache()
+
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
@@ -54,6 +56,16 @@ Partial Class MR_OpenTicketStatusBoard
                 }
 
                 Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStampList] SET Active=@Active WHERE TitleKey=@TitleKey AND AreaKey=@AreaKey", QueryObject)
+            Next
+
+            'sql query to get all submitted logs that do not have all of there stamps
+            Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+                {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")}
+            }
+            Dim RelevantLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D WHERE CompleteLog=1 AND AreaKey=@AreaKey AND D.Date > '07/22/2025'", SqlConfig)
+
+            For Each RelevantLogsDr As Data.DataRow In RelevantLogsDs.Tables(0).Rows
+                _ActivePmCache.CacheAdd(RelevantLogsDr("DataKey"))
             Next
         End If
 

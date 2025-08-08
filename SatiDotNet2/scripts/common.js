@@ -39,7 +39,7 @@ async function httpGet(url) {
         });
 
         if (!response.ok) {
-           await prepHttpError(response);
+            await prepHttpError(response);
         }
 
         return await response.json();
@@ -68,3 +68,17 @@ async function httpPost(url, data) {
         throwHttpError(error);
     }
 }
+
+// =============== HTML DOM manipulation function ==================
+
+//traverse through all child elements and invoke callback function on them
+function iterateChildren(callback, elem) {
+    callback.call(elem);
+    for (const child of elem.children) iterateChildren(callback, child);
+}
+
+//get asp control supplying standard id rather than asp conglomerated id
+function getAspControl(id) {
+    return document.querySelector('[id$="' + id + '"]');
+}
+

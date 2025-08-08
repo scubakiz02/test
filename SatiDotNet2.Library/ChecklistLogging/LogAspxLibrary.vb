@@ -113,4 +113,18 @@ Public Class LogAspxLibrary
 
         Return Res
     End Function
+
+    Public Function IsEveryInputEmpty(InputsStringified As String) As Boolean
+        Dim InputsJson As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(InputsStringified)
+
+        For Each Input As KeyValuePair(Of Integer, Dictionary(Of String, String)) In InputsJson
+            Dim OperatorValue As String = InputsJson(Input.Key)("Value")
+
+            If String.IsNullOrEmpty(OperatorValue) = False Then
+                Return False
+            End If
+        Next
+
+        Return True
+    End Function
 End Class

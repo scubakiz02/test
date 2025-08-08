@@ -17,8 +17,11 @@ Partial Class MR_OpenTicketStatusBoard
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-    Private Shared StampIndicator As New StampIndicator()
     Dim SqlFuncDR As Data.DataRow
+
+    Private Shared StampIndicator As New StampIndicator()
+    Private _ActivePm As New ActivePm()
+    Private _ActivePmCache As New ActivePmCache()
 
     Private Sub PageInit(sender As Object, e As EventArgs) Handles Me.Init
         Dim DS As New Data.DataSet
@@ -234,35 +237,6 @@ Partial Class MR_OpenTicketStatusBoard
         Connection.Close()
     End Sub
 
-    Sub SetButtonBackground(DR As Data.DataRow)
-        Dim T_LogDataInputs As Dictionary(Of Integer, Dictionary(Of String, String)) = LogAspx.GetInputs(DR)
-        Dim AllEmptyInputs As Boolean = True
-
-        'check if T_LogDataInputs has any non-empty 'Value' fields
-        For Each kvp As KeyValuePair(Of Integer, Dictionary(Of String, String)) In T_LogDataInputs
-            Dim LabelKey As Integer = kvp.Key
-            Dim LabelKeyObject As Dictionary(Of String, String) = kvp.Value
-
-            If String.IsNullOrEmpty(LabelKeyObject("Value")) = False Then
-                AllEmptyInputs = False
-                Exit For
-            End If
-        Next
-
-        QueryConfig("@T_LogDataKey") = New Dictionary(Of String, String) From {
-            {"value", DR("Key")},
-            {"typeOf", "int"}
-        }
-
-        If AllEmptyInputs = False OrElse Security.GetSingleDbField("SELECT CompleteLog FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@T_LogDataKey", QueryConfig, "CompleteLog") Then
-            LogStatus = DR("LogStatus")
-            StripeColor = DR("StripeColor")
-        Else
-            LogStatus = "pink"
-            StripeColor = "pink"
-        End If
-    End Sub
-
     Sub Build(AreaKey As Integer)
         Dim I As Integer = 0
         Dim II As Integer = 0
@@ -312,11 +286,8 @@ Partial Class MR_OpenTicketStatusBoard
             CurrentLogsButton = BuildLogExport.Item2
 
             If DuplicateRecord Then
-                CurrentLogsButton.Attributes.Add("style", "background: red; border: none;")
-                CurrentLogsButton.Text = "CONTACT DB ADMIN: " & DR("Area")
-                CurrentLogsButton.Enabled = False
-
-                Panel.Attributes.Add("style", "background-color: red; cursor: auto;")
+                'update all clients to reflect duplicate record error
+                _ActivePmCache.CacheAdd(DR("Key"))
             End If
 
             Select Case DR("Interval")
@@ -388,7 +359,6 @@ Partial Class MR_OpenTicketStatusBoard
 
         If AdminPanel.Visible Then
             Dim DS As New Data.DataSet
-            Dim DR As Data.DataRow
             Dim RC As Integer
             Dim AreaConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
 
@@ -401,21 +371,24 @@ Partial Class MR_OpenTicketStatusBoard
             For I = 0 To RC - 1
                 Dim IdConfig As New Dictionary(Of String, String)
                 Dim IconConfig As Dictionary(Of String, Dictionary(Of String, String))
-                Dim IconPathList As New List(Of String)
-
-                DR = DS.Tables(0).Rows(I)
+                Dim IconCssClasses As New List(Of String)
+                Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
+                Dim LogState As String = _ActivePm.GetState(DR("Key"))("logState")
 
                 IdConfig("Checklist") = DR("Area")
+                IdConfig("logState") = LogState
 
-                SetButtonBackground(DR)
-                IdConfig("LogStatus") = LogStatus
-                IdConfig("StripeColor") = StripeColor
+                'server side supplies stamp icons to client side only when log state is submitted
+                If LogState = "submitted" Then
+                    IconConfig = StampIndicator.Icons(DR("Key"))
+                    For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In IconConfig
+                        Dim IconImgFilePath As String = kvp.Value("IconImgFilePath")
+                        Dim IconCssClass As String = StampIndicator.GetCssClass(IconImgFilePath)
 
-                IconConfig = StampIndicator.Icons(DR("Key"))
-                For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In IconConfig
-                    IconPathList.Add(kvp.Value("IconImgFilePath"))
-                Next
-                IdConfig("iconsConfig") = JsonSerializer.Serialize(IconPathList)
+                        IconCssClasses.Add(IconCssClass)
+                    Next
+                End If
+                IdConfig("iconsConfig") = JsonSerializer.Serialize(IconCssClasses)
 
                 AreaConfig(DR("Key")) = IdConfig
 
@@ -433,29 +406,31 @@ Partial Class MR_OpenTicketStatusBoard
         Dim SubPanel As New Panel()
         Dim LogButton As New Button()
         Dim IconPanel As New Panel()
-        Dim CssStripedBackground As String
+        Dim LogState As String = _ActivePm.GetState(DR("Key"))("logState")
+        Dim Datakey As String = DR("Key")
 
-        SetButtonBackground(DR)
-        CssStripedBackground = "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px);"
+        Panel.Attributes.Add("style", "display: inline-block; border: 2px solid black;")
+        Panel.ID = "log-" & Datakey
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "Script1-" & Datakey, "applyBackcolorClass(document.getElementById('ctl00_ContentPlaceHolder1_" & Panel.ClientID & "'), '" & LogState & "');", True)
 
-        Panel.Attributes.Add("style", "display: inline-block; border: 2px solid black; " & CssStripedBackground)
         SubPanel.Attributes.Add("style", "display: flex")
-        LogButton.Attributes.Add("style", "width: 100%; border: none; cursor: pointer; " & CssStripedBackground)
-        IconPanel.Attributes.Add("style", "display: grid; align-items: center;")
 
-        IconPanel.ID = "IconPanel_" & DR("Key") 'will be used within SetStampIndicators()
+        LogButton.Attributes.Add("style", "width: 100%; border: none; cursor: pointer;")
+        LogButton.CssClass &= " ChecklistButton"
+        LogButton.ID = Datakey
+        LogButton.Text = DR("Area")
+        LogButton.OnClientClick = "newTab('Log.aspx?Key=" & DR("Key") & "'); return false;"
+        ScriptManager.RegisterStartupScript(Me, Me.GetType(), "Script2-" & Datakey, "applyBackcolorClass(document.getElementById('ctl00_ContentPlaceHolder1_" & LogButton.ClientID & "'), '" & LogState & "'); ", True)
 
-        If LogStatus <> "red" AndAlso LogStatus <> "pink" Then 'has to be complete to receive icons
-            StampIndicator.CreateIcons(IconPanel, DR("Key"))
+        IconPanel.CssClass &= " icon-panel"
+        IconPanel.ID = "IconPanel_" & Datakey
+
+        If LogState = "submitted" Then
+            StampIndicator.CreateStampHtml(IconPanel, Datakey)
         End If
 
-        'SetButtonText(LogButton, DR)
-        LogButton.ID = DR("Key")
-        LogButton.Text = DR("Area")
-        LogButton.CssClass = "ChecklistButton"
-        LogButton.OnClientClick = "redirect('Log.aspx?Key=" & DR("Key") & "'); satiSpinner.displaySpin();" ' Log.aspx redirect is js driven, to prevent page events firing within StatusBoard.aspx, which should reduce overall redirect time
-
         Panel.Controls.Add(SubPanel)
+
         SubPanel.Controls.Add(LogButton)
         SubPanel.Controls.Add(IconPanel)
 

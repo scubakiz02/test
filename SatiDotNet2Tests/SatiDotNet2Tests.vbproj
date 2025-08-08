@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="MaintPMTests.vb" />
     <Compile Include="ChecklistLogging\LogAspxTests.vb" />
+    <Compile Include="ActivePmTests.vb" />
     <Compile Include="ReportTests.vb" />
     <Compile Include="GeneralTests.vb" />
     <Compile Include="PhaseControllerTests.vb" />

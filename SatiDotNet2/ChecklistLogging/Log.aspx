@@ -775,7 +775,8 @@
                     //    });
                 }
 
-                function iterateChildren(callback, elem) { //traverse through all child elements and invoke callback function on them
+                //traverse through all child elements and invoke callback function on them
+                function iterateChildren(callback, elem) {
                     callback.call(elem);
                     for (const child of elem.children) iterateChildren(callback, child);
                 }
@@ -1109,10 +1110,7 @@
                     </div>
                     <div id="overlay"></div>
 
-                    <div style="display: flex; justify-content: space-between; flex-direction: row;">
-                        <asp:LinkButton ID="StatusBoardAnchor" runat="server" OnClientClick="WebpageSpinner.displaySpin();" OnClick="BackToStatusBoard_OnClick" Text="← Status Board" Style="padding-bottom: var(--UWhitespace);"></asp:LinkButton>
-                        <asp:Label ID="DateLabel" runat="server" Style="text-wrap: nowrap; font-style: italic;"></asp:Label>
-                    </div>
+                    <asp:Label ID="DateLabel" runat="server" Style="text-wrap: nowrap; font-style: italic; position: absolute; top: -12px; left: 0;"></asp:Label>
 
                     <div style="display: flex; justify-content: space-between; flex-direction: row;">
                         <asp:Panel ID="StampPanel" runat="server" Style="display: flex; gap: var(--UWhitespace);"></asp:Panel>
@@ -1145,7 +1143,7 @@
                             <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
                                 <asp:CheckBox Visible="False" AutoPostBack="True" ID="MarkAsDoneCheckBox" OnCheckedChanged="MarkAsDoneCheckBox_OnCheckedChanged" runat="server" Text="← Some logs are invalid. Mark as done." CssClass="LogCheckBox" Style="color: red; margin: 0 10px"></asp:CheckBox>
                                 <asp:Button ID="UndoDoneButton" CssClass="HeaderPanelButtons" OnClick="UndoDoneButton_Click" Text="Undo Done" Enabled="False" runat="server"></asp:Button>
-                                <asp:Button ID="DoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" Text="Done" runat="server"></asp:Button>
+                                <asp:Button ID="DoneButton" CssClass="HeaderPanelButtons" OnClick="DoneButton_Click" OnClientClick="window.close();" Text="Done" runat="server"></asp:Button>
                             </div>
                         </asp:Panel>
                     </div>

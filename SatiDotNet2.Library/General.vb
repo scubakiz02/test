@@ -288,9 +288,6 @@ Public Class AspWebpage
     Private QsConfig As New Dictionary(Of String, String)
     Private UrlWithQs As String
 
-    '#TO DO: 
-    'do NOT pass 'QsKeys' arg to constructor during instantiation of this class.
-    'Rather, let SetUrl() function handle logic constructor does with 'QsKeys' arg
     Sub New(Url As String, QsKeys As List(Of String))
         WebpageUrl = Url
         UrlWithQs = Url
@@ -300,7 +297,6 @@ Public Class AspWebpage
         Next
     End Sub
 
-    '#TO DO: modify QsConfig hash for ONLY the key passed to the arg rather than all keys
     Public Sub SetUrl(Key As String, Value As String)
         Dim QsPresent As Boolean = False
         QsConfig(Key) = Value

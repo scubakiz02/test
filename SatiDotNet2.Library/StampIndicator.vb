@@ -1,11 +1,11 @@
 ﻿Imports System.Text.Json
 Imports System.Web.UI.WebControls
+Imports System.Web.UI.HtmlControls
 
 Public Class StampIndicator
     Inherits Security
 
     Private TitleToIcon As New Dictionary(Of String, String)
-    Public StampIconCss As String = "width: 20px; height: 20px; border-radius: 50% 50%; cursor: pointer;"
 
     Sub New()
     End Sub
@@ -41,7 +41,7 @@ Public Class StampIndicator
 
                 QueryObject("@StampKey")("value") = StatusBoardDR("StampKey")
 
-                If GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogStamp] S WHERE StampKey=@StampKey AND DataRecordKey=@DataRecordKey", QueryObject, "Key") Is Nothing Then
+                If GetSingleDbField("SELECT [Key] FROM [ALTS].[dbo].[T_LogStamp] S WHERE StampKey=@StampKey AND DataRecordKey=@DataRecordKey AND Active=1", QueryObject, "Key") Is Nothing Then
                     Dim IconHash As New Dictionary(Of String, String)
 
                     IconHash("Base64Icon") = StatusBoardDR("Base64Icon")
@@ -75,28 +75,46 @@ Public Class StampIndicator
         Return GetSingleDbField("SELECT COUNT(S.[Key]) As NumOfStamps FROM [ALTS].[dbo].[T_LogStamp] S INNER Join [ALTS].[dbo].[T_LogStampList] SL ON S.StampKey=SL.[Key] WHERE DataRecordKey=@DataRecordKey And S.Active = 1", QueryObject, "NumOfStamps")
     End Function
 
-    Function CreateIcons(ParentControl As Panel, T_LogDataKey As Integer) As Panel
-        Dim Icon As ImageButton
+    Public Function GetCssClass(IconImgFilePath As String) As String
+        Dim IconCssClass As String = String.Empty
+
+        Select Case IconImgFilePath
+            Case "../Color/wrench-fill.png"
+                IconCssClass = "icon-fm-manager"
+
+            Case "../Color/list-checks-fill.png"
+                IconCssClass = "icon-qshe-manager"
+
+            Case "../Color/factory-fill.png"
+                IconCssClass = "icon-prod-sup"
+
+            Case "../Color/pipe-wrench-fill.png"
+                IconCssClass = "icon-maint-sup"
+        End Select
+
+        Return IconCssClass
+    End Function
+
+    Public Function CreateStampHtml(ParentControl As Panel, T_LogDataKey As Integer) As Panel
         Dim DbKey As Integer = ParentControl.ID.Split("_")(1)
-        Dim SbUrls As New List(Of String)
         Dim StatusBoardIconsHash As Dictionary(Of String, Dictionary(Of String, String)) = Icons(T_LogDataKey)
+        Dim StampCssClasses As New List(Of String)
+        Dim StampIconCss As String = "width: 20px; height: 20px; border-radius: 50% 50%; cursor: pointer;"
 
         For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In StatusBoardIconsHash
-            SbUrls.Add(kvp.Value("Base64Icon"))
+            Dim IconImgFilePath As String = kvp.Value("IconImgFilePath")
+            Dim StampCssClass As String = GetCssClass(IconImgFilePath)
+            Dim Stamp As New HtmlGenericControl("div")
+
+            Stamp.Attributes("class") = "stamp-icon " & StampCssClass
+            Stamp.Attributes("onclick") = "newTab('Log.aspx?Key=" & T_LogDataKey & "'); return false;"
+
+            ParentControl.Controls.Add(Stamp)
         Next
 
-        If SbUrls.Count > 2 Then 'only add the css below when needed, to prevent excessive whitespace
+        If StampCssClasses.Count > 2 Then 'only add the css below when needed, to prevent excessive whitespace
             ParentControl.Attributes.Add("style", "grid-template-columns: 1fr 1fr;")
         End If
-
-        For Each SbUrl As String In SbUrls
-            Icon = New ImageButton()
-            Icon.ImageUrl = SbUrl
-            Icon.Attributes.Add("style", StampIconCss)
-            Icon.OnClientClick = "redirect('Log.aspx?Key=" & T_LogDataKey & "'); satiSpinner.displaySpin();" ' Log.aspx redirect is js driven, to prevent page events firing within StatusBoard.aspx, which should reduce overall redirect time
-
-            ParentControl.Controls.Add(Icon)
-        Next
 
         Return ParentControl
     End Function

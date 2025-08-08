@@ -505,9 +505,6 @@ Public Class PhaseControllerStatelessGetPhaseFunctionTests
 
         Assert.Equal(2, GetPhase(FakeDataKey, FakeDS)) 'return 2, even though we're on phase 1 b/c non-phased inputs section acts as phase 0
     End Sub
-
-    '#TO DO: create test to replicate bug
-    'environment: all inputs are phased. Once phase 0 is complete, stateless GetPhase() function return jumps to phase 2 rather than 1
 End Class
 
 Public Class PhaseControllerDeleteBatchTests

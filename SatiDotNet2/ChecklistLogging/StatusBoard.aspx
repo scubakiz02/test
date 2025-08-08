@@ -5,29 +5,44 @@
 
         <ContentTemplate>
             <script src="../scripts/WebComponents/Spinner.js"></script>
+            <script src="../scripts/common.js"></script>
             <script type="text/javascript">
-                let satiSpinner;
                 let threeDotSpinner;
                 let cancelBuildOfLogs = false;
                 let builtFirst50Logs = false;
                 let dataChunkingDone = false;
                 let checklistsConfig = {};
                 let BuildMoreLogs_Hyperlink;
-                let pageReloadInterval = 60000; //1 minute
-                let pageReloadTimer;
 
-                function startTimer() {
-                    pageReloadTimer = setInterval(() => {
-                        window.location.reload();
-                    }, pageReloadInterval);
-                }
-
-                window.addEventListener("load", function () {
-                    satiSpinner = document.body.querySelector("sati-spinner");
+                window.addEventListener("load", async function () {
                     threeDotSpinner = document.body.querySelector(".dots-spinner");
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
-                    startTimer();
+
+                    //#TO DO: reinstate pollIntervalInMs to 10 seconds rather than 1 second
+                    const pollIntervalInMs = 1000; //10 seconds
+                    setInterval(async function () {
+                        if (isMidnightRollover(pollIntervalInMs)) {
+                            location.reload();
+                        }
+
+                        await getLogStateChanges();
+                    }, pollIntervalInMs);
                 })
+
+                function isMidnightRollover(intervalInMs) {
+                    const now = new Date();
+                    const hour = now.getHours();
+                    const minute = now.getMinutes();
+                    const seconds = now.getSeconds();
+                    const intervalInSeconds = intervalInMs / 1000;
+
+                    if (hour !== 0) return false; //not the 1st hour (midnight) of the day
+
+                    if (minute !== 0) return false; //not the 1st minute of the hour
+
+                    if (seconds >= 0 && seconds < intervalInSeconds) return true; //is the 1st poll within the minute
+                    return false; //is not the 1st poll within the minute
+                }
 
                 window.addEventListener("DOMContentLoaded", async function () {
                     //build controls for PastIssuesPanel after html has rendered, to reduce long render times for initial load of page
@@ -36,7 +51,6 @@
                         .then(response => {
                             const reader = response.body.getReader();
                             const decoder = new TextDecoder();
-                            let logCount = 0; //for debugging/troubleshooting
 
                             function buildFirst50logs() {
                                 build50Logs();
@@ -61,8 +75,6 @@
 
                                         if (checklistChunk === "") continue;
 
-                                        logCount++;
-
                                         try {
                                             checklistChunkConfig = JSON.parse(checklistChunk);
                                             checklist = checklistChunkConfig.Value.Checklist;
@@ -72,8 +84,6 @@
                                             }
 
                                             checklistsConfig[checklist][checklistChunkConfig.Key] = checklistChunkConfig.Value;
-
-                                            console.log(logCount + ": successful parsing of JSON: \n" + checklistChunk)
                                         }
                                         catch (err) {
                                             console.log("error when parsing JSON: \n\terror: " + err + "\n\tchunk:" + checklistChunk);
@@ -95,6 +105,144 @@
                         });
                 })
 
+                async function getLogStateChanges() {
+                    //configure server side events after data for all overdue logs has been received
+                    //const logStateChangeCollection = fakeSseData();
+                    const logStateChangeCollection = await httpGet("/api/pm-log-state-change.ashx");
+                    const logStateChangeKeys = Object.keys(logStateChangeCollection);
+
+                    for (const logStateChangeKey of logStateChangeKeys) {
+                        const datakey = logStateChangeKey;
+                        const data = logStateChangeCollection[logStateChangeKey];
+                        const logState = data.logState;
+                        let log;
+
+                        try {
+                            //overdue logs
+                            log = document.getElementById("log-" + datakey);
+                            if (!log) throw error;
+                        }
+                        catch (err) {
+                            //current logs (still built in asp code-behind)
+                            const logId = "log-" + datakey
+                            log = getAspControl(logId);
+                        }
+
+                        //repeat data can return from http response
+                        //check log state to ensure it has not already been applied
+                        if (log) {
+                            switch (logState) {
+                                case "virgin":
+                                case "incomplete":
+                                    removeStampCtrlsFrom(log);
+                                    break;
+                                case "submitted":
+                                    // remove stamps
+                                    for (const stampRole of data.removeStamps) {
+                                        const stampCtrlClass = getStampCssClass(stampRole);
+                                        const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                        if (stampCtrl) {
+                                            stampCtrl.parentElement.removeChild(stampCtrl);
+                                        }
+                                    }
+
+                                    //add stamps
+                                    for (const stampRole of data.addStamps) {
+                                        const stampCtrlClass = getStampCssClass(stampRole);
+                                        const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                        if (!stampCtrl) {
+                                            const iconPanel = log.querySelector(".icon-panel");
+                                            createStamp(stampCtrlClass, datakey, iconPanel)
+                                        }
+                                    }
+
+                                    break;
+                                case "completed":
+                                    //log is complete. It has been submitted and received all its stamps
+
+                                    if (data.logType === "current") {
+                                        //If log type is current, remove its stamps
+                                        removeStampCtrlsFrom(log);
+                                    }
+                                    else if (data.logType === "overdue") {
+                                        //If log type is overdue, remove it entirely
+                                        log.parentElement.removeChild(log);
+                                        return;
+                                    }
+
+                                    break;
+                                case "error":
+                                    //error has occured. Display the message from http response on log
+                                    const logButton = log.querySelector(".ChecklistButton");
+                                    const pmOrChecklistName = logButton.value;
+
+                                    if (!pmOrChecklistName.includes("error")) logButton.value = "error: '" + pmOrChecklistName + "' duplication";
+
+                                    removeStampCtrlsFrom(log);
+                                    applyBackcolorClass(log, "error");
+                            }
+
+                            //no matter the log state, apply the log state backcolor css classes
+                            applyBackcolorClass(log, logState);
+                            iterateChildren(function () {
+                                applyBackcolorClass(this, logState);
+                            }, log);
+                        }
+                    }
+                }
+
+                function removeStampCtrlsFrom(ctrl) {
+                    const stampCtrls = ctrl.querySelectorAll(".stamp-icon");
+
+                    for (const stampCtrl of stampCtrls) {
+                        stampCtrl.parentElement.removeChild(stampCtrl);
+                    }
+                }
+
+                function getStampCssClass(managerRole) {
+                    let cssClass;
+
+                    switch (managerRole) {
+                        case "F&M Manager":
+                            cssClass = "icon-fm-manager";
+                            break;
+                        case "Q/SHE Manager":
+                            cssClass = "icon-qshe-manager";
+                            break;
+                        case "Prod Sup":
+                            cssClass = "icon-prod-sup";
+                            break;
+                        case "Maint Sup":
+                            cssClass = "icon-maint-sup";
+                            break;
+                    }
+
+                    return cssClass;
+                }
+
+                let fakeSseDataInvocations = 0;
+                function fakeSseData() {
+                    const fakeId = 1464 + fakeSseDataInvocations;
+
+                    fakeSseDataInvocations++;
+
+                    return {
+                        [fakeId]: {
+                            //logState: "completed",
+                            //logState: "virgin",
+                            //logState: "incomplete",
+                            //logState: "submitted",
+                            logState: "error",
+                            //removeStamps: ["F&M Manager"],
+                            //addStamps: ["Prod Sup", "Maint Sup"],
+                            logType: "current",
+                            //logType: "overdue",
+                        }
+                    }
+                }
+
                 function build50Logs() {
                     let checklistsToBuildConfig = {};
 
@@ -110,29 +258,20 @@
 
                             if (configCount(checklistsToBuildConfig) === 50 || configCount(checklistsConfig) === 0) {
                                 //calling the function below asynchronously
-                                //this is in case user invocates 'redirect' js function while BuildLogs() function is still executing
-                                //instead of having to wait for BuildLogs() to execute, redirect() is called right away, b/c BuildLogs() is executing asynchronously
+                                //this is in case user invocates 'newTab' js function while BuildLogs() function is still executing
+                                //instead of having to wait for BuildLogs() to execute, newTab() is called right away, b/c BuildLogs() is executing asynchronously
                                 BuildLogs(checklistsToBuildConfig);
                                 threeDotSpinner.style.display = "none";
 
                                 //programmatically scroll to bottom of page IF user has clicked 'More...' hyperlink
                                 //'More...' hyperlink onclick event invocates build50Logs AND passes itself as this pointer
                                 if (this.id) {
-                                    let newInterval = 300000; //5 minutes
-
-                                    //set timer control interval property to 5 minutes upon interaction with 'More...' hyperlink
-                                    if (pageReloadInterval !== newInterval) {
-                                        clearInterval(pageReloadTimer);
-                                        pageReloadInterval = newInterval;
-                                        startTimer();
-                                    }
-
-                                    setTimeout(() => { // give DOM time to layout fully
+                                    // give DOM time to layout fully, then programmatically scroll to bottom
+                                    setTimeout(() => {
                                         window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
                                     }, 100);
                                 }
 
-                                //#TO DO: if # of logs needed in PastIssuesPanel is exactly 50, 'More...' hyperlink is visible. It shouldn't be. Fix this!!!!
                                 if (dataChunkingDone && configCount(checklistsConfig) === 0) BuildMoreLogs_Hyperlink.style.display = "none";
                                 else BuildMoreLogs_Hyperlink.style.display = "";
 
@@ -154,6 +293,34 @@
                     return count;
                 }
 
+                function applyBackcolorClass(elem, cssClass) {
+                    const logStates = ["error", "virgin", "incomplete", "submitted", "completed"];
+
+                    //remove currently applied log states
+                    for (const css_class of elem.classList) {
+                        if (logStates.includes(css_class)) {
+                            elem.classList.remove(css_class);
+                        }
+                    }
+
+                    //add new css class
+                    elem.classList.add(cssClass);
+                }
+
+                function createStamp(stampIconClass, datakey, parentCtrl) {
+                    const stampCtrl = document.createElement("div");
+
+                    stampCtrl.classList.add("stamp-icon");
+                    stampCtrl.classList.add(stampIconClass);
+
+                    stampCtrl.addEventListener("click", function () {
+                        newTab("Log.aspx?Key=" + datakey);
+                        cancelBuildOfLogs = true;
+                    })
+
+                    parentCtrl.appendChild(stampCtrl);
+                }
+
                 function BuildLogs(partitionedChecklistsConfig) {
                     if (partitionedChecklistsConfig) {
                         const checklistsArr = Object.keys(partitionedChecklistsConfig);
@@ -161,55 +328,42 @@
 
                         for (const checklist of checklistsArr) {
                             const checklistConfig = partitionedChecklistsConfig[checklist];
-                            const areaKeyArr = Object.keys(checklistConfig);
+                            const datakeyArr = Object.keys(checklistConfig);
 
                             if (cancelBuildOfLogs) return;
 
-                            for (const areaKey of areaKeyArr) {
-                                const areaKeyConfig = checklistConfig[areaKey];
+                            for (const datakey of datakeyArr) {
+                                const datakeyConfig = checklistConfig[datakey];
                                 const Panel = document.createElement("div");
                                 const SubPanel = document.createElement("div");
                                 const IconPanel = document.createElement("div");
                                 const LogButton = document.createElement("input");
-                                const LogStatus = areaKeyConfig.LogStatus;
-                                const StripeColor = areaKeyConfig.StripeColor
-                                let CssStripedBackground = "background: repeating-linear-gradient(60deg, " + LogStatus + ", " + LogStatus + " 10px, " + StripeColor + ", " + StripeColor + " 20px);"
+                                const logState = datakeyConfig.logState
+                                const iconsList = JSON.parse(datakeyConfig.iconsConfig);
 
-                                Panel.setAttribute("style", "display: inline-block; border: 2px solid black; " + CssStripedBackground)
+                                Panel.setAttribute("style", "display: inline-block; border: 2px solid black;")
+                                Panel.id = "log-" + datakey;
+                                applyBackcolorClass(Panel, logState);
+
                                 SubPanel.setAttribute("style", "display: flex")
-                                LogButton.setAttribute("style", "width: 100%; border: none; cursor: pointer; " + CssStripedBackground)
-                                IconPanel.setAttribute("style", "display: flex; align-items: center; cursor: pointer;")
 
-                                IconPanel.id = "IconPanel_" + areaKey
-
-                                if (LogStatus !== "red" && LogStatus !== "pink")  //log has to be complete to receive icons
-                                {
-                                    const iconsList = JSON.parse(areaKeyConfig.iconsConfig);
-
-                                    iconsList.forEach(function (iconSrc) {
-                                        const icon = document.createElement("img");
-
-                                        icon.setAttribute("src", iconSrc);
-                                        icon.setAttribute("class", "ChecklistButtonIcon");
-                                        icon.addEventListener("click", function () {
-                                            redirect("Log.aspx?Key=" + areaKey);
-                                            satiSpinner.displaySpin();
-                                            cancelBuildOfLogs = true;
-                                        })
-
-                                        IconPanel.appendChild(icon);
-                                    });
-                                }
-
+                                LogButton.setAttribute("style", "width: 100%; border: none; cursor: pointer;")
                                 LogButton.setAttribute("type", "button")
-                                LogButton.setAttribute("class", "ChecklistButton");
-                                LogButton.id = areaKey;
+                                LogButton.classList.add("ChecklistButton");
+                                LogButton.id = datakey;
                                 LogButton.value = checklist;
                                 LogButton.addEventListener("click", function () {
-                                    redirect("Log.aspx?Key=" + areaKey);
-                                    satiSpinner.displaySpin();
+                                    newTab("Log.aspx?Key=" + datakey);
                                     cancelBuildOfLogs = true;
                                 })
+                                applyBackcolorClass(LogButton, logState);
+
+                                IconPanel.classList.add("icon-panel")
+                                IconPanel.id = "IconPanel_" + datakey
+
+                                iconsList.forEach(function (iconClass) {
+                                    createStamp(iconClass, datakey, IconPanel);
+                                });
 
                                 PastIssuesPanel.appendChild(Panel);
 
@@ -220,17 +374,12 @@
                             }
 
                         }
-
-                        //end loading effects for user to see past issues have been built
-
                     }
                 }
 
-
-                function redirect(url) {
-                    window.location.href = url;
+                function newTab(url) {
+                    window.open(url, '_blank');
                 }
-
             </script>
 
             <style>
@@ -240,6 +389,62 @@
                     --ChecklistButtonWidth: calc(100vw / 5); /*5 so there is room for the 'special' (> monthly) checklists column*/
                     --ChecklistButtonHeight: 50px;
                 }
+
+                /* status board log classes */
+                .error {
+                    background: red;
+                    pointer-events: none;
+                    opacity: .75;
+                }
+
+                .virgin {
+                    background: pink;
+                }
+
+                .incomplete {
+                    background: red;
+                }
+
+                .submitted {
+                    /* green and blue candy cane design */
+                    background: repeating-linear-gradient(60deg, #33CC33, #33CC33 10px, #ADD8E6, #ADD8E6 20px);
+                }
+
+                .completed {
+                    /* green */
+                    background: #33CC33;
+                }
+
+                .icon-panel {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                .stamp-icon {
+                    width: calc(var(--ChecklistButtonHeight) * .5);
+                    height: calc(var(--ChecklistButtonHeight) * .5);
+                    background-size: cover;
+                    background-position: center;
+                }
+
+                .icon-fm-manager {
+                    background-image: url(../Color/wrench-fill.png);
+                }
+
+                .icon-qshe-manager {
+                    background-image: url(../Color/list-checks-fill.png);
+                }
+
+                .icon-prod-sup {
+                    background-image: url(../Color/factory-fill.png);
+                }
+
+                .icon-maint-sup {
+                    background-image: url(../Color/pipe-wrench-fill.png);
+                }
+
+                /* ? section */
 
                 .SectionPanel {
                     margin: var(--UWhitespace) 0;
@@ -291,10 +496,6 @@
                 .ChecklistButton {
                     height: var(--ChecklistButtonHeight);
                     text-overflow: ellipsis;
-                }
-
-                .ChecklistButtonIcon {
-                    height: calc(var(--ChecklistButtonHeight) * .5);
                 }
 
                 .ColorCodingMessages {
@@ -470,8 +671,6 @@
                     }
                 }
             </style>
-
-            <sati-spinner></sati-spinner>
 
             <%--style="display: flex; justify-content: space-between;"--%>
             <div style="display: flex; flex-direction: column-reverse;">
@@ -773,4 +972,3 @@
         </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
-

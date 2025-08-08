@@ -12,6 +12,7 @@ Public Class StreamData
     Private Format As New Format()
     Private LogAspx As New LogAspxLibrary()
     Private ActivePm As New ActivePm()
+    Private _ActivePmCache As New ActivePmCache()
     Private PmInput As New PmInput()
     Private PhaseController As New PhaseController()
 
@@ -45,6 +46,8 @@ Public Class StreamData
 
                 Res = ModifyInput(DataKey, Json("labelId").ToString(), Json("value").ToString())
                 Res("success") = True
+
+                _ActivePmCache.CacheAdd(DataKey)
             End If
         Catch KeyNotFoundException As KeyNotFoundException
             Res = New Dictionary(Of String, Object)

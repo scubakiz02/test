@@ -717,7 +717,6 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Function RefreshPreview() As String
-        '#TO DO: 'use AspWebpage Class to configure arg to pass to Response.Redirect()
         Dim NewUrl As String = WebpageUrl & "?EPP_ScrollPos=" & EditPreviewPanel_HiddenField.Value & If(AreaFromQueryString IsNot Nothing, "&Area=" & AreaFromQueryString, Nothing) & If(PhaseFromQs IsNot Nothing, "&Phase=" & PhaseFromQs, Nothing) & If(LabelFromQueryString IsNot Nothing, "&Label=" & LabelFromQueryString, Nothing) & If(CommentFromQueryString IsNot Nothing, "&Comment=" & CommentFromQueryString, Nothing) & If(ViewFromQs IsNot Nothing, "&View=" & ViewFromQs, Nothing)
 
         'try catch block in case WebMethod is invocating this function
@@ -906,7 +905,6 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub FormViewDeleteHyperlink_OnClick(sender As Object, e As EventArgs)
-        '#TO DO: after client side is calling PhaseController.DeletePhaseOrGroup(), delete if condition related to it
         If sender.ID.Contains("Phase") Then
             PhaseController.DeletePhaseOrGroup(PhaseFromQs)
             PhaseFromQs = Nothing
@@ -1142,7 +1140,6 @@ Partial Class MR_OpenTicketStatusBoard
             {"typeOf", "int"}
         }
 
-        '#TO DO: T_LogLabel FieldType cannot be null. 'number' is the new default value. account for this DB change where it is needed (here, FieldType Class, etc.)
         If String.IsNullOrEmpty(FieldType) = False Then
             QueryConfig("@FieldType") = New Dictionary(Of String, String) From {
                 {"value", FieldType},
