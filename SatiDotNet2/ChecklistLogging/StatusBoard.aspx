@@ -18,8 +18,7 @@
                     threeDotSpinner = document.body.querySelector(".dots-spinner");
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
 
-                    //#TO DO: reinstate pollIntervalInMs to 10 seconds rather than 1 second
-                    const pollIntervalInMs = 1000; //10 seconds
+                    const pollIntervalInMs = 10000; //10 seconds
                     setInterval(async function () {
                         if (isMidnightRollover(pollIntervalInMs)) {
                             location.reload();
