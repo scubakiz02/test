@@ -28,7 +28,6 @@ Public Class ActivePm
         Return Res
     End Function
 
-    '#TO DO: adjust production sql queries to 2 dataset design
     Public Function GetState(DataKey As Integer, Optional FakeStampDs As Data.DataSet = Nothing, Optional FakeLogDs As Data.DataSet = Nothing) As Dictionary(Of String, Object)
         Dim Res As New Dictionary(Of String, Object)
         Dim StampDs As Data.DataSet
