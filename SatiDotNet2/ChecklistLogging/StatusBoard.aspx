@@ -5,6 +5,7 @@
 
         <ContentTemplate>
             <script src="../scripts/WebComponents/Spinner.js"></script>
+            <script src="../scripts/WebComponents/sati-full-screen.js"></script>
             <script src="../scripts/common.js"></script>
             <script type="text/javascript">
                 let threeDotSpinner;
@@ -15,10 +16,11 @@
                 let BuildMoreLogs_Hyperlink;
 
                 window.addEventListener("load", async function () {
+                    const pollIntervalInMs = 10000; 
+
                     threeDotSpinner = document.body.querySelector(".dots-spinner");
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
 
-                    const pollIntervalInMs = 10000; //10 seconds
                     setInterval(async function () {
                         if (isMidnightRollover(pollIntervalInMs)) {
                             location.reload();
@@ -472,6 +474,7 @@
                     font-size: calc(var(--UFontSize)* 2);
                 }
 
+                /* ======== hide sati header and footer ============= */
                 #ctl00_MasterPagePanelTop {
                     display: none;
                 }
@@ -487,9 +490,6 @@
                 .MasterMainBackground {
                     background: none;
                     margin: 0;
-                }
-
-                #ctl00_MasterPagePanelMain {
                 }
 
                 .ChecklistButton {
@@ -670,6 +670,8 @@
                     }
                 }
             </style>
+
+            <sati-full-screen></sati-full-screen>
 
             <%--style="display: flex; justify-content: space-between;"--%>
             <div style="display: flex; flex-direction: column-reverse;">

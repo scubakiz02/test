@@ -8,12 +8,13 @@
 
     <asp:Panel ID="Panel2" runat="server"></asp:Panel>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
-        <ContentTemplate>             
+        <ContentTemplate>
+            <script src="../scripts/WebComponents/sati-full-screen.js"></script>
+            <sati-full-screen isSatiLayoutActive="true"></sati-full-screen>
             <asp:Panel ID="Panel1" runat="server">
-
             </asp:Panel>
             <br />
-        </ContentTemplate>       
+        </ContentTemplate>
     </asp:UpdatePanel>
 </asp:Content>
 
