@@ -16,14 +16,15 @@
                 let BuildMoreLogs_Hyperlink;
 
                 window.addEventListener("load", async function () {
-                    const pollIntervalInMs = 10000; 
+                    const pollIntervalInMs = 10000;
 
                     threeDotSpinner = document.body.querySelector(".dots-spinner");
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
 
                     setInterval(async function () {
                         if (isMidnightRollover(pollIntervalInMs)) {
-                            location.reload();
+                            //hard reload (includes cache)
+                            window.location.replace(window.location.href);
                         }
 
                         await getLogStateChanges();
@@ -31,6 +32,7 @@
                 })
 
                 function isMidnightRollover(intervalInMs) {
+                    //const now = new Date("2025-08-14T00:00:10"); //for troubleshooting/testing
                     const now = new Date();
                     const hour = now.getHours();
                     const minute = now.getMinutes();
