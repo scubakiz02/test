@@ -197,11 +197,6 @@
                     }
                 }
 
-                function isOutOfScopeValueVerified(valueConfig) {
-                    if (valueConfig.state === 'outOfScope' && !valueConfig.valueVerified) return false;
-                    return true;
-                }
-
                 async function configDbConnection(config) {
                     const { elem, eventListeners, getValueCallback, LogPanel, LogPanels } = config;
 
@@ -213,23 +208,25 @@
                             if (isHttpTrigger(eventListener, e)) e.preventDefault(); //prevent postback (going to send http request)
                             else return;
 
-                            //default out of range verification to false on value change
-                            await setOutOfScopeVerifyValue(this, false);
-
                             //in case http request within recordInput() function responds with error
                             try {
                                 httpRes = await recordInput(this, value);
-                                configureInput(httpRes, LogPanel);
-                                setPhasingBehavior(httpRes.phaseLevel);
 
-                                if (isOutOfScopeValueVerified(httpRes)) {
-                                    //programmatically set cursor focus to next control unless event listener is blur
-                                    //always let end user cursor focus take priority over the programmatic configuration of the cursor
-                                    if (eventListener !== "blur") {
-                                        setCursorFocus(this, LogPanels);
+                                if (httpRes.state === 'outOfScope') {
+                                    if (httpRes.valueVerified) {
+                                        //programmatically set cursor focus to next control unless event listener is blur
+                                        //always let end user cursor focus take priority over the programmatic configuration of the cursor
+                                        if (eventListener !== "blur") {
+                                            setCursorFocus(this, LogPanels);
+                                        }
+                                    }
+                                    else {
+                                        elem.focus(); //block all end user actions until out of scope value is verified
                                     }
                                 }
-                                else elem.focus(); //block all end user actions until out of scope value is verified
+
+                                configureInput(httpRes, LogPanel);
+                                setPhasingBehavior(httpRes.phaseLevel);
                             }
                             catch (err) {
                                 pmLogAlert.setAttribute("message", err.endUserMessage);
@@ -272,15 +269,38 @@
 
                 function configureInput(res, LogPanel) {
                     //change background color for all html elements of the relevant input panel
-                    const message = res.message;
+                    const colorblindmessageHtmlElem = LogPanel.querySelector("[colorblindmessage]");
                     const cbxContainerClass = "value-out-of-scope-container";
                     let cbxContainer = LogPanel.querySelector("." + cbxContainerClass);
 
-                    //if html for 'check if correct' checkbox exists, delete it
-                    //this way:
-                    //1) 'valid' or 'invalid' controls don't have the cbx
-                    //2) 'outOfScope' controls don't have more than 1 cbx
-                    if (cbxContainer) cbxContainer.parentElement.removeChild(cbxContainer);
+                    colorblindmessageHtmlElem.innerText = res.message;
+
+                    //build html controls used when log state is out of scope
+                    if (!cbxContainer) {
+                        const cbx = document.createElement("input");
+                        const cbxLabel = document.createElement("span");
+
+                        cbxContainer = document.createElement("span");
+                        cbxContainer.classList.add(cbxContainerClass);
+                        colorblindmessageHtmlElem.parentElement.appendChild(cbxContainer);
+
+                        cbx.type = "checkbox";
+                        cbx.checked = res.valueVerified;
+                        cbx.classList.add("out-of-scope-cbx");
+                        // set cbx mousedown event listener to stop browser’s own focus shift
+                        // this is necessary because cbx change event listener executes setCursorFocus() function, which programmatically executes focus shift
+                        // without this setup (mousedown and change event listeners on cbx), unintentional cursor focus behavior occurs from time to time
+                        cbx.addEventListener("mousedown", function (e) {
+                            e.preventDefault();
+                        })
+                        cbx.addEventListener("change", async function (e) {
+                            await setOutOfScopeVerifyValue(this);
+                        })
+                        cbxContainer.appendChild(cbx);
+
+                        cbxLabel.innerText = " ← Check if correct";
+                        cbxContainer.appendChild(cbxLabel);
+                    }
 
                     iterateChildren(function () {
                         let backcolor;
@@ -288,42 +308,16 @@
                         switch (res.state) {
                             case "valid":
                                 backcolor = "#FFFFFF";
+                                cbxContainer.style.display = "none";
                                 break;
                             case "invalid":
                                 backcolor = "red"
+                                cbxContainer.style.display = "none";
                                 break;
                             case "outOfScope":
                                 backcolor = "#E6E600";
-
-                                //create html for 'check if correct' checkbox and display it
-                                if (this.getAttribute("colorblindmessage")) {
-                                    const cbxContainer = document.createElement("span");
-                                    const cbx = document.createElement("input");
-                                    const cbxLabel = document.createElement("span");
-
-                                    this.parentElement.appendChild(cbxContainer);
-                                    cbxContainer.appendChild(cbx);
-                                    cbxContainer.appendChild(cbxLabel);
-
-                                    cbxContainer.classList.add(cbxContainerClass);
-                                    cbxContainer.style.backgroundColor = backcolor;
-
-                                    cbx.type = "checkbox";
-                                    cbx.name = "out-of-scope-cbx";
-                                    cbx.checked = res.valueVerified;
-                                    cbx.addEventListener("change", async function (e) {
-                                        await setOutOfScopeVerifyValue(this, this.checked);
-                                        e.preventDefault(); //prevent postback
-                                    })
-
-                                    cbxLabel.innerText = " ← Check if correct";
-                                }
-
+                                cbxContainer.style.display = "";
                                 break;
-                        }
-
-                        if (this.getAttribute("colorblindmessage")) {
-                            this.innerText = message;
                         }
 
                         this.style.backgroundColor = backcolor;
@@ -331,9 +325,10 @@
                     }, LogPanel)
                 }
 
-                async function setOutOfScopeVerifyValue(activeInputElem, verifyValue) {
+                async function setOutOfScopeVerifyValue(verifyValueCbx) {
                     const params = new URLSearchParams(window.location.search);
-                    const activeTbx = activeInputElem.closest(".LogPanel").querySelector(".activeInput");
+                    const verifyValue = verifyValueCbx.checked;
+                    const activeTbx = verifyValueCbx.closest(".LogPanel").querySelector(".activeInput");
                     const label_id = getLabelId(activeTbx)
                     let dataKey = params.get("Key");
                     let httpPostRes;
@@ -348,9 +343,17 @@
                         value: verifyValue
                     });
 
-                    //debugger;
-                    if (httpPostRes.success && verifyValue === true) setCursorFocus(activeTbx, document.querySelectorAll(".LogPanel"));
-                    else verifyValue = !verifyValue; //reverse checked status to hopefully alert end user
+                    if (verifyValue) {
+                        //display sati alert if http request response has failed in setOutOfScopeVerifyValue() invocation
+                        if (!httpPostRes.success) {
+                            verifyValueCbx.checked = false;
+                            pmLogAlert.setAttribute("message", "Save failed. Refresh and retry");
+                            pmLogAlert.show();
+                            return;
+                        }
+
+                        setCursorFocus(activeTbx, document.querySelectorAll(".LogPanel"));
+                    }
                 }
 
                 let count = 0;
