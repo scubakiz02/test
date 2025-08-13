@@ -11,13 +11,26 @@
     connectedCallback() {
         const self = this;
 
+        //automatedScroll function calls itself every frame using requestAnimationFrame() js method. Only invoke this method once within connectedCallback()!!!
+        self.#automatedScroll(10000);
+
         document.addEventListener('fullscreenchange', function (event) {
-            if (self.getAttribute('isSatiLayoutActive') === "true") {
-                if (document.fullscreenElement) {
-                    //remove sati layout (header, footer, and background)
-                    const style = document.createElement('style');
+            let style = document.getElementById(self.#hideSatiLayoutStyleId);
+
+            if (document.fullscreenElement) {
+                //this event listener tends to run several times. Why? i don't know
+                //to combat the issues this causes, check to make sure html style tag does not exist
+                if (!style) {
+                    //if relevant html style element does not exist, create it to:
+                    //1) remove sati layout(header, footer, and background)
+                    //2) adjust background-color of fullscreen backdrop to white (default is black)
+                    style = document.createElement('style');
                     style.id = self.#hideSatiLayoutStyleId;
                     style.textContent = `
+                        :fullscreen::backdrop {
+                          background-color: white;
+                        }
+
                         #ctl00_MasterPagePanelTop {
                             display: none;
                         }
@@ -35,11 +48,13 @@
                             margin: 0;
                         }`;
                     document.head.appendChild(style);
-
                 }
-                else {
+            }
+            else {
+                //this event listener tends to run several times. Why? i don't know
+                //to combat the issues this causes, check to make sure html style tag does exist
+                if (style) {
                     //bring back sati layout (header, footer, and background)
-                    const style = document.getElementById(self.#hideSatiLayoutStyleId);
                     style.parentElement.removeChild(style)
 
                     //remove fullscreen wrapper
@@ -57,8 +72,6 @@
                     self.#fullscreenWrapper = undefined;
                 }
             }
-
-            self.#automatedScroll(10000); //10000ms duration to scroll from top to bottom
         })
 
         document.addEventListener("keydown", function (event) {
