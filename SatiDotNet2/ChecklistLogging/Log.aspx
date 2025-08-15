@@ -212,17 +212,14 @@
                             try {
                                 httpRes = await recordInput(this, value);
 
-                                if (httpRes.state === 'outOfScope') {
-                                    if (httpRes.valueVerified) {
-                                        //programmatically set cursor focus to next control unless event listener is blur
-                                        //always let end user cursor focus take priority over the programmatic configuration of the cursor
-                                        if (eventListener !== "blur") {
-                                            setCursorFocus(this, LogPanels);
-                                        }
-                                    }
-                                    else {
-                                        elem.focus(); //block all end user actions until out of scope value is verified
-                                    }
+                                if (httpRes.state === 'outOfScope' && !httpRes.valueVerified) {
+                                    //block end user from moving on if out of scope value is not verified
+                                    elem.focus();
+                                }
+                                else if (eventListener !== "blur") {
+                                    //programmatically set cursor focus to next control unless event listener is blur
+                                    //always let end user cursor focus take priority over the programmatic placement of the cursor
+                                    setCursorFocus(this, LogPanels);
                                 }
 
                                 configureInput(httpRes, LogPanel);
