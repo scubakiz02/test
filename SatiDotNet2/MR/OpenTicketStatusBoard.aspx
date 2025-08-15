@@ -4,13 +4,27 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
 
-    <meta http-equiv="refresh" content="60">
-
     <asp:Panel ID="Panel2" runat="server"></asp:Panel>
     <asp:UpdatePanel ID="UpdatePane" runat="server">
         <ContentTemplate>
             <script src="../scripts/WebComponents/sati-full-screen.js"></script>
-            <sati-full-screen isSatiLayoutActive="true"></sati-full-screen>
+            <script src="../scripts/common.js"></script>
+            <script type="text/javascript">
+                window.addEventListener("load", async function () {
+                    const Panel1 = document.getElementById("<%= Panel1.ClientID %>");
+                    Panel1.innerHTML = await getBuildHtml();
+
+                    setInterval(async function() {
+                        Panel1.innerHTML = await getBuildHtml();
+                    }, 60000); //60 second poll interval
+                })
+
+                async function getBuildHtml() {
+                    const res = await httpGet("/api/mr-status-board-html.ashx");
+                    return res.html;
+                }
+            </script>
+            <sati-full-screen issatilayoutactive="true"></sati-full-screen>
             <asp:Panel ID="Panel1" runat="server">
             </asp:Panel>
             <br />
