@@ -381,7 +381,7 @@
                 async function recordInput(activeInput, value) {
                     const params = new URLSearchParams(window.location.search);
                     const data_id = params.get("Key");
-                    const httpPostRes = await httpPost("pm-input.ashx", {
+                    const httpPostRes = await httpPost("/api/pm-input.ashx", {
                         dataId: data_id,
                         labelId: getLabelId(activeInput),
                         value: value
@@ -396,7 +396,7 @@
                     const data_id = params.get("Key");
                     const labelId = getLabelId(activeInput);
                     if (!labelId) debugger;
-                    const httpGetRes = await httpGet("pm-input.ashx?dataId=" + data_id + "&labelId=" + labelId);
+                    const httpGetRes = await httpGet("/api/pm-input.ashx?dataId=" + data_id + "&labelId=" + labelId);
 
                     //debugger;
                     return httpGetRes;

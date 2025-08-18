@@ -938,9 +938,9 @@
                                 <asp:Button Text="Greater Than (>)" ID="GreaterThanPickButton" InterfacePanel="GreaterThanPanel" OnClick="RangeOrderMenu_onClick" runat="server" />
                             </asp:Panel>
                             <asp:Panel runat="server" ID="DynamicRangeBoxPanel" Style="position: relative; display: flex; justify-content: center; align-items: center; border: 2px solid black; padding: var(--UWhitespace); height: 100px;">
-                                <asp:Panel runat="server" ID="RangePanel" Visible="False" Style="display: flex; justify-content: center; gap: var(--UWhitespace);">
+                                <asp:Panel runat="server" ID="RangePanel" Visible="False" Style="display: flex; justify-content: center; align-items: center; gap: var(--UWhitespace);">
                                     <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="LowerBoundTextbox" />
-                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="-" runat="server" />
+                                    <asp:Label CssClass="RangeOrderInterfacePanel_Label" Text="to" runat="server" />
                                     <asp:TextBox CssClass="RangeOrderInterfacePanel_TextBox" runat="server" ID="UpperBoundTextbox" />
                                 </asp:Panel>
 

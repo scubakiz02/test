@@ -29,6 +29,7 @@ Public Class NumberPmInputTests
     <Theory>
     <InlineData("1")>
     <InlineData("2.2")>
+    <InlineData("-7")>
     Private Sub ValidUserInputs(UserInput As String)
         Assert.Equal(Of Dictionary(Of String, Object))(ValidExpectedRes, ReportValidity(NumberFieldTypeDbValue, String.Empty, UserInput))
     End Sub
@@ -38,6 +39,12 @@ Public Class NumberPmInputTests
     <InlineData("5-10", 11)>
     <InlineData("5.5-7.5", 5)>
     <InlineData("5.5-7.5", 7.51)>
+    <InlineData("5 to 10", 4.99)>
+    <InlineData("5 to 10", 10.01)>
+    <InlineData("-5 to 10", -5.01)>
+    <InlineData("-5 to 10", 10.01)>
+    <InlineData("-7.55 to -7.45", -7.56)>
+    <InlineData("-7.55 to -7.45", -7.44)>
     Private Sub RangeSpanTests(Range As String, UserInput As String)
         Assert.Equal(Of Dictionary(Of String, Object))(OutOfScopeExpectedRes, ReportValidity(NumberFieldTypeDbValue, Range, UserInput))
     End Sub

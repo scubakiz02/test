@@ -45,8 +45,16 @@ Public Class PmInput
             Dim UserInputDec As Decimal = Decimal.Parse(Value) 'FormatException can be thrown here
 
             If Value <> "000" Then '"000" is a valid input by default
-                If Range.Contains("-") Then 'span range (Ex: 1-2; 3-10.5, etc.)
+                If Range.Contains("-") OrElse Range.Contains("to") Then 'span range (Ex: 1-2; 3-10.5, etc.)
                     Dim DelimitArr() As String = Range.Split("-")
+
+                    'temporary solution.
+                    'Eventually 'to' delimeter should replace '-' delimiter throughout all T_LogLabel Range field values
+                    'after this is done, remove checks for '-' delimiter
+                    If DelimitArr.Count <> 2 OrElse DelimitArr.Contains(String.Empty) Then
+                        DelimitArr = Range.Split(New String() {"to"}, StringSplitOptions.None)
+                    End If
+
                     Dim LowerBound As Decimal = Decimal.Parse(Trim(DelimitArr(0)))
                     Dim UpperBound As Decimal = Decimal.Parse(Trim(DelimitArr(1)))
 

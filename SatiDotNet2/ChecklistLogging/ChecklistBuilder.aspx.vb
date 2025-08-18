@@ -737,8 +737,16 @@ Partial Class MR_OpenTicketStatusBoard
         Dim DbRangeDelimited As String()
 
         If DbRange IsNot Nothing Then
-            If DbRange.Contains("-") Then
+            If DbRange.Contains("-") OrElse DbRange.Contains("to") Then
                 DbRangeDelimited = DbRange.Split("-")
+
+                'temporary solution.
+                'Eventually 'to' delimeter should replace '-' delimiter throughout all T_LogLabel Range field values
+                'after this is done, remove checks for '-' delimiter
+                If DbRangeDelimited.Count <> 2 OrElse DbRangeDelimited.Contains(String.Empty) Then
+                    DbRangeDelimited = DbRange.Split(New String() {"to"}, StringSplitOptions.None)
+                End If
+
                 LowerBoundTextbox.Text = DbRangeDelimited(0)
                 UpperBoundTextbox.Text = DbRangeDelimited(1)
                 RangeOrderMenu_onClick(RangePickButton, EventArgs.Empty)
@@ -1327,7 +1335,7 @@ Partial Class MR_OpenTicketStatusBoard
 
         If RangePanel.Visible Then
             If Double.TryParse(LowerBoundTextbox.Text, UserInput) And Double.TryParse(UpperBoundTextbox.Text, UserInput2) And UserInput < UserInput2 Then
-                DbRange = UserInput & "-" & UserInput2
+                DbRange = UserInput & " to " & UserInput2
                 InvalidInputLabel.Visible = False 'hide error message from user
             Else
                 InvalidInputLabel.Visible = True
