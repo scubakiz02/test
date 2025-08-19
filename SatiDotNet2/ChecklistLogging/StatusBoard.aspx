@@ -22,30 +22,9 @@
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
 
                     setInterval(async function () {
-                        if (isMidnightRollover(pollIntervalInMs)) {
-                            //hard reload (includes cache)
-                            window.location.replace(window.location.href);
-                        }
-
                         await getLogStateChanges();
                     }, pollIntervalInMs);
                 })
-
-                function isMidnightRollover(intervalInMs) {
-                    //const now = new Date("2025-08-14T00:00:10"); //for troubleshooting/testing
-                    const now = new Date();
-                    const hour = now.getHours();
-                    const minute = now.getMinutes();
-                    const seconds = now.getSeconds();
-                    const intervalInSeconds = intervalInMs / 1000;
-
-                    if (hour !== 0) return false; //not the 1st hour (midnight) of the day
-
-                    if (minute !== 0) return false; //not the 1st minute of the hour
-
-                    if (seconds >= 0 && seconds < intervalInSeconds) return true; //is the 1st poll within the minute
-                    return false; //is not the 1st poll within the minute
-                }
 
                 window.addEventListener("DOMContentLoaded", async function () {
                     //build controls for PastIssuesPanel after html has rendered, to reduce long render times for initial load of page
@@ -110,13 +89,15 @@
 
                 async function getLogStateChanges() {
                     //configure server side events after data for all overdue logs has been received
-                    //const logStateChangeCollection = fakeSseData();
-                    const logStateChangeCollection = await httpGet("/api/pm-log-state-change.ashx");
-                    const logStateChangeKeys = Object.keys(logStateChangeCollection);
+                    //const response = fakeSseData();
+                    const response = await httpGet("/api/pm-log-state-change.ashx");
 
+                    if (response.refreshPage) window.location.reload(true); //hard reload (no cache storage)
+
+                    const logStateChangeKeys = Object.keys(response);
                     for (const logStateChangeKey of logStateChangeKeys) {
                         const datakey = logStateChangeKey;
-                        const data = logStateChangeCollection[logStateChangeKey];
+                        const data = response[logStateChangeKey];
                         const logState = data.logState;
                         let log;
 
