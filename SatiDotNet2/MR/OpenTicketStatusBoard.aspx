@@ -24,7 +24,7 @@
                     return res.html;
                 }
             </script>
-            <sati-full-screen issatilayoutactive="true"></sati-full-screen>
+            <sati-full-screen></sati-full-screen>
             <asp:Panel ID="Panel1" runat="server">
             </asp:Panel>
             <br />
