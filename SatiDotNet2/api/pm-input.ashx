@@ -137,10 +137,10 @@ Public Class StreamData
 
                     Return Res
                 Case "HOA"
-                    If UserInput.Contains("...") Then
-                        Res("state") = "invalid"
-                    Else
+                    If UserInput.Contains("Hand") OrElse UserInput.Contains("Off") OrElse UserInput.Contains("Auto") Then
                         Res("state") = "valid"
+                    Else
+                        Res("state") = "invalid"
                     End If
                     Res("message") = ""
 
