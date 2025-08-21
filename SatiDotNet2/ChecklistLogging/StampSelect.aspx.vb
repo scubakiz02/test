@@ -60,9 +60,10 @@ Partial Class MR_OpenTicketStatusBoard
 
             'sql query to get all submitted logs that do not have all of there stamps
             Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
-                {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")}
+                {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")},
+                {"@StartDateCutoffAt", Security.GetParamVarHash(Session("StartDateCutoffAt"), "string")}
             }
-            Dim RelevantLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D WHERE CompleteLog=1 AND AreaKey=@AreaKey AND D.Date > '07/22/2025'", SqlConfig)
+            Dim RelevantLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D WHERE CompleteLog=1 AND AreaKey=@AreaKey AND D.Date > @StartDateCutoffAt", SqlConfig)
 
             For Each RelevantLogsDr As Data.DataRow In RelevantLogsDs.Tables(0).Rows
                 _ActivePmCache.CacheAdd(RelevantLogsDr("DataKey"))

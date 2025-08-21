@@ -32,7 +32,6 @@ Public Class ActivePm
         Dim Res As New Dictionary(Of String, Object)
         Dim StampDs As Data.DataSet
         Dim LogState As String
-        Dim LogType As String
         Dim LogDataDr As Data.DataRow
 
         If FakeStampDs Is Nothing OrElse FakeLogDs Is Nothing Then
@@ -57,25 +56,21 @@ Public Class ActivePm
                     "CASE WHEN (SELECT COUNT(*) FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=D.AreaKey AND Date=D.Date) > 1 Then 1 " &
                 "Else 0 " &
                 "End As IsLogDuplicated, " &
-            "Inputs " &
-            "FROM [ALTS].[dbo].[T_LogData] D WHERE [Key]=@DataKey", SqlConfig).Tables(0).Rows(0)
+                "(SELECT Active FROM [ALTS].[dbo].[T_LogArea] WHERE [Key]=D.AreaKey) As IsActive, " &
+                "Inputs " &
+                "FROM [ALTS].[dbo].[T_LogData] D WHERE [Key]=@DataKey", SqlConfig).Tables(0).Rows(0)
         Else
             StampDs = FakeStampDs
             LogDataDr = FakeLogDs.Tables(0).Rows(0) 'use this variable to access values fixed across all rows (IsLogNewest, IsLogComplete, Inputs)
         End If
 
-        Dim IsLogNewest As Boolean = LogDataDr("IsLogNewest")
-        If IsLogNewest Then
-            LogType = "current"
-        Else
-            LogType = "overdue"
-        End If
-
         Try
             Dim IsLogDuplicated As Boolean = LogDataDr("IsLogDuplicated")
             Dim IsLogComplete As Boolean = LogDataDr("IsLogComplete")
+            Dim IsActive As Boolean = LogDataDr("IsActive")
 
-            If IsLogDuplicated Then Throw New Exception("")
+            If IsActive = False Then Throw New InactiveLogException()
+            If IsLogDuplicated Then Throw New DuplicateLogException()
 
             If IsLogComplete Then
                 Dim AddStamps As New List(Of String)
@@ -93,9 +88,15 @@ Public Class ActivePm
                     End If
                 Next
 
-                'evaluate log state (submitted or completed)
+                'evaluate log state (submitted, completed, or delete)
                 If AddStamps.Count = 0 Then
-                    LogState = "completed"
+                    Dim IsLogNewest As Boolean = LogDataDr("IsLogNewest")
+                    If IsLogNewest Then
+                        'log completed on time
+                        LogState = "completed"
+                    Else
+                        Throw New OverdueLogCompleted()
+                    End If
                 Else
                     LogState = "submitted"
                     Res("addStamps") = AddStamps
@@ -111,13 +112,32 @@ Public Class ActivePm
                     LogState = "incomplete"
                 End If
             End If
+        Catch ex As OverdueLogCompleted
+            LogState = "delete"
+        Catch ex As InactiveLogException
+            LogState = "delete"
+        Catch ex As DuplicateLogException
+            LogState = "error"
         Catch ex As Exception
+            'this block catches errors that are not accounted for
             LogState = "error"
         End Try
 
         Res("logState") = LogState
-        Res("logType") = LogType
 
         Return Res
     End Function
 End Class
+
+Public Class DuplicateLogException
+    Inherits Exception
+End Class
+
+Public Class InactiveLogException
+    Inherits Exception
+End Class
+
+Public Class OverdueLogCompleted
+    Inherits Exception
+End Class
+

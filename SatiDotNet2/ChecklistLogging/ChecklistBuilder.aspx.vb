@@ -36,8 +36,11 @@ Partial Class MR_OpenTicketStatusBoard
     Dim Department As String = CurrUser.GetDepartment()
     Dim DepartmentKey As String = CurrUser.GetDepartmentKey()
     Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+
     Private PhaseController As New PhaseController()
     Private PmInput As New PmInput()
+    Private _ActivePmCache As New ActivePmCache()
+    Private _ActivePm As New ActivePm()
 
     <WebMethod()>
     Public Shared Function Area_Change(AreaKey As Integer) As String
@@ -1107,9 +1110,62 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
+    Private Sub CacheDisabledLogs(AreaKey As String)
+        'send data regarding every potential log in status board relevant to pm/checklist that has been disabled 
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", Security.GetParamVarHash(AreaKey, "int")},
+            {"@StartDateCutoffAt", Security.GetParamVarHash(Session("StartDateCutoffAt"), "string")}
+        }
+        Dim AreaKeyLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D " &
+            "WHERE " &
+            "AreaKey=@AreaKey " &
+            "And D.Date > @StartDateCutoffAt " &
+            "ORDER BY Date DESC", SqlConfig)
+
+        'add newest log related to areakey no matter the log state
+        Dim CurrentLogDataKey As String = AreaKeyLogsDs.Tables(0).Rows(0)("DataKey")
+        _ActivePmCache.CacheAdd(CurrentLogDataKey)
+        For Each AreaKeyLogsDr As Data.DataRow In AreaKeyLogsDs.Tables(0).Rows
+            'if log state is not completed (unless it is the newest log), that means the log is overdue
+            'add all of these logs to cache
+            Dim DataKey As String = AreaKeyLogsDr("DataKey")
+            Dim DataKeyState As Dictionary(Of String, Object) = _ActivePm.GetState(DataKey)
+
+            If DataKeyState("logState") <> "completed" Then
+                _ActivePmCache.CacheAdd(DataKey)
+            End If
+        Next
+    End Sub
+
+    Private Sub SetPmActiveStatus(IsActive As Boolean, AreaKey As String)
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From
+        {
+            {"@Active", Security.GetParamVarHash(IsActive, "bit")},
+            {"@AreaKey", Security.GetParamVarHash(AreaKey, "int")}
+        }
+        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Active=@Active WHERE [Key]=@AreaKey", QueryConfig)
+    End Sub
+
+
+    Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
+        Dim ActiveStatus As Boolean = If(sender.Text = "Disable", False, True)
+
+        SetPmActiveStatus(ActiveStatus, AreaFromQueryString)
+        CacheDisabledLogs(AreaFromQueryString)
+        RefreshPreview()
+    End Sub
+
     Protected Sub ArchiveStatusButton_onClick(sender As Object, e As EventArgs)
         ViewFromQs = "Archived"
         ChecklistBuilder.ArchivePM(AreaFromQueryString)
+
+        'both functions below are needed to cache the disabled logs properly
+        'this is b/c CacheDisabledLogs() function calls ActivePmCache Class CacheAdd function
+        'CacheAdd function call ActivePm Class GetState() function, which looks at ALTS Database T_LogArea Table Active field value
+        'hence why, before calling CacheDisabledLogs() function, SetPmActiveStatus() function is called (to set Active field value mentioned to false)
+        SetPmActiveStatus(False, AreaFromQueryString)
+        CacheDisabledLogs(AreaFromQueryString)
+
         RefreshPreview()
     End Sub
 
@@ -1123,22 +1179,6 @@ Partial Class MR_OpenTicketStatusBoard
         CommentFromQueryString = Nothing
         RefreshPreview()
     End Sub
-
-    Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
-        Dim Active As Boolean = If(sender.Text = "Disable", False, True)
-
-        QueryConfig("@Active") = New Dictionary(Of String, String) From {
-            {"value", Active},
-            {"typeOf", "bit"}
-        }
-        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-            {"value", AreaFromQueryString},
-            {"typeOf", "int"}
-        }
-        Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Active=@Active WHERE [Key]=@AreaKey", QueryConfig)
-        RefreshPreview()
-    End Sub
-
     Protected Sub FieldType_OnSelectedIndexChanged(sender As Object, e As EventArgs)
         Dim FieldType As String = sender.SelectedValue
         Dim UpdateQuery As String = "UPDATE [ALTS].[dbo].[T_LogLabel] Set FieldType="

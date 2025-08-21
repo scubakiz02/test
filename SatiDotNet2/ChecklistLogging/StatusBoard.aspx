@@ -16,14 +16,12 @@
                 let BuildMoreLogs_Hyperlink;
 
                 window.addEventListener("load", async function () {
-                    const pollIntervalInMs = 10000;
-
                     threeDotSpinner = document.body.querySelector(".dots-spinner");
                     BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
 
                     setInterval(async function () {
                         await getLogStateChanges();
-                    }, pollIntervalInMs);
+                    }, 10000);
                 })
 
                 window.addEventListener("DOMContentLoaded", async function () {
@@ -89,7 +87,8 @@
 
                 async function getLogStateChanges() {
                     //configure server side events after data for all overdue logs has been received
-                    //const response = fakeSseData();
+
+                    //const response = fakeSseData(); //for debugging/troubleshooting
                     const response = await httpGet("/api/pm-log-state-change.ashx");
 
                     if (response.refreshPage) window.location.reload(true); //hard reload (no cache storage)
@@ -119,6 +118,7 @@
                                 case "virgin":
                                 case "incomplete":
                                     removeStampCtrlsFrom(log);
+
                                     break;
                                 case "submitted":
                                     // remove stamps
@@ -144,17 +144,8 @@
 
                                     break;
                                 case "completed":
-                                    //log is complete. It has been submitted and received all its stamps
-
-                                    if (data.logType === "current") {
-                                        //If log type is current, remove its stamps
-                                        removeStampCtrlsFrom(log);
-                                    }
-                                    else if (data.logType === "overdue") {
-                                        //If log type is overdue, remove it entirely
-                                        log.parentElement.removeChild(log);
-                                        return;
-                                    }
+                                    //log is complete. It has been submitted, received all its stamps, and is staying up on the status board
+                                    removeStampCtrlsFrom(log);
 
                                     break;
                                 case "error":
@@ -166,6 +157,23 @@
 
                                     removeStampCtrlsFrom(log);
                                     applyBackcolorClass(log, "error");
+
+                                    break;
+                                case "delete":
+                                    const logParentCtrl = log.parentElement;
+
+                                    logParentCtrl.removeChild(log);
+
+                                    const wasLogOverdue = logParentCtrl.closest(".interval-shift-section") ? false : true;
+                                    if (!wasLogOverdue) {
+                                        //log was not in past issues section
+                                        if (logParentCtrl.children.length === 1) {
+                                            //the only element within interval shift section is the no logs message
+                                            logParentCtrl.classList.remove("has-logs")
+                                        }
+                                    }
+
+                                    continue;
                             }
 
                             //no matter the log state, apply the log state backcolor css classes
@@ -208,21 +216,25 @@
 
                 let fakeSseDataInvocations = 0;
                 function fakeSseData() {
-                    const fakeId = 1464 + fakeSseDataInvocations;
+                    const fakeId = 1193 + fakeSseDataInvocations;
 
                     fakeSseDataInvocations++;
 
                     return {
                         [fakeId]: {
-                            //logState: "completed",
                             //logState: "virgin",
+
                             //logState: "incomplete",
+
                             //logState: "submitted",
-                            logState: "error",
                             //removeStamps: ["F&M Manager"],
                             //addStamps: ["Prod Sup", "Maint Sup"],
-                            logType: "current",
-                            //logType: "overdue",
+
+                            //logState: "error",
+
+                            logState: "delete",
+
+                            //logState: "completed",
                         }
                     }
                 }
@@ -437,9 +449,13 @@
                     gap: var(--UWhitespace);
                 }
 
-                .SubSection {
+                .interval-shift-section {
                     display: grid;
                     grid-template-columns: 1fr;
+                }
+
+                .interval-shift-section.has-logs > .interval-shift-no-logs-message {
+                    display: none;
                 }
 
                 .SectionLabel {
@@ -447,11 +463,11 @@
                     font-weight: bold;
                 }
 
-                .SubSectionLabel {
+                .interval-shift-section-label {
                     font-size: calc(var(--UFontSize) * 1.75);
                 }
 
-                .ItalicizeLabel {
+                .interval-shift-no-logs-message {
                     font-style: italic;
                     color: gray;
                     font-size: calc(var(--UFontSize)* 2);
@@ -569,7 +585,7 @@
                 }
 
                 @media (min-width: 601px) and (orientation: portrait) { /*tablets in portrait mode*/
-                    .SubSection {
+                    .interval-shift-section {
                         grid-template-columns: 1fr 1fr;
                     }
                 }
@@ -580,7 +596,7 @@
                         justify-content: space-around;
                     }
 
-                    .ItalicizeLabel {
+                    .interval-shift-no-logs-message {
                         font-size: calc(var(--UFontSize) * 1.5);
                     }
 
@@ -627,7 +643,7 @@
                 }
 
                 @media (min-width: 1920px) {
-                    .MonthlyLogsPanel .SubSection {
+                    .MonthlyLogsPanel .interval-shift-section {
                         grid-template-columns: 1fr 1fr;
                     }
 
@@ -697,7 +713,7 @@
 
                 <asp:Panel runat="server">
                     <div class="PageHeader">
-                        <asp:Label ID="WhereLabel" CssClass="SubSectionLabel" runat="server" />
+                        <asp:Label ID="WhereLabel" CssClass="interval-shift-section-label" runat="server" />
 
                         <asp:Panel ID="ColorCodingMessages" CssClass="ColorCodingMessages" runat="server" Style="">
                             <div style="display: flex; align-items: center; justify-content: center;">
@@ -735,44 +751,44 @@
                             <asp:Label runat="server" Text="One Time Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
-                                <asp:Label runat="server" Text="Users" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeUsersPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Users" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeUsersPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeD1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeD1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeD1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeD1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeN1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeN1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeN1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeN1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeD2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeD2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeD2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeD2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeN2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeN2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeN2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeN2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Days (M-F)" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneTimeMFShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneTimeMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Days (M-F)" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneTimeMFShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneTimeMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
@@ -780,23 +796,23 @@
                         <asp:Panel CssClass="SectionPanel" ID="DailyLogsPanel" runat="server">
                             <asp:Label runat="server" Text="Daily Logs" CssClass="SectionLabel"></asp:Label>
                             <div>
-                                <asp:Label runat="server" Text="Day Shift" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="DailyDayShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="DailyDayShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Day Shift" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="DailyDayShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="DailyDayShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Night Shift" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="DailyNightShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="DailyNightShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Night Shift" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="DailyNightShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="DailyNightShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Days (M-F)" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="DailyMFShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="DailyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Days (M-F)" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="DailyMFShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="DailyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
@@ -805,44 +821,44 @@
                             <asp:Label runat="server" Text="Weekly Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
-                                <asp:Label runat="server" Text="Users" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyUsersPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Users" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyUsersPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyD1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyD1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyD1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyD1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyN1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyN1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyN1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyN1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyD2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyD2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyD2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyD2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyN2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyN2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyN2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyN2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Days (M-F)" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="WeeklyMFShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="WeeklyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Days (M-F)" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="WeeklyMFShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="WeeklyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
@@ -851,44 +867,44 @@
                             <asp:Label runat="server" Text="Monthly Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
-                                <asp:Label runat="server" Text="Users" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyUsersPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Users" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyUsersPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyUsersNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyD1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyD1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyD1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyD1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N1" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyN1Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyN1NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N1" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyN1Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyN1NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="D2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyD2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyD2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="D2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyD2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyD2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="N2" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyN2Panel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyN2NoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="N2" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyN2Panel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyN2NoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Days (M-F)" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="MonthlyMFShiftPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="MonthlyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Days (M-F)" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="MonthlyMFShiftPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="MonthlyMFShiftNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
@@ -899,51 +915,51 @@
                             <asp:Label runat="server" Text="Special Logs" CssClass="SectionLabel"></asp:Label>
 
                             <div>
-                                <asp:Label runat="server" Text="Quarterly" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="QuarterlyPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="QuarterlyNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Quarterly" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="QuarterlyPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="QuarterlyNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="Bi-Annual" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="BiAnnualPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="BiAnnualNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="Bi-Annual" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="BiAnnualPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="BiAnnualNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="1 Year" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="OneYearPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="OneYearNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="1 Year" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="OneYearPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="OneYearNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="2 Year" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="TwoYearPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="TwoYearNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="2 Year" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="TwoYearPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="TwoYearNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="3 Year" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="ThreeYearPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="ThreeYearNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="3 Year" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="ThreeYearPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="ThreeYearNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="4 Year" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="FourYearPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="FourYearNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="4 Year" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="FourYearPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="FourYearNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
                             <div>
-                                <asp:Label runat="server" Text="5 Year" CssClass="SubSectionLabel"></asp:Label>
-                                <asp:Panel runat="server" ID="FiveYearPanel" CssClass="SubSection">
-                                    <asp:Label runat="server" ID="FiveYearNoneLabel" Text="NONE AT THIS TIME" CssClass="ItalicizeLabel"></asp:Label>
+                                <asp:Label runat="server" Text="5 Year" CssClass="interval-shift-section-label"></asp:Label>
+                                <asp:Panel runat="server" ID="FiveYearPanel" CssClass="interval-shift-section">
+                                    <asp:Label runat="server" ID="FiveYearNoneLabel" Text="NONE AT THIS TIME" CssClass="interval-shift-no-logs-message"></asp:Label>
                                 </asp:Panel>
                             </div>
 
