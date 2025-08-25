@@ -31,6 +31,10 @@ Public Class Report
     Private AreaKeysList As New List(Of Integer)
     Private DS_OrderedByDate As Boolean = False
 
+    Public Sub New()
+
+    End Sub
+
     Public Sub New(Config As Dictionary(Of String, String))
         Dim DT As New DataTable("Employees")
 
@@ -424,6 +428,156 @@ Public Class Report
 
         Return IdenticalColsList
     End Function
+
+    Private Sub AddRowBreak(ListOfArrays As List(Of String()))
+        ListOfArrays.Add({"", "", "", "", "", "default"})
+    End Sub
+
+    Private Function IsValueInMatrix(Value As Object, ActiveSheetData As List(Of String())) As Boolean
+        Return ActiveSheetData.Any(Function(Row) Row.Any(Function(Cell) Cell.Contains(Value)))
+    End Function
+
+    Private Sub WriteExcelBase(A1 As String, ByRef MasterCollection As Dictionary(Of String, List(Of String())), ByRef SheetName As String)
+        Dim DataMatrix As List(Of String()) = New List(Of String())
+        DataMatrix.Add({A1, "", "", "", "", "A1"})
+        AddRowBreak(DataMatrix)
+        AddRowBreak(DataMatrix)
+        DataMatrix.Add({"Item", "Value", "Start Date", "Input Date", "Operator", "bold"})
+
+        MasterCollection(SheetName) = DataMatrix
+    End Sub
+
+    Private Function GetFieldTypeValue(Value As Object, FieldType As Object) As String
+        If IsDBNull(FieldType) = False Then
+            If FieldType = "Checkbox" Then
+                If Value = "1" Then
+                    Return "✔"
+                Else
+                    Return "❌"
+                End If
+            End If
+        End If
+
+        Return Value
+    End Function
+
+    Public Function GetExcelData(ReportInst As Report) As Dictionary(Of String, List(Of String()))
+        Dim DS_Final As Data.DataSet = ReportInst.GetDS()
+        Dim DsRc As Integer = DS_Final.Tables(0).Rows.Count
+        Dim IsDatasetOrderedByDate As Boolean = ReportInst.OrderedByDate()
+        Dim ExcelCollection As New Dictionary(Of String, List(Of String()))
+
+        For I As Integer = 0 To DsRc - 1
+            Dim DR_Final As Data.DataRow = DS_Final.Tables(0).Rows(I)
+            Dim Area As String = DR_Final("Area")
+            Dim FieldType As Object = DR_Final("FieldType")
+            Dim DrInput As String = DR_Final("Label")
+            Dim Phase As Object = DR_Final("Phase")
+            Dim Value As Object = GetFieldTypeValue(DR_Final("Value"), FieldType)
+            Dim StartDate As Object = DR_Final("StartDate")
+            Dim InputDate As Object = DR_Final("InputDate")
+            Dim InputOperator As Object = DR_Final("InputOperator")
+
+            If IsDBNull(InputDate) Then
+                InputDate = String.Empty
+            End If
+
+            'row break logic
+            If IsDatasetOrderedByDate Then
+                'dataset is ordered by date
+                Dim ActiveSheetName As String = GenerateActiveSheetName(Area, StartDate)
+                Dim ActiveSheetNames As List(Of String) = ExcelCollection.Keys.ToList()
+                If ActiveSheetNames.Any(Function(SheetName) SheetName.Contains(StartDate)) = False Then
+                    'discovered a new start date
+                    WriteExcelBase(Area, ExcelCollection, ActiveSheetName)
+                End If
+
+                Dim DataMatrixOfFocus As List(Of String()) = ExcelCollection(ActiveSheetName)
+                If IsDBNull(Phase) = False Then
+                    If IsValueInMatrix(Phase, DataMatrixOfFocus) = False Then
+                        'discovered a new phase
+                        AddRowBreak(DataMatrixOfFocus)
+                        DataMatrixOfFocus.Add({Phase, "", "", "", "", "bold"})
+                    End If
+                End If
+                DataMatrixOfFocus.Add({DrInput, Value, StartDate, InputDate, InputOperator, "default"})
+            Else
+                'dataset is ordered by input
+                Dim ActiveSheetName As String = GenerateActiveSheetName(Area)
+                Dim ActiveSheetNames As List(Of String) = ExcelCollection.Keys.ToList()
+                If ActiveSheetNames.Contains(ActiveSheetName) = False Then
+                    'discovered a new pm/checklist
+                    WriteExcelBase(Area, ExcelCollection, ActiveSheetName)
+                End If
+
+                Dim DataMatrixOfFocus As List(Of String()) = ExcelCollection(ActiveSheetName)
+                Try
+                    If IsDBNull(Phase) Then Throw New SamePhaseException()
+
+                    If IsValueInMatrix(Phase, DataMatrixOfFocus) = False Then
+                        'discovered a new phase
+                        AddRowBreak(DataMatrixOfFocus)
+                        DataMatrixOfFocus.Add({Phase, "", "", "", "", "bold"})
+                    Else
+                        Throw New SamePhaseException()
+                    End If
+                Catch ex As SamePhaseException
+                    Dim IsExcelBase As Boolean = If(DataMatrixOfFocus.Count = 4, True, False)
+                    If IsExcelBase = False AndAlso IsValueInMatrix(DrInput, DataMatrixOfFocus) = False Then
+                        'discovered a new input beyond the 1st one
+                        AddRowBreak(DataMatrixOfFocus)
+                    End If
+                End Try
+                DataMatrixOfFocus.Add({DrInput, Value, StartDate, InputDate, InputOperator, "default"})
+            End If
+        Next
+
+        Return ExcelCollection
+    End Function
+
+    Public Function GenerateActiveSheetName(ActiveSheetName As String, Optional DateNoTime As String = Nothing) As String
+        'In Excel, an active sheet name (Or any worksheet name) can be up to 31 characters long.
+        'Other restrictions:
+        '   Cannot contain:  \ / ? * [ ] 
+        '   Cannot be blank.
+        '   Cannot be the same as another sheet name in the same workbook (case-insensitive).
+        '   Cannot start Or end with an apostrophe (') — although apostrophes can be inside the name.
+
+        Dim AdjustedSheetName As String
+
+        If DateNoTime Is Nothing Then
+            If ActiveSheetName.Length > 31 Then
+                AdjustedSheetName = ActiveSheetName.Substring(0, 28) + "..."
+            Else
+                AdjustedSheetName = ActiveSheetName
+            End If
+        Else
+            Dim DateNoTimeExtension As String = " (" & DateNoTime & ")"
+            Dim MaxCharCount As Integer = 31 - DateNoTimeExtension.Length
+
+            If ActiveSheetName.Length > MaxCharCount Then
+                'cut off pm or checklist name with ellipses to add date on end (Ex: SC1 Fume Sc... (08/14/2025))
+                Dim SheetNameWithoutDate As String = ActiveSheetName.Substring(0, (MaxCharCount - 3)) & "..."
+                AdjustedSheetName = SheetNameWithoutDate + DateNoTimeExtension
+            Else
+                AdjustedSheetName = ActiveSheetName + DateNoTimeExtension
+            End If
+
+        End If
+
+        Return AdjustedSheetName
+    End Function
+
+    'use these functions below for testing purposes only!!!!!!!!!
+    Public Sub RebindGroupDS(DS As Data.DataSet)
+        SetVar("StartDate", "googoo gaagaa", "string")
+        SetVar("EndDate", "i'm going to cry", "string")
+        GroupDS = DS
+    End Sub
+
+    Public Sub RebindIsOrderedByDate(TestValue As Boolean)
+        DS_OrderedByDate = TestValue
+    End Sub
 End Class
 
 Public Class RecordSet
@@ -488,5 +642,9 @@ Public Class RecordSet
     Public Function DataSetsMatch(DS As Data.DataSet) As Boolean
         Return CheckDataSets(DS)
     End Function
+End Class
+
+Public Class SamePhaseException
+    Inherits Exception
 End Class
 

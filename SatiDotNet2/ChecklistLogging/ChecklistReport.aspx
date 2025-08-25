@@ -303,6 +303,19 @@
                 transform: rotate(360deg);
             }
         }
+
+        /*============== label-modal =============*/
+        #label-modal-footer {
+            padding: var(--UWhitespace);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid black;
+        }
+
+        #label-modal-order-by-functionality {
+            display: flex; 
+            align-items: center;
+        }
     </style>
 
     <sati-spinner id="WebpageSpinner"></sati-spinner>
@@ -350,24 +363,12 @@
                 </div>
 
                 <asp:Button Enabled="False" ID="FilterChecklists_Button" Text="Filter PMs/Checklists" data-modal-target="#checklistModal" runat="server" OnClientClick="return false;" />
-                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Items" data-modal-target="#labelModal" runat="server" OnClientClick="return false;" />
+                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Items" data-modal-target="#label-modal" runat="server" OnClientClick="return false;" />
             </div>
 
-            <div class="modal" id="labelModal">
+            <div class="modal" id="label-modal">
                 <div class="modal-header">
-                    <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
-                        <span>Labels To <span style="font-weight: bold;">Include</span>:</span>
-
-                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
-                        <div>
-                            <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
-                        </div>
-
-                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
-                        <div>
-                            <asp:CheckBox ID="CompareFields_CheckBox" Text="Compare Fields" runat="server" />
-                        </div>
-                    </div>
+                    <span>Labels To <span style="font-weight: bold;">Include</span>:</span>
                 </div>
                 <div class="modal-body">
                     <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right">
@@ -376,6 +377,17 @@
                     <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
                         <button data-close-button class="HeaderPanelButtons">Cancel</button>
                         <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
+                    </div>
+                </div>
+                <div id="label-modal-footer">
+                    <div>
+                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                        <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
+                    </div>
+                    <div id="label-modal-order-by-functionality">
+                        <asp:Label Text="Order By: " runat="server" />
+                        <asp:RadioButton ID="OrderByInputRB" GroupName="OrderByGroup" Text="Input" runat="server" />
+                        <asp:RadioButton ID="OrderByDateRB" GroupName="OrderByGroup" Text="Date" runat="server" />
                     </div>
                 </div>
             </div>
@@ -444,7 +456,7 @@
                             <asp:Label ID="ReportLabelKey_Label" runat="server" Text='<%# Eval("LabelKey") %>'></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Label">
+                    <asp:TemplateField HeaderText="Input">
                         <ItemTemplate>
                             <asp:Label runat="server" Text='<%# Eval("Label") %>'></asp:Label>
                         </ItemTemplate>

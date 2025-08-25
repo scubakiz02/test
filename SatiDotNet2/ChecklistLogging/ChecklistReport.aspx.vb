@@ -26,7 +26,7 @@ Partial Class MR_OpenTicketStatusBoard
     Private MaintPM As New MaintPM()
     Private PhaseController As New PhaseController()
     Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
-
+    Private _Report As New Report()
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'to ensure each user of this webpage gets their own class objects
         If Session("Report") Is Nothing Then
@@ -73,7 +73,7 @@ Partial Class MR_OpenTicketStatusBoard
         End If
 
         'set Visible property for ViewFilters_Panel and Checked property for ViewFilters_CheckBox
-        'if "ViewFilters" does NOT exist, set properties mentioned above to true, meaning checkbox is checked by default
+        'if "ViewFilters" does NOT exist, set properties mentioned above to true, meaning checkbox is checked by p
         'if the above does not occur, a double click on ViewFilters_CheckBox will be required on initial load of webpage for proper functionality
         Dim ViewFilters As Boolean = True
         If ViewFiltersFromQs IsNot Nothing Then ViewFilters = ViewFiltersFromQs
@@ -172,17 +172,21 @@ Partial Class MR_OpenTicketStatusBoard
 
                 'condition below ensures 1 checklist is being selected for reporting
                 If AreasList.Count = 1 Then
-                    Dim Cbx1 As ListItem
+                    Dim DataIsOrderedByDate As Boolean = Session("Report").OrderedByDate()
 
                     FilterLabels_Button.Enabled = True
-                    CompareFields_CheckBox.Checked = Session("Report").OrderedByDate()
+                    If DataIsOrderedByDate Then
+                        OrderByDateRB.Checked = True
+                    Else
+                        OrderByInputRB.Checked = True
+                    End If
 
                     LabelCbxList.Items.Clear()
                     For Each kvp As KeyValuePair(Of Integer, String) In LabelsHash
                         Dim LabelKey As Integer = kvp.Key
                         Dim Label As String = kvp.Value
+                        Dim Cbx1 As New ListItem(Label, LabelKey)
 
-                        Cbx1 = New ListItem(Label, LabelKey)
                         LabelCbxList.Items.Add(Cbx1)
 
                         If LabelsToInclude.Contains(LabelKey) Then
@@ -259,7 +263,7 @@ Partial Class MR_OpenTicketStatusBoard
             End If
         Next
 
-        If CompareFields_CheckBox.Checked Then
+        If OrderByDateRB.Checked Then
             Session("Report").OrderDSByDate()
         Else
             Session("Report").UndoOrderDSByDate()
@@ -456,140 +460,96 @@ Partial Class MR_OpenTicketStatusBoard
         SetGridViewSrc()
     End Sub
 
-    Protected Sub ExportButton_OnClick(sender As Object, e As EventArgs) Handles ExportButton.Click
+    Private Sub GenerateActiveSheet(FlexObj As FlexCel.XlsAdapter.XlsFile, SheetName As String)
+        Dim NewSheetCount As Integer = FlexObj.SheetCount + 1
+
+        FlexObj.InsertAndCopySheets(1, NewSheetCount, 1)
+        FlexObj.ActiveSheet = NewSheetCount
+        FlexObj.SheetName = SheetName
+    End Sub
+
+    Private Function GetExcelFormatIds(FlexObj As FlexCel.XlsAdapter.XlsFile) As Dictionary(Of String, Integer)
+        Dim ExcelFormatToFormatIdHash As New Dictionary(Of String, Integer)
+
+        'A1 Cell format
+        Dim HeaderFormat As TFlxFormat = FlexObj.GetDefaultFormat
+        HeaderFormat.Font.Size20 = 16 * 20  ' FlexCel uses 1/20 pt units
+        HeaderFormat.HAlignment = THFlxAlignment.center 'horizontal alignment
+        ExcelFormatToFormatIdHash("A1") = FlexObj.AddFormat(HeaderFormat)
+
+        'default format
+        ExcelFormatToFormatIdHash("default") = 0 'default cell format within excel
+
+        'bold format
+        Dim BoldFormat As TFlxFormat = FlexObj.GetDefaultFormat
+        BoldFormat.Font.Style = TFlxFontStyles.Bold
+        ExcelFormatToFormatIdHash("bold") = FlexObj.AddFormat(BoldFormat)
+
+        Return ExcelFormatToFormatIdHash
+    End Function
+
+    Protected Sub ExportButton_OnClick2(sender As Object, e As EventArgs) Handles ExportButton.Click
         Dim Flex As New FlexCel.XlsAdapter.XlsFile(True)
+        Dim ExportDataHash As Dictionary(Of String, List(Of String())) = _Report.GetExcelData(Session("Report"))
         Dim DS_Final As Data.DataSet = Session("Report").GetDS()
-        Dim Path As String
-        Dim SaveDir As String
-        Dim FileName As String
-        Dim Value As String
-        Dim FieldType As Object
-        Dim Area As String = String.Empty
-        Dim Phase As Object = String.Empty
-        Dim Label As String = String.Empty
-        Dim RowOffset As Integer = 0
-        Dim FieldIdxHash As New Dictionary(Of String, Integer) From {
-            {"Label", 1},
-            {"Value", 2},
-            {"StartDate", 3},
-            {"InputDate", 4},
-            {"InputOperator", 5}
-        }
-        Dim GetMaxFieldVals As Dictionary(Of String, String) = Session("Report").GetMaxFieldVals()
-        Dim LargestValue As Integer = GetMaxFieldVals("Value").Length
+        Dim DataIsOrderedByDate As Boolean = Session("Report").OrderedByDate()
+        Dim Path As String = "\\PWI-40\software$\LabelTemplates\Sati_ChecklistReport.v2.xls"
 
-        'Sometimes # of chars in largest Value field within DataSet < # of chars in 'Value'. In this case, treat 'Value' string as the largest 'Value' field value
-        'if the condition above is false, use assocaited value in GetMaxFieldVals
-        If ("Value").Length + 2 > LargestValue Then ' +2 for horizontal cushion Then
-            LargestValue = ("Value").Length + 2
-        End If
-
-        Path = "\\PWI-40\software$\LabelTemplates\Sati_ChecklistReport.xls"
-        Flex.Open(Path)
+        Flex.Open(Path) 'create spreadsheet
         Flex.ActiveSheetByName = "ChecklistReport"
 
-        For I As Integer = 0 To DS_Final.Tables(0).Rows.Count - 1
-            Dim DR_Final As Data.DataRow = DS_Final.Tables(0).Rows(I)
+        'write data onto spreadsheet
+        Dim ExcelFormatIdsHash As Dictionary(Of String, Integer) = GetExcelFormatIds(Flex)
+        For Each kvp As KeyValuePair(Of String, List(Of String())) In ExportDataHash
+            Dim ActiveSheetName As String = kvp.Key
+            Dim ActiveSheetMatrix As List(Of String()) = kvp.Value
 
-            FieldType = DR_Final("FieldType")
+            GenerateActiveSheet(Flex, ActiveSheetName)
 
-            If Area <> DR_Final("Area") Then
-                'determine a checklist change has occured
-                'if so, create a new sheet
+            Dim ExcelFormat As String
+            Dim SpreadsheetRowIdx As Integer
+            For RowIdx As Integer = 0 To ActiveSheetMatrix.Count - 1  ' Number of rows
+                Dim NumOfCols As Integer = 6
+                ExcelFormat = ActiveSheetMatrix(RowIdx)(NumOfCols - 1)
+                SpreadsheetRowIdx = 1 + RowIdx '(1 based indexing)
 
-                Dim NewSheetCount As Integer = Flex.SheetCount + 1
-                Dim SheetName As String
+                For ColIdx As Integer = 0 To NumOfCols - 2 ' Number of columns (exclude the last column, which is the fontstyle value)
+                    Dim CellValue As String = ActiveSheetMatrix(RowIdx)(ColIdx)
+                    Dim SpreadsheetColIdx As Integer = 1 + ColIdx '(1 based indexing)
+                    Dim ExcelFormatId As Integer = ExcelFormatIdsHash(ExcelFormat)
 
-                Area = DR_Final("Area")
+                    Flex.SetCellFormat(SpreadsheetRowIdx, SpreadsheetColIdx, ExcelFormatId)
+                    Flex.SetCellValue(SpreadsheetRowIdx, SpreadsheetColIdx, CellValue)
 
-                If Area.Length > 31 Then
-                    SheetName = Area.Substring(0, 31)
-                Else
-                    SheetName = Area
-                End If
 
-                Flex.InsertAndCopySheets(1, NewSheetCount, 1)
-                Flex.ActiveSheet = NewSheetCount
-                Flex.SheetName = SheetName
-
-                Flex.SetCellValue(1, 1, Area) 'A1 cell (make sure to call SetCellValue AFTER setting ActiveSheet)
-
-                RowOffset = 0 'if ActiveSheet has changed, should start writing to cells in 1st available row, so reset this var to 0
-            Else
-                'by default, increment RowOffset every iteration of this if else statement
-
-                RowOffset += 1
-            End If
-
-            'upon initial discovery of a group/phase title in dataset, add it to spreadsheet
-            If IsDBNull(DR_Final("Phase")) = False Then
-                If Phase <> DR_Final("Phase") Then
-                    Dim BoldFormat As TFlxFormat = Flex.GetDefaultFormat
-                    Dim BoldFormatId As Integer
-                    Dim ColumnIdx As Integer = 1
-                    Dim RowIdx As Integer
-
-                    Phase = DR_Final("Phase") 'signal to environment that a new phase/group has been discovered
-
-                    RowOffset += 2
-                    RowIdx = 4 + RowOffset
-
-                    BoldFormat.Font.Style = TFlxFontStyles.Bold
-                    BoldFormatId = Flex.AddFormat(BoldFormat)
-
-                    Flex.SetCellValue(RowIdx, ColumnIdx, Phase)
-                    Flex.SetCellFormat(RowIdx, ColumnIdx, BoldFormatId)
-                End If
-            End If
-
-            If Label <> DR_Final("Label") Then
-                'check if Label has changed
-                'if so, enter row break by incrementing RowOffset
-                'not included in if else statement above, because an Area & Label change can occur in the same for loop iteration
-
-                Label = DR_Final("Label")
-                RowOffset += 1
-            End If
-
-            If IsDBNull(FieldType) = False AndAlso FieldType = "Checkbox" Then
-                If DR_Final("Value") = "1" Then
-                    Value = "✔"
-                Else
-                    Value = "❌"
-                End If
-            Else
-                Value = DR_Final("Value")
-            End If
-
-            Flex.SetCellValue(4 + RowOffset, 1, DR_Final("Label"))
-            Flex.SetCellValue(4 + RowOffset, 2, Value)
-            Flex.SetCellValue(4 + RowOffset, 3, DR_Final("StartDate"))
-            Flex.SetCellValue(4 + RowOffset, 4, DR_Final("InputDate"))
-            Flex.SetCellValue(4 + RowOffset, 5, DR_Final("InputOperator"))
+                    Dim CurrColWidth As Integer = Flex.GetColWidth(SpreadsheetColIdx)
+                    Dim CellValueWithPadding As Integer = (CellValue.Length + 5) * 256 '256 is a factor to scale the width in Excel units
+                    Flex.SetColWidth(SpreadsheetColIdx, Math.Max(CurrColWidth, CellValueWithPadding))
+                Next
+            Next
         Next
-        'Note: Excel uses 1 based index counting
-        'delete template sheet (1st sheet)
-        'set active sheet to sheet at index 1
+
+        'set active sheet first to remove active sheet 1, which is a placeholder to start writing data
         Flex.ActiveSheet = 1
         Flex.DeleteSheet(1)
+        SaveToFileExplorer(Flex)
+    End Sub
 
-        'programmatically fit column widths
-        ' 256 is a factor to scale the width in Excel units
-        Flex.SetColWidth(1, GetMaxFieldVals("Label").Length * 256)
-        Flex.SetColWidth(2, LargestValue * 256)
-        Flex.SetColWidth(3, GetMaxFieldVals("StartDate").Length * 256)
-        Flex.SetColWidth(4, GetMaxFieldVals("InputDate").Length * 256)
-        Flex.SetColWidth(5, GetMaxFieldVals("InputOperator").Length * 256)
+    Private Sub SaveToFileExplorer(FlexObj As FlexCel.XlsAdapter.XlsFile)
+        Dim SaveDir As String
+        Dim FileName As String
 
         SaveDir = "\\PWI-40\SATI_Upload_Pics$\$ChecklistReports\"
         FileName = GenerateSpreadsheetName(Session("AreasToInclude"), User.Identity.Name.ToString())
-        Flex.Save(SaveDir & FileName)
+        FlexObj.Save(SaveDir & FileName)
 
-        If SendMailCheckBox.Checked Then SatiCode.SendMailWithFile("Checklist Report From " & User.Identity.Name.ToString, "SATI.Net Checklist Report", EmailUserNameTextBox.Text & "@purewafer.com", SaveDir & FileName)
+        If SendMailCheckBox.Checked Then
+            SatiCode.SendMailWithFile("Checklist Report From " & User.Identity.Name.ToString, "SATI.Net Checklist Report", EmailUserNameTextBox.Text & "@purewafer.com", SaveDir & FileName)
+        End If
     End Sub
 
     Private Function StripIllegalFileSystemChars(Str As String) As String
-        Dim IllegalCharMatches As Match = Regex.Match(Str, "[% < > : / \ | ? *]")
+        Dim IllegalCharMatches As Match = Regex.Match(Str, "[% < > : / \ | ? * ""]")
         Dim Res As String = Str
 
         Do While IllegalCharMatches.Success

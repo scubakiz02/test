@@ -1299,3 +1299,810 @@ Public Class OrderedByDateTests
         Assert.False(Report.OrderedByDate)
     End Sub
 End Class
+
+Public Class GenerateActiveSheetNameTests
+    Inherits Report
+
+    <Theory>
+    <InlineData("Short Name")>
+    <InlineData("ExactlyThirtyOneCharacterssssss")>
+    Public Sub DatasetOrderedByInput_CharLimitClearedTests(PmOrChecklistName As String)
+        Dim Result As String = GenerateActiveSheetName(PmOrChecklistName)
+
+        Assert.True(Result.Length <= 31)
+        Assert.Equal(PmOrChecklistName, Result)
+    End Sub
+
+    <Fact>
+    Public Sub DatasetOrderedByInput_CharLimitExceededTest()
+        Dim PmOrChecklistName As String = "Loooooooooooooong Loooooooooooooooooooong Name"
+        Dim Result As String = GenerateActiveSheetName(PmOrChecklistName)
+
+        Assert.True(Result.Length <= 31)
+        Assert.Equal("Loooooooooooooong Looooooooo...", Result)
+    End Sub
+
+    <Theory>
+    <InlineData("Short Name")>
+    <InlineData("31Charactersssssss")>
+    Public Sub DatasetOrderedByDate_CharLimitClearedTests(PmOrChecklistName As String)
+        Dim DateNoTime As Date = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
+        Dim Result As String = GenerateActiveSheetName(PmOrChecklistName, DateNoTime)
+
+        Assert.True(Result.Length <= 31)
+        Assert.Equal(PmOrChecklistName & " (" & DateNoTime & ")", Result)
+    End Sub
+
+    <Fact>
+    Public Sub DatasetOrderedByDate_CharLimitExceededTest()
+        Dim PmOrChecklistName As String = "Your mom is so ugly, bigfoot is scared of her"
+        Dim DateNoTime As Date = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
+        Dim Result As String = GenerateActiveSheetName(PmOrChecklistName, DateNoTime)
+
+        Assert.True(Result.Length <= 31)
+        Assert.Equal("Your mom is so u..." & " (" & DateNoTime & ")", Result)
+    End Sub
+End Class
+
+Public Class GetExcelDataTests
+    Inherits Report
+
+    Private Function CreateFakeDsSchema() As Data.DataSet
+        Dim DS As New Data.DataSet
+        Dim DT As New Data.DataTable
+
+        DT.Columns.Add("Area", GetType(String))
+        DT.Columns.Add("FieldType", GetType(String))
+        DT.Columns.Add("Label", GetType(String))
+        DT.Columns.Add("Phase", GetType(String))
+        DT.Columns.Add("Value", GetType(String))
+        DT.Columns.Add("StartDate", GetType(String))
+        DT.Columns.Add("InputDate", GetType(String))
+        DT.Columns.Add("InputOperator", GetType(String))
+
+        DS.Tables.Add(DT)
+
+        Return DS
+    End Function
+
+    Private Sub CreateFakeDr(DT As Data.DataTable, Data As Dictionary(Of String, Object))
+        Dim DR As Data.DataRow = DT.NewRow()
+
+        For Each kvp As KeyValuePair(Of String, Object) In Data
+            Dim Field As String = kvp.Key
+            Dim FieldValue As Object = kvp.Value
+
+            DR(Field) = FieldValue
+        Next
+
+        DT.Rows.Add(DR)
+    End Sub
+
+    Private Function StringifyMatrixHash(MatrixHash As Dictionary(Of String, List(Of String())))
+        Return JsonSerializer.Serialize(
+            MatrixHash.ToDictionary(Function(kv) kv.Key, Function(kv) kv.Value),
+            New JsonSerializerOptions With {.WriteIndented = True}
+        )
+    End Function
+
+    Private Function GetOneLogNoPhasesDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Return DS
+    End Function
+
+    <Fact>
+    Public Sub OneLogNoPhasesDatasetOrderedByInputTest()
+        '1 log with no phases or groups (ordered by input)
+        Dim DS As Data.DataSet = GetOneLogNoPhasesDataset()
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("No Inputs Phased") = New List(Of String()) From {
+            New String() {"No Inputs Phased", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+
+
+
+
+
+
+
+    Private Function GetOneLogAllInputsPhasedDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", "phase 1"},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", "phase 1"},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+
+        Return DS
+    End Function
+
+    <Fact>
+    Public Sub OneLogAllInputsPhasedOrderedByInputTest()
+        '1 log with all inputs in phases or groups  (ordered by input)
+        Dim DS As Data.DataSet = GetOneLogAllInputsPhasedDataset()
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("All Inputs Phased") = New List(Of String()) From {
+            New String() {"All Inputs Phased", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 1", "", "", "", "", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+
+
+
+
+
+
+
+    Private Function GetOneLogSomeInputsPhasedDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+
+        Return DS
+    End Function
+
+    <Fact>
+    Public Sub OneLogSomeInputsPhasedOrderedByInputTest()
+        '1 log with some inputs in phases or groups (ordered by input)
+        Dim DS As Data.DataSet = GetOneLogSomeInputsPhasedDataset()
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("Some Inputs Phased Loooooooo...") = New List(Of String()) From {
+            New String() {"Some Inputs Phased Loooooooooooong Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+
+
+
+
+    <Fact>
+    Public Sub SeveralLogsOrderedByInput()
+        'several logs with various types (some/none/all inputs in phases or groups). All logs are ordered by input
+        Dim Datasets As New List(Of DataSet) From {GetOneLogNoPhasesDataset(), GetOneLogSomeInputsPhasedDataset(), GetOneLogAllInputsPhasedDataset()}
+        Dim MasterDS As New Data.DataSet
+        For Each DS As DataSet In Datasets
+            MasterDS.Merge(DS, preserveChanges:=True, missingSchemaAction:=MissingSchemaAction.Add)
+        Next
+        Dim DT As Data.DataTable = MasterDS.Tables(0)
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(MasterDS)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("No Inputs Phased") = New List(Of String()) From {
+            New String() {"No Inputs Phased", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+        ExpectedRes("Some Inputs Phased Loooooooo...") = New List(Of String()) From {
+            New String() {"Some Inputs Phased Loooooooooooong Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+        ExpectedRes("All Inputs Phased") = New List(Of String()) From {
+            New String() {"All Inputs Phased", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 1", "", "", "", "", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+    <Fact>
+    Public Sub CheckboxFieldtypeDatasetOrderedByInput()
+        '1 log with no phases or groups (ordered by input) 
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", ""},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", DBNull.Value},
+            {"InputOperator", ""}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "0"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "1"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("No Inputs Phased") = New List(Of String()) From {
+            New String() {"No Inputs Phased", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/11/2025", "", "", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+
+
+    '================= dataset ordered by date unit tests ====================
+    <Fact>
+    Public Sub CheckboxFieldtypeDatasetOrderedByDate()
+        '1 log with no phases or groups (ordered by date) 
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", ""},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", DBNull.Value},
+            {"InputOperator", ""}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "0"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", "Checkbox"},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "1"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+        ReportInst.RebindIsOrderedByDate(True)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("Pm Or Checklist... (08/11/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/11/2025", "", "", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+        }
+        ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+    <Fact>
+    Public Sub OneLogNoPhasesDatasetOrderedByDateTest()
+        '1 log with no phases or groups (ordered by date) 
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+        ReportInst.RebindIsOrderedByDate(True)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("Pm Or Checklist... (08/11/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+        }
+        ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+    <Fact>
+    Public Sub OneLogAllInputsPhasedOrderedByDate()
+        '1 log with all inputs in phases or groups  (ordered by date)
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", "phase 1"},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", "phase 1"},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+        ReportInst.RebindIsOrderedByDate(True)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("Pm Or Checklist... (08/11/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 1", "", "", "", "", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+        }
+        ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 1", "", "", "", "", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+
+    <Fact>
+    Public Sub OneLogSomeInputsPhasedOrderedByDate()
+        '1 log with some inputs in phases or groups (ordered by date)
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Pm Or Checklist Name"},
+            {"FieldType", DBNull.Value},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Dim ReportInst As New Report()
+        ReportInst.RebindGroupDS(DS)
+        ReportInst.RebindIsOrderedByDate(True)
+
+        Dim ExpectedRes As New Dictionary(Of String, List(Of String()))
+        ExpectedRes("Pm Or Checklist... (08/11/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+        }
+        ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
+            New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"", "", "", "", "", "default"},
+            New String() {"phase 2", "", "", "", "", "bold"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+        }
+
+        Assert.Equal(
+            StringifyMatrixHash(ExpectedRes),
+            StringifyMatrixHash(GetExcelData(ReportInst))
+        )
+    End Sub
+End Class
