@@ -1,18 +1,19 @@
 ﻿
-Imports System.Text.Json
 Imports System.Text.Encodings.Web
-Imports SatiDotNet2.Library
+Imports System.Text.Json
+Imports System.Threading.Tasks
 Imports System.Web.Services
+Imports SatiDotNet2.Library
+Imports System.Configuration
+
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim SatiCode As New Class1
     Dim LogAspx As New LogAspxLibrary
     Dim Security As New Security
-    Dim TimeForNewLog As Boolean
     Dim LogStatus As String
     Dim StripeColor As String
-    Dim CurrLogDate As String
     Dim SqlFunc As String
     Dim LogDS As New Data.DataSet
     Dim LogDR As Data.DataRow
@@ -32,17 +33,15 @@ Partial Class MR_OpenTicketStatusBoard
         Dim TodaysDate As Date = Date.Parse(System.DateTime.Now)
         Dim StampIndicatorLabels As New Dictionary(Of String, String)
 
-        Session("PastIssues") = New Func(Of Integer, SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String))))(AddressOf BuildPastIssues)
-
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
-            Response.Redirect("/MaintenanceDepartment/MD_Main.aspx")
+            Response.Redirect("/MaintenanceDepartment/MD_Main.aspx", False)
+            Exit Sub
         ElseIf Request.QueryString.Count > 0 Then
             Dim QsDepartment As String = Request.QueryString("Department")
             Dim QsView As String = Request.QueryString("View")
 
-            'if where waa NOT passed to querystring OR midnight rollover occurs
-            If Request.QueryString("WHERE") Is Nothing OrElse (DateDiff(DateInterval.Day, Date.Parse(Session("WhereFromQueryString")), TodaysDate) = 1 AndAlso TodaysDate.Hour = 0) Then
+            If Request.QueryString("WHERE") Is Nothing Then
                 Session("WhereFromQueryString") = TodaysDate.Date
             Else 'If Request.QueryString("WHERE") IsNot Nothing Then
                 Session("WhereFromQueryString") = Request.QueryString("WHERE")
@@ -51,7 +50,8 @@ Partial Class MR_OpenTicketStatusBoard
             Session("DepartmentFromQueryString") = If(QsDepartment Is Nothing, Session("DepartmentFromQueryString"), QsDepartment)
             Session("ViewFromQueryString") = If(QsView Is Nothing, Session("ViewFromQueryString"), QsView)
 
-            Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path)) 'redirect the user to the URL without query strings
+            Response.Redirect(Request.Url.GetLeftPart(UriPartial.Path), False) 'redirect the user to the URL without query strings
+            Exit Sub
         Else
             'MenuAuthentication hierarchy based on querystrings user loaded the page with
             'MenuAuthenication.CheckGroupAuthenication("EditRoles", Server)
@@ -66,7 +66,7 @@ Partial Class MR_OpenTicketStatusBoard
                 AdminPanel.Visible = True
             End If
 
-            'build button controls for checklists that have a department, interval, assignee, & at least 1 input
+            'BuildCurrentLogs button controls for checklists that have a department, interval, assignee, & at least 1 input
             QueryConfig("@Department") = New Dictionary(Of String, String) From {
                 {"value", Session("DepartmentFromQueryString")},
                 {"typeOf", "string"}
@@ -74,60 +74,18 @@ Partial Class MR_OpenTicketStatusBoard
             AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Status='live' AND A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area", QueryConfig)
             AreaRC = AreaDS.Tables(0).Rows.Count
 
-            Session("AreaKeys") = New List(Of Integer)
             For I = 0 To AreaRC - 1
                 QueryConfig.Clear()
                 AreaKey = AreaDS.Tables(0).Rows(I)("Key")
 
-                ConfigureLogVariables(AreaKey)
-
-                If TimeForNewLog Then
+                If _ActivePm.IsTimeForNewLog(AreaKey, Session("WhereFromQueryString")) Then
                     CreateRecord(AreaKey)
                 End If
 
-                Build(AreaKey)
-                Session("AreaKeys").Add(AreaKey)
+                BuildCurrentLogs(AreaKey)
             Next
         End If
     End Sub
-
-    Private Sub ConfigureLogVariables(AreaKey As Integer)
-        'TODO: package the logic within ConfigureLogVariables & BuildPastIssues into a class, since it used in several files (StatusBoard.aspx, PastIssues.ashx)
-
-        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-                    {"value", AreaKey},
-                    {"typeOf", "int"}
-                }
-        SqlFuncDR = Security.GetMyDataSetParamQuery("SELECT I.SqlFunc, I.SqlFunc2ndArg FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.[Key]=@AreaKey", QueryConfig).Tables(0).Rows(0)
-        SqlFunc = SqlFuncDR("SqlFunc")
-        Dim DailyOrWeeklyChecklist As Boolean = If(SqlFunc = "[ALTS].[dbo].[T_Log_DailyChecklistInfo]" OrElse SqlFunc = "[ALTS].[dbo].[T_Log_WeeklyChecklistInfo]", True, False)
-
-        'If Date.Parse(Session("WhereFromQueryString")).Date <> Today.Date AndAlso DailyOrWeeklyChecklist Then 'do NOT display daily or weekly checklists during time travel
-        '    TimeTravelMessageLabel.Visible = True
-        '    Continue For
-        'End If
-
-        QueryConfig("@SqlFunc2ndArg") = New Dictionary(Of String, String) From {
-                    {"value", SqlFuncDR("SqlFunc2ndArg")},
-                    {"typeOf", "int"}
-                }
-        QueryConfig("@Where") = New Dictionary(Of String, String) From {
-                    {"value", Session("WhereFromQueryString")},
-                    {"typeOf", "string"}
-                }
-        LogDS = Security.GetMyDataSetParamQuery("Select  * FROM " & SqlFunc & "(@AreaKey, @SqlFunc2ndArg, @Where)", QueryConfig)
-
-        LogDR = LogDS.Tables(0).Rows(0)
-        TimeForNewLog = LogDR("TimeForNewLog")
-        CurrLogDate = LogDR("CurrLogDate")
-
-        QueryConfig("@CurrLogDate") = New Dictionary(Of String, String) From {
-            {"value", CurrLogDate},
-            {"typeOf", "string"}
-        }
-        QueryConfig.Remove("@SqlFunc2ndArg")
-    End Sub
-
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
@@ -139,7 +97,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Sub CreateRecord(AreaKey As Integer)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter
@@ -221,7 +179,7 @@ Partial Class MR_OpenTicketStatusBoard
             Next
 
             My_DR("OutOfRange") = JsonSerializer.Serialize(OutOfRangeMap)
-            My_DR("Date") = CurrLogDate
+            My_DR("Date") = _ActivePm.GetCurrLogDate(AreaKey, Session("WhereFromQueryString"))
             My_DR("Operator") = Nothing
             My_DR("CompleteLog") = False
             My_DR("Shift") = Security.GetSingleDbField("SELECT Shift FROM [ALTS].[dbo].[T_Log_GetShift]()", New Dictionary(Of String, Dictionary(Of String, String)), "Shift")
@@ -237,46 +195,37 @@ Partial Class MR_OpenTicketStatusBoard
         Connection.Close()
     End Sub
 
-    Sub Build(AreaKey As Integer)
+    Sub BuildCurrentLogs(AreaKey As Integer)
         Dim I As Integer = 0
         Dim II As Integer = 0
         Dim RC As Integer = 0
         Dim Department As String = ""
-        Dim SB As New StringBuilder
-        Dim PastIssuesSB As New StringBuilder
-        Dim TempNote As String
         Dim DS As New Data.DataSet
         Dim DR As Data.DataRow
-        Dim DR_Look As Data.DataRow
-        Dim CountNotes As Integer
         Dim DateDiffInterval As String = "Day"
-        Dim SubSectionId As String
         Dim Assignee As String
-        Dim DuplicateRecord As Boolean = False
-
-        'build controls for CurrentLogsPanel dynamically
-        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-            {"value", AreaKey},
-            {"typeOf", "int"}
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", Security.GetParamVarHash(AreaKey, "int")},
+            {"@CurrLogDate", Security.GetParamVarHash(_ActivePm.GetCurrLogDate(AreaKey, Session("WhereFromQueryString")), "string")}
         }
 
-        'DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
-        DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor", QueryConfig)
-        If DS Is Nothing Then 'if here, this is most likely the error: "Subquery returned more than 1 value. This is not permitted when the subquery follows =, !=, <, <= , >, >= or when the subquery is used as an expression"
-            DuplicateRecord = True
-            'modified query to return 'problem child' records
-            ' DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Operator, Sql.LogStatus, Sql.StripeColor", QueryConfig)
-            DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor, MAX(D.Date) AS MaxDate FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo]((SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(Date As Date) = @CurrLogDate), 1, @CurrLogDate) Sql WHERE CAST(D.Date As Date) = @CurrLogDate AND AreaKey=@AreaKey GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, Sql.LogStatus, Sql.StripeColor", QueryConfig)
-        End If
+        DS = Security.GetMyDataSetParamQuery("SELECT A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date, MAX(D.Date) AS MaxDate " &
+            "From [ALTS].[dbo].[T_LogData] D " &
+            "INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey = A.[Key] " &
+            "INNER Join [ALTS].[dbo].[T_LogAreaInterval] I On A.IntervalKey=I.[Key] " &
+            "WHERE " &
+            "CAST(D.Date As Date) = @CurrLogDate " &
+            "And AreaKey = @AreaKey " &
+            "GROUP BY A.Area, I.Interval, A.Assignee, D.[Key], D.AreaKey, D.Inputs, D.Operator, D.Date " &
+            "ORDER BY [Key] DESC", SqlConfig)
 
         RC = DS.Tables(0).Rows.Count
-
         For I = 0 To RC - 1
             Dim Panel As Panel
             Dim CurrentLogsButton As Button
             Dim BuildLogExport As Tuple(Of Panel, Button)
 
-            If I > 0 Then Exit For 'Will be > 1 when double booking records of a checklist occurs in DB, so account for this edgecase
+            If I > 0 Then Exit For 'in case duplicates exist
 
             DR = DS.Tables(0).Rows(I)
             Assignee = If(IsDBNull(DR("Assignee")), Nothing, DR("Assignee").ToString())
@@ -285,68 +234,10 @@ Partial Class MR_OpenTicketStatusBoard
             Panel = BuildLogExport.Item1
             CurrentLogsButton = BuildLogExport.Item2
 
-            If DuplicateRecord Then
-                'update all clients to reflect duplicate record error
-                _ActivePmCache.CacheAdd(DR("Key"))
-            End If
-
-            Select Case DR("Interval")
-                Case "ONE TIME ONLY"
-                    If Date.Parse(Session("WhereFromQueryString")).Date = LogDR("CurrLogDate").Date Then 'check if date of One TIme Task matches date in querystring
-                        SubSectionId += "OneTime"
-                    Else
-                        Continue For
-                    End If
-                Case "DAILY"
-                    SubSectionId += "Daily"
-                Case "WEEKLY"
-                    SubSectionId += "Weekly"
-                Case "MONTHLY"
-                    SubSectionId += "Monthly"
-                Case Else ' Interval > Monthly. Ex: 1 year, 2 years, 5 years, etc.
-                    If Not LogDR("BuildInStatusBoard") Then 'check value of BuildInStatusBoard from sql function
-                        Continue For
-                    Else
-                        SpecialLogsPanel.Visible = True
-                    End If
-            End Select
-
-            Select Case Assignee
-                Case "Day Shift"
-                    SubSectionId += "DayShift"
-                Case "Night Shift"
-                    SubSectionId += "NightShift"
-                Case "Days (M-F)"
-                    SubSectionId += "MFShift"
-                Case "D1"
-                    SubSectionId += "D1"
-                Case "N1"
-                    SubSectionId += "N1"
-                Case "D2"
-                    SubSectionId += "D2"
-                Case "N2"
-                    SubSectionId += "N2"
-                Case "QUARTERLY"
-                    SubSectionId += "Quarterly"
-                Case "BIANNUAL"
-                    SubSectionId += "BiAnnual"
-                Case "1 YEAR"
-                    SubSectionId += "OneYear"
-                Case "2 YEARS"
-                    SubSectionId += "TwoYear"
-                Case "3 YEARS"
-                    SubSectionId += "ThreeYear"
-                Case "4 YEARS"
-                    SubSectionId += "FourYear"
-                Case "5 YEARS"
-                    SubSectionId += "FiveYear"
-                Case Else 'User
-                    SubSectionId += "Users"
-                    CurrentLogsButton.Text = DR("Assignee") & " - " & DR("Area")
-            End Select
-
-            If SubSectionId IsNot Nothing Then
-                Dim SubSectionPanel As Panel = CType(CurrentLogsPanel.FindControl(SubSectionId & "Panel"), Panel)
+            Dim StatusBoardDateAt As String = Session("WhereFromQueryString")
+            Dim SubSectionId As String = _ActivePm.GetParentId(DR("Key"), StatusBoardDateAt)
+            If SubSectionId <> String.Empty Then
+                Dim SubSectionPanel As Panel = CType(CurrentLogsPanel.FindControl(SubSectionId), Panel)
                 SubSectionPanel.Controls.Add(Panel)
 
                 Dim SubSectionCssClass As String = SubSectionPanel.CssClass
@@ -358,62 +249,12 @@ Partial Class MR_OpenTicketStatusBoard
         Next
     End Sub
 
-    Public Function BuildPastIssues(AreaKey As Integer) As SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
-        'TODO: package the logic within ConfigureLogVariables & BuildPastIssues into a class, since it used in several files (StatusBoard.aspx, PastIssues.ashx)
-
-        Dim ClientSideConfig As New SortedDictionary(Of String, Dictionary(Of Integer, Dictionary(Of String, String)))
-
-        If AdminPanel.Visible Then
-            Dim DS As New Data.DataSet
-            Dim RC As Integer
-            Dim AreaConfig As New Dictionary(Of Integer, Dictionary(Of String, String))
-
-            'build controls for PastIssuesPanel dynamically
-            ConfigureLogVariables(AreaKey)
-
-            'DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, D.Inputs, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
-            QueryConfig("@StartDateCutoffAt") = Security.GetParamVarHash(Session("StartDateCutoffAt"), "string")
-            DS = Security.GetMyDataSetParamQuery("SELECT D.[Key], D.Date, D.Operator, D.Inputs, A.Area, A.Assignee, Sql.LogStatus, Sql.StripeColor, Sql.NumOfStamps, Sql.NumOfNeededStamps FROM [ALTS].[dbo].[T_LogData] D INNER JOIN [ALTS].[dbo].[T_LogArea] A ON D.AreaKey=A.[Key] CROSS APPLY [ALTS].[dbo].[T_Log_ChecklistRecordInfo](D.[Key], 1, (SELECT Date FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=D.[Key])) Sql WHERE D.Date > @StartDateCutoffAt AND AreaKey=@AreaKey AND (D.[Key] <> (SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=@AreaKey AND CAST(D.Date As Date) < @CurrLogDate ORDER BY DATE DESC) OR (A.OneTimeDate IS NOT NULL AND @Where > D.Date)) AND (D.CompleteLog <> 1 OR Sql.NumOfStamps < Sql.NumOfNeededStamps) ORDER BY Date ASC", QueryConfig)
-            RC = DS.Tables(0).Rows.Count
-            For I = 0 To RC - 1
-                Dim IdConfig As New Dictionary(Of String, String)
-                Dim IconConfig As Dictionary(Of String, Dictionary(Of String, String))
-                Dim IconCssClasses As New List(Of String)
-                Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
-                Dim LogState As String = _ActivePm.GetState(DR("Key"))("logState")
-
-                IdConfig("Checklist") = DR("Area")
-                IdConfig("logState") = LogState
-
-                'server side supplies stamp icons to client side only when log state is submitted
-                If LogState = "submitted" Then
-                    IconConfig = StampIndicator.Icons(DR("Key"))
-                    For Each kvp As KeyValuePair(Of String, Dictionary(Of String, String)) In IconConfig
-                        Dim IconImgFilePath As String = kvp.Value("IconImgFilePath")
-                        Dim IconCssClass As String = StampIndicator.GetCssClass(IconImgFilePath)
-
-                        IconCssClasses.Add(IconCssClass)
-                    Next
-                End If
-                IdConfig("iconsConfig") = JsonSerializer.Serialize(IconCssClasses)
-
-                AreaConfig(DR("Key")) = IdConfig
-
-                If ClientSideConfig.ContainsKey(DR("Area")) = False Then
-                    ClientSideConfig(DR("Area")) = AreaConfig
-                End If
-            Next
-        End If
-
-        Return ClientSideConfig
-    End Function
-
     Public Function BuildLog(DR As Data.DataRow) As Tuple(Of Panel, Button)
         Dim Panel As New Panel()
         Dim SubPanel As New Panel()
         Dim LogButton As New Button()
         Dim IconPanel As New Panel()
-        Dim LogState As String = _ActivePm.GetState(DR("Key"))("logState")
+        Dim LogState As String = _ActivePm.GetLogConfig(DR("Key"))("logState")
         Dim Datakey As String = DR("Key")
 
         Panel.Attributes.Add("style", "display: inline-block; border: 2px solid black;")

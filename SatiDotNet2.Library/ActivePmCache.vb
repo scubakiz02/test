@@ -13,7 +13,7 @@ Public Class ActivePmCache
         Cache.Set(CacheKey, Data, Policy)
     End Sub
 
-    Public Sub CacheAdd(DataKey As Integer)
+    Public Sub CacheAdd(DataKey As Integer, Optional StatusBoardDateAt As String = Nothing)
         Dim CachedDataAsObj As Object = CacheRead("LogStateChanges")
         Dim CachedDataAsDict As Dictionary(Of Integer, Object) = DirectCast(CachedDataAsObj, Dictionary(Of Integer, Object))
 
@@ -21,7 +21,8 @@ Public Class ActivePmCache
             CachedDataAsDict = New Dictionary(Of Integer, Object)
         End If
 
-        CachedDataAsDict(DataKey) = GetState(DataKey)
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now().ToString("MM/dd/yyyy")
+        CachedDataAsDict(DataKey) = GetLogConfig(DataKey, StatusBoardDateAt)
 
         CacheWrite("LogStateChanges", CachedDataAsDict)
     End Sub

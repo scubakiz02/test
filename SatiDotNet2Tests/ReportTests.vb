@@ -1318,7 +1318,7 @@ Public Class GenerateActiveSheetNameTests
         Dim PmOrChecklistName As String = "Loooooooooooooong Loooooooooooooooooooong Name"
         Dim Result As String = GenerateActiveSheetName(PmOrChecklistName)
 
-        Assert.True(Result.Length <= 31)
+        Assert.True(Result.Length = 31)
         Assert.Equal("Loooooooooooooong Looooooooo...", Result)
     End Sub
 
@@ -1326,7 +1326,7 @@ Public Class GenerateActiveSheetNameTests
     <InlineData("Short Name")>
     <InlineData("31Charactersssssss")>
     Public Sub DatasetOrderedByDate_CharLimitClearedTests(PmOrChecklistName As String)
-        Dim DateNoTime As Date = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
+        Dim DateNoTime As String = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
         Dim Result As String = GenerateActiveSheetName(PmOrChecklistName, DateNoTime)
 
         Assert.True(Result.Length <= 31)
@@ -1336,11 +1336,11 @@ Public Class GenerateActiveSheetNameTests
     <Fact>
     Public Sub DatasetOrderedByDate_CharLimitExceededTest()
         Dim PmOrChecklistName As String = "Your mom is so ugly, bigfoot is scared of her"
-        Dim DateNoTime As Date = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
+        Dim DateNoTime As String = System.DateTime.Now().Date.ToString("MM/dd/yyyy")
         Dim Result As String = GenerateActiveSheetName(PmOrChecklistName, DateNoTime)
 
-        Assert.True(Result.Length <= 31)
-        Assert.Equal("Your mom is so u..." & " (" & DateNoTime & ")", Result)
+        Assert.True(Result.Length = 31)
+        Assert.Equal("Your mom is so ..." & " (" & DateNoTime & ")", Result)
     End Sub
 End Class
 

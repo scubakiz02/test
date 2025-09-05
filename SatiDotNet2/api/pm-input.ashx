@@ -4,6 +4,7 @@ Imports System.IO
 Imports System.Text.Json
 Imports SatiDotNet2.Library
 Imports System.Data
+Imports System.Configuration
 
 Public Class StreamData
     Inherits Security
@@ -247,7 +248,7 @@ Public Class StreamData
 
     Sub UploadToDataTable(LogOperator As String, InputsFieldValue As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter

@@ -8,180 +8,164 @@
             <script src="../scripts/WebComponents/sati-full-screen.js"></script>
             <script src="../scripts/common.js"></script>
             <script type="text/javascript">
-                let threeDotSpinner;
-                let cancelBuildOfLogs = false;
-                let builtFirst50Logs = false;
-                let dataChunkingDone = false;
-                let checklistsConfig = {};
-                let BuildMoreLogs_Hyperlink;
+                let _overdueCache = new OverdueLogsCache();
 
                 window.addEventListener("load", async function () {
-                    threeDotSpinner = document.body.querySelector(".dots-spinner");
-                    BuildMoreLogs_Hyperlink = document.getElementById('<%= BuildMoreLogs_Hyperlink.ClientID %>');
+                    const response = await httpGet("/api/pm-logs-past-issues.ashx");
+                    const datakeys = Object.keys(response);
+                    for (const datakey of datakeys) {
+                        const data = response[datakey];
+                        let log;
+
+                        try {
+                            log = document.getElementById("log-" + datakey);
+                            if (!log) throw error;
+                        }
+                        catch (err) {
+                            //logs built in asp code-behind
+                            const logId = "log-" + datakey
+                            log = getAspControl(logId);
+                        }
+
+                        if (!log) {
+                            //log needs to be created on status board
+                            if (data.logParentId === "PastIssuesPanel") {
+                                //overdue log
+                                _overdueCache.set(datakey, data);
+                                continue;
+                            }
+                        }
+                    }
+                    build50OverdueLogs();
+
+                    const horizontalSpinner = document.body.querySelector(".dots-spinner");
+                    horizontalSpinner.style.display = "none";
 
                     setInterval(async function () {
                         await getLogStateChanges();
                     }, 10000);
-                })
 
-                window.addEventListener("DOMContentLoaded", async function () {
-                    //build controls for PastIssuesPanel after html has rendered, to reduce long render times for initial load of page
-                    //waiting to receive server side event to build controls for Past Issues
-                    fetch('PastIssues.ashx')
-                        .then(response => {
-                            const reader = response.body.getReader();
-                            const decoder = new TextDecoder();
+                    const buildMoreHyperlink = document.getElementById("overdue-logs-build-more-hyperlink");
+                    buildMoreHyperlink.addEventListener("click", function () {
+                        build50OverdueLogs();
 
-                            function buildFirst50logs() {
-                                build50Logs();
-                                builtFirst50Logs = true; //this must be after invocation of build50Logs()
-                                threeDotSpinner.style.display = "none";
-                            }
+                        setTimeout(() => {
+                            // give DOM time to layout fully, then programmatically scroll to bottom
+                            window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+                        }, 100);
 
-                            function readChunk() {
-                                reader.read().then(({ done, value }) => {
-                                    let chunk = decoder.decode(value);
-
-                                    if (done) {
-                                        console.log('Stream finished');
-                                        dataChunkingDone = true;
-                                        if (!builtFirst50Logs) buildFirst50logs();
-                                        return;
-                                    }
-
-                                    for (const checklistChunk of chunk.split("\n")) {
-                                        let checklistChunkConfig = {};
-                                        let checklist;
-
-                                        if (checklistChunk === "") continue;
-
-                                        try {
-                                            checklistChunkConfig = JSON.parse(checklistChunk);
-                                            checklist = checklistChunkConfig.Value.Checklist;
-
-                                            if (!checklistsConfig.hasOwnProperty(checklist)) {
-                                                checklistsConfig[[checklist]] = {};
-                                            }
-
-                                            checklistsConfig[checklist][checklistChunkConfig.Key] = checklistChunkConfig.Value;
-                                        }
-                                        catch (err) {
-                                            console.log("error when parsing JSON: \n\terror: " + err + "\n\tchunk:" + checklistChunk);
-                                        }
-                                    }
-
-                                    //must collect all data chunks from http response, but ALSO build exactly the 50 first received logs
-                                    if (configCount(checklistsConfig) >= 50 && !builtFirst50Logs) buildFirst50logs();
-
-                                    readChunk(); // Read the next chunk
-                                });
-                            }
-
-                            readChunk(); // Start reading chunks
-
-                        })
-                        .catch(error => {
-                            console.error('Error fetching data:', error);
-                        });
+                    });
                 })
 
                 async function getLogStateChanges() {
                     //configure server side events after data for all overdue logs has been received
 
-                    //const response = fakeSseData(); //for debugging/troubleshooting
+                    //const response = fakeApiCacheData(); //for debugging/troubleshooting
                     const response = await httpGet("/api/pm-log-state-change.ashx");
-
                     if (response.refreshPage) window.location.reload(true); //hard reload (no cache storage)
 
-                    const logStateChangeKeys = Object.keys(response);
-                    for (const logStateChangeKey of logStateChangeKeys) {
-                        const datakey = logStateChangeKey;
-                        const data = response[logStateChangeKey];
+                    const datakeys = Object.keys(response);
+                    for (const datakey of datakeys) {
+                        const data = response[datakey];
                         const logState = data.logState;
                         let log;
 
                         try {
-                            //overdue logs
                             log = document.getElementById("log-" + datakey);
                             if (!log) throw error;
                         }
                         catch (err) {
-                            //current logs (still built in asp code-behind)
+                            //logs built in asp code-behind
                             const logId = "log-" + datakey
                             log = getAspControl(logId);
                         }
 
-                        //repeat data can return from http response
-                        //check log state to ensure it has not already been applied
-                        if (log) {
-                            switch (logState) {
-                                case "virgin":
-                                case "incomplete":
-                                    removeStampCtrlsFrom(log);
+                        const newParentCtrl = getAspControl(data.logParentId);
+                        const oldParentCtrl = log ? log.parentElement : null;
+                        if (log && (oldParentCtrl !== newParentCtrl || logState === "delete")) {
+                            //log needs to be moved, so delete the current one
+                            oldParentCtrl.removeChild(log);
+                            assessIntervalSectionState(oldParentCtrl);
 
-                                    break;
-                                case "submitted":
-                                    // remove stamps
-                                    for (const stampRole of data.removeStamps) {
-                                        const stampCtrlClass = getStampCssClass(stampRole);
-                                        const stampCtrl = log.querySelector("." + stampCtrlClass);
-
-                                        if (stampCtrl) {
-                                            stampCtrl.parentElement.removeChild(stampCtrl);
-                                        }
-                                    }
-
-                                    //add stamps
-                                    for (const stampRole of data.addStamps) {
-                                        const stampCtrlClass = getStampCssClass(stampRole);
-                                        const stampCtrl = log.querySelector("." + stampCtrlClass);
-
-                                        if (!stampCtrl) {
-                                            const iconPanel = log.querySelector(".icon-panel");
-                                            createStamp(stampCtrlClass, datakey, iconPanel)
-                                        }
-                                    }
-
-                                    break;
-                                case "completed":
-                                    //log is complete. It has been submitted, received all its stamps, and is staying up on the status board
-                                    removeStampCtrlsFrom(log);
-
-                                    break;
-                                case "error":
-                                    //error has occured. Display the message from http response on log
-                                    const logButton = log.querySelector(".ChecklistButton");
-                                    const pmOrChecklistName = logButton.value;
-
-                                    if (!pmOrChecklistName.includes("error")) logButton.value = "error: '" + pmOrChecklistName + "' duplication";
-
-                                    removeStampCtrlsFrom(log);
-                                    applyBackcolorClass(log, "error");
-
-                                    break;
-                                case "delete":
-                                    const logParentCtrl = log.parentElement;
-
-                                    logParentCtrl.removeChild(log);
-
-                                    const wasLogOverdue = logParentCtrl.closest(".interval-shift-section") ? false : true;
-                                    if (!wasLogOverdue) {
-                                        //log was not in past issues section
-                                        if (logParentCtrl.children.length === 1) {
-                                            //the only element within interval shift section is the no logs message
-                                            logParentCtrl.classList.remove("has-logs")
-                                        }
-                                    }
-
-                                    continue;
+                            if (logState === "delete") {
+                                //log is deleted, so move onto the next log
+                                continue;
                             }
-
-                            //no matter the log state, apply the log state backcolor css classes
-                            applyBackcolorClass(log, logState);
-                            iterateChildren(function () {
-                                applyBackcolorClass(this, logState);
-                            }, log);
+                            else {
+                                //initialze log var with null value so the log is created in the appropriate interval section
+                                log = null;
+                            }
                         }
+                        if (!log) {
+                            log = buildLog({
+                                datakey: datakey,
+                                pmName: data.pmName,
+                                iconsConfig: [], //the case statement below creates the icons
+                                logState: data.logState
+                            }, newParentCtrl)
+
+                            const hasLogsClass = "has-logs";
+                            if (!newParentCtrl.classList.contains(hasLogsClass)) {
+                                newParentCtrl.classList.add(hasLogsClass);
+                            }
+                        }
+
+                        switch (logState) {
+                            case "virgin":
+                            case "incomplete":
+                                removeStampCtrlsFrom(log);
+
+                                break;
+                            case "submitted":
+                                // remove stamps
+                                for (const stampRole of data.removeStamps) {
+                                    const stampCtrlClass = getStampCssClass(stampRole);
+                                    const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                    if (stampCtrl) {
+                                        stampCtrl.parentElement.removeChild(stampCtrl);
+                                    }
+                                }
+
+                                //add stamps
+                                for (const stampRole of data.addStamps) {
+                                    const stampCtrlClass = getStampCssClass(stampRole);
+                                    const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                    if (!stampCtrl) {
+                                        const iconPanel = log.querySelector(".icon-panel");
+                                        createStamp(stampCtrlClass, datakey, iconPanel)
+                                    }
+                                }
+
+                                break;
+                            case "completed":
+                                //log is complete. It has been submitted, received all its stamps, and is staying up on the status board
+                                removeStampCtrlsFrom(log);
+
+                                break;
+                            case "error":
+                                //error has occured. Display the message from http response on log
+                                const logButton = log.querySelector(".ChecklistButton");
+
+                                removeStampCtrlsFrom(log);
+                                applyBackcolorClass(log, "error");
+
+                                break;
+                        }
+
+                        //no matter the log state, apply the log state backcolor css classes
+                        applyBackcolorClass(log, logState);
+                        iterateChildren(function () {
+                            applyBackcolorClass(this, logState);
+                        }, log);
+                    }
+                }
+
+                function assessIntervalSectionState(intervalSection) {
+                    if (intervalSection.children.length === 1) {
+                        //the only element within interval shift section is the no logs message
+                        intervalSection.classList.remove("has-logs")
                     }
                 }
 
@@ -214,66 +198,33 @@
                     return cssClass;
                 }
 
-                let fakeSseDataInvocations = 0;
-                function fakeSseData() {
-                    const fakeId = 1193 + fakeSseDataInvocations;
+                function build50OverdueLogs() {
+                    const cacheStorage = _overdueCache.getAll()
+                    const datakeys = Object.keys(cacheStorage);
+                    const buildMoreHyperlink = document.getElementById("overdue-logs-build-more-hyperlink");
+                    const cacheTotal = _overdueCache.getCount();
 
-                    fakeSseDataInvocations++;
+                    for (let i = 0; i < 50 && i < cacheTotal; i++) {
+                        const datakey = datakeys[i];
+                        const parentCtrl = document.getElementById('<%= PastIssuesPanel.ClientID %>');
+                        const data = cacheStorage[datakey];
+                        const stampClasses = data.addStamps ? data.addStamps.map(stampRole => getStampCssClass(stampRole)) : [];
 
-                    return {
-                        [fakeId]: {
-                            //logState: "virgin",
+                        buildLog({
+                            datakey: datakey,
+                            pmName: data.pmName,
+                            iconsConfig: stampClasses,
+                            logState: data.logState
+                        }, parentCtrl)
 
-                            //logState: "incomplete",
-
-                            //logState: "submitted",
-                            //removeStamps: ["F&M Manager"],
-                            //addStamps: ["Prod Sup", "Maint Sup"],
-
-                            //logState: "error",
-
-                            logState: "delete",
-
-                            //logState: "completed",
-                        }
+                        _overdueCache.remove(datakey);
                     }
-                }
 
-                function build50Logs() {
-                    let checklistsToBuildConfig = {};
 
-                    for (const checklist of Object.keys(checklistsConfig)) {
-                        for (const areaKey of Object.keys(checklistsConfig[checklist])) {
-                            let drillDownPath = checklistsConfig[checklist];
-                            let logConfig = drillDownPath[areaKey];
-
-                            if (!checklistsToBuildConfig[checklist]) checklistsToBuildConfig[checklist] = {};
-
-                            checklistsToBuildConfig[checklist][areaKey] = logConfig;
-                            delete drillDownPath[areaKey];
-
-                            if (configCount(checklistsToBuildConfig) === 50 || configCount(checklistsConfig) === 0) {
-                                //calling the function below asynchronously
-                                //this is in case user invocates 'newTab' js function while BuildLogs() function is still executing
-                                //instead of having to wait for BuildLogs() to execute, newTab() is called right away, b/c BuildLogs() is executing asynchronously
-                                BuildLogs(checklistsToBuildConfig);
-                                threeDotSpinner.style.display = "none";
-
-                                //programmatically scroll to bottom of page IF user has clicked 'More...' hyperlink
-                                //'More...' hyperlink onclick event invocates build50Logs AND passes itself as this pointer
-                                if (this.id) {
-                                    // give DOM time to layout fully, then programmatically scroll to bottom
-                                    setTimeout(() => {
-                                        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
-                                    }, 100);
-                                }
-
-                                if (dataChunkingDone && configCount(checklistsConfig) === 0) BuildMoreLogs_Hyperlink.style.display = "none";
-                                else BuildMoreLogs_Hyperlink.style.display = "";
-
-                                return;
-                            }
-                        }
+                    if (_overdueCache.getCount() > 0) {
+                        buildMoreHyperlink.style.display = "";
+                    } else {
+                        buildMoreHyperlink.style.display = "none";
                     }
                 }
 
@@ -301,6 +252,15 @@
 
                     //add new css class
                     elem.classList.add(cssClass);
+
+                    if (cssClass === "error") {
+                        try {
+                            pushErrorToDom(elem);
+                        }
+                        catch (err) {
+                            return;
+                        }
+                    }
                 }
 
                 function createStamp(stampIconClass, datakey, parentCtrl) {
@@ -311,70 +271,645 @@
 
                     stampCtrl.addEventListener("click", function () {
                         newTab("Log.aspx?Key=" + datakey);
-                        cancelBuildOfLogs = true;
                     })
 
                     parentCtrl.appendChild(stampCtrl);
                 }
 
-                function BuildLogs(partitionedChecklistsConfig) {
-                    if (partitionedChecklistsConfig) {
-                        const checklistsArr = Object.keys(partitionedChecklistsConfig);
-                        const PastIssuesPanel = document.getElementById('<%= PastIssuesPanel.ClientID %>');
+                function buildLog(config, parentCtrl) {
+                    let { datakey, pmName, iconsConfig, logState } = config;
+                    const Panel = document.createElement("div");
+                    const SubPanel = document.createElement("div");
+                    const IconPanel = document.createElement("div");
+                    const LogButton = document.createElement("input");
 
-                        for (const checklist of checklistsArr) {
-                            const checklistConfig = partitionedChecklistsConfig[checklist];
-                            const datakeyArr = Object.keys(checklistConfig);
+                    Panel.setAttribute("style", "display: inline-block; border: 2px solid black;")
+                    Panel.id = "log-" + datakey;
+                    applyBackcolorClass(Panel, logState);
 
-                            if (cancelBuildOfLogs) return;
+                    SubPanel.setAttribute("style", "display: flex")
 
-                            for (const datakey of datakeyArr) {
-                                const datakeyConfig = checklistConfig[datakey];
-                                const Panel = document.createElement("div");
-                                const SubPanel = document.createElement("div");
-                                const IconPanel = document.createElement("div");
-                                const LogButton = document.createElement("input");
-                                const logState = datakeyConfig.logState
-                                const iconsList = JSON.parse(datakeyConfig.iconsConfig);
+                    LogButton.setAttribute("style", "width: 100%; border: none; cursor: pointer;")
+                    LogButton.setAttribute("type", "button")
+                    LogButton.classList.add("ChecklistButton");
+                    LogButton.id = datakey;
+                    LogButton.addEventListener("click", function () {
+                        newTab("Log.aspx?Key=" + datakey);
+                    })
+                    LogButton.value = pmName;
+                    applyBackcolorClass(LogButton, logState);
 
-                                Panel.setAttribute("style", "display: inline-block; border: 2px solid black;")
-                                Panel.id = "log-" + datakey;
-                                applyBackcolorClass(Panel, logState);
+                    IconPanel.classList.add("icon-panel")
+                    IconPanel.id = "IconPanel_" + datakey
 
-                                SubPanel.setAttribute("style", "display: flex")
+                    iconsConfig.forEach(function (iconClass) {
+                        createStamp(iconClass, datakey, IconPanel);
+                    });
 
-                                LogButton.setAttribute("style", "width: 100%; border: none; cursor: pointer;")
-                                LogButton.setAttribute("type", "button")
-                                LogButton.classList.add("ChecklistButton");
-                                LogButton.id = datakey;
-                                LogButton.value = checklist;
-                                LogButton.addEventListener("click", function () {
-                                    newTab("Log.aspx?Key=" + datakey);
-                                    cancelBuildOfLogs = true;
-                                })
-                                applyBackcolorClass(LogButton, logState);
+                    parentCtrl.appendChild(Panel);
 
-                                IconPanel.classList.add("icon-panel")
-                                IconPanel.id = "IconPanel_" + datakey
+                    Panel.appendChild(SubPanel);
 
-                                iconsList.forEach(function (iconClass) {
-                                    createStamp(iconClass, datakey, IconPanel);
-                                });
+                    SubPanel.appendChild(LogButton);
+                    SubPanel.appendChild(IconPanel);
 
-                                PastIssuesPanel.appendChild(Panel);
+                    return Panel;
+                }
 
-                                Panel.appendChild(SubPanel);
+                function pushErrorToDom(elem) {
+                    const elemValue = elem.value;
 
-                                SubPanel.appendChild(LogButton);
-                                SubPanel.appendChild(IconPanel);
-                            }
-
-                        }
+                    if (!elemValue.includes("error")) {
+                        elem.value = "error: '" + elemValue + "' duplication";
                     }
                 }
 
                 function newTab(url) {
                     window.open(url, '_blank');
+                }
+
+
+                function fakeApiCacheData() {
+                    return {
+                        10000000: {
+                            logParentId: "DailyNightShiftPanel",
+                            pmName: "some random checklist again",
+                            logState: "error",
+                        },
+                        10000001: {
+                            logParentId: "DailyDayShiftPanel",
+                            pmName: "AWN Daily",
+                            logState: "incomplete",
+                        },
+                        10000002: {
+                            logParentId: "DailyNightShiftPanel",
+                            pmName: "some random checklist",
+                            logState: "virgin",
+                        },
+                        10000003: {
+                            logParentId: "DailyDayShiftPanel",
+                            pmName: "your mom",
+                            logState: "submitted",
+                            removeStamps: ["F&M Manager"],
+                            addStamps: ["Prod Sup", "Maint Sup"],
+                        },
+                        "100000001": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 1",
+                            "logState": "error"
+                        },
+                        "100000002": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 2",
+                            "logState": "virgin"
+                        },
+                        "100000003": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 3",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000004": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 4",
+                            "logState": "error"
+                        },
+                        "100000005": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 5",
+                            "logState": "incomplete"
+                        },
+                        "100000006": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 6",
+                            "logState": "virgin"
+                        },
+                        "100000007": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 7",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000008": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 8",
+                            "logState": "error"
+                        },
+                        "100000009": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 9",
+                            "logState": "incomplete"
+                        },
+                        "100000010": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 10",
+                            "logState": "virgin"
+                        },
+                        "100000011": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 11",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000012": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 12",
+                            "logState": "error"
+                        },
+                        "100000013": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 13",
+                            "logState": "incomplete"
+                        },
+                        "100000014": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 14",
+                            "logState": "virgin"
+                        },
+                        "100000015": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 15",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000016": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 16",
+                            "logState": "error"
+                        },
+                        "100000017": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 17",
+                            "logState": "incomplete"
+                        },
+                        "100000018": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 18",
+                            "logState": "virgin"
+                        },
+                        "100000019": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 19",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000020": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 20",
+                            "logState": "error"
+                        },
+                        "100000021": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 21",
+                            "logState": "incomplete"
+                        },
+                        "100000022": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 22",
+                            "logState": "virgin"
+                        },
+                        "100000023": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 23",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000024": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 24",
+                            "logState": "error"
+                        },
+                        "100000025": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 25",
+                            "logState": "incomplete"
+                        },
+                        "100000026": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 26",
+                            "logState": "virgin"
+                        },
+                        "100000027": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 27",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000028": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 28",
+                            "logState": "error"
+                        },
+                        "100000029": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 29",
+                            "logState": "incomplete"
+                        },
+                        "100000030": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 30",
+                            "logState": "virgin"
+                        },
+                        "100000031": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 31",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000032": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 32",
+                            "logState": "error"
+                        },
+                        "100000033": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 33",
+                            "logState": "incomplete"
+                        },
+                        "100000034": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 34",
+                            "logState": "virgin"
+                        },
+                        "100000035": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 35",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000036": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 36",
+                            "logState": "error"
+                        },
+                        "100000037": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 37",
+                            "logState": "incomplete"
+                        },
+                        "100000038": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 38",
+                            "logState": "virgin"
+                        },
+                        "100000039": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 39",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000040": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 40",
+                            "logState": "error"
+                        },
+                        "100000041": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 41",
+                            "logState": "incomplete"
+                        },
+                        "100000042": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 42",
+                            "logState": "virgin"
+                        },
+                        "100000043": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 43",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000044": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 44",
+                            "logState": "error"
+                        },
+                        "100000045": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 45",
+                            "logState": "incomplete"
+                        },
+                        "100000046": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 46",
+                            "logState": "virgin"
+                        },
+                        "100000047": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 47",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000048": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 48",
+                            "logState": "error"
+                        },
+                        "100000049": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 49",
+                            "logState": "incomplete"
+                        },
+                        "100000050": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 50",
+                            "logState": "virgin"
+                        },
+                        "100000051": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 51",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000052": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 52",
+                            "logState": "error"
+                        },
+                        "100000053": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 53",
+                            "logState": "incomplete"
+                        },
+                        "100000054": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 54",
+                            "logState": "virgin"
+                        },
+                        "100000055": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 55",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000056": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 56",
+                            "logState": "error"
+                        },
+                        "100000057": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 57",
+                            "logState": "incomplete"
+                        },
+                        "100000058": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 58",
+                            "logState": "virgin"
+                        },
+                        "100000059": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 59",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000060": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 60",
+                            "logState": "error"
+                        },
+                        "100000061": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 61",
+                            "logState": "incomplete"
+                        },
+                        "100000062": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 62",
+                            "logState": "virgin"
+                        },
+                        "100000063": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 63",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000064": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 64",
+                            "logState": "error"
+                        },
+                        "100000065": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 65",
+                            "logState": "incomplete"
+                        },
+                        "100000066": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 66",
+                            "logState": "virgin"
+                        },
+                        "100000067": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 67",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000068": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 68",
+                            "logState": "error"
+                        },
+                        "100000069": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 69",
+                            "logState": "incomplete"
+                        },
+                        "100000070": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 70",
+                            "logState": "virgin"
+                        },
+                        "100000071": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 71",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000072": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 72",
+                            "logState": "error"
+                        },
+                        "100000073": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 73",
+                            "logState": "incomplete"
+                        },
+                        "100000074": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 74",
+                            "logState": "virgin"
+                        },
+                        "100000075": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 75",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000076": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 76",
+                            "logState": "error"
+                        },
+                        "100000077": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 77",
+                            "logState": "incomplete"
+                        },
+                        "100000078": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 78",
+                            "logState": "virgin"
+                        },
+                        "100000079": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 79",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000080": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 80",
+                            "logState": "error"
+                        },
+                        "100000081": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 81",
+                            "logState": "incomplete"
+                        },
+                        "100000082": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 82",
+                            "logState": "virgin"
+                        },
+                        "100000083": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 83",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000084": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 84",
+                            "logState": "error"
+                        },
+                        "100000085": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 85",
+                            "logState": "incomplete"
+                        },
+                        "100000086": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 86",
+                            "logState": "virgin"
+                        },
+                        "100000087": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 87",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000088": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 88",
+                            "logState": "error"
+                        },
+                        "100000089": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 89",
+                            "logState": "incomplete"
+                        },
+                        "100000090": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 90",
+                            "logState": "virgin"
+                        },
+                        "100000091": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 91",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000092": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 92",
+                            "logState": "error"
+                        },
+                        "100000093": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 93",
+                            "logState": "incomplete"
+                        },
+                        "100000094": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 94",
+                            "logState": "virgin"
+                        },
+                        "100000095": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 95",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000096": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 96",
+                            "logState": "error"
+                        },
+                        "100000097": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 97",
+                            "logState": "incomplete"
+                        },
+                        "100000098": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 98",
+                            "logState": "virgin"
+                        },
+                        "100000099": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 99",
+                            "logState": "submitted",
+                            "removeStamps": ["F&M Manager"],
+                            "addStamps": ["Prod Sup", "Maint Sup"]
+                        },
+                        "100000100": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 100",
+                            "logState": "error"
+                        },
+                        "100000101": {
+                            "logParentId": "PastIssuesPanel",
+                            "pmName": "checklist item 101",
+                            "logState": "error"
+                        }
+
+                    }
                 }
             </script>
 
@@ -454,9 +989,9 @@
                     grid-template-columns: 1fr;
                 }
 
-                .interval-shift-section.has-logs > .interval-shift-no-logs-message {
-                    display: none;
-                }
+                    .interval-shift-section.has-logs > .interval-shift-no-logs-message {
+                        display: none;
+                    }
 
                 .SectionLabel {
                     font-size: calc(var(--UFontSize) * 2);
@@ -584,6 +1119,12 @@
                     }
                 }
 
+                .hyperlink {
+                    text-decoration: underline;
+                    color: blue;
+                    cursor: pointer;
+                }
+
                 @media (min-width: 601px) and (orientation: portrait) { /*tablets in portrait mode*/
                     .interval-shift-section {
                         grid-template-columns: 1fr 1fr;
@@ -702,7 +1243,7 @@
                     </asp:Panel>
 
                     <div style="display: flex; align-items: center;">
-                        <asp:LinkButton ID="BuildMoreLogs_Hyperlink" OnClientClick="build50Logs.call(this); return false;" Style="display: none;" Text="More..." runat="server" />
+                        <span id="overdue-logs-build-more-hyperlink" class="hyperlink">More...</span>
                         <div class="dots-spinner">
                             <span></span>
                             <span></span>

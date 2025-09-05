@@ -1,4 +1,45 @@
-﻿// ============== http request/response flow related functions =============== 
+﻿class OverdueLogsCache {
+    constructor(storage = sessionStorage) {
+        this.storage = storage;
+    }
+
+    set(key, value) {
+        const data = JSON.stringify(value)
+        this.storage.setItem(key, data);
+    }
+
+    get(key) {
+        const data = this.storage.getItem(key);
+        return JSON.parse(data);
+    }
+
+    getAll() {
+        const allData = {};
+
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            const value = sessionStorage.getItem(key);
+
+            allData[key] = JSON.parse(value);
+        }
+
+        return allData;
+    }
+
+    getCount() {
+        return sessionStorage.length;
+    }
+
+    remove(key) {
+        this.storage.removeItem(key);
+    }
+
+    clear() {
+        this.storage.clear();
+    }
+}
+
+// ============== http request/response flow related functions ===============
 
 async function prepHttpError(httpRes) {
     let endUserMessage = '';

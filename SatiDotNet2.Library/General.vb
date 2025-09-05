@@ -5,9 +5,10 @@ Imports System.Text.RegularExpressions
 Imports System.IO
 Imports System.Globalization
 Imports System.Text.Json
+Imports System.Configuration
 
 Public Class Security
-    Private connectionString As String = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
+    Private connectionString As String = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
 
     Public Function NoSqlInjection(str As String) As Boolean
         'SELECT -extracts data from a database       

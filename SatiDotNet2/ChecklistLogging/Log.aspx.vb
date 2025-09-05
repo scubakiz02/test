@@ -4,6 +4,8 @@ Imports SatiDotNet2.Library
 Imports System.Data
 Imports System.IO
 Imports System.Text.RegularExpressions
+Imports System.Configuration
+
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -663,7 +665,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Sub UploadToDataTable(LogOperator As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter

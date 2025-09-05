@@ -1,6 +1,7 @@
 ﻿Imports System.Text.Json
 Imports SatiDotNet2.Library
 Imports System.Web.Services
+Imports System.Configuration
 
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
@@ -474,7 +475,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Sub UploadToDataTable()
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter
@@ -1110,31 +1111,20 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Private Sub CacheDisabledLogs(AreaKey As String)
-        'send data regarding every potential log in status board relevant to pm/checklist that has been disabled 
+    Private Sub CacheUnfinishedCurrentLog(AreaKey As String, StartDateCutoffAt As String, StatusBoardDateAt As String)
+        'send data regarding the current log in status board relevant to pm/checklist that has been tampered 
         Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", Security.GetParamVarHash(AreaKey, "int")},
-            {"@StartDateCutoffAt", Security.GetParamVarHash(Session("StartDateCutoffAt"), "string")}
+            {"@StatusBoardDateAt", Security.GetParamVarHash(StatusBoardDateAt, "string")},
+            {"@StartDateCutoffAt", Security.GetParamVarHash(StartDateCutoffAt, "string")}
         }
-        Dim AreaKeyLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D " &
+        Dim CurrentLogDataKey As Integer = Security.GetSingleDbField("SELECT TOP(1) [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D " &
             "WHERE " &
             "AreaKey=@AreaKey " &
+            "AND D.Date <= @StatusBoardDateAt " &
             "And D.Date > @StartDateCutoffAt " &
-            "ORDER BY Date DESC", SqlConfig)
-
-        'add newest log related to areakey no matter the log state
-        Dim CurrentLogDataKey As String = AreaKeyLogsDs.Tables(0).Rows(0)("DataKey")
+            "ORDER BY Date DESC", SqlConfig, "Datakey")
         _ActivePmCache.CacheAdd(CurrentLogDataKey)
-        For Each AreaKeyLogsDr As Data.DataRow In AreaKeyLogsDs.Tables(0).Rows
-            'if log state is not completed (unless it is the newest log), that means the log is overdue
-            'add all of these logs to cache
-            Dim DataKey As String = AreaKeyLogsDr("DataKey")
-            Dim DataKeyState As Dictionary(Of String, Object) = _ActivePm.GetState(DataKey)
-
-            If DataKeyState("logState") <> "completed" Then
-                _ActivePmCache.CacheAdd(DataKey)
-            End If
-        Next
     End Sub
 
     Private Sub SetPmActiveStatus(IsActive As Boolean, AreaKey As String)
@@ -1146,12 +1136,11 @@ Partial Class MR_OpenTicketStatusBoard
         Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Active=@Active WHERE [Key]=@AreaKey", QueryConfig)
     End Sub
 
-
     Protected Sub DisableButton_onClick(sender As Object, e As EventArgs)
         Dim ActiveStatus As Boolean = If(sender.Text = "Disable", False, True)
 
         SetPmActiveStatus(ActiveStatus, AreaFromQueryString)
-        CacheDisabledLogs(AreaFromQueryString)
+        CacheUnfinishedCurrentLog(AreaFromQueryString, Session("StartDateCutoffAt"), Session("WhereFromQueryString"))
         RefreshPreview()
     End Sub
 
@@ -1160,12 +1149,11 @@ Partial Class MR_OpenTicketStatusBoard
         ChecklistBuilder.ArchivePM(AreaFromQueryString)
 
         'both functions below are needed to cache the disabled logs properly
-        'this is b/c CacheDisabledLogs() function calls ActivePmCache Class CacheAdd function
-        'CacheAdd function call ActivePm Class GetState() function, which looks at ALTS Database T_LogArea Table Active field value
-        'hence why, before calling CacheDisabledLogs() function, SetPmActiveStatus() function is called (to set Active field value mentioned to false)
+        'this is b/c CacheUnfinishedLogs() function calls ActivePmCache Class CacheAdd function
+        'CacheAdd function call ActivePm Class GetLogConfig() function, which looks at ALTS Database T_LogArea Table Active field value
+        'hence why, before calling CacheUnfinishedLogs() function, SetPmActiveStatus() function is called (to set Active field value mentioned to false)
         SetPmActiveStatus(False, AreaFromQueryString)
-        CacheDisabledLogs(AreaFromQueryString)
-
+        CacheUnfinishedCurrentLog(AreaFromQueryString, Session("StartDateCutoffAt"), Session("WhereFromQueryString"))
         RefreshPreview()
     End Sub
 
@@ -1355,6 +1343,7 @@ Partial Class MR_OpenTicketStatusBoard
         }
 
         Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET Assignee=@Assignee WHERE [Key]=@AreaKey", QueryConfig)
+        CacheUnfinishedCurrentLog(AreaFromQueryString, Session("StartDateCutoffAt"), Session("WhereFromQueryString"))
         RefreshPreview()
     End Sub
 
