@@ -269,6 +269,9 @@ Public Class ActivePm
         'what is CurrLogDate? Great question!
         'the status board has a time travel feature (available to Sati admins only, intended for dev use to troubleshoot/debug)
         'and so, CurrLogDate is the start date of a pm/checklist log relevant to the status board time
+
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
+
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", GetParamVarHash(AreaKey, "int")}
         }
@@ -283,6 +286,8 @@ Public Class ActivePm
     End Function
 
     Public Function IsTimeForNewLog(AreaKey As Integer, StatusBoardDateAt As String) As Boolean
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
+
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", GetParamVarHash(AreaKey, "int")}
         }

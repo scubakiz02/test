@@ -187,18 +187,18 @@ Public Class PhaseController
         Return Res
     End Function
 
-    Public Function DeletePhaseOrGroup(PhaseOrGroupKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
+    Public Function DeletePhaseOrBatch(PhaseOrBatchKey As String, Optional InvocateAsTest As Boolean = False) As Dictionary(Of String, String)
         Dim Res As New Dictionary(Of String, String)
         Dim SqlQuery As String
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
 
-        If PhaseOrGroupKey Is Nothing Then
+        If PhaseOrBatchKey Is Nothing Then
             Res("Success") = False
             Return Res
         End If
 
-        QueryConfig("@PhaseOrGroupKey") = GetParamVarHash(PhaseOrGroupKey, "int")
-        SqlQuery = "DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;"
+        QueryConfig("@PhaseOrBatchKey") = GetParamVarHash(PhaseOrBatchKey, "int")
+        SqlQuery = "DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrBatchKey;"
 
         If InvocateAsTest Then
             Res("QueryConfig") = JsonSerializer.Serialize(QueryConfig)
@@ -211,10 +211,10 @@ Public Class PhaseController
 
             'return message when delete query fails (assuming the reason for failure is a foreign key relationship)
             If Success = False Then
-                Dim AreaKey As Integer = GetSingleDbField("SELECT AreaKey FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", QueryConfig, "AreaKey")
+                Dim AreaKey As Integer = GetSingleDbField("SELECT AreaKey FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrBatchKey;", QueryConfig, "AreaKey")
                 Dim SectionType As String = GetSectionType(AreaKey)
 
-                'tailor message to T_LogArea SectionType field value (phases or groups)
+                'tailor message to T_LogArea SectionType field value (phases or Batchs)
                 Message = "detach inputs to delete " & SectionType
             End If
 
@@ -276,7 +276,7 @@ Public Class PhaseController
         Return Res
     End Function
 
-    Public Function GroupsOrPhasesInUse(AreaKey As String) As Boolean
+    Public Function BatchsOrPhasesInUse(AreaKey As String) As Boolean
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
         Dim LabelsWithPhaseCount As String
 

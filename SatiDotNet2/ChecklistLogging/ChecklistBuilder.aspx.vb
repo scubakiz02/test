@@ -164,6 +164,8 @@ Partial Class MR_OpenTicketStatusBoard
                     AreaDropDownList.Items.RemoveAt(0)
                 End If
 
+                ClusterDropDownList.SelectedValue = Security.GetSingleDbField("SELECT G.[Key] AS ClusterKey FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogGroup] G ON A.GroupKey=G.[Key] WHERE A.[Key]=@AreaKey", QueryConfig, "ClusterKey")
+
                 '======== PHASE INTERFACE ==============
                 QueryConfig("@PhaseKey") = Security.GetParamVarHash(PhaseFromQs, "string")
 
@@ -590,42 +592,41 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub AreaFormView_DataBound(sender As Object, e As EventArgs) Handles AreaFormView.DataBound
         If AreaFormView.CurrentMode = FormViewMode.ReadOnly Then
-            Dim GroupingCheckBox As CheckBox
+            Dim BatchingCheckBox As CheckBox
             Dim SectionType As String = PhaseController.GetSectionType(AreaFromQueryString)
             Dim PhaseShow As Boolean = If(SectionType = "none", False, True)
 
-            'using try catch block in case GroupingCheckBox or GroupingCheckBox are null
             Try
-                Dim GroupingCheckBoxID As String
+                Dim BatchingCheckBoxID As String
                 Dim Text As String
 
                 If SectionType = "phase" Then
                     Text = "Phase: "
-                    GroupingCheckBoxID = "PhasingCheckBox"
-                ElseIf SectionType = "group" Then
-                    Text = "Group: "
-                    GroupingCheckBoxID = "GroupingCheckBox"
+                    BatchingCheckBoxID = "PhasingCheckBox"
+                ElseIf SectionType = "batch" Then
+                    Text = "Batch: "
+                    BatchingCheckBoxID = "BatchingCheckBox"
                 Else
                     Throw New Exception()
                 End If
-                GroupingCheckBox = DirectCast(AreaFormView.FindControl(GroupingCheckBoxID), CheckBox)
+                BatchingCheckBox = DirectCast(AreaFormView.FindControl(BatchingCheckBoxID), CheckBox)
                 PhaseInterfaceLabelPart2.Text = Text
                 LabelInterface_PhaseDdl_Label.Text = Text
 
-                If GroupingCheckBox Is Nothing Then Throw New Exception()
+                If BatchingCheckBox Is Nothing Then Throw New Exception()
             Catch ex As Exception
                 Exit Sub
             End Try
 
-            'GroupsOrPhasesInUse detects if 1 or more labels for a pm/checklist has an associated Phase
+            'BatchsOrPhasesInUse detects if 1 or more labels for a pm/checklist has an associated Phase
             'if it returns true, then disable PhasingCheckBox
-            If PhaseController.GroupsOrPhasesInUse(AreaFromQueryString) Then
+            If PhaseController.BatchsOrPhasesInUse(AreaFromQueryString) Then
                 PhaseShow = True
             End If
 
             If PhaseShow Then LabelInterface_PhaseDdlContainer.Visible = True
 
-            GroupingCheckBox.Checked = PhaseShow
+            BatchingCheckBox.Checked = PhaseShow
             PhaseOrBundle_Panel.Visible = PhaseShow
         End If
     End Sub
@@ -638,6 +639,17 @@ Partial Class MR_OpenTicketStatusBoard
         LabelFromQueryString = sender.SelectedValue
         CommentFromQueryString = SetCommentFromQueryString()
         RefreshPreview()
+    End Sub
+
+    Protected Sub ClusterDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+        Dim DdlValue As String = sender.SelectedValue
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@GroupKey", Security.GetParamVarHash(DdlValue, "string")},
+            {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")}
+        }
+        Dim IsNull As Boolean = If(DdlValue = String.Empty, True, False)
+
+        Security.GetMyDataSetParamQuery("UPDATE [ALTS].[dbo].[T_LogArea] SET GroupKey=" & If(IsNull, "NULL", "@GroupKey") & " WHERE [Key]=@AreaKey", SqlConfig)
     End Sub
 
     Protected Sub LabelInterface_PhaseDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
@@ -918,7 +930,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub FormViewDeleteHyperlink_OnClick(sender As Object, e As EventArgs)
         If sender.ID.Contains("Phase") Then
-            PhaseController.DeletePhaseOrGroup(PhaseFromQs)
+            PhaseController.DeletePhaseOrBatch(PhaseFromQs)
             PhaseFromQs = Nothing
         ElseIf sender.ID.Contains("Label") Then
             'created InputPM.Delete() using TDD (that means tests are involved!)
@@ -987,6 +999,7 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", DepartmentKey},
                 {"typeOf", "int"}
             }
+
             Security.ExecuteSqlParamQuery("INSERT INTO [ALTS].[dbo].[T_LogArea] (Area, DateCreated, DepartmentKey, Active, Status) OUTPUT INSERTED.[Key] VALUES (@UserInput, @Date, @DepartmentKey, 0, 'live');", QueryConfig)
 
             QueryConfig.Remove("@Date")
@@ -1113,6 +1126,8 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub CacheUnfinishedCurrentLog(AreaKey As String, StartDateCutoffAt As String, StatusBoardDateAt As String)
         'send data regarding the current log in status board relevant to pm/checklist that has been tampered 
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
+
         Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@AreaKey", Security.GetParamVarHash(AreaKey, "int")},
             {"@StatusBoardDateAt", Security.GetParamVarHash(StatusBoardDateAt, "string")},
@@ -1444,21 +1459,21 @@ Partial Class MR_OpenTicketStatusBoard
         PhaseDropDownList.SelectedIndex = 0
     End Sub
 
-    Protected Sub PhaseOrGroup_OnCheckedChanged(sender As Object, e As EventArgs)
+    Protected Sub PhaseOrBatch_OnCheckedChanged(sender As Object, e As EventArgs)
         Dim PhasingCheckBox As CheckBox = TryCast(AreaFormView.FindControl("PhasingCheckBox"), CheckBox)
-        Dim GroupingCheckBox As CheckBox = TryCast(AreaFormView.FindControl("GroupingCheckBox"), CheckBox)
+        Dim BatchingCheckBox As CheckBox = TryCast(AreaFormView.FindControl("BatchingCheckBox"), CheckBox)
 
-        If PhasingCheckBox IsNot Nothing AndAlso GroupingCheckBox IsNot Nothing Then
+        If PhasingCheckBox IsNot Nothing AndAlso BatchingCheckBox IsNot Nothing Then
             Dim SectionType As String = String.Empty
 
-            'only allow user to uncheck Phasing or Group Checkbox when no labels are tied to a phase
-            If sender.Checked = False AndAlso PhaseController.GroupsOrPhasesInUse(AreaFromQueryString) = False Then
+            'only allow user to uncheck Phasing or Batch Checkbox when no labels are tied to a phase
+            If sender.Checked = False AndAlso PhaseController.BatchsOrPhasesInUse(AreaFromQueryString) = False Then
                 SectionType = "none"
             Else
                 If PhasingCheckBox Is sender Then
                     SectionType = "phase"
-                ElseIf GroupingCheckBox Is sender Then
-                    SectionType = "group"
+                ElseIf BatchingCheckBox Is sender Then
+                    SectionType = "batch"
                 End If
             End If
 

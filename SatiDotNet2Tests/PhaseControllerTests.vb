@@ -429,7 +429,7 @@ Public Class PhaseControllerStatelessGetPhaseFunctionTests
     <InlineData("e")>
     <InlineData("12.2")>
     Public Sub NonPhasedInputsInPhasedPm(FakeUserInput As String)
-        'phase 0 should visible even when non phased/grouped inputs exists within pm/checklist
+        'phase 0 should visible even when non phased/Batched inputs exists within pm/checklist
         Dim FakeDataKey As Integer = 0
         Dim NullPhaseLabelKey As Integer = 1690
 
@@ -640,7 +640,7 @@ Public Class AssignPhaseTests
 
 End Class
 
-Public Class GroupsOrPhasesInUseTests
+Public Class BatchsOrPhasesInUseTests
     Inherits PhaseController
     Private Security As New Security()
     Private PMsWithPhases As New List(Of Integer)
@@ -656,13 +656,13 @@ Public Class GroupsOrPhasesInUseTests
 
     <Fact>
     Private Sub NothingAsArg()
-        Assert.False(GroupsOrPhasesInUse(Nothing))
+        Assert.False(BatchsOrPhasesInUse(Nothing))
     End Sub
 
     <Fact>
     Private Sub TrueReturnTestCases()
         For Each PMWithPhases As Integer In PMsWithPhases
-            Assert.True(GroupsOrPhasesInUse(PMWithPhases))
+            Assert.True(BatchsOrPhasesInUse(PMWithPhases))
         Next
     End Sub
 
@@ -674,7 +674,7 @@ Public Class GroupsOrPhasesInUseTests
             Dim AreaKey As Integer = AreaDR("Key")
 
             If PMsWithPhases.Contains(AreaKey) = False Then
-                Assert.False(GroupsOrPhasesInUse(AreaKey))
+                Assert.False(BatchsOrPhasesInUse(AreaKey))
             End If
         Next
 
@@ -688,36 +688,36 @@ Public Class DeleteBatchTests
 
     <Fact>
     Public Sub UnsuccessfulEdgecases()
-        Assert.False(Boolean.Parse(DeletePhaseOrGroup(Nothing)("Success")))
+        Assert.False(Boolean.Parse(DeletePhaseOrBatch(Nothing)("Success")))
     End Sub
 
     <Theory>
     <InlineData(4)>
     <InlineData(238)>
-    Public Sub DeletePhaseOrGroupTestCases(PhaseOrGroupKey As String)
-        Dim DeletePhaseOrGroupRes As Dictionary(Of String, String) = DeletePhaseOrGroup(PhaseOrGroupKey, True)
-        Dim DeletePhaseOrGroupHash As New Dictionary(Of String, String) From {
-            {"PhaseOrGroupKey", PhaseOrGroupKey}
+    Public Sub DeletePhaseOrBatchTestCases(PhaseOrBatchKey As String)
+        Dim DeletePhaseOrBatchRes As Dictionary(Of String, String) = DeletePhaseOrBatch(PhaseOrBatchKey, True)
+        Dim DeletePhaseOrBatchHash As New Dictionary(Of String, String) From {
+            {"PhaseOrBatchKey", PhaseOrBatchKey}
         }
 
-        Assert.Equal("DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrGroupKey;", DeletePhaseOrGroupRes("SqlQuery"))
-        Assert.True(SqlParameters.ValidParameterizedValues(DeletePhaseOrGroupHash, DeletePhaseOrGroupRes))
+        Assert.Equal("DELETE FROM [ALTS].[dbo].[T_LogPhase] WHERE [Key]=@PhaseOrBatchKey;", DeletePhaseOrBatchRes("SqlQuery"))
+        Assert.True(SqlParameters.ValidParameterizedValues(DeletePhaseOrBatchHash, DeletePhaseOrBatchRes))
     End Sub
 
     <Theory>
     <InlineData(-1)>
     <InlineData(0)>
-    Public Sub DeletePhaseOrGroupWithSqlExecutionsTestCases(PhaseOrGroupKey As String)
+    Public Sub DeletePhaseOrBatchWithSqlExecutionsTestCases(PhaseOrBatchKey As String)
         'sql does NOT complain when a sql query is ran on a record that doesn't exists in a table
         'do just that, to ensure return is as expected
-        Dim DeletePhaseOrGroupRes As Dictionary(Of String, String) = DeletePhaseOrGroup(PhaseOrGroupKey)
-        Dim DeletePhaseOrGroupHash As New Dictionary(Of String, String) From {
-            {"PhaseOrGroupKey", PhaseOrGroupKey}
+        Dim DeletePhaseOrBatchRes As Dictionary(Of String, String) = DeletePhaseOrBatch(PhaseOrBatchKey)
+        Dim DeletePhaseOrBatchHash As New Dictionary(Of String, String) From {
+            {"PhaseOrBatchKey", PhaseOrBatchKey}
         }
 
-        Assert.False(DeletePhaseOrGroupRes.ContainsKey("SqlQuery"))
-        Assert.False(DeletePhaseOrGroupRes.ContainsKey("QueryConfig"))
-        Assert.True(Boolean.Parse(DeletePhaseOrGroupRes("Success")))
+        Assert.False(DeletePhaseOrBatchRes.ContainsKey("SqlQuery"))
+        Assert.False(DeletePhaseOrBatchRes.ContainsKey("QueryConfig"))
+        Assert.True(Boolean.Parse(DeletePhaseOrBatchRes("Success")))
     End Sub
 
 End Class
@@ -881,7 +881,7 @@ Public Class GetSectionTypeTests
     <Theory>
     <InlineData("none")>
     <InlineData("phase")>
-    <InlineData("group")>
+    <InlineData("batch")>
     Public Sub SectionTypeTestsWithFakeData(SectionType As String)
         'get 20 records with:
         '1) random primary key values from T_LogArea as AreaKey
@@ -923,8 +923,8 @@ Public Class SetSectionTypeTests
     <Theory>
     <InlineData(34, "none")>
     <InlineData(46, "none")>
-    <InlineData(34, "group")>
-    <InlineData(23, "group")>
+    <InlineData(34, "batch")>
+    <InlineData(23, "batch")>
     <InlineData(3434, "phase")>
     <InlineData(23, "phase")>
     Public Sub SetSectionTypeWithFakeData(AreaKey As String, SectionType As String)
@@ -941,7 +941,7 @@ Public Class SetSectionTypeTests
 
     <Theory>
     <InlineData(0, "none")>
-    <InlineData(0, "group")>
+    <InlineData(0, "batch")>
     <InlineData(0, "phase")>
     Public Sub SetSectionTypeWithRealData(AreaKey As String, SectionType As String)
         Dim SetTypeRes As Dictionary(Of String, String) = SetSectionType(AreaKey, SectionType)

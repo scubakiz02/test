@@ -23,7 +23,7 @@ Public Class StreamData
 
         Data = JsonSerializer.Deserialize(Of Dictionary(Of String, Object))(HttpBody)
         PhaseKey = Data("phaseKey").ToString()
-        PhaseDeleteRes = DeletePhaseOrGroup(PhaseKey)
+        PhaseDeleteRes = DeletePhaseOrBatch(PhaseKey)
 
         If PhaseDeleteRes("Success") = "True" Then
             HttpRes("success") = True

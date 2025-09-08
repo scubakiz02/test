@@ -672,8 +672,8 @@
                                 </div>
 
                                 <div id="area-formview-itemtemplate-checkbox-container">
-                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="Grouping: " ID="GroupingCheckBox" OnCheckedChanged="PhaseOrGroup_OnCheckedChanged" runat="server" AutoPostBack="true" />
-                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="(Rare) Phasing: " ID="PhasingCheckBox" OnCheckedChanged="PhaseOrGroup_OnCheckedChanged" runat="server" AutoPostBack="true" />
+                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="Batching: " ID="BatchingCheckBox" OnCheckedChanged="PhaseOrBatch_OnCheckedChanged" runat="server" AutoPostBack="true" />
+                                    <asp:CheckBox CssClass="vertical-align-asp-checkbox" Text="(Rare) Phasing: " ID="PhasingCheckBox" OnCheckedChanged="PhaseOrBatch_OnCheckedChanged" runat="server" AutoPostBack="true" />
                                 </div>
                             </div>
                         </ItemTemplate>
@@ -699,6 +699,19 @@
                             <asp:Parameter Name="Area" Type="String" />
                         </UpdateParameters>
                     </asp:SqlDataSource>
+
+                    <asp:Panel runat="server" ID="Panel1" class="flexbox Width">
+                        <span>Cluster:</span>
+                        <asp:DropDownList ID="ClusterDropDownList" CssClass="label-interface-phase-select auto-fit" runat="server"
+                            AppendDataBoundItems="True" AutoPostBack="True"
+                            DataSourceID="ClusterDropDownList_SqlDataSource" DataTextField="Cluster"
+                            DataValueField="Key" OnSelectedIndexChanged="ClusterDropDownList_SelectedIndexChanged">
+                            <asp:ListItem Text="None" Value="" />
+                        </asp:DropDownList>
+                        <asp:SqlDataSource ID="ClusterDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                            SelectCommand="SELECT [Key], [Group] As Cluster FROM [T_LogGroup]"></asp:SqlDataSource>
+                    </asp:Panel>
+
                 </asp:Panel>
 
                 <asp:Panel Visible="False" ID="PhaseOrBundle_Panel" CssClass="InterfacePanel" Style="background-color: #FF69B4;" runat="server">

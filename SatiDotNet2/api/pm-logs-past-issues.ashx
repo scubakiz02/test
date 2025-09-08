@@ -18,6 +18,8 @@ Public Class StreamData
     End Sub
 
     Private Function GetOverdueLogsConfig(StartDateCutoffAt As String, StatusBoardDateAt As String, Department As String) As Dictionary(Of Integer, Dictionary(Of String, Object))
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
+
         Dim Res As New Dictionary(Of Integer, Dictionary(Of String, Object))
 
         Dim QueryConfig1 As New Dictionary(Of String, Dictionary(Of String, String)) From {

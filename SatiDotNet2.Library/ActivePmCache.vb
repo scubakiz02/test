@@ -21,7 +21,7 @@ Public Class ActivePmCache
             CachedDataAsDict = New Dictionary(Of Integer, Object)
         End If
 
-        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now().ToString("MM/dd/yyyy")
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
         CachedDataAsDict(DataKey) = GetLogConfig(DataKey, StatusBoardDateAt)
 
         CacheWrite("LogStateChanges", CachedDataAsDict)
