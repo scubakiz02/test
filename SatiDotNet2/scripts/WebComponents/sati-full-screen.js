@@ -1,7 +1,7 @@
 ﻿class SatiFullScreen extends HTMLElement {
-    #wheelLastActiveAt = new Date();
-    #mouseLastMovedAt = new Date();
     #inactivityIntervalMs = 60000;
+    #_isTabActive = true;
+    #lastUserActivityAt;
 
     constructor() {
         super();
@@ -11,8 +11,7 @@
     connectedCallback() {
         const self = this;
 
-        //autoScroll function calls itself every frame using requestAnimationFrame() js method. Only invoke this method once within connectedCallback()!!!
-        self.#autoScroll(10000);
+        this.#startListeningForAutoScroll();
 
         document.addEventListener("keydown", function (event) {
             //F11 keydown is tracked across Chrome, Edge, and FireFox only when entering full screen mode (not true when exiting full screen mode)
@@ -24,22 +23,32 @@
                 //start automated scroll right away (modify logic to make isAutoScrollTime() function return true)
                 const now = new Date();
                 const nowMinus60s = new Date(now.getTime() - self.#inactivityIntervalMs);
-                self.#wheelLastActiveAt = nowMinus60s;
-                self.#mouseLastMovedAt = nowMinus60s;
+                self.#lastUserActivityAt = nowMinus60s;
 
                 //remove sati layout
                 self.#setSatiLayoutVisibility();
             }
         })
 
-        document.addEventListener("wheel", function (event) {
-            //this event listener fires when the scrollwheel has been used
-            self.#wheelLastActiveAt = new Date();
-        })
+        document.addEventListener("wheel", (event) => this.#userActivity(event)); //wheel event listener is for laptops/desktops
+        document.addEventListener("mousemove", (event) => this.#userActivity(event)); //mousemove event listener is for laptops/desktops
+        document.addEventListener("touchmove", (event) => this.#userActivity(event)); //touchmove event listener is for touchscreen devices
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+                self.#_isTabActive = true;
 
-        document.addEventListener("mousemove", function (event) {
-            self.#mouseLastMovedAt = new Date();
-        })
+                //when user exits tab, auto scroll function is killed (return is executed)
+                self.#startListeningForAutoScroll();
+            }
+            else {
+                self.#_isTabActive = false;
+            }
+        });
+    }
+
+    #userActivity() {
+        //disable auto scroll by resetting date var and programmatically scroll to top (if auto scroll was enabled)
+        this.#lastUserActivityAt = new Date();
     }
 
     #setSatiLayoutVisibility() {
@@ -84,19 +93,24 @@
 
     #isAutoScrollTime() {
         const now = new Date();
-        const wheellDiffMs = Math.abs(now - this.#wheelLastActiveAt);
-        const mousemoveDiffMs = Math.abs(now - this.#mouseLastMovedAt);
+        const activityDiffMs = Math.abs(now - this.#lastUserActivityAt);
 
         //make sure scroll wheel or cursor has not been used within the last inactivity interval
-        if (wheellDiffMs > this.#inactivityIntervalMs && mousemoveDiffMs > this.#inactivityIntervalMs) return true;
+        if (activityDiffMs > this.#inactivityIntervalMs) return true;
         return false;
+    }
+
+    #startListeningForAutoScroll() {
+        //prep environment, then invoke listenForAutoScroll function
+        this.#lastUserActivityAt = new Date();
+        this.#listenForAutoScroll(10000); //arg 1 indicates time (in milliseconds) to scroll from top to bottom of page
     }
 
     //NOTES:
     //1) performance.now() returns the time (in milliseconds) since the page started loading
     //2) requestAnimationFrame() schedules the callback to run just before the browser's next repaint cycle, typically matching the display's refresh rate (e.g., 60Hz, 120Hz). 
     //This ensures animations are rendered efficiently and without tearing.
-    #autoScroll(durationMs) {
+    #listenForAutoScroll(durationMs) {
         const self = this;
         let direction = 1; // 1 = down, -1 = up
         let start = performance.now();
@@ -106,6 +120,8 @@
             const progress = Math.min(elapsed / durationMs, 1);
             let startScroll = 0;
             let endScroll = document.documentElement.scrollHeight - window.innerHeight;
+
+            if (!self.#_isTabActive) return;
 
             if (self.#isAutoScrollTime()) {
                 // Determine the current position based on direction
