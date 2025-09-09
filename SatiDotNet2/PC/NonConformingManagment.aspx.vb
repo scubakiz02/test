@@ -21,7 +21,7 @@ Partial Class PC_NonConformingManagment
 
     Sub SolarType(ByVal SelectedID As String, ByVal What As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -86,7 +86,7 @@ Partial Class PC_NonConformingManagment
 
     Sub IDInfo(ByVal SelectedID As String, ByVal PackID As String, ByVal What As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -151,7 +151,7 @@ Partial Class PC_NonConformingManagment
     Sub LoadAvalibleIds(ByVal SelectedID As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -202,7 +202,7 @@ Partial Class PC_NonConformingManagment
 
     Sub CheckBelong(ByVal SelectedID As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet

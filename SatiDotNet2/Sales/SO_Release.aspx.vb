@@ -44,7 +44,7 @@ Partial Class Sales_SO_Release
     Sub Remove(TheMainID As String, SO As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

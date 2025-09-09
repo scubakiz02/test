@@ -1,6 +1,6 @@
 <%@ Application Language="VB" %>
 
-<script runat="server">
+<script RunAt="server">
 
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         ' Code that runs on application startup
@@ -47,17 +47,6 @@
         Session.Add("MakeLotPart1", "~/PC/MakeFirstPassLot.aspx")
         Session.Add("BackTo", "Home.aspx")
         Session.Add("SRN", "~/PC/SRN.aspx")
-
-        'DataBases
-        Session.Add("DBConnect", "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser")
-        Session.Add("AutoDataDBConnection", "Data Source=PWI-31\SATIDB;Initial Catalog=AutoData;Persist Security Info=True;User ID=exsil_user;Password=exsiluser")
-
-        Session.Add("SatiDB", "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=Sati;Password=SatiNet")
-        Session.Add("SatiDB_AD", "Data Source=PWI-31\SATIDB;Initial Catalog=AutoData;Persist Security Info=True;User ID=Sati;Password=SatiNet")
-
-        Session.Add("SATI_SPC_DB", "Data Source=PWI-31\SATIDB;Initial Catalog=SATI_SPC;Persist Security Info=True;User ID=exsil_user;Password=exsiluser")
-
-
 
         'Servers & Directorys        
         Session.Add("EmailServerIP", "PWI-2010R")

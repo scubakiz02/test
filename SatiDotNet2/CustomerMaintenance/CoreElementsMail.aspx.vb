@@ -97,7 +97,7 @@ Partial Class DBMaintenance_CoreElementsMail
             End If
         End If
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_AddFab As New Data.SqlClient.SqlDataAdapter
@@ -275,7 +275,7 @@ Partial Class DBMaintenance_CoreElementsMail
 
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         'MainID Table
@@ -502,7 +502,7 @@ Partial Class DBMaintenance_CoreElementsMail
 
 
             Dim Connection As New Data.SqlClient.SqlConnection
-            Connection.ConnectionString = Session("DBConnect")
+            Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
             Connection.Open()
 
             'MainID Table
@@ -553,7 +553,7 @@ Partial Class DBMaintenance_CoreElementsMail
         Me.AddressShippingEditButton.Text = "New"
         Me.AddressBillingEditButton.Text = "New"
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_AddressGet As New Data.SqlClient.SqlDataAdapter
         Dim DS_AddressGet As New Data.DataSet
@@ -699,7 +699,7 @@ Partial Class DBMaintenance_CoreElementsMail
         End Select
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Address As New Data.SqlClient.SqlDataAdapter

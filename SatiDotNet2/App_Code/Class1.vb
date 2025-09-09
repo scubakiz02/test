@@ -39,7 +39,7 @@ Public Class Class1
         '5-12 = Instance number, Padding 0's on left
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -511,7 +511,7 @@ Public Class Class1
 
     Function PendingShipmentAdd(ByVal action As String, ByVal PickTicket As String, ByVal Note As String, ByVal Op As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -618,7 +618,7 @@ Public Class Class1
         ' looks like the other function that deals with this table is "Pick_Shipping_UnitTable". used when shipments are made.
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -689,7 +689,7 @@ Public Class Class1
     Function Mod_Shipping_Log(ByVal action As String, ByVal PickTicket As String, ByVal NewValue As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -761,7 +761,7 @@ Public Class Class1
 
     Sub Tools(ByVal Action As String, ByVal ToolName As String, ByVal Deparment As String, ByVal ToolID As String, ByVal OnlineDate As DateTime)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Tool As New Data.SqlClient.SqlDataAdapter
@@ -813,7 +813,7 @@ Public Class Class1
 
     Sub Deparments(ByVal Action As String, ByVal Department As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Dept As New Data.SqlClient.SqlDataAdapter
@@ -861,7 +861,7 @@ Public Class Class1
 
     Sub ChangeSalesSchedule(ByVal Entry As String, ByVal TheColume As String, ByVal Data As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_SS As New Data.SqlClient.SqlDataAdapter
@@ -898,7 +898,7 @@ Public Class Class1
     Sub ModPickLog(ByVal Action As String, ByVal PickTicket As String, ByVal SO As String, ByVal SEQ As Int16, ByVal Qty As String, ByVal TheDate As DateTime)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_PL As New Data.SqlClient.SqlDataAdapter
@@ -971,7 +971,7 @@ Public Class Class1
     ByVal ContainmentQty As String, ByVal Notes As String, ByVal InvType As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_RI As New Data.SqlClient.SqlDataAdapter
@@ -1042,7 +1042,7 @@ Public Class Class1
     Function GetIDSpec(ByVal ID As String) As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_Spec As New Data.SqlClient.SqlDataAdapter
         Dim DS_Spec As New Data.DataSet
@@ -1061,7 +1061,7 @@ Public Class Class1
     Function GetCustomerName(ByVal ID As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -1087,7 +1087,7 @@ Public Class Class1
     Function GetCustomerFAB(ByVal ID As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -1113,7 +1113,7 @@ Public Class Class1
     Function GetCustomerID(ByVal ID As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -1140,7 +1140,7 @@ Public Class Class1
         Dim last As Int16
         Dim pad As Int16 = 2
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_PT As New Data.SqlClient.SqlDataAdapter
         Dim DS_PT As New Data.DataSet
@@ -1166,7 +1166,7 @@ Public Class Class1
     Function GetSpec(ByVal SpecNumber As String) As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_Spec As New Data.SqlClient.SqlDataAdapter
         Dim DS_Spec As New Data.DataSet
@@ -1186,7 +1186,7 @@ Public Class Class1
 
     Function GetSpecForCofA(ByVal SpecNumber As String) As Data.DataRow
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_Spec As New Data.SqlClient.SqlDataAdapter
         Dim DS_Spec As New Data.DataSet
@@ -1258,7 +1258,7 @@ Public Class Class1
 
     Function GetCartonMetals(ByVal Carton As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_Metals As New Data.SqlClient.SqlDataAdapter
         Dim DS_Metals As New Data.DataSet
@@ -1278,7 +1278,7 @@ Public Class Class1
         'SELECT dbo.ShippingInventory.Carton_Key, SUM(dbo.ShippingInventory.Total_Qty) AS Qty, dbo.LabelsMade.Lot FROM dbo.ShippingInventory INNER JOIN dbo.LabelsMade ON dbo.ShippingInventory.LotEntry = dbo.LabelsMade.LabelRecordNumber GROUP BY dbo.LabelsMade.Lot, dbo.ShippingInventory.Carton_Key HAVING (dbo.ShippingInventory.Carton_Key = 319149)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim LotNumber As String = ""
         'Find LotNumber for the Carton Number
@@ -1313,7 +1313,7 @@ Public Class Class1
 
     Function GetCarton300mmMetals(ByVal InstanceNumber As String) As Data.DataSet 'normal 300mm make CofA pulls here
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim LotNumber As String = ""
         'Find LotNumber for the Instance Number
@@ -1349,7 +1349,7 @@ Public Class Class1
 
     Function Get300Metals(ByVal InstanceNumber As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_Metals As New Data.SqlClient.SqlDataAdapter
         Dim DS_Metals As New Data.DataSet
@@ -1367,7 +1367,7 @@ Public Class Class1
     Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -1772,7 +1772,7 @@ Public Class Class1
     'Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
 
     '    Dim Connection As New Data.SqlClient.SqlConnection
-    '    Connection.ConnectionString = Session("DBConnect")
+    '    Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
     '    Connection.Open()
 
     '    Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -1908,7 +1908,7 @@ Public Class Class1
     Function Data_Enlightenment_Camp(BoxType As String, Box As String, Info As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -2534,7 +2534,7 @@ Public Class Class1
     Function GetCofAData(ByVal CartonString As String, ByVal T7s As Boolean, ByVal Customer As String) As Data.DataSet
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
         Dim DS_CofAData As New Data.DataSet
@@ -2596,7 +2596,7 @@ Public Class Class1
     Function GetCofAData_BK_2018_06_13(ByVal CartonString As String, ByVal T7s As Boolean, ByVal Customer As String) As Data.DataSet
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
         Dim DS_CofAData As New Data.DataSet
@@ -2787,7 +2787,7 @@ Public Class Class1
     Function GetCofAData______Backup(ByVal CartonString As String, ByVal T7s As Boolean) As Data.DataSet
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
         Dim DS_CofAData As New Data.DataSet
@@ -2859,7 +2859,7 @@ Public Class Class1
     Function GetCofADataSumary(ByVal CartonString As String, ByVal T7s As Boolean) As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
         Dim DS_CofAData As New Data.DataSet
@@ -2951,7 +2951,7 @@ Public Class Class1
     Function GetIDCurrentPO(ByVal ID As String) As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_PO As New Data.SqlClient.SqlDataAdapter
         Dim DS_PO As New Data.DataSet
@@ -2970,7 +2970,7 @@ Public Class Class1
     Function GetPO_bySOKey(ByVal SO_Key As String) As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_PO As New Data.SqlClient.SqlDataAdapter
         Dim DS_PO As New Data.DataSet
@@ -2989,7 +2989,7 @@ Public Class Class1
     Function Find_If_PO_On_Label(ByVal MainID As String) As Boolean
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_ID As New Data.SqlClient.SqlDataAdapter
         Dim DS_ID As New Data.DataSet
@@ -3010,7 +3010,7 @@ Public Class Class1
     Sub CopyProcessIDRecords(ByVal ProcessRecordNumber As Integer, ByVal NewID As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_PInfo As New Data.SqlClient.SqlDataAdapter
         Dim DS_PInfo As New Data.DataSet
@@ -3047,7 +3047,7 @@ Public Class Class1
     Function IDForSP1Reciver(ByVal MainID As String, ByVal RecevierStation As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_PInfoID As New Data.SqlClient.SqlDataAdapter
@@ -3084,7 +3084,7 @@ Public Class Class1
     Function GetLabelTemplateForID(ByVal MainID As String, ByVal TemplateType As String, ByVal StageName As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Template As New Data.SqlClient.SqlDataAdapter
@@ -3123,7 +3123,7 @@ Public Class Class1
         WBLabel = Mid(WBLabel, 3)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_OldWBInfo As New Data.SqlClient.SqlDataAdapter
@@ -3182,7 +3182,7 @@ Public Class Class1
         WBLabel = Mid(WBLabel, 2)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_OldWBInfo As New Data.SqlClient.SqlDataAdapter
@@ -3222,7 +3222,7 @@ Public Class Class1
     Function IS_RFID_Enable(ByVal TheID As String) As Boolean
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_ID As New Data.SqlClient.SqlDataAdapter
         Dim DS_ID As New Data.DataSet
@@ -3974,7 +3974,7 @@ Public Class Class1
     Function RecordLabelsMadeTable(ByVal Lot As String, ByVal WaferQty As Integer, ByVal Count As Integer, ByVal Spec_Record As Integer, ByVal SO_Record As Integer, ByVal RFID As String, ByVal SatiUser As String, ByVal LBN As Integer) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_LabelRecord As New Data.SqlClient.SqlDataAdapter
         Dim DS_LabelRecord As New Data.DataSet
@@ -4087,7 +4087,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_LabelsSpec As New Data.SqlClient.SqlDataAdapter
@@ -6235,7 +6235,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         'SELECT dbo.T_FGI_Cartons.CartonNumber, dbo.LabelsMade.Lot, dbo.LabelsMade.RecordNumber, dbo.LabelsMade.SO_Key, dbo.LabelsMade.Wafers, dbo.T_FGI_Boxes.BoxInvNumber, dbo.T_FGI_Boxes.InstanceKey FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey INNER JOIN dbo.T_FGI_Cartons ON dbo.T_FGI_Boxes.CartonNumber = dbo.T_FGI_Cartons.CartonNumber WHERE (dbo.T_FGI_Cartons.CartonNumber = 6) OR (dbo.T_FGI_Cartons.CartonNumber = 10)
@@ -8456,7 +8456,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         'SELECT dbo.T_FGI_Cartons.CartonNumber, dbo.LabelsMade.Lot, dbo.LabelsMade.RecordNumber, dbo.LabelsMade.SO_Key, dbo.LabelsMade.Wafers, dbo.T_FGI_Boxes.BoxInvNumber, dbo.T_FGI_Boxes.InstanceKey FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey INNER JOIN dbo.T_FGI_Cartons ON dbo.T_FGI_Boxes.CartonNumber = dbo.T_FGI_Cartons.CartonNumber WHERE (dbo.T_FGI_Cartons.CartonNumber = 6) OR (dbo.T_FGI_Cartons.CartonNumber = 10)
@@ -11112,7 +11112,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_LabelsSpec As New Data.SqlClient.SqlDataAdapter
@@ -20724,7 +20724,7 @@ Public Class Class1
     Function CofALotMetals(ByVal lotnumber As String) As Data.DataRow ' In LotNumber as string
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Metals As New Data.SqlClient.SqlDataAdapter
@@ -21150,7 +21150,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         'SELECT dbo.T_FGI_Cartons.CartonNumber, dbo.LabelsMade.Lot, dbo.LabelsMade.RecordNumber, dbo.LabelsMade.SO_Key, dbo.LabelsMade.Wafers, dbo.T_FGI_Boxes.BoxInvNumber, dbo.T_FGI_Boxes.InstanceKey FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey INNER JOIN dbo.T_FGI_Cartons ON dbo.T_FGI_Boxes.CartonNumber = dbo.T_FGI_Cartons.CartonNumber WHERE (dbo.T_FGI_Cartons.CartonNumber = 6) OR (dbo.T_FGI_Cartons.CartonNumber = 10)
 
@@ -21333,7 +21333,7 @@ Public Class Class1
 
     Function GetWaferBoxNumberFromCardBoardBoxNumber(ByVal CB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -21358,7 +21358,7 @@ Public Class Class1
 
     Function GetCartonBoxNumberFromWaferBoardBoxNumber(ByVal WB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -21815,7 +21815,7 @@ Public Class Class1
         WaferBoxIDsCopy = WaferBoxIDs
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         'SELECT dbo.T_FGI_Boxes.BoxInvNumber, dbo.LabelsMade.Lot, dbo.LabelsMade.RecordNumber, dbo.LabelsMade.SO_Key, dbo.LabelsMade.Wafers FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey WHERE (dbo.T_FGI_Boxes.BoxInvNumber = 72 OR dbo.T_FGI_Boxes.BoxInvNumber = 71)
 
@@ -22084,7 +22084,7 @@ Public Class Class1
         WaferBoxIDsCopy = WaferBoxIDs
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         'SELECT dbo.T_FGI_Boxes.BoxInvNumber, dbo.LabelsMade.Lot, dbo.LabelsMade.RecordNumber, dbo.LabelsMade.SO_Key, dbo.LabelsMade.Wafers FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey WHERE (dbo.T_FGI_Boxes.BoxInvNumber = 72 OR dbo.T_FGI_Boxes.BoxInvNumber = 71)
 
@@ -22311,7 +22311,7 @@ Public Class Class1
 
     Function Add_T_Bulk_Final_QA_Lots(Lot As String, TheUser As String, Notes As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -22367,7 +22367,7 @@ Public Class Class1
     Function BoxTableMod(ByVal New_ModCarton As String, ByVal BoxInvNumber_ZeroForNew As Integer, ByVal CartonKey_ForMod As Integer, ByVal PreFix As String, ByVal IKey As Integer, ByVal LabelsMadeKey As Integer) As Integer
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_FGI_Box As New Data.SqlClient.SqlDataAdapter
@@ -22469,7 +22469,7 @@ Public Class Class1
 
     Function GetNewCartonNumber() As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Carton As New Data.SqlClient.SqlDataAdapter
@@ -22495,7 +22495,7 @@ Public Class Class1
 
     Function ShippingInvTable(ByVal Def As String, ByVal Carton_Key As String, ByVal LotEntry As String, ByVal Total_Qty As String, ByVal PickTicket As String, ByVal Confirmed As String, ByVal SatiUser As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Carton As New Data.SqlClient.SqlDataAdapter
@@ -22609,7 +22609,7 @@ Public Class Class1
 
     Function CartonTableMod(ByVal New_AddShip_RemoveShip_AddVerify_RemoveVerify As String, ByVal RecordNumber_ZeroForNew As Integer, ByVal IfShipNumber As Integer) As Integer
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Carton As New Data.SqlClient.SqlDataAdapter
@@ -22702,7 +22702,7 @@ Public Class Class1
 
     Function ShipmentTableMod(ByVal New_AddVerify_RemoveVerify As String, ByVal RecordNumber_ZeroForNew As Integer) As Integer
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Shipment As New Data.SqlClient.SqlDataAdapter
@@ -23357,7 +23357,7 @@ Public Class Class1
 
     Function GetAddress(ByVal TypeShippingORBilling As String, ByVal TheID As String, ByVal OrAddressKey As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA_AddressGet As New Data.SqlClient.SqlDataAdapter
         Dim DS_AddressGet As New Data.DataSet
@@ -23400,7 +23400,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_LabelsSpec As New Data.SqlClient.SqlDataAdapter
@@ -23626,7 +23626,7 @@ Public Class Class1
 
         'Make sure all the cartons are the same ID, Spec, PO
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_LabelsSpec As New Data.SqlClient.SqlDataAdapter
@@ -23869,7 +23869,7 @@ Public Class Class1
 
     Function Shipping_LogTable(ByVal Carrier As String, ByVal Account As String, ByVal Frieght As String, ByVal User As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Ship As New Data.SqlClient.SqlDataAdapter
@@ -23935,7 +23935,7 @@ Public Class Class1
 
     Function Shipping_UnitTable(ByVal ShipID As String, ByVal User As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Ship As New Data.SqlClient.SqlDataAdapter
@@ -24001,7 +24001,7 @@ Public Class Class1
 
     Function Pick_Shipping_UnitTable(ByVal PickTicket As String, ByVal PalletKey As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_Ship As New Data.SqlClient.SqlDataAdapter
@@ -24072,7 +24072,7 @@ Public Class Class1
     ByVal Carrier As String, ByVal Note As String, ByVal ContainmentUnit As String, ByVal ContainmentQty As String, ByVal SatiUser As String) As String
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_WH As New Data.SqlClient.SqlDataAdapter
@@ -24151,7 +24151,7 @@ Public Class Class1
     Function MaintenanceRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer, ByVal Status As String) As String
         MaintenanceRequestTicket = 0
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_MRTicket As New Data.SqlClient.SqlDataAdapter
@@ -24305,7 +24305,7 @@ Public Class Class1
     Sub MaintenanceRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_MRNote As New Data.SqlClient.SqlDataAdapter
@@ -24363,7 +24363,7 @@ Public Class Class1
     Function ScheduledMaintenanceRequestTicket(ByVal Action As String, ByVal Ticket As String, ByVal Tool As Integer) As String
         ScheduledMaintenanceRequestTicket = 0
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_SMRTicket As New Data.SqlClient.SqlDataAdapter
@@ -24519,7 +24519,7 @@ Public Class Class1
     Sub ScheduledMaintenanceRequestNote(ByVal Ticket As String, ByVal NoteType As String, ByVal Note As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_SMRNote As New Data.SqlClient.SqlDataAdapter
@@ -24661,7 +24661,7 @@ Public Class Class1
 
     Function ModWafermover(ByVal LotNumber As String, ByVal Stage As String, Order As Integer, InQty As Integer, OutQty As Integer) As Int64
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -24761,7 +24761,7 @@ Public Class Class1
 
     Sub ModDefectTracking(Action As String, ByVal MR As Integer, ByVal Name As String, Location As Integer, Qty As Integer)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -24850,7 +24850,7 @@ Public Class Class1
 
     Sub ModUniqueProcess(ByVal LotNumber As String, ByVal Stage As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -25236,7 +25236,7 @@ Public Class Class1
 
     Function CB_CheckAndFix_Geo_BK(ByVal CB As String) As Int16
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -25324,7 +25324,7 @@ Public Class Class1
 
     Function CB_CheckAndFix_Geo(ByVal CB As String) As Int16
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -25462,7 +25462,7 @@ Public Class Class1
 
     Function CBFullDataRecordCheck(ByVal CB As String, ByVal Action As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         CBFullDataRecordCheck = "No Problems"
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -25566,7 +25566,7 @@ Public Class Class1
 
     Sub EditPreDataThick(ByVal Wat As Integer, ByVal PreKey As Integer, ByVal PostKey As Integer, ByVal Val As Double)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim MyNull As Object
         MyNull = System.DBNull.Value
@@ -25671,7 +25671,7 @@ Public Class Class1
     Sub UpdateSPxTool(ByVal Tool As String)
 
         Dim AutoDataConnection As New Data.SqlClient.SqlConnection
-        AutoDataConnection.ConnectionString = Session("AutoDataDBConnection")
+        AutoDataConnection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         AutoDataConnection.Open()
 
         Select Case Tool
@@ -25935,7 +25935,7 @@ Public Class Class1
 
     Function GetScribes(ByVal InstanceID As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26036,7 +26036,7 @@ Public Class Class1
 
     Function GetInstanceSeqRecords(ByVal Scaned As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26059,7 +26059,7 @@ Public Class Class1
     Sub DeleteMyAltsRecords(DeleteSQL As String)
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         With MySQLCommand
             .CommandText = DeleteSQL
@@ -26072,7 +26072,7 @@ Public Class Class1
     Function GetSchema(ByVal TableName As String) As Data.DataTable
         'include System.Data Namespace to any file that uses this function (Imports System.Data)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim SelectCmd As New System.Data.SqlClient.SqlCommand
@@ -26097,7 +26097,7 @@ Public Class Class1
 
     Function GetMyDataSet(ByVal SQLString As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26118,7 +26118,7 @@ Public Class Class1
 
     Function GetMyDataSetAutoData(ByVal SQLString As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("AutoDataDBConnection")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26139,7 +26139,7 @@ Public Class Class1
 
     Function GetMyDataSetSPCData(ByVal SQLString As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("SATI_SPC_DB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SATI_SPCConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26160,7 +26160,7 @@ Public Class Class1
 
     Function CrossFabShip(ByVal MainID As String) As Boolean
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26192,7 +26192,7 @@ Public Class Class1
 
     Function CurrentSpec(ByVal MainID As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26234,7 +26234,7 @@ Public Class Class1
 
     Function CurrentPath(ByVal MainID As String, ByVal Type_MAIN_CMP_DSP_SE_LAP_POLISH As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26292,7 +26292,7 @@ Public Class Class1
 
     Sub SetNewPath(ByVal MainID As String, ByVal Type_MAIN_CMP_DSP_SE_LAP_POLISH As String, ByVal PathName As String, ByVal TheUser As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim MyNull As Object
         MyNull = System.DBNull.Value
@@ -26426,7 +26426,7 @@ Public Class Class1
     Sub UpdateAddressTable(ByVal MainID As String, ByVal Ship_or_Bill As String, ByVal ShipKey As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26496,7 +26496,7 @@ Public Class Class1
 
     Function AddAddressLineFive(ByVal Fab As String, ByVal Line1 As String, ByVal line2 As String, ByVal line3 As String, ByVal line4 As String, ByVal line5 As String, ByVal TheUser As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -26565,7 +26565,7 @@ Public Class Class1
               ByVal EndDate As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         '***********************************************************
@@ -27789,7 +27789,7 @@ Public Class Class1
 
     Sub Record_Diameter(TheT7 As String, Diameter As Double)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=ALTS;Persist Security Info=True;User ID=exsil_user;Password=exsiluser"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

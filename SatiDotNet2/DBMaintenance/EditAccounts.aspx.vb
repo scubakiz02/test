@@ -105,7 +105,7 @@ Partial Class DBMaintenance_EditRoles
         'SELECT UserId, RoleId FROM aspnet_UsersInRoles WHERE (UserId LIKE '0')
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=SatiUsers;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SatiUsersConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter
@@ -227,7 +227,7 @@ Partial Class DBMaintenance_EditRoles
     Sub LockUser(ByVal Action As String, DropDownList As DropDownList)
         'SELECT UserId, RoleId FROM aspnet_UsersInRoles WHERE (UserId LIKE '0')
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = "Data Source=PWI-31\SATIDB;Initial Catalog=SatiUsers;Persist Security Info=True;User ID=sati;Password=laptopia"
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SatiUsersConnectionString").ConnectionString
         Connection.Open()
 
         Dim My_DA As New Data.SqlClient.SqlDataAdapter

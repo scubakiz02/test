@@ -166,7 +166,7 @@ Partial Class MR_MR_Group_List_Managment
     Sub ModGroup(ByVal GroupName As String, ByVal Action_Add_Remove_Update As String)
         Dim ItemCount As Integer = 0
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

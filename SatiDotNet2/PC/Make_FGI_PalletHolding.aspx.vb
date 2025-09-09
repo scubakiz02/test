@@ -62,7 +62,7 @@ Partial Class PC_Make_FGI_PalletHolding
     Function Get_PH_Number(TheUserName As String, CartonType As String) As Integer
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -131,7 +131,7 @@ Partial Class PC_Make_FGI_PalletHolding
 
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim MyDS As New Data.DataSet

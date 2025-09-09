@@ -43,7 +43,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT LotEntry, ProcessOrder, StageName, Complete FROM dbo.UniqueProcesses WHERE (LotEntry = N'" & Session("LotNumber").ToString & "') ORDER BY ProcessOrder"
 
         MyAdapter.SelectCommand = SQL
@@ -134,7 +134,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT LotEntry, ProcessOrder, StageName FROM dbo.UniqueProcesses WHERE (LotEntry = N'" & Lot & "')"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection
@@ -172,7 +172,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT dbo.WaferMover.LotEntry, dbo.UniqueProcesses.ProcessOrder, dbo.UniqueProcesses.StageName, SUM(dbo.WaferMover.InQty) AS IQ, SUM(dbo.WaferMover.OutQty) AS OQ FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder GROUP BY dbo.WaferMover.LotEntry, dbo.UniqueProcesses.ProcessOrder, dbo.UniqueProcesses.StageName HAVING (dbo.WaferMover.LotEntry = N'" & Lot & "')"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection
@@ -208,7 +208,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT SUM(Qty) AS SplitQty FROM dbo.ActionTracker WHERE (ParentLotNum = N'" & Lot & "') AND (Action LIKE N'split%') AND (P_Order < " & CStep + 1 & " AND P_Order > " & PreStep & ")"
         'SELECT SUM(Qty) AS SplitQty FROM dbo.ActionTracker WHERE (ParentLotNum = N'1713-6496-3069') AND (Action LIKE N'split%') AND (P_Order < 7) AND (P_Order > 2)
         MyAdapter.SelectCommand = SQL
@@ -239,7 +239,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT SUM(Qty) AS SplitQty FROM dbo.ActionTracker WHERE (ParentLotNum = N'" & Lot & "') AND (Action LIKE N'Merge%') AND (P_Order < " & CStep + 1 & ") AND (P_Order > " & PreStep & ")"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection
@@ -271,7 +271,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         'SQL.CommandText = "SELECT SUM(dbo.DefectTracking.Qty) AS RejectQty FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder INNER JOIN dbo.DefectTracking ON dbo.WaferMover.MovementEntry = dbo.DefectTracking.MovementEntry WHERE (dbo.DefectTracking.Location = '-1' OR dbo.DefectTracking.Location = '-2') AND (dbo.UniqueProcesses.ProcessOrder > " & PreStep & ") AND (dbo.UniqueProcesses.ProcessOrder < " & CStep + 1 & ") GROUP BY dbo.UniqueProcesses.LotEntry, dbo.UniqueProcesses.StageName HAVING (dbo.UniqueProcesses.LotEntry = N'" & Lot & "') AND (NOT (SUM(dbo.DefectTracking.Qty) = 0))"
         SQL.CommandText = "SELECT SUM(dbo.DefectTracking.Qty) AS RejectQty FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder INNER JOIN dbo.DefectTracking ON dbo.WaferMover.MovementEntry = dbo.DefectTracking.MovementEntry WHERE (dbo.DefectTracking.Location = '-1' OR dbo.DefectTracking.Location = '-2') AND (dbo.UniqueProcesses.ProcessOrder > " & PreStep & ") AND (dbo.UniqueProcesses.ProcessOrder < " & CStep + 1 & ") GROUP BY dbo.UniqueProcesses.LotEntry HAVING (dbo.UniqueProcesses.LotEntry = N'" & Lot & "') AND (NOT (SUM(dbo.DefectTracking.Qty) = 0))"
         MyAdapter.SelectCommand = SQL
@@ -305,7 +305,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         'SQL.CommandText = "SELECT SUM(dbo.DefectTracking.Qty) AS ReworkQty FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder INNER JOIN dbo.DefectTracking ON dbo.WaferMover.MovementEntry = dbo.DefectTracking.MovementEntry WHERE (dbo.DefectTracking.Location < - 2) AND (dbo.UniqueProcesses.ProcessOrder > " & PreStep & ") AND (dbo.UniqueProcesses.ProcessOrder < " & CStep & ") GROUP BY dbo.UniqueProcesses.LotEntry, dbo.UniqueProcesses.StageName HAVING (dbo.UniqueProcesses.LotEntry = N'" & Lot & "') AND (NOT (SUM(dbo.DefectTracking.Qty) = 0))"
         SQL.CommandText = "SELECT SUM(dbo.DefectTracking.Qty) AS ReworkQty FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder INNER JOIN dbo.DefectTracking ON dbo.WaferMover.MovementEntry = dbo.DefectTracking.MovementEntry WHERE (dbo.DefectTracking.Location < - 2) AND (dbo.UniqueProcesses.ProcessOrder > " & PreStep & ") AND (dbo.UniqueProcesses.ProcessOrder < " & CStep & ") GROUP BY dbo.UniqueProcesses.LotEntry HAVING (dbo.UniqueProcesses.LotEntry = N'" & Lot & "') AND (NOT (SUM(dbo.DefectTracking.Qty) = 0))"
         MyAdapter.SelectCommand = SQL
@@ -340,7 +340,7 @@ Partial Class PC_CheckPoint
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT SUM(dbo.DefectTracking.Qty) AS ReworkQty, dbo.DefectTracking.Location FROM dbo.WaferMover INNER JOIN dbo.UniqueProcesses ON dbo.WaferMover.LotEntry = dbo.UniqueProcesses.LotEntry AND dbo.WaferMover.[Order] = dbo.UniqueProcesses.ProcessOrder INNER JOIN dbo.DefectTracking ON dbo.WaferMover.MovementEntry = dbo.DefectTracking.MovementEntry WHERE (dbo.DefectTracking.Location < - 2) AND (dbo.UniqueProcesses.ProcessOrder > " & Session("PreStep").ToString & ") AND (dbo.UniqueProcesses.ProcessOrder < " & CStep & ") GROUP BY dbo.UniqueProcesses.LotEntry, dbo.DefectTracking.Location HAVING (NOT (SUM(dbo.DefectTracking.Qty) = 0)) AND (dbo.UniqueProcesses.LotEntry = N'" & Lot & "')"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection

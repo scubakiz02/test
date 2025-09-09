@@ -8,7 +8,7 @@ Partial Class TestArea_NewDBtest
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQLString As String = "SELECT ChildLotNum, ParentLotNum, C_Order, P_Order, Qty, Action, Action_Key, Operator, EventTime, Error FROM dbo.ActionTracker WHERE (EventTime < CONVERT(DATETIME, '2012-02-02 00:00:00', 102))"
 
-        Connection.ConnectionString = Session("SatiDB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

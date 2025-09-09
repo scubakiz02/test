@@ -65,7 +65,7 @@ Partial Class Production_SelectedLotStageToWork
             Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
             Dim Connection As New Data.SqlClient.SqlConnection
             Dim SQL As New Data.SqlClient.SqlCommand
-            Connection.ConnectionString = Session("DBConnect")
+            Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
             SQL.CommandText = "SELECT MovementEntry AS MR FROM dbo.WaferMover WHERE (LotEntry = N'" & Session("LotNumber").ToString & "') AND ([Order] = " & Session("Step").ToString & ") AND (InQty = 0) AND (OutQty = " & Qty & ") AND (LotStatus = N'Log') ORDER BY MovementEntry DESC"
             MyAdapter.SelectCommand = SQL
             MyAdapter.SelectCommand.Connection = Connection
@@ -224,7 +224,7 @@ Partial Class Production_SelectedLotStageToWork
                 Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
                 Dim Connection As New Data.SqlClient.SqlConnection
                 Dim SQL As New Data.SqlClient.SqlCommand
-                Connection.ConnectionString = Session("DBConnect")
+                Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
                 SQL.CommandText = "SELECT LotEntry, ProcessOrder, StageName FROM dbo.UniqueProcesses WHERE (LotEntry = N'" & Session("LotNumber").ToString & "')"
                 MyAdapter.SelectCommand = SQL
                 MyAdapter.SelectCommand.Connection = Connection
@@ -506,7 +506,7 @@ Partial Class Production_SelectedLotStageToWork
             Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
             Dim Connection As New Data.SqlClient.SqlConnection
             Dim SQL As New Data.SqlClient.SqlCommand
-            Connection.ConnectionString = Session("DBConnect")
+            Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
             SQL.CommandText = "SELECT SUM(InQty) AS [In], SUM(OutQty) AS Out, SUM(InQty) - SUM(OutQty) AS [left] FROM dbo.WaferMover GROUP BY LotEntry, [Order] HAVING (LotEntry = N'" & Session("LotNumber").ToString & "') AND ([Order] = " & Session("Step").ToString & ")"
             MyAdapter.SelectCommand = SQL
             MyAdapter.SelectCommand.Connection = Connection

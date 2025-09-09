@@ -15,7 +15,7 @@ Partial Class MR_OpenTicketStatusBoard
     Sub ExecuteSqlQuery(SqlQuery As String)
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim MySQLCommand As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         With MySQLCommand
             .CommandText = SqlQuery

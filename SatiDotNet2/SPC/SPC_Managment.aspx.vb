@@ -28,7 +28,7 @@ Partial Class SPC_SPC_Managment
     Sub EnterTool(Tool As String, Department As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("SATI_SPC_DB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SATI_SPCConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -77,7 +77,7 @@ Partial Class SPC_SPC_Managment
 
     Sub Enter_Parameter(tool As Int16, seq As Int16)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("SATI_SPC_DB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SATI_SPCConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -184,7 +184,7 @@ Partial Class SPC_SPC_Managment
 
     Sub Enter_Limit(Parameter As Int16)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("SATI_SPC_DB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SATI_SPCConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

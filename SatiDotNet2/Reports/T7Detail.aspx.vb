@@ -65,7 +65,7 @@ Partial Class Reports_T7Detail
     Sub ChangeData(ByVal T7 As String)
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet

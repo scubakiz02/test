@@ -31,11 +31,11 @@ Partial Class Production_SurfScanLabelMaker
         '********Connections*********
         '****************************
         Dim AutoDataConnection As New Data.SqlClient.SqlConnection
-        AutoDataConnection.ConnectionString = Session("AutoDataDBConnection")
+        AutoDataConnection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         AutoDataConnection.Open()
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         '*****************************

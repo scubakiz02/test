@@ -64,7 +64,7 @@ Partial Class MakeReworkLot
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT dbo.CannedPaths.ProcessOrder AS Step, dbo.CannedPaths.StageName AS Stage FROM dbo.CannedPathInfo INNER JOIN dbo.CannedPaths ON dbo.CannedPathInfo.PathName = dbo.CannedPaths.PathName WHERE (dbo.CannedPathInfo.MainID = '" & MainID & "') AND (dbo.CannedPathInfo.PathType = '" & PathType & "')"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection
@@ -136,7 +136,7 @@ Partial Class MakeReworkLot
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         SQL.CommandText = "SELECT FieldName, Value FROM dbo.DB_Characteristics WHERE (FieldName = N'RecWaferlog')"
         MyAdapter.SelectCommand = SQL
         MyAdapter.SelectCommand.Connection = Connection

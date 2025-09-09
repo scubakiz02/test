@@ -148,7 +148,7 @@ Partial Class Production_ProcessWafers
 
     Function CommentControl(ByVal LotNumber As String, ByVal What As String, ByVal Comment As String, ByVal Stage As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

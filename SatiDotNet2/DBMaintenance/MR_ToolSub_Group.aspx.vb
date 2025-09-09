@@ -40,7 +40,7 @@ Partial Class DBMaintenance_MR_ToolSub_Group
 
     Sub Add_Record(ToolID As Int16, SGN As String, Tag As String, Delete_Record_Number As Integer)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

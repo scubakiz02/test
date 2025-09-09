@@ -13,7 +13,7 @@ Partial Class PC_MakeShipment
 
     Function GetMyDataSet(ByVal SQLString As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -109,7 +109,7 @@ Partial Class PC_MakeShipment
 
     Function GetPickTicketInfo(ByVal PickTicket As String, ShippingQty As String) As Boolean
         'Dim Connection As New Data.SqlClient.SqlConnection
-        'Connection.ConnectionString = Session("DBConnect")
+        'Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         'Connection.Open()
 
         'Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -295,7 +295,7 @@ Partial Class PC_MakeShipment
 
     Function CartonAddBulk(ByVal carton As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         CartonAddBulk = ""
         'Me.ErrorInfoLabel.Visible = False
@@ -426,7 +426,7 @@ Partial Class PC_MakeShipment
 
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         CartonAdd = ""
         'Me.ErrorInfoLabel.Visible = False

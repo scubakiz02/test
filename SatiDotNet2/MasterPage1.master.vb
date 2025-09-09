@@ -16,7 +16,7 @@ Partial Class MasterPage1
 
     Function WaferBoxTOInstanceNumber(ByVal WB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -42,7 +42,7 @@ Partial Class MasterPage1
 
     Function CardBoardBoxToWaferBox(ByVal CB As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -134,7 +134,7 @@ Partial Class MasterPage1
 
     Protected Sub BuildDataSet()
         Dim connect As New Data.SqlClient.SqlConnection
-        connect.ConnectionString = Session("DBConnect")
+        connect.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Dim command As Data.SqlClient.SqlCommand
         Dim reader As Data.SqlClient.SqlDataReader
 

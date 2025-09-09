@@ -207,7 +207,7 @@ Partial Class Production_SPxT7DupeCompatibilityCheck
 
     Function GetInstance(ByVal Scaned As String) As Data.DataSet
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -229,7 +229,7 @@ Partial Class Production_SPxT7DupeCompatibilityCheck
 
     Function GetSlot(ByVal I_Number As String, ByVal I_Slot As String) As Data.DataRow
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -301,7 +301,7 @@ Partial Class Production_SPxT7DupeCompatibilityCheck
 
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("AutoDataDBConnection")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

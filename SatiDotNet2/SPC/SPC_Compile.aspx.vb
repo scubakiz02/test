@@ -386,7 +386,7 @@ Partial Class SPC_SPC_Compile
         End If
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("SATI_SPC_DB")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("SATI_SPCConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -495,7 +495,7 @@ Partial Class SPC_SPC_Compile
 
     Sub UpdateToolData(Tool As String)
         Dim AutoDataConnection As New Data.SqlClient.SqlConnection
-        AutoDataConnection.ConnectionString = Session("AutoDataDBConnection")
+        AutoDataConnection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         AutoDataConnection.Open()
 
         Select Case Tool

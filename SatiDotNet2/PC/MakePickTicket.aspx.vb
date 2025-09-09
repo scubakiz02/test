@@ -51,7 +51,7 @@ Partial Class PC_MakePickTicket
 
             'GEt Lots
             Dim Connection As New Data.SqlClient.SqlConnection
-            Connection.ConnectionString = Session("DBConnect")
+            Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
             Connection.Open()
 
             Dim DA As New Data.SqlClient.SqlDataAdapter

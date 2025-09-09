@@ -49,14 +49,14 @@ Partial Class Production_MakeSurfScanWaferBoxLabel
         Dim DR_Scribe As Data.DataRow
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Dim DA_Scribe As New Data.SqlClient.SqlDataAdapter
         Dim SelectCmd As New System.Data.SqlClient.SqlCommand
         SelectCmd.Connection = Connection
         Connection.Open()
 
         Dim AutoDataConnection As New Data.SqlClient.SqlConnection
-        AutoDataConnection.ConnectionString = Session("AutoDataDBConnection")
+        AutoDataConnection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         AutoDataConnection.Open()
 
         Me.PanelScribeCheck.Visible = True
@@ -337,11 +337,11 @@ Partial Class Production_MakeSurfScanWaferBoxLabel
         '********Connections*********
         '****************************
         Dim AutoDataConnection As New Data.SqlClient.SqlConnection
-        AutoDataConnection.ConnectionString = Session("AutoDataDBConnection")
+        AutoDataConnection.ConnectionString = ConfigurationManager.ConnectionStrings("AutoDataConnectionString").ConnectionString
         AutoDataConnection.Open()
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         '*****************************

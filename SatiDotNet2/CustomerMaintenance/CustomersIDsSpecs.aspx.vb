@@ -360,7 +360,7 @@ Partial Class CustomerMaintenance_CustomersIDsSpecs
         'MainID 
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -433,7 +433,7 @@ Partial Class CustomerMaintenance_CustomersIDsSpecs
 
     Function Record_A_Spec() As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -584,7 +584,7 @@ Partial Class CustomerMaintenance_CustomersIDsSpecs
 
     Sub ModDefects(ByVal MainID As String, ByVal Add_Clone As String, ByVal AddDefect As String, ByVal AddType As String, ByVal AddGroup As String, ByVal CloneID As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -809,7 +809,7 @@ Partial Class CustomerMaintenance_CustomersIDsSpecs
     Protected Sub Button_SaveTransferShipID_Click(sender As Object, e As EventArgs) Handles Button_SaveTransferShipID.Click
 
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

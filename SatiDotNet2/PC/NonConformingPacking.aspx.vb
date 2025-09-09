@@ -11,7 +11,7 @@ Partial Class PC_NonConformingPacking
 
     Sub Get_ID_Info(ByVal SelectedID As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet
@@ -72,7 +72,7 @@ Partial Class PC_NonConformingPacking
 
     Sub NC_Box_Add(ByVal InvNumber As Integer, ByVal Qty As Integer, ByVal User As String)
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter
@@ -119,7 +119,7 @@ Partial Class PC_NonConformingPacking
 
     Function NC_Box(ByVal What As String, ByVal Type As String, ByVal SelectedID As String, ByVal InvNumber As Integer, ByVal SpecialKey As Integer, ByVal CloseQty As String) As String
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA As New Data.SqlClient.SqlDataAdapter

@@ -43,7 +43,7 @@ Partial Class Reports_SAR_SAR_View
         Dim MyAdapter As New Data.SqlClient.SqlDataAdapter
         Dim Connection As New Data.SqlClient.SqlConnection
         Dim SQL As New Data.SqlClient.SqlCommand
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
 
         'main
         SQL.CommandText = Main_SQL

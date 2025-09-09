@@ -24,7 +24,7 @@ Partial Class Sales_EnterFuturePO
 
     Sub EnterNewSO()
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
         Dim DA As New Data.SqlClient.SqlDataAdapter
         Dim DS As New Data.DataSet

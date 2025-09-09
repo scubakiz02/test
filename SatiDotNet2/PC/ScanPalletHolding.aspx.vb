@@ -36,7 +36,7 @@ Partial Class PC_ScanPalletHolding
         Dim TheUser As String = User.Identity.Name.ToString
         Dim MyScanDate As DateTime = DateAndTime.Now
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim MyDS As New Data.DataSet

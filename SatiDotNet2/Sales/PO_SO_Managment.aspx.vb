@@ -123,7 +123,7 @@ Partial Class Sales_PO_SO_Managment
         MainID = Me.LabelMainIDforSharedID.Text
         ChildID = Me.ChildIDDropDownList.SelectedItem.Text
         Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = Session("DBConnect")
+        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
         Connection.Open()
 
         Dim DA_AddShare As New Data.SqlClient.SqlDataAdapter
