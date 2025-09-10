@@ -701,15 +701,15 @@
                     </asp:SqlDataSource>
 
                     <asp:Panel runat="server" ID="Panel1" class="flexbox Width">
-                        <span>Cluster:</span>
-                        <asp:DropDownList ID="ClusterDropDownList" CssClass="label-interface-phase-select auto-fit" runat="server"
+                        <span>Group:</span>
+                        <asp:DropDownList ID="GroupDropDownList" CssClass="label-interface-phase-select auto-fit" runat="server"
                             AppendDataBoundItems="True" AutoPostBack="True"
-                            DataSourceID="ClusterDropDownList_SqlDataSource" DataTextField="Cluster"
-                            DataValueField="Key" OnSelectedIndexChanged="ClusterDropDownList_SelectedIndexChanged">
+                            DataSourceID="GroupDropDownList_SqlDataSource" DataTextField="Group"
+                            DataValueField="Key" OnSelectedIndexChanged="GroupDropDownList_SelectedIndexChanged">
                             <asp:ListItem Text="None" Value="" />
                         </asp:DropDownList>
-                        <asp:SqlDataSource ID="ClusterDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
-                            SelectCommand="SELECT [Key], [Group] As Cluster FROM [T_LogGroup]"></asp:SqlDataSource>
+                        <asp:SqlDataSource ID="GroupDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
+                            SelectCommand="SELECT [Key], [Group] FROM [T_LogGroup]"></asp:SqlDataSource>
                     </asp:Panel>
 
                 </asp:Panel>

@@ -164,7 +164,7 @@ Partial Class MR_OpenTicketStatusBoard
                     AreaDropDownList.Items.RemoveAt(0)
                 End If
 
-                ClusterDropDownList.SelectedValue = Security.GetSingleDbField("SELECT G.[Key] AS ClusterKey FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogGroup] G ON A.GroupKey=G.[Key] WHERE A.[Key]=@AreaKey", QueryConfig, "ClusterKey")
+                GroupDropDownList.SelectedValue = Security.GetSingleDbField("SELECT G.[Key] AS GroupKey FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogGroup] G ON A.GroupKey=G.[Key] WHERE A.[Key]=@AreaKey", QueryConfig, "GroupKey")
 
                 '======== PHASE INTERFACE ==============
                 QueryConfig("@PhaseKey") = Security.GetParamVarHash(PhaseFromQs, "string")
@@ -641,7 +641,7 @@ Partial Class MR_OpenTicketStatusBoard
         RefreshPreview()
     End Sub
 
-    Protected Sub ClusterDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Protected Sub GroupDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim DdlValue As String = sender.SelectedValue
         Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@GroupKey", Security.GetParamVarHash(DdlValue, "string")},
@@ -1139,7 +1139,14 @@ Partial Class MR_OpenTicketStatusBoard
             "AND D.Date <= @StatusBoardDateAt " &
             "And D.Date > @StartDateCutoffAt " &
             "ORDER BY Date DESC", SqlConfig, "Datakey")
-        _ActivePmCache.CacheAdd(CurrentLogDataKey)
+
+        Try
+            'if there are no logs for a pm/checklist and this function is called, GetLogConfig() function throws an error
+            'that is why this try catch block exists
+            _ActivePmCache.CacheAdd(CurrentLogDataKey)
+        Catch ex As Exception
+            Exit Sub
+        End Try
     End Sub
 
     Private Sub SetPmActiveStatus(IsActive As Boolean, AreaKey As String)
