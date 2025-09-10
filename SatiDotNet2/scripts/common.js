@@ -110,16 +110,24 @@ async function httpPost(url, data) {
     }
 }
 
-// =============== HTML DOM manipulation function ==================
+// =============== HTML DOM manipulation functions ==================
 
-//traverse through all child elements and invoke callback function on them
 function iterateChildren(callback, elem) {
+    //traverse through all child elements and invoke callback function on them
     callback.call(elem);
     for (const child of elem.children) iterateChildren(callback, child);
 }
 
-//get asp control supplying standard id rather than asp conglomerated id
 function getAspControl(id) {
+    //get asp control supplying standard id rather than asp conglomerated id
     return document.querySelector('[id$="' + id + '"]');
+}
+
+function redirectClickTo(clickedElem, targetElem) {
+    //you cannot set asp.net event on Panel control
+    //as a workaround, this function sets a click event listener on an html element which programmatically clicks a second element to trigger the code-behind event
+    clickedElem.addEventListener("click", function () {
+        targetElem.click();
+    })
 }
 

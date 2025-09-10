@@ -544,10 +544,26 @@ Partial Class MR_OpenTicketStatusBoard
 
         SaveDir = "\\PWI-40\SATI_Upload_Pics$\$ChecklistReports\"
         FileName = GenerateSpreadsheetName(Session("AreasToInclude"), User.Identity.Name.ToString())
-        FlexObj.Save(SaveDir & FileName)
 
-        If SendMailCheckBox.Checked Then
-            SatiCode.SendMailWithFile("Checklist Report From " & User.Identity.Name.ToString, "SATI.Net Checklist Report", EmailUserNameTextBox.Text & "@purewafer.com", SaveDir & FileName)
+        Dim FilePath As String = SaveDir & FileName
+        FlexObj.Save(FilePath) 'save spreadsheet to shared file system
+        DownloadFileToClient(FilePath, FileName)
+    End Sub
+
+    Protected Sub DownloadFileToClient(ServerFilePath As String, DownloadFileName As String)
+        ' Example: Download a file from the server to the client
+        Dim FileInfo As New System.IO.FileInfo(ServerFilePath)
+        If FileInfo.Exists Then
+            Response.Clear()
+            Response.ContentType = "application/octet-stream"
+            Response.AddHeader("Content-Disposition", "attachment; filename=""" & DownloadFileName & """")
+            Response.AddHeader("Content-Length", FileInfo.Length.ToString())
+            Response.TransmitFile(FileInfo.FullName)
+            Response.Flush()
+            Response.End()
+        Else
+            Response.Write("File not found.")
+            Response.End()
         End If
     End Sub
 

@@ -2,6 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <script src="../scripts/WebComponents/Spinner.js"></script>
+    <script src="../scripts/common.js"></script>
     <script defer type="text/javascript">
         let StartDate_Textbox;
         let EndDate_Textbox;
@@ -31,7 +32,6 @@
             if (ReportGridView) {
                 let LargestReportGridViewHeight = sessionStorage.getItem("ReportGridView_Height") ? parseFloat(sessionStorage.getItem("ReportGridView_Height")) : 0;
 
-                debugger;
                 if (ReportGridView.offsetHeight > LargestReportGridViewHeight) {
                     LargestReportGridViewHeight = ReportGridView.offsetHeight;
                     sessionStorage.setItem("ReportGridView_Height", LargestReportGridViewHeight);
@@ -70,7 +70,12 @@
             if (ReportGridView) {
                 SetSpinAnimation.call(ReportGridView);
             }
+
+            const exportButtonContainer = document.getElementById("export-button-container");
+            const exportButton = document.getElementById('<%= ExportButton.ClientID %>');
+            redirectClickTo(exportButtonContainer, exportButton);
         })
+
 
         function CheckAllFunctionality(CheckBoxList) {
             const targetCtrl = CheckBoxList;
@@ -174,6 +179,14 @@
             modal.classList.remove('active')
             overlay.classList.remove('active')
             return false; //prevent postback
+        }
+
+        function spinOnExport() {
+            WebpageSpinner.displaySpin();
+
+            setTimeout(function () {
+                WebpageSpinner.hideSpin();
+            }, 3000);
         }
     </script>
     <style>
@@ -313,8 +326,30 @@
         }
 
         #label-modal-order-by-functionality {
-            display: flex; 
+            display: flex;
             align-items: center;
+        }
+
+        /* =========== export-button-container =============== */
+        #export-button-container {
+            background: #80BEFD;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .export-button {
+            background: #80BEFD;
+            border: none;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        #export-button-icon {
+            width: 21px;
         }
     </style>
 
@@ -416,24 +451,9 @@
 
             <div id="overlay"></div>
 
-            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #DAB1DA;">
-                <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
-                    <div>
-                        <asp:CheckBox ID="SendMailCheckBox" TextAlign="Right" Text="Email a Copy:" runat="server" />
-                    </div>
-                    <div>
-                        <asp:TextBox ID="EmailUserNameTextBox" runat="server" />
-                        <asp:Label Text="@purewafer.com" runat="server" />
-                    </div>
-                </div>
-
-                <div>
-                    <asp:Button ID="ExportButton" Enabled="False" OnClientClick="WebpageSpinner.displaySpin();" Text="Go" runat="server" />
-                </div>
-            </div>
-
-            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #FFFFCC;">
-                <span></span>
+            <div id="export-button-container">
+                <asp:Button ID="ExportButton" CssClass="export-button" Enabled="False" OnClientClick="spinOnExport();" Text="Export" runat="server" />
+                <img id="export-button-icon" src="../Color/icons/download-simple-bold.svg" alt="Export" />
             </div>
         </asp:Panel>
 
