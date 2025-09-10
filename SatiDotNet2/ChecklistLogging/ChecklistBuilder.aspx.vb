@@ -627,7 +627,14 @@ Partial Class MR_OpenTicketStatusBoard
             If PhaseShow Then LabelInterface_PhaseDdlContainer.Visible = True
 
             BatchingCheckBox.Checked = PhaseShow
-            PhaseOrBundle_Panel.Visible = PhaseShow
+
+            If ViewFromQs = "Archived" Then
+                PhaseOrBundle_Panel.Visible = False
+                GroupDropDownList.Enabled = False
+                AreaIntervalDropDownList.Enabled = False
+            Else
+                PhaseOrBundle_Panel.Visible = PhaseShow
+            End If
         End If
     End Sub
 

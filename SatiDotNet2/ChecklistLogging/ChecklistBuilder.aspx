@@ -620,7 +620,7 @@
                             </div>
                         </div>
                         <asp:Button ID="RemoveStatusButton" Text="Remove" Visible="False" Enabled="False" data-modal-open="#remove-area-modal" runat="server" />
-                        <asp:Button ID="ArchiveStatusButton" Text="Archive" OnClick="ArchiveStatusButton_onClick" Visible="False" Enabled="False" runat="server" />
+                        <asp:Button ID="ArchiveStatusButton" Text="Archive" OnClick="ArchiveStatusButton_onClick"  Enabled="False" runat="server" />
                     </div>
 
                     <asp:FormView ID="AreaFormView" runat="server" DataKeyNames="Key" DataSourceID="AreaFormView_SqlDataSource" CellPadding="4" ForeColor="#333333">
