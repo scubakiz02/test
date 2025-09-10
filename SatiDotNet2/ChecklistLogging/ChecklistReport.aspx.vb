@@ -277,6 +277,15 @@ Partial Class MR_OpenTicketStatusBoard
     End Sub
 
     Protected Sub UpdateChecklistsButton_OnClick(sender As Object, e As EventArgs)
+        SetPmAndChecklists()
+
+        LabelCbxList.Items.Clear()
+        Session("AspWebpage").SetUrl("LabelsToInclude", Nothing)
+
+        RefreshPreview() 'to see changes in AreasToInclude and LabelsToInclude querystring keys
+    End Sub
+
+    Private Sub SetPmAndChecklists()
         Dim AreasToInclude As New List(Of Integer) 'b/c interacting with Session("AreasToInclude") directly tends to cause issues
 
         For Each AreaCheckBox As ListItem In AreaCheckBoxList.Items
@@ -292,12 +301,6 @@ Partial Class MR_OpenTicketStatusBoard
         Session("AreasToInclude") = New List(Of Integer)(AreasToInclude)
         Session("AspWebpage").SetUrl("AreasToInclude", JsonSerializer.Serialize(Of List(Of Integer))(AreasToInclude))
         Session("Report").SetAreas(Session("AreasToInclude"))
-
-        LabelCbxList.Items.Clear()
-
-        Session("AspWebpage").SetUrl("LabelsToInclude", Nothing)
-
-        RefreshPreview() 'to see changes in AreasToInclude querystring key
     End Sub
 
     Protected Sub SetGridViewSrc()
@@ -591,7 +594,10 @@ Partial Class MR_OpenTicketStatusBoard
         Dim Route As String
         Dim Res As String
 
-        If ReportAreaKeys Is Nothing Then Return String.Empty
+        If ReportAreaKeys Is Nothing Then
+            SetPmAndChecklists()
+            ReportAreaKeys = Session("AreasToInclude")
+        End If
 
         'combine all strings that are going to be weaved into a List data structure
         For Each ReportAreaKey As String In ReportAreaKeys
