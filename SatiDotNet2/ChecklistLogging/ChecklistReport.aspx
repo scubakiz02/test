@@ -289,6 +289,13 @@
             padding: var(--UWhitespace);
         }
 
+        .modal-footer {
+            padding: var(--UWhitespace);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid black;
+        }
+
         #overlay {
             position: fixed;
             opacity: 0;
@@ -318,13 +325,6 @@
         }
 
         /*============== label-modal =============*/
-        #label-modal-footer {
-            padding: var(--UWhitespace);
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid black;
-        }
-
         #label-modal-order-by-functionality {
             display: flex;
             align-items: center;
@@ -414,7 +414,7 @@
                         <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
                     </div>
                 </div>
-                <div id="label-modal-footer">
+                <div id="label-modal-footer" class="modal-footer">
                     <div>
                         <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
                         <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
@@ -431,18 +431,20 @@
                 <div class="modal-header">
                     <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
                         <span>Checklists To <span style="font-weight: bold;">Include</span>:</span>
-
-                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
-                        <div>
-                            <asp:CheckBox ID="CheckAllChecklists_CheckBox" Text="Check All" runat="server" />
-                        </div>
                     </div>
                 </div>
                 <div class="modal-body">
                     <asp:CheckBoxList ID="AreaCheckBoxList" runat="server" RepeatColumns="2" TextAlign="Right">
                     </asp:CheckBoxList>
+                </div>
 
-                    <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
+                <div id="checklist-modal-footer" class="modal-footer">
+                    <div>
+                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                        <asp:CheckBox ID="CheckAllChecklists_CheckBox" Text="Check All" runat="server" />
+                    </div>
+
+                    <div id="checklist-footer-buttons-container">
                         <button data-close-button class="HeaderPanelButtons">Cancel</button>
                         <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateChecklistsButton" OnClick="UpdateChecklistsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
                     </div>
