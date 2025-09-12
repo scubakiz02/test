@@ -447,18 +447,37 @@ Public Class Report
         MasterCollection(SheetName) = DataMatrix
     End Sub
 
-    Private Function GetFieldTypeValue(Value As Object, FieldType As Object) As String
+    Public Function GetFieldTypeValue(Value As Object, FieldType As Object) As String
         If IsDBNull(FieldType) = False Then
             If FieldType = "Checkbox" Then
-                If Value = "1" Then
-                    Return "✔"
-                Else
-                    Return "❌"
-                End If
+                Return BitToSymbol(Value)
+            ElseIf FieldType = "DP" Then
+                'what is DP? Great question!
+                'DP is distribution pumps. They are paired. Only 1 needs to be running at a time
+                'the interface is 2 checkbox controls next to one another
+                Dim DpValues As String()
+                Dim Dp1 As String
+                Dim Dp2 As String
+                Try
+                    'in case arg 1 is an empty string
+                    DpValues = Value.Split("/")
+                    Dp1 = BitToSymbol(DpValues(0))
+                    Dp2 = BitToSymbol(DpValues(1))
+                Catch ex As Exception
+                    Dp1 = BitToSymbol("0")
+                    Dp2 = BitToSymbol("0")
+                End Try
+
+                Return Dp1 & "/" & Dp2
             End If
         End If
 
         Return Value
+    End Function
+
+    Private Function BitToSymbol(Bit As Object) As String
+        If Bit = "1" Then Return "✔"
+        Return "✘"
     End Function
 
     Public Function GetExcelData(ReportInst As Report) As Dictionary(Of String, List(Of String()))

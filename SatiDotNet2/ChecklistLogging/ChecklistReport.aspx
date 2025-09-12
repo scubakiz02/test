@@ -343,7 +343,7 @@
         .export-button {
             background: #80BEFD;
             border: none;
-            color: white;
+            color: #0000FF;
             font-size: 15px;
             cursor: pointer;
         }
@@ -494,18 +494,13 @@
                             <asp:TextBox ID="ReportValue_TextBox" runat="server" Text='<%# Bind("Value") %>' />
 
                             <asp:Panel ID="Checkbox_Panel" Visible="False" runat="server">
-                                <asp:CheckBox ID="ReportValue_CheckBox" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
+                                <asp:CheckBox ID="ReportValue_CheckBox" runat="server"></asp:CheckBox>
                             </asp:Panel>
 
-                            <asp:Panel ID="DP_Panel" Visible="False" runat="server" Style="display: flex; align-items: center; gap: var(--UWhitespace)">
-                                <div style="display: flex; flex-direction: column">
-                                    <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
-                                </div>
-                                <div style="display: flex; flex-direction: column">
-                                    <asp:Label Style="font-size: calc(var(--UFontSize) / 2);" runat="server" />
-                                    <asp:CheckBox Style="display: flex; flex-direction: column-reverse;" AutoPostBack="True" CssClass="LogCheckBox" runat="server"></asp:CheckBox>
-                                </div>
+                            <asp:Panel ID="DP_Panel" Visible="False" runat="server">
+                                <asp:CheckBox ID="ReportValue_DpCbx1" runat="server"></asp:CheckBox>
+                                <span>/</span>
+                                <asp:CheckBox ID="ReportValue_DpCbx2" runat="server"></asp:CheckBox>
                             </asp:Panel>
 
                             <asp:Panel ID="HOA_Panel" Visible="False" HOA="False" runat="server">
@@ -532,10 +527,20 @@
                         </ItemTemplate>
 
                         <EditItemTemplate>
-                            <div style="display: flex; flex-direction: column; gap: var(--UWhitespace);">
-                                <asp:Label Text="mm/dd/yyyy hh:mm:ss tt" runat="server" />
+                            <%--placed css styles for admin mode related css classes here to reduce chances of it being found accidently--%>
+                            <style>
+                                .input-date-admin-mode-container {
+                                    display: flex;
+                                    flex-direction: column;
+                                }
+                                .input-date-admin-mode-label {
+                                    padding: 0 !important;
+                                }
+                            </style>
+                            <div class="input-date-admin-mode-container">
+                                <asp:Label Text="mm/dd/yyyy hh:mm:ss tt" CssClass="input-date-admin-mode-label" runat="server" />
                                 <asp:TextBox ID="ReportDate_TextBox" Text='<%# Eval("InputDate") %>' runat="server" />
-                                <asp:Label ID="InvalidReportDate_Label" Visible="False" ForeColor="Red" Text="Error: invalid date" runat="server" />
+                                <asp:Label ID="InvalidReportDate_Label" CssClass="input-date-admin-mode-label" Visible="False" ForeColor="Red" Text="error: invalid date" runat="server" />
                             </div>
                         </EditItemTemplate>
                     </asp:TemplateField>

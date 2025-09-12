@@ -26,7 +26,10 @@ Partial Class MR_OpenTicketStatusBoard
     Private MaintPM As New MaintPM()
     Private PhaseController As New PhaseController()
     Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
+
     Private _Report As New Report()
+    Private _PmInput As New PmInput()
+
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'to ensure each user of this webpage gets their own class objects
         If Session("Report") Is Nothing Then
@@ -105,19 +108,15 @@ Partial Class MR_OpenTicketStatusBoard
         'set CheckBox overlay where FieldType is 'CheckBox'
         For Each Row As GridViewRow In ReportGridView.Rows
             If Row.RowType = DataControlRowType.DataRow Then
-                FieldTypeOverlay(Row, Sub(CheckBox As CheckBox)
-                                          If CheckBox IsNot Nothing Then 'if true, FieldType is CheckBox. However, control is not the one we're looking for
-                                              Dim ReportValue_CheckBox As CheckBox = CType(Row.FindControl("ReportValue_CheckBox"), CheckBox)
-                                              Dim ReportValue_Label As Label = CType(Row.FindControl("ReportValue_Label"), Label)
+                Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
+                Dim LabelKey As Integer = ReportLabelKey_Label.Text
+                Dim FieldType As String = _PmInput.GetFieldType(LabelKey)
 
-                                              If ReportValue_Label IsNot Nothing Then 'do not know why, but this logic doesn't work properly w/o this condition
-                                                  ReportValue_Label.Visible = False
-
-                                                  ReportValue_CheckBox.Visible = True
-                                                  ReportValue_CheckBox.Checked = If(ReportValue_Label.Text = "1", True, False)
-                                              End If
-                                          End If
-                                      End Sub)
+                Dim ReportValue_Label As Label = CType(Row.FindControl("ReportValue_Label"), Label)
+                If ReportValue_Label IsNot Nothing Then
+                    'filter value through fieldtype
+                    ReportValue_Label.Text = _Report.GetFieldTypeValue(ReportValue_Label.Text, FieldType)
+                End If
             End If
         Next
 
@@ -375,71 +374,91 @@ Partial Class MR_OpenTicketStatusBoard
             End If
 
             'incorporate Checkbox asp overlay if needed
-            FieldTypeOverlay(Row, Sub(CheckBox As CheckBox)
-                                      CheckBox.Checked = If(ReportValue_TextBox.Text = "1", True, False)
-                                      ReportValue_TextBox.Visible = False
-                                      CType(Row.FindControl("CheckBox_Panel"), Panel).Visible = True
+            FieldTypeOverlay(Row, Sub(FieldType As Object, Ctrl As Control)
+                                      Select Case FieldType
+                                          Case "Checkbox"
+                                              Dim CheckBox As CheckBox = DirectCast(Ctrl, CheckBox)
+
+                                              CheckBox.Checked = If(ReportValue_TextBox.Text = "1", True, False)
+
+                                              ReportValue_TextBox.Visible = False
+
+                                              CType(Row.FindControl("CheckBox_Panel"), Panel).Visible = True
+                                          Case "DP"
+                                              Dim DpPanel As Panel = DirectCast(Ctrl, Panel)
+                                              DpPanel.Visible = True
+                                              ReportValue_TextBox.Visible = False
+
+                                              Dim DpCbx1 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx1")
+                                              Dim DpCbx2 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx2")
+
+                                              Dim DpValues As String() = ReportValue_TextBox.Text.Split("/")
+                                              DpCbx1.Checked = If(DpValues(0) = "1", True, False)
+                                              DpCbx2.Checked = If(DpValues(1) = "1", True, False)
+                                      End Select
                                   End Sub)
         End If
     End Sub
 
     Private Sub ReportGridView_RowUpdating(sender As Object, e As GridViewUpdateEventArgs) Handles ReportGridView.RowUpdating
         Dim Row As GridViewRow = ReportGridView.Rows(Convert.ToInt32(ReportGridView.EditIndex))
-        Dim StartDate_Label As Label = CType(Row.FindControl("StartDate_Label"), Label)
-        Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
         Dim ReportValue_TextBox As TextBox = CType(Row.FindControl("ReportValue_TextBox"), TextBox)
-        Dim ReportDate_TextBox As TextBox = CType(Row.FindControl("ReportDate_TextBox"), TextBox)
-        Dim ReportOperator_DropDownList As DropDownList = CType(Row.FindControl("ReportOperator_DropDownList"), DropDownList)
-        Dim InputDate As String = ReportDate_TextBox.Text
-        Dim InputValue As String = ReportValue_TextBox.Text
-        Dim InputOperator As String = ReportOperator_DropDownList.SelectedValue
-        Dim Config As New Dictionary(Of String, String) From {
-            {"LabelKey", ReportLabelKey_Label.Text},
-            {"Date", StartDate_Label.Text}
-        }
-        Dim Mods As New Dictionary(Of String, String) From {
-            {"Value", InputValue},
-            {"Date", InputDate},
-            {"Operator", InputOperator}
-        }
+        Dim DbValue As String = ReportValue_TextBox.Text
+        FieldTypeOverlay(Row, Sub(FieldType As String, Ctrl As Control)
+                                  'here to grab db values from fieldtype control overlays used to increase ui/ux for end user
+                                  Select Case FieldType
+                                      Case "Checkbox"
+                                          Dim CheckBox As CheckBox = DirectCast(Ctrl, CheckBox)
+                                          DbValue = If(CheckBox.Checked, 1, 0)
+                                      Case "DP"
+                                          Dim DpPanel As Panel = DirectCast(Ctrl, Panel)
+                                          Dim DpCbx1 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx1")
+                                          Dim DpCbx2 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx2")
 
-        'the callback subroutine below will only run when the fieldtype is checkbox
-        FieldTypeOverlay(Row, Sub(CheckBox As CheckBox)
-                                  InputValue = If(CheckBox.Checked, 1, 0)
-                                  Mods("Value") = InputValue
+                                          Dim DpDbValue As String = Convert.ToInt32(DpCbx1.Checked) & "/" & Convert.ToInt32(DpCbx2.Checked)
+                                          DbValue = DpDbValue
+                                  End Select
                               End Sub)
 
-        If Format.ValidLogDate(InputDate) Then
+        Dim ReportDate_TextBox As TextBox = CType(Row.FindControl("ReportDate_TextBox"), TextBox)
+        Dim ReportOperator_DropDownList As DropDownList = CType(Row.FindControl("ReportOperator_DropDownList"), DropDownList)
+        Dim DbDate As String = ReportDate_TextBox.Text
+        Dim Mods As New Dictionary(Of String, String) From {
+            {"Value", DbValue},
+            {"Date", DbDate},
+            {"Operator", ReportOperator_DropDownList.SelectedValue}
+        }
+
+        If Format.ValidLogDate(DbDate) Then
+            Dim StartDate_Label As Label = CType(Row.FindControl("StartDate_Label"), Label)
+            Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
+            Dim Config As New Dictionary(Of String, String) From {
+                {"LabelKey", ReportLabelKey_Label.Text},
+                {"Date", StartDate_Label.Text}
+            }
+
             Session.Remove("EditModeValues")
             Session("Report").Override(Config, Mods, True)
 
             ReportGridView.EditIndex = -1
             SetGridViewSrc()
         Else
-            Session("EditModeValues") = New Dictionary(Of String, String) From {
-                {"Date", InputDate},
-                {"Value", InputValue},
-                {"Operator", InputOperator}
-            }
+            Session("EditModeValues") = Mods
         End If
     End Sub
 
-    Private Sub FieldTypeOverlay(Row As GridViewRow, Callback As Action(Of CheckBox))
+    Private Sub FieldTypeOverlay(Row As GridViewRow, Callback As Action(Of String, Control))
         Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim FieldType As String
-
-        QueryConfig("@LabelKey") = New Dictionary(Of String, String) From {
-            {"value", ReportLabelKey_Label.Text},
-            {"typeOf", "int"}
-        }
-        FieldType = Security.GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
+        Dim LabelKey As Integer = ReportLabelKey_Label.Text
+        Dim FieldType As String = _PmInput.GetFieldType(LabelKey)
 
         If FieldType IsNot Nothing Then
             Dim DbValueCtrl As Label = CType(Row.FindControl("ReportValue_Label"), Label)
             Dim DbValue As String
 
-            Try 'in case GridView is in edit mode (Label control will NOT be visible)
+            Try
+                'in case GridView is in edit mode (Label control will NOT be visible)
                 DbValue = DbValueCtrl.Text
             Catch ex As Exception
                 DbValue = CType(Row.FindControl("ReportValue_TextBox"), TextBox).Text
@@ -447,7 +466,9 @@ Partial Class MR_OpenTicketStatusBoard
 
             Select Case FieldType
                 Case "Checkbox"
-                    Callback(CType(Row.FindControl("ReportValue_CheckBox"), CheckBox))
+                    Callback("Checkbox", Row.FindControl("ReportValue_CheckBox"))
+                Case "DP"
+                    Callback("DP", Row.FindControl("DP_Panel"))
             End Select
         End If
     End Sub

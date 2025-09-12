@@ -1761,8 +1761,8 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
-            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/11/2025", "", "", "default"},
-            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘", "08/11/2025", "", "", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
             New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
@@ -1786,10 +1786,10 @@ Public Class GetExcelDataTests
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
-            {"FieldType", "Checkbox"},
+            {"FieldType", "DP"},
             {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
             {"Phase", DBNull.Value},
-            {"Value", ""},
+            {"Value", "0/0"},
             {"StartDate", "08/11/2025"},
             {"InputDate", DBNull.Value},
             {"InputOperator", ""}
@@ -1797,10 +1797,10 @@ Public Class GetExcelDataTests
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
-            {"FieldType", "Checkbox"},
+            {"FieldType", "DP"},
             {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
             {"Phase", DBNull.Value},
-            {"Value", "0"},
+            {"Value", "0/1"},
             {"StartDate", "08/12/2025"},
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
@@ -1808,10 +1808,10 @@ Public Class GetExcelDataTests
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
-            {"FieldType", "Checkbox"},
+            {"FieldType", "DP"},
             {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
             {"Phase", DBNull.Value},
-            {"Value", "1"},
+            {"Value", "1/0"},
             {"StartDate", "08/11/2025"},
             {"InputDate", "08/11/2025 02: 44:29 PM"},
             {"InputOperator", "andrew williams"}
@@ -1819,10 +1819,10 @@ Public Class GetExcelDataTests
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
-            {"FieldType", DBNull.Value},
+            {"FieldType", "DP"},
             {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
             {"Phase", DBNull.Value},
-            {"Value", "7.18"},
+            {"Value", "1/1"},
             {"StartDate", "08/12/2025"},
             {"InputDate", "08/12/2025 06: 33:19 AM"},
             {"InputOperator", "andrew williams"}
@@ -1838,16 +1838,16 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
-            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/11/2025", "", "", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✘", "08/11/2025", "", "", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✘", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
             New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
             New String() {"", "", "", "", "", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
-            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "❌", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✔", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✔", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1865,10 +1865,10 @@ Public Class GetExcelDataTests
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
-            {"FieldType", DBNull.Value},
+            {"FieldType", "DP"},
             {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
             {"Phase", DBNull.Value},
-            {"Value", "8.19"},
+            {"Value", ""},
             {"StartDate", "08/11/2025"},
             {"InputDate", "08/11/2025 02:44:22 PM"},
             {"InputOperator", "andrew williams"}
@@ -1917,7 +1917,7 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
-            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
+            New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✘", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
             New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
@@ -2104,5 +2104,34 @@ Public Class GetExcelDataTests
             StringifyMatrixHash(ExpectedRes),
             StringifyMatrixHash(GetExcelData(ReportInst))
         )
+    End Sub
+End Class
+
+Public Class GetFieldTypeValueTests
+    Inherits Report
+
+    <Fact>
+    Public Sub NumberFieldTypeTests()
+        Dim FieldType As Object = DBNull.Value
+        Dim Value As Integer = 34
+        Assert.Equal(Value, GetFieldTypeValue(Value, FieldType))
+    End Sub
+
+    <Theory>
+    <InlineData("Checkbox", "1", "✔")>
+    <InlineData("Checkbox", "0", "✘")>
+    <InlineData("Checkbox", "", "✘")>
+    Public Sub CheckboxFieldTypeTests(FieldType As String, Value As Object, DesiredRes As String)
+        Assert.Equal(DesiredRes, GetFieldTypeValue(Value, FieldType))
+    End Sub
+
+    <Theory>
+    <InlineData("DP", "0/0", "✘/✘")>
+    <InlineData("DP", "", "✘/✘")>
+    <InlineData("DP", "0/1", "✘/✔")>
+    <InlineData("DP", "1/0", "✔/✘")>
+    <InlineData("DP", "1/1", "✔/✔")>
+    Public Sub DpFieldTypeTests(FieldType As String, Value As Object, DesiredRes As String)
+        Assert.Equal(DesiredRes, GetFieldTypeValue(Value, FieldType))
     End Sub
 End Class

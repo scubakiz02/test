@@ -7,6 +7,14 @@ Public Class PmInput
 
     End Sub
 
+    Public Function GetFieldType(LabelKey As String) As String
+        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@LabelKey", GetParamVarHash(LabelKey, "int")}
+        }
+
+        Return GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
+    End Function
+
     Public Function GetArea(LabelKey As String) As Integer
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@LabelKey", GetParamVarHash(LabelKey, "int")}
