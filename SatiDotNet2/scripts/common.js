@@ -70,7 +70,26 @@ function throwHttpError(catchErr) {
     }
 }
 
-async function httpGet(url) {
+function packageQuerystringParams(obj) {
+    let qs = "";
+
+    const qsKeys = Object.keys(obj);
+    for (let i = 0; i < qsKeys.length; i++) {
+        const qsKey = qsKeys[i];
+        const qsValue = obj[qsKey];
+
+        if (i === 0) qs += "?";
+        else qs += "&";
+
+        qs += qsKey + "=" + qsValue;
+    }
+
+    return qs;
+}
+
+async function httpGet(url, qsObj) {
+    if (qsObj) url += packageQuerystringParams(qsObj);
+
     try {
         const response = await fetch(url, {
             method: 'GET',

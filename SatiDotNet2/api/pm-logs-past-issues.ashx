@@ -13,14 +13,20 @@ Public Class StreamData
     Public Sub ProcessRequest(Context As HttpContext) Implements IHttpHandler.ProcessRequest
         Context.Response.ContentType = "application/json"
 
-        Dim Result As Dictionary(Of Integer, Dictionary(Of String, Object)) = GetOverdueLogsConfig(Context.Session("StartDateCutoffAt"), Context.Session("WhereFromQueryString"), Context.Session("DepartmentFromQueryString"))
+        Dim Department As String = Context.Request.QueryString("department")
+        Dim View As String = Context.Request.QueryString("view")
+        Dim StatusBoardDateAt As String = Context.Request.QueryString("StatusBoardDateAt")
+        Dim StartDateCutoffAt As String = Context.Request.QueryString("StartDateCutoffAt")
+
+        Dim Result As Dictionary(Of Integer, Dictionary(Of String, Object)) = GetOverdueLogsConfig(StartDateCutoffAt, StatusBoardDateAt, Department, View)
         Context.Response.Write(JsonSerializer.Serialize(Result))
     End Sub
 
-    Private Function GetOverdueLogsConfig(StartDateCutoffAt As String, StatusBoardDateAt As String, Department As String) As Dictionary(Of Integer, Dictionary(Of String, Object))
-        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
-
+    Private Function GetOverdueLogsConfig(StartDateCutoffAt As String, StatusBoardDateAt As String, Department As String, View As String) As Dictionary(Of Integer, Dictionary(Of String, Object))
         Dim Res As New Dictionary(Of Integer, Dictionary(Of String, Object))
+
+        If StatusBoardDateAt Is Nothing Then StatusBoardDateAt = System.DateTime.Now.ToString("MM/dd/yyyy")
+        If View = "Focus" Then Return Res
 
         Dim QueryConfig1 As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@Department", GetParamVarHash(Department, "string")}

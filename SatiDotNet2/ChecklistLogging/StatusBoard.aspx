@@ -11,50 +11,65 @@
                 let _overdueCache = new OverdueLogsCache();
 
                 window.addEventListener("load", async function () {
-                    const response = await httpGet("/api/pm-logs-past-issues.ashx");
+                    const department = '<%= Session("DepartmentFromQueryString") %>';
+                    const statusBoardDateAt = '<%= Session("WhereFromQueryString") %>';
+                    const startDateCutoffAt = '<%= Session("StartDateCutoffAt") %>';
+                    const view = '<%= Session("ViewFromQueryString") %>';
+
+                    const response = await httpGet("/api/pm-logs-past-issues.ashx", {
+                        department: department,
+                        statusBoardDateAt: statusBoardDateAt,
+                        startDateCutoffAt: startDateCutoffAt,
+                        view: view
+                    });
                     const datakeys = Object.keys(response);
-                    for (const datakey of datakeys) {
-                        const data = response[datakey];
-                        let log;
 
-                        try {
-                            log = document.getElementById("log-" + datakey);
-                            if (!log) throw error;
-                        }
-                        catch (err) {
-                            //logs built in asp code-behind
-                            const logId = "log-" + datakey
-                            log = getAspControl(logId);
-                        }
+                    if (datakeys.length > 0) {
+                        //logic related to overdue log functionalities
+                        for (const datakey of datakeys) {
+                            const data = response[datakey];
+                            let log;
 
-                        if (!log) {
-                            //log needs to be created on status board
-                            if (data.logParentId === "PastIssuesPanel") {
-                                //overdue log
-                                _overdueCache.set(datakey, data);
-                                continue;
+                            try {
+                                log = document.getElementById("log-" + datakey);
+                                if (!log) throw error;
+                            }
+                            catch (err) {
+                                //logs built in asp code-behind
+                                const logId = "log-" + datakey
+                                log = getAspControl(logId);
+                            }
+
+                            if (!log) {
+                                //log needs to be created on status board
+                                if (data.logParentId === "PastIssuesPanel") {
+                                    //overdue log
+                                    _overdueCache.set(datakey, data);
+                                    continue;
+                                }
                             }
                         }
-                    }
-                    build50OverdueLogs();
 
-                    const horizontalSpinner = document.body.querySelector(".dots-spinner");
-                    horizontalSpinner.style.display = "none";
+                        build50OverdueLogs();
+
+                        const horizontalSpinner = document.body.querySelector(".dots-spinner");
+                        horizontalSpinner.style.display = "none";
+
+                        const buildMoreHyperlink = document.getElementById("overdue-logs-build-more-hyperlink");
+                        buildMoreHyperlink.addEventListener("click", function () {
+                            build50OverdueLogs();
+
+                            setTimeout(() => {
+                                // give DOM time to layout fully, then programmatically scroll to bottom
+                                window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+                            }, 100);
+
+                        });
+                    }
 
                     setInterval(async function () {
                         await getLogStateChanges();
                     }, 10000);
-
-                    const buildMoreHyperlink = document.getElementById("overdue-logs-build-more-hyperlink");
-                    buildMoreHyperlink.addEventListener("click", function () {
-                        build50OverdueLogs();
-
-                        setTimeout(() => {
-                            // give DOM time to layout fully, then programmatically scroll to bottom
-                            window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
-                        }, 100);
-
-                    });
                 })
 
                 async function getLogStateChanges() {

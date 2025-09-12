@@ -395,8 +395,13 @@
                     const params = new URLSearchParams(window.location.search);
                     const data_id = params.get("Key");
                     const labelId = getLabelId(activeInput);
+
                     if (!labelId) debugger;
-                    const httpGetRes = await httpGet("/api/pm-input.ashx?dataId=" + data_id + "&labelId=" + labelId);
+                    
+                    const httpGetRes = await httpGet("/api/pm-input.ashx", {
+                        dataId: data_id,
+                        labelId, labelId
+                    });
 
                     //debugger;
                     return httpGetRes;
