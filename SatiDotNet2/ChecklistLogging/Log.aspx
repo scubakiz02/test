@@ -235,7 +235,7 @@
                 }
 
                 function setCursorFocus(currControl, LogPanels) {
-                    for (let i = 0; i < LogPanels.length - 1; i++) {
+                    for (let i = 0; i < LogPanels.length; i++) {
                         const LogPanel = LogPanels[i];
 
                         if (LogPanel.contains(currControl)) {
@@ -244,12 +244,20 @@
                             //'date' and 'text' fieldtype controls have several currControl control
                             //however, only 1 is visible at a time
                             //look for that visible currControl
-                            const tbxs = LogPanels[i + 1].querySelectorAll("input[type='text']");
-                            for (const tbx of tbxs) {
-                                if (tbx.style.display !== "none") {
-                                    nextTbx = tbx;
-                                    break;
+                            try {
+                                //encased in a try catch block in case logPanel is the last input
+                                const logPanel = LogPanels[i + 1];
+                                const tbxs = LogPanels[i + 1].querySelectorAll("input[type='text']");
+
+                                for (const tbx of tbxs) {
+                                    if (tbx.style.display !== "none") {
+                                        nextTbx = tbx;
+                                        break;
+                                    }
                                 }
+                            }
+                            catch (err) {
+                                currControl.blur(); //hides the keyboard
                             }
 
                             //if next control is a textbox element (number, text, or date fieldtype), place focus there
@@ -397,7 +405,7 @@
                     const labelId = getLabelId(activeInput);
 
                     if (!labelId) debugger;
-                    
+
                     const httpGetRes = await httpGet("/api/pm-input.ashx", {
                         dataId: data_id,
                         labelId, labelId
