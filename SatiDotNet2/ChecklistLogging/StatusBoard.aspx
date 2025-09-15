@@ -298,7 +298,7 @@
                     const IconPanel = document.createElement("div");
                     const LogButton = document.createElement("input");
 
-                    Panel.setAttribute("style", "display: inline-block; border: 2px solid black;")
+                    Panel.classList.add("button-and-stamps-container");
                     Panel.id = "log-" + datakey;
                     applyBackcolorClass(Panel, logState);
 
@@ -1039,6 +1039,11 @@
                 .MasterMainBackground {
                     background: none;
                     margin: 0;
+                }
+
+                .button-and-stamps-container {
+                    display: inline-block;
+                    border: 2px solid black;
                 }
 
                 .ChecklistButton {

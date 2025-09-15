@@ -257,7 +257,7 @@ Partial Class MR_OpenTicketStatusBoard
         Dim LogState As String = _ActivePm.GetLogConfig(DR("Key"))("logState")
         Dim Datakey As String = DR("Key")
 
-        Panel.Attributes.Add("style", "display: inline-block; border: 2px solid black;")
+        Panel.CssClass = "button-and-stamps-container"
         Panel.ID = "log-" & Datakey
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "Script1-" & Datakey, "applyBackcolorClass(document.getElementById('ctl00_ContentPlaceHolder1_" & Panel.ClientID & "'), '" & LogState & "');", True)
 
