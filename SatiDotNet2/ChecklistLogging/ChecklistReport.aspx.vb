@@ -393,8 +393,14 @@ Partial Class MR_OpenTicketStatusBoard
                                               Dim DpCbx2 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx2")
 
                                               Dim DpValues As String() = ReportValue_TextBox.Text.Split("/")
-                                              DpCbx1.Checked = If(DpValues(0) = "1", True, False)
-                                              DpCbx2.Checked = If(DpValues(1) = "1", True, False)
+                                              Try
+                                                  'try catch block in case db field value is a blank string
+                                                  DpCbx1.Checked = If(DpValues(0) = "1", True, False)
+                                                  DpCbx2.Checked = If(DpValues(1) = "1", True, False)
+                                              Catch ex As Exception
+                                                  DpCbx1.Checked = False
+                                                  DpCbx2.Checked = False
+                                              End Try
                                       End Select
                                   End Sub)
         End If

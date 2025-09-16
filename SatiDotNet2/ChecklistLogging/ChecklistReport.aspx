@@ -398,12 +398,12 @@
                 </div>
 
                 <asp:Button Enabled="False" ID="FilterChecklists_Button" Text="Filter PMs/Checklists" data-modal-target="#checklistModal" runat="server" OnClientClick="return false;" />
-                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Items" data-modal-target="#label-modal" runat="server" OnClientClick="return false;" />
+                <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Inputs" data-modal-target="#label-modal" runat="server" OnClientClick="return false;" />
             </div>
 
             <div class="modal" id="label-modal">
                 <div class="modal-header">
-                    <span>Labels To <span style="font-weight: bold;">Include</span>:</span>
+                    <span>Inputs To <span style="font-weight: bold;">Include</span>:</span>
                 </div>
                 <div class="modal-body">
                     <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right">
