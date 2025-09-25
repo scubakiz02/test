@@ -1,46 +1,24 @@
-﻿Imports System.Text
-Imports Xunit
-Imports SatiDotNet2.Library
-Imports System
+﻿Imports System
 Imports System.Globalization
+Imports System.Runtime.InteropServices.ComTypes
+Imports System.Text
 Imports System.Text.Json
+Imports SatiDotNet2.Library
+Imports Xunit
 
-Public Class ReportTests
-    Dim GroupKey As Integer = 1
-    Public ReportConfig As New Dictionary(Of String, String) From {
-        {"GroupKey", GroupKey},
-        {"AreaKey", 58}
+Public Class ReportTestsLibrary
+    Private _Config As New Dictionary(Of String, String) From {
+        {"GroupKey", 0},
+        {"AreaKey", 0}
     }
-    Public FDCG As New Report(ReportConfig) 'FDCG = Facilities Daily Checklist Group
-    Dim Security As New Security
-    Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-    Private ReadOnly InvalidDateMessage As String = "Error: Invalid date"
-    Private ReadOnly OutOfRangeDateMessage As String = "Error: Out of dataset range"
 
-    Public Sub New()
-        Dim StartDate As Date = "03/16/2025"
-        Dim EndDate As Date = "03/18/2025"
-
-        FDCG.SetDateRange(StartDate, EndDate)
-
-        QueryConfig("@GroupKey") = New Dictionary(Of String, String) From {
-            {"value", GroupKey},
-            {"typeOf", "int"}
-        }
-        QueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
-            {"value", 0}, '0 = all checklists
-            {"typeOf", "int"}
-        }
-        QueryConfig("@StartDate") = New Dictionary(Of String, String) From {
-            {"value", StartDate},
-            {"typeOf", "date"}
-        }
-        QueryConfig("@EndDate") = New Dictionary(Of String, String) From {
-            {"value", EndDate},
-            {"typeOf", "date"}
-        }
-    End Sub
-
+    Public Function CreateReport() As Report
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetAreas({58}.ToList())
+        Report.SetDateRange("08/23/2025", "08/24/2025")
+        Return Report
+    End Function
 
     Public Function AreDataSetsEqual(ds1 As DataSet, ds2 As DataSet) As Boolean
         If ds1 Is Nothing OrElse ds2 Is Nothing Then Return False
@@ -60,7 +38,7 @@ Public Class ReportTests
         Return True
     End Function
 
-    Public Function AreDataTablesEqual(table1 As DataTable, table2 As DataTable) As Boolean
+    Private Function AreDataTablesEqual(table1 As DataTable, table2 As DataTable) As Boolean
         ' Check if both tables have the same column count and names
         If table1.Columns.Count <> table2.Columns.Count Then
             Return False
@@ -89,51 +67,139 @@ Public Class ReportTests
         Return True
     End Function
 
-    '<Fact>
-    'Public Sub ConstructorTest1()
-    '    'execute sql query with the same GroupKey as FDCG instantiation of Report class. Compare the 2 DataSets, expect false
-    '    Dim DS As Data.DataSet
+    Public Function RemoveAreasFromDS(ReportDS As Data.DataSet, AreasToExclude As Integer()) As Data.DataSet
+        'programmatically delete rows that are tied to values in 'AreasToExclude' array
+        For Each DR As Data.DataRow In ReportDS.Tables(0).Rows
+            If AreasToExclude.Contains(DR("AreaKey")) Then
+                DR.Delete() 'mark row for deletion
+            End If
+        Next
+        ReportDS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
 
-    '    DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
+        Return ReportDS
+    End Function
 
-    '    Assert.False(AreDataSetsEqual(DS, FDCG.GetDS()))
-    'End Sub
+    Public Function NumOfRecords(Report As Report)
+        Return Report.GetDS().Tables(0).Rows.Count
+    End Function
 
-    '<Fact>
-    'Public Sub ConstructorTest2()
-    '    'instantiate Report class with GroupKey of 2, and compare it to DS of GroupKey 1, which should NOT be same, returning false
-    '    Dim DS As Data.DataSet
+    Public Function NumOfRecords(Ds As Data.DataSet)
+        Return Ds.Tables(0).Rows.Count
+    End Function
+End Class
 
-    '    DS = Security.GetMyDataSetParamQuery(FDCG.ConstructorQuery, QueryConfig)
+Public Class BuildWhereClauseTests
+    Inherits Report
+    Private _Security As New Security()
 
-    '    Assert.False(AreDataSetsEqual(DS, New Report(New Dictionary(Of String, String) From {
-    '        {"GroupKey", 2},
-    '        {"AreaKey", 0}
-    '    }).GetDS()))
-    'End Sub
+    <Theory>
+    <InlineData(1, "09/13/2025", "09/17/2025")>
+    <InlineData(3, "07/01/2029", "07/21/2029")>
+    Public Sub BasicQueryTest(GroupKey As Integer, StartDate As String, EndDate As String)
+        'what is a 'basic query' in this context? Great question!
+        'a basic query is one where the config object contains only the required keys (GroupKey, StartDate, EndDate)
+        Dim Config As New Dictionary(Of String, Object) From {
+            {"GroupKey", GroupKey},
+            {"StartDate", StartDate},
+            {"EndDate", EndDate}
+        }
+        Dim ActualSqlConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ActualWhereClause As String = BuildWhereClause(Config, ActualSqlConfig)
+        Dim ExpectedSqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@GroupKey", _Security.GetParamVarHash(GroupKey, "int")},
+            {"@StartDate", _Security.GetParamVarHash(StartDate, "string")},
+            {"@EndDate", _Security.GetParamVarHash(EndDate, "string")}
+        }
+        Dim ExpectedWhereClause As String = "WHERE A.GroupKey=@GroupKey And D.Date >= @StartDate And D.Date <= @EndDate "
 
+        Assert.Equal(ExpectedWhereClause, ActualWhereClause)
+        Assert.Equal(Of Dictionary(Of String, Dictionary(Of String, String)))(ExpectedSqlConfig, ActualSqlConfig)
+    End Sub
+
+    <Theory>
+    <InlineData(1, "09/13/2025", "09/17/2025", {1, 5})>
+    Public Sub AreaKeysToExcludeTest(GroupKey As Integer, StartDate As String, EndDate As String, AreaKeysToExclude As Integer())
+        Dim Config As New Dictionary(Of String, Object) From {
+            {"GroupKey", GroupKey},
+            {"StartDate", StartDate},
+            {"EndDate", EndDate},
+            {"AreasToExclude", AreaKeysToExclude.ToList()}
+        }
+        Dim ActualSqlConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ActualWhereClause As String = BuildWhereClause(Config, ActualSqlConfig)
+        Dim ExpectedSqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@GroupKey", _Security.GetParamVarHash(GroupKey, "int")},
+            {"@AreaKey1", _Security.GetParamVarHash(1, "int")},
+            {"@AreaKey5", _Security.GetParamVarHash(5, "int")},
+            {"@StartDate", _Security.GetParamVarHash(StartDate, "string")},
+            {"@EndDate", _Security.GetParamVarHash(EndDate, "string")}
+        }
+        Dim ExpectedWhereClause As String = "WHERE A.GroupKey=@GroupKey " &
+            "And D.Date >= @StartDate And D.Date <= @EndDate " &
+            "And A.[Key] Not In (@AreaKey1, @AreaKey5) "
+
+        Assert.Equal(ExpectedWhereClause, ActualWhereClause)
+        Assert.Equal(Of Dictionary(Of String, Dictionary(Of String, String)))(ExpectedSqlConfig, ActualSqlConfig)
+    End Sub
+
+    <Theory>
+    <InlineData(1, "09/13/2025", "09/17/2025", {1, 5}, {3, 6})>
+    Public Sub LabelKeysToExcludeTest(GroupKey As Integer, StartDate As String, EndDate As String, AreaKeysToExclude As Integer(), LabelKeysToExclude As Integer())
+        'in the UI, end users will be focusing on 1 pm/checklist
+        'this is the only time end users have the option to select inputs (a.k.a labels) to exclude
+        Dim Config As New Dictionary(Of String, Object) From {
+            {"GroupKey", GroupKey},
+            {"StartDate", StartDate},
+            {"EndDate", EndDate},
+            {"AreasToExclude", AreaKeysToExclude.ToList()},
+            {"LabelsToExclude", LabelKeysToExclude.ToList()}
+        }
+        Dim ActualSqlConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim ActualWhereClause As String = BuildWhereClause(Config, ActualSqlConfig)
+        Dim ExpectedSqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@GroupKey", _Security.GetParamVarHash(GroupKey, "int")},
+            {"@AreaKey1", _Security.GetParamVarHash(1, "int")},
+            {"@AreaKey5", _Security.GetParamVarHash(5, "int")},
+            {"@LabelKey3", _Security.GetParamVarHash(3, "int")},
+            {"@LabelKey6", _Security.GetParamVarHash(6, "int")},
+            {"@StartDate", _Security.GetParamVarHash(StartDate, "string")},
+            {"@EndDate", _Security.GetParamVarHash(EndDate, "string")}
+        }
+        Dim ExpectedWhereClause As String = "WHERE A.GroupKey=@GroupKey " &
+            "And D.Date >= @StartDate And D.Date <= @EndDate " &
+            "And A.[Key] Not In (@AreaKey1, @AreaKey5) " &
+            "And L.[Key] Not In (@LabelKey3, @LabelKey6) "
+
+        Assert.Equal(ExpectedWhereClause, ActualWhereClause)
+        Assert.Equal(Of Dictionary(Of String, Dictionary(Of String, String)))(ExpectedSqlConfig, ActualSqlConfig)
+    End Sub
+End Class
+
+Public Class ReportTests
+    Inherits ReportTestsLibrary
 
     <Fact>
-    Public Sub ConstructorTest1()
-        'ensure that if a date range does NOT exists, and after calling FDCG.OrderByDate(), the DS has no records
-        FDCG.SetDateRange(Nothing, Nothing)
-        Assert.Equal(Of Integer)(0, FDCG.OrderDSByDate().Tables(0).Rows.Count)
+    Public Sub NonNullDsTest()
+        Dim Report As Report = CreateReport()
+        Dim ReportDs As Data.DataSet = Report.GetDS()
+        Assert.NotEqual(0, ReportDs.Tables(0).Rows.Count)
     End Sub
 
 
     <Fact>
-    Public Sub ConstructorTest6()
-        'instantiate Report class mocking FDCG, meaning its GetDS() should be the same
-        Dim Report As New Report(ReportConfig)
-        Report.SetDateRange("03/16/2025", "03/18/2025")
-
-        Assert.True(AreDataSetsEqual(FDCG.GetDS(), Report.GetDS()))
+    Public Sub TwoDatasetsSameEnvironmentTest()
+        Dim Report1 As Report = CreateReport()
+        Dim Report1Ds As Data.DataSet = Report1.GetDS()
+        Dim Report2 As Report = CreateReport()
+        Assert.NotEqual(0, Report1Ds.Tables(0).Rows.Count)
+        Assert.True(AreDataSetsEqual(Report1Ds, Report2.GetDS()))
     End Sub
 
     <Fact>
-    Public Sub ConstructorTest4()
+    Public Sub DatasetValuesTest()
         'test ConfigureDS function against a live dataset
-        Dim DS As Data.DataSet = FDCG.GetDS()
+        Dim Report As Report = CreateReport()
+        Dim DS As Data.DataSet = Report.GetDS()
         Dim DR As Data.DataRow
         Dim RC = DS.Tables(0).Rows.Count - 1
         Dim AccurateData As Boolean = True
@@ -152,32 +218,24 @@ Public Class ReportTests
                 Exit For
 
             End If
-
         Next
 
+        Assert.NotEqual(0, RC)
         Assert.True(AccurateData)
     End Sub
 
     <Fact>
-    Public Sub ConstructorTest5()
+    Public Sub DatasetValuesTest2()
         'test ConfigureDS function against a live dataset, with a specific AreaKey 
         Dim AreaKey As Integer = 60 'SC-3 Fume Scrubber Monitoring Daily
-        Dim Report As New Report(New Dictionary(Of String, String) From {
-            {"GroupKey", GroupKey},
-            {"AreaKey", AreaKey}
-        })
-        Dim DS As Data.DataSet
-        Dim DR As Data.DataRow
-        Dim RC As Integer
+        Dim Report As Report = CreateReport()
+        Report.SetAreas({AreaKey}.ToList())
+        Dim DS As Data.DataSet = Report.GetDS()
+        Dim RC As Integer = DS.Tables(0).Rows.Count - 1
         Dim AccurateData As Boolean = True
 
-        DS = Report.GetDS()
-        RC = DS.Tables(0).Rows.Count - 1
-
-        QueryConfig("@AreaKey")("value") = AreaKey 'constructor sets this to 0
-
         For I As Integer = 0 To RC
-            DR = DS.Tables(0).Rows(I)
+            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
 
             If DR("DataKey") = 253 Then 'T_LogData Key 253 is associated with a checklist other than the one passed to the constructor
                 AccurateData = False
@@ -193,166 +251,52 @@ Public Class ReportTests
 
         Next
 
+        Assert.NotEqual(0, RC)
         Assert.True(AccurateData)
     End Sub
 
     <Fact>
-    Public Sub ConstructorTest7()
+    Public Sub DatasetDateRangeTest()
         'date range is passed to the constructor config object. ensure GetDS() from Report class is within the set date range
+        Dim Report As Report = CreateReport()
         Dim StartDate As Date = "03-22-2025"
         Dim EndDate As Date = "03-25-2025"
-        Dim ReportConfig As New Dictionary(Of String, String) From {
-            {"GroupKey", GroupKey},
-            {"AreaKey", 0},
-            {"StartDate", StartDate},
-            {"EndDate", EndDate}
-        }
-        Dim DS As Data.DataSet = New Report(ReportConfig).GetDS()
+        Report.SetDateRange(StartDate, EndDate)
+        Dim DS As Data.DataSet = Report.GetDS()
         Dim RC = DS.Tables(0).Rows.Count - 1
         Dim OutOfRange As Boolean = False
 
         For I As Integer = 0 To RC
             Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
-            Dim InputDate As Date = DR("Date") 'Date field is the date the checklist log was created
+            Dim InputDate As Date = DR("StartDate") 'StartDate field is the date the checklist log was created
 
             If InputDate.Date < StartDate.Date OrElse InputDate.Date > EndDate.Date Then
                 OutOfRange = True
                 Exit For
             End If
-
         Next
 
+        Assert.NotEqual(0, RC)
         Assert.False(OutOfRange)
     End Sub
 
-    <Fact>
-    Public Sub ConstructorTest8()
-        'no records in dataset without supplying a date range first
-        Dim ReportConfig As New Dictionary(Of String, String) From {
-            {"GroupKey", GroupKey},
-            {"AreaKey", 0},
-            {"StartDate", Nothing},
-            {"EndDate", Nothing}
-        }
-        Dim Report As New Report(ReportConfig)
-        Dim DS As Data.DataSet
-        Dim DR As Data.DataRow
-        Dim AccurateData As Boolean = True
-
-        DS = Report.GetDS()
-
-        Assert.True(If(DS.Tables(0).Rows.Count = 0, True, False))
-    End Sub
 
     <Fact>
-    Public Sub SetDateRangeTest1()
-        'date range is NOT passed to the constructor, but SetDateRange public function is called after the constructor runs. ensure GetDS() from Report class is within the set date range
-        Dim StartDate As Date = "03-22-2025"
-        Dim EndDate As Date = "03-25-2025"
-        Dim DS As Data.DataSet = FDCG.SetDateRange(StartDate, EndDate)
-        Dim RC = DS.Tables(0).Rows.Count - 1
-        Dim OutOfRange As Boolean = False
-
-        For I As Integer = 0 To RC
-            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
-            Dim InputDate As Date = DR("Date") 'Date field is the date the checklist log was created
-
-            If InputDate.Date < StartDate.Date OrElse InputDate.Date > EndDate.Date Then
-                OutOfRange = True
-                Exit For
-            End If
-
-        Next
-
-        Assert.False(OutOfRange)
-    End Sub
-
-    <Fact>
-    Public Sub SetDateRangeTest2()
-        'if start date is greater than end date, there should be no rows returned
-        Dim StartDate As Date = "03-25-2025"
-        Dim EndDate As Date = "03-22-2025"
-        Dim DS As Data.DataSet = FDCG.SetDateRange(StartDate, EndDate)
-
-        Assert.False(If(DS.Tables(0).Rows.Count > 0, True, False))
-    End Sub
-
-    <Fact>
-    Public Sub SetDateRangeTest3()
+    Public Sub DatasetDateRangeTest2()
         'start date and end date are the same date. There should be rows returned
-        Dim DS As Data.DataSet = FDCG.SetDateRange("03-22-2025", "03-22-2025")
+        Dim Report As Report = CreateReport()
+        Report.SetDateRange("03-22-2025", "03-22-2025")
+        Dim Ds As Data.DataSet = Report.GetDS()
 
-        Assert.True(If(DS.Tables(0).Rows.Count > 0, True, False))
+        Assert.NotEqual(0, Ds.Tables(0).Rows.Count)
     End Sub
 
-    <Fact>
-    Public Sub SetAreaTest1()
-        'calling SetArea function. ensure GetDS() from Report class does not hold data for any other checklist
-        Dim AreaKey As Integer = 55 'AWN Daily
-        Dim DS As Data.DataSet = FDCG.SetArea(AreaKey)
-        Dim RC = DS.Tables(0).Rows.Count - 1
-        Dim OutOfSpec As Boolean = False
-
-        For I As Integer = 0 To RC
-            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
-
-            If DR("AreaKey") <> AreaKey Then
-                OutOfSpec = True
-                Exit For
-            End If
-
-        Next
-
-        Assert.False(OutOfSpec)
-    End Sub
-
-    <Fact>
-    Public Sub SetAreaTest2()
-        'calling SetArea function with AreaKey of 0, which means ALL checklists
-        Dim DS As Data.DataSet = FDCG.SetArea(0)
-        'Dim RC = DS.Tables(0).Rows.Count - 1
-
-        Assert.True(DS.Tables(0).Rows.Count > 0)
-    End Sub
-
-    <Fact>
-    Public Sub SetAreaTest3()
-        'calling SetArea function with existing AreaKey
-        Assert.True(FDCG.SetArea(58).Tables(0).Rows.Count > 0)
-    End Sub
-
-    <Fact>
-    Public Sub SetGroupTest1()
-        'calling SetGroup function. ensure GetDS() from Report class does not hold data for any other group
-        Dim GroupKey As Integer = 2
-        Dim DS As Data.DataSet = FDCG.SetGroup(GroupKey)
-        Dim RC = DS.Tables(0).Rows.Count - 1
-        Dim OutOfSpec As Boolean = False
-
-        For I As Integer = 0 To RC
-            Dim DR As Data.DataRow = DS.Tables(0).Rows(I)
-
-            If DR("GroupKey") <> GroupKey Then
-                OutOfSpec = True
-                Exit For
-            End If
-
-        Next
-
-        Assert.False(OutOfSpec)
-    End Sub
-
-    <Fact>
-    Public Sub SetGroupTest2()
-        'calling SetGroup function with GroupKey of 0, which means ALL checklists
-        FDCG.SetDateRange("03/23/2025", "03/24/2025") 'so lights don't flicker from lots of DB being pulled
-        Assert.True(FDCG.SetGroup(1).Tables(0).Rows.Count > 0)
-    End Sub
     <Fact>
     Public Sub GetMaxFieldValsTest1()
-        'calling GetMaxFieldVals function. test return field values against entire dataset for GroupKey 1 AreaKey 57
-        FDCG.SetArea(48) 'Nitrogen Daily
-        Dim MaxFieldVals As Dictionary(Of String, String) = FDCG.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
+        'calling GetMaxFieldVals function. test return field values against entire dataset for GroupKey 1 AreaKey 48
+        Dim Report As Report = CreateReport()
+        Report.SetAreas({48}.ToList()) 'Nitrogen Daily
+        Dim MaxFieldVals As Dictionary(Of String, String) = Report.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
         Dim AccurateResults As Boolean = True
 
         If MaxFieldVals("Label").Length < ("Check for leaks - blow-off").Length Then 'in case a new label with longer length is added
@@ -373,8 +317,9 @@ Public Class ReportTests
     <Fact>
     Public Sub GetMaxFieldValsTest2()
         'calling GetMaxFieldVals function. test return field values against entire dataset for GroupKey 1 AreaKey 56
-        FDCG.SetArea(56) 'R.O. Daily
-        Dim MaxFieldVals As Dictionary(Of String, String) = FDCG.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
+        Dim Report As Report = CreateReport()
+        Report.SetAreas({56}.ToList()) 'R.O. Daily
+        Dim MaxFieldVals As Dictionary(Of String, String) = Report.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
         Dim AccurateResults As Boolean = True
 
         If MaxFieldVals("Label").Contains("1st Pass System Pressure, Final Concentrate") = False Then
@@ -391,65 +336,11 @@ Public Class ReportTests
 
         Assert.True(AccurateResults)
     End Sub
-
-    'InvalidDateMessage
-    'OutOfRangeDateMessage
-
-    <Fact>
-    Public Sub DateInRangeTest1()
-        'if date is null, the return should equal InvalidDateMessage
-        Assert.Equal(FDCG.InvalidDateMessage, FDCG.DateInRange(Nothing))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest2()
-        'if date is not a valid date (MM/DD/YYYY), the return should equal InvalidDateMessage
-        Assert.Equal(FDCG.InvalidDateMessage, FDCG.DateInRange("03/23/20"))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest3()
-        'if date is valid, compare against date range. The input will match the lower bound, so expect empty string as return
-        FDCG.SetDateRange("03/16/2025", "03/23/2025")
-        Assert.Equal(String.Empty, FDCG.DateInRange("03/16/2025"))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest4()
-        'if date is valid, compare against date range. The input will be in range, so expect empty string as return
-        FDCG.SetDateRange("03/16/2025", "03/23/2025")
-        Assert.Equal(String.Empty, FDCG.DateInRange("03/22/2025"))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest5()
-        'if date is valid, compare against date range. The input will be out of range, so expect OutOfRangeDateMessage
-        FDCG.SetDateRange("03/16/2025", "03/23/2025")
-        Assert.Contains(FDCG.OutOfRangeDateMessage, FDCG.DateInRange("03/14/2025"))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest6()
-        'no date range exists. valid date, so expect empty string
-        FDCG.SetDateRange(Nothing, Nothing)
-        Assert.Equal(String.Empty, FDCG.DateInRange("03/22/2025"))
-    End Sub
-
-    <Fact>
-    Public Sub DateInRangeTest7()
-        'no date range exists. invalid date (MM/DD/YYYY), so return should equal InvalidDateMessage
-        FDCG.SetDateRange(Nothing, Nothing)
-        Assert.Equal(FDCG.InvalidDateMessage, FDCG.DateInRange("03/22/5"))
-    End Sub
 End Class
 
 Public Class SetAreasTests
-    Inherits Security
+    Inherits ReportTestsLibrary
 
-    Private Report As New Report(New Dictionary(Of String, String) From {
-        {"GroupKey", 1},
-        {"AreaKey", 0}
-    })
     Private GroupKey1AreasHash As New Dictionary(Of Integer, String) From {
         {48, "Nitrogen Daily"},
         {55, "AWN Daily"},
@@ -460,31 +351,21 @@ Public Class SetAreasTests
         {60, "SC-3 Fume Scrubber Monitoring Daily"},
         {61, "Daily Fluoride Measurement Log"}
     }
-    Private DS As Data.DataSet
-    Private OgDS As Data.DataSet
-    Private Format As New Format()
 
-    Public Sub New()
+    Private Function CustomReport() As Report
+        Dim Report As Report = New Report(New Dictionary(Of String, String) From {
+            {"GroupKey", 0},
+            {"AreaKey", 0}
+        })
         Report.SetGroup(1)
-        Report.SetDateRange("04/01/2025", "04/01/2025")
+        Report.SetDateRange("08/01/2025", "08/01/2025")
 
-        OgDS = Report.GetDS()
-    End Sub
-
-    Private Function RemoveAreasFromDS(AreasToExclude As Integer()) As Data.DataSet 'programmatically delete rows that are tied to values in 'AreasToExclude' array
-        Dim ReportDS As Data.DataSet = OgDS.Copy()
-
-        For Each DR As Data.DataRow In ReportDS.Tables(0).Rows
-            If AreasToExclude.Contains(DR("AreaKey")) Then
-                DR.Delete() 'mark row for deletion
-            End If
-        Next
-        ReportDS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
-
-        Return ReportDS
+        Return Report
     End Function
-    Private Function IncludeAreasFromDS(AreasToInclude As Integer()) As Data.DataSet 'programmatically delete rows that are tied to values in 'AreasToExclude' array
-        Dim ReportDS As Data.DataSet = OgDS.Copy()
+
+    Private Function IncludeAreasFromDS(AreasToInclude As Integer()) As Data.DataSet
+        'programmatically delete rows that are not in 'AreasToInclude' array
+        Dim ReportDS As Data.DataSet = CustomReport().GetDS()
 
         For Each DR As Data.DataRow In ReportDS.Tables(0).Rows
             If AreasToInclude.Contains(DR("AreaKey")) = False Then
@@ -496,463 +377,240 @@ Public Class SetAreasTests
         Return ReportDS
     End Function
 
-    Private Function NumOfRows() As Integer
-        Return Report.GetDS().Tables(0).Rows.Count
-    End Function
-
-    <Fact>
-    Public Sub BaselineTest()
-        'check if return dataset from class instantiation is as expected
-        Assert.Equal(OgDS.Tables(0).Rows.Count, NumOfRows())
-    End Sub
-
-    <Fact>
-    Public Sub SetAreasNothingArg()
-        'if SetAreas receivs null as arg 1, return empty dataset
-        Report.SetAreas(Nothing)
-        Assert.Equal(0, NumOfRows())
-    End Sub
-
     <Fact>
     Public Sub SetAreasEmptyListArg()
         'if SetAreas receivs empty list as arg 1, return empty dataset
+        Dim Report As Report = CreateReport()
         Report.SetAreas(New List(Of Integer))
-        Assert.Equal(0, NumOfRows()) 'ensure number of rows is not confined to a single area
+        Assert.Equal(0, NumOfRecords(Report))
     End Sub
 
     <Fact>
     Public Sub SetAreasAllAreas()
-        'pass list of all Areas for GroupKey 1, and check to see if instantiation holds the same dataset before function SetAreas in called
-        Dim RecordSet As New RecordSet(Report.SetGroup(1))  'calling SetGroup function to reset GroupDS in Class instantiation
+        Dim Report1 As Report = CustomReport()
+        Dim ExpectedDS As Data.DataSet = Report1.GetDS()
 
-        SetAreasEmptyListArg() 'calling this will set GroupDS to be blank within Report Class instantiation
+        Dim Report2 As Report = CustomReport()
+        Report2.SetAreas(GroupKey1AreasHash.Keys.ToList())
+        Dim ActualDS As Data.DataSet = Report2.GetDS()
 
-        Assert.True(RecordSet.DataSetsMatch(Report.SetAreas(GroupKey1AreasHash.Keys.ToList()))) 'ensure number of rows is not confined to a single area
+        Assert.NotEqual(0, NumOfRecords(Report2))
+        Assert.True(AreDataSetsEqual(ActualDS, ExpectedDS))
     End Sub
 
     <Fact>
     Public Sub SetAreasExclude1Area()
-        'pass list that excludes 1 Area from GroupKey1 and check to see if instantiation holds different dataset before function SetAreas in called
-        Dim RecordSet As RecordSet
-        Dim GroupKey1AreasHashNew As New Dictionary(Of Integer, String)(GroupKey1AreasHash)
+        Dim GroupKey1AreasHashCopy As New Dictionary(Of Integer, String)(GroupKey1AreasHash)
 
-        Report.SetGroup(1) 'sanity check
+        Dim ExpectedDS As Data.DataSet = RemoveAreasFromDS(CustomReport().GetDS(), {48})
+        GroupKey1AreasHashCopy.Remove(48)
 
-        RecordSet = New RecordSet(RemoveAreasFromDS({48}))
-        GroupKey1AreasHashNew.Remove(48)
+        Dim Report2 As Report = CustomReport()
+        Report2.SetAreas(GroupKey1AreasHashCopy.Keys.ToList())
+        Dim ActualDS As Data.DataSet = Report2.GetDS()
 
-        Assert.True(RecordSet.DataSetsMatch(Report.SetAreas(GroupKey1AreasHashNew.Keys.ToList())))
+        Assert.NotEqual(0, NumOfRecords(Report2))
+        Assert.True(AreDataSetsEqual(ActualDS, ExpectedDS))
     End Sub
 
     <Fact>
-    Public Sub SetAreasExcludeThenIncludeAll()
-        'excluding certain areas out from DS, then bringing them backing in does NOT work
-        'refactor Report Class, so this unit test passes, which in turn mean the problem above no longer occurs
-        SetAreasExclude1Area()
-        SetAreasAllAreas()
-    End Sub
-
-    <Fact>
-    Public Sub GetAreasTest()
-        Assert.Equal(Of Dictionary(Of Integer, String))(GroupKey1AreasHash, Report.GetAreas())
-    End Sub
-
-    <Fact>
-    Public Sub GetReportedAreasBaseLine()
-        Report.SetGroup(1)
-        Assert.Equal(Of Dictionary(Of Integer, String))(Report.GetAreas(), Report.GetReportedAreas())
-    End Sub
-
-    <Fact>
-    Public Sub GetReportedAreas1()
-        SetAreasExclude1Area()
-        Assert.NotEqual(Of Dictionary(Of Integer, String))(GroupKey1AreasHash, Report.GetReportedAreas())
-    End Sub
-
-    <Fact>
-    Public Sub GetReportedAreas2()
-        SetAreasExcludeThenIncludeAll()
-        Assert.Equal(Of Dictionary(Of Integer, String))(GroupKey1AreasHash, Report.GetReportedAreas())
-    End Sub
-
-    <Fact>
-    Public Sub DoNotExcludeLabelsOnInvocationOfSetAreas()
-        ' using 'Filter Checklist' functionality to exclude label(s), then including another checklist, so that 'Filter Label' functionality is no longer available
-        ' This causes excluded label(s) from before to still be excluded
+    Public Sub RestoreLabelsOnSetAreas()
+        ' end user can filter inputs if they are dialed in on 1 pm/checklist
+        ' if they were to then include another pm/checklist, all inputs from both pm/checklists must be included
         Dim AreasToInclude As Integer() = {58, 59}
         Dim ExpectedDS As Data.DataSet = IncludeAreasFromDS(AreasToInclude)
-        Dim ResDS As New Data.DataSet
-        Dim ExpectedRecordSet As New RecordSet(ExpectedDS)
 
-        Report.SetArea(58)
-
+        Dim Report As Report = CustomReport()
+        Report.SetAreas({58}.ToList())
         Report.SetLabels({553, 554}.ToList()) 'exclude a label (LabelKey 555)
-        ResDS = Report.SetAreas(AreasToInclude.ToList()) 'include another checklist
+        Report.SetAreas({58, 59}.ToList())
+        Dim ActualDS As Data.DataSet = Report.GetDS()
 
-        'ensure excluded label(s) from before are NOT excluded anymore
-        Assert.Equal(ExpectedDS.Tables(0).Rows.Count, ResDS.Tables(0).Rows.Count)
-        Assert.True(ExpectedRecordSet.DataSetsMatch(ResDS))
+        Assert.NotEqual(0, NumOfRecords(Report))
+        Assert.True(AreDataSetsEqual(ActualDS, ExpectedDS))
+    End Sub
 
-        Report.SetGroup(1) 'reset status of Report class instantiation to og environment from constructor
+    <Fact>
+    Public Sub ExcludeAreaBeforeSetDateRangeTest()
+        Dim GroupKey1AreasHashCopy As New Dictionary(Of Integer, String)(GroupKey1AreasHash)
+
+        Dim ExpectedDS As Data.DataSet = RemoveAreasFromDS(CustomReport().GetDS(), {48})
+        GroupKey1AreasHashCopy.Remove(48)
+
+        Dim Report As Report = New Report(New Dictionary(Of String, String) From {
+            {"GroupKey", 0},
+            {"AreaKey", 0}
+        })
+        Report.SetGroup(1) 'end user interacts with group ddl
+        Report.SetAreas(GroupKey1AreasHashCopy.Keys.ToList()) 'end user interacts with and unselects 1 pm/checklist from modal
+        Report.SetDateRange("08/01/2025", "08/01/2025") 'end user interacts with date range pickers
+        Dim ActualDS As Data.DataSet = Report.GetDS()
+
+        Assert.NotEqual(0, NumOfRecords(Report))
+        Assert.True(AreDataSetsEqual(ActualDS, ExpectedDS))
     End Sub
 End Class
 
 Public Class LabelFunctionTests
-    Inherits Security
+    Inherits ReportTestsLibrary
 
-    Private Report As New Report(New Dictionary(Of String, String) From {
-        {"GroupKey", 1},
-        {"AreaKey", 0}
-    })
-    Private NitrogenDailyLabelsHash As New Dictionary(Of Integer, String) From {
+    Private LabelsHash As New Dictionary(Of Integer, String) From {
         {553, "Recirculation Water | >75 GPM"},
         {554, "DP Across Media | 1-3 inH20"},
         {555, "Recirculation Water | 3-10 pH"}
     }
-    Private DS As Data.DataSet
-    Private Format As New Format()
+    Private _AreaKey As Integer = 58
 
-    Public Sub New()
-        Report.SetArea(58) 'SC-1 Fume Scrubber Monitoring Daily
+    Private Function CreateCustomReport() As Report
+        '1 day, 3 records (for simplicity of troubleshooting)
+        Dim Report As Report = CreateReport()
+        Report.SetAreas({_AreaKey}.ToList())
         Report.SetDateRange("04/01/2025", "04/01/2025")
-    End Sub
-
-    Public Function NumOfRows() As Integer
-        Return Report.GetDS().Tables(0).Rows.Count
+        Return Report
     End Function
 
     <Fact>
     Public Sub BaselineTest()
         'check if return dataset from class instantiation is as expected
-        Assert.Equal(3, NumOfRows())
-    End Sub
-
-    <Fact>
-    Public Sub SetLabelsNothingArg()
-        'if SetLabels receivs null as arg 1, return empty dataset
-        Report.SetLabels(Nothing)
-        Assert.Equal(0, NumOfRows())
-    End Sub
-
-    <Fact>
-    Public Sub SetLabelsEmptyListArg()
-        'if SetLabels receivs empty list as arg 1, return empty dataset
-        Report.SetLabels(New List(Of Integer))
-        Assert.Equal(0, NumOfRows()) 'ensure number of rows is not confined to a single area
+        Dim Report As Report = CreateCustomReport()
+        Assert.Equal(3, NumOfRecords(Report))
     End Sub
 
     <Fact>
     Public Sub SetLabelsAllLabels()
         'pass list of all labels for AreaKey 58, and check to see if instantiation holds the same dataset before function SetLabels in called
-        Dim RecordSet As New RecordSet(Report.SetArea(58))  'calling SetArea function to reset GroupDS in Class instantiation
+        Dim Report1 As Report = CreateCustomReport()
+        Dim ExpectedDs As Data.DataSet = Report1.GetDS()
 
-        SetLabelsEmptyListArg() 'calling this will set GroupDS to be blank within Report Class instantiation
+        Dim Report2 As Report = CreateCustomReport()
+        Report2.SetLabels(LabelsHash.Keys.ToList())
+        Dim ActualDs As Data.DataSet = Report2.GetDS()
 
-        Assert.True(RecordSet.DataSetsMatch(Report.SetLabels(NitrogenDailyLabelsHash.Keys.ToList()))) 'ensure number of rows is not confined to a single area
+        Assert.Equal(3, NumOfRecords(Report2))
+        Assert.True(AreDataSetsEqual(ActualDs, ExpectedDs))
     End Sub
 
     <Fact>
     Public Sub SetLabelsExcludeALabel()
         'pass list that excludes 1 label for AreaKey 58, and check to see if instantiation holds different dataset before function SetLabels in called
-        Dim RecordSet As RecordSet
-        Dim NitrogenDailyLabelsHashNew As New Dictionary(Of Integer, String)(NitrogenDailyLabelsHash)
+        Dim LabelsHashNew As New Dictionary(Of Integer, String)(LabelsHash)
         Dim RemovedKvp As New Dictionary(Of Integer, String) From {
             {553, "Recirculation Water | >75 GPM"}
         }
         Dim LabelsToInclude As New List(Of Integer)
-        Dim DS As Data.DataSet = Report.GetDS()
-
-        Report.SetArea(58) 'sanity check
+        Dim Report1 As Report = CreateCustomReport()
+        Dim ExpectedDS As Data.DataSet = Report1.GetDS()
 
         'remove rows from DataSet programmatically that include LabelToRemove
-        NitrogenDailyLabelsHashNew.Remove(0)
-        For Each DR As Data.DataRow In DS.Tables(0).Rows
+        LabelsHashNew.Remove(0)
+        For Each DR As Data.DataRow In ExpectedDS.Tables(0).Rows
             If RemovedKvp.ContainsKey(DR("LabelKey")) Then
                 DR.Delete() 'mark DataRow for deletion
             Else
                 LabelsToInclude.Add(DR("LabelKey"))
             End If
         Next
-        DS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
+        ExpectedDS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
 
-        RecordSet = New RecordSet(DS)
+        Dim Report2 As Report = CreateCustomReport()
+        Dim ActualDs As Data.DataSet = Report2.SetLabels(LabelsToInclude)
 
-        Assert.True(RecordSet.DataSetsMatch(Report.SetLabels(LabelsToInclude)))
-    End Sub
-
-    <Fact>
-    Public Sub GetLabelsTest1()
-        'ensure, after constructor is ran, that Report.GetLabels() returns a list of all labels from a checklist
-        Assert.Equal(Of Dictionary(Of Integer, String))(NitrogenDailyLabelsHash, Report.GetLabels())
-    End Sub
-
-    <Fact>
-    Public Sub GetLabelsTest2()
-        'call several Report functions, to simulate an instantiation being used. All this to ensure that Report.GetLabels() returns a list of all labels from a checklist
-        SetLabelsAllLabels()
-        SetLabelsExcludeALabel()
-        Assert.Equal(Of Dictionary(Of Integer, String))(NitrogenDailyLabelsHash, Report.GetLabels())
-    End Sub
-
-    <Fact>
-    Public Sub GetLabelsTest3()
-        'ensure, after changing Group, then changing Group back to 'All', that Report.GetLabels() returns an empty list
-        Report.SetGroup(2)
-        Report.SetGroup(0) 'return back to og from constructor
-        Assert.Equal(Of Dictionary(Of Integer, String))(New Dictionary(Of Integer, String), Report.GetLabels())
-    End Sub
-
-    <Fact>
-    Public Sub GetLabelsTest4()
-        'ensure, after changing Area, then changing Area back to Nitrogen Daily, that Report.GetLabels() returns a list of all labels from Nitrogen Daily
-        Report.SetArea(48)
-        Report.SetArea(58) 'return back to og from constructor
-        Assert.Equal(Of Dictionary(Of Integer, String))(NitrogenDailyLabelsHash, Report.GetLabels())
+        Assert.Equal(2, NumOfRecords(Report2))
+        Assert.True(AreDataSetsEqual(ActualDs, ExpectedDS))
     End Sub
 
 
     <Fact>
-    Public Sub GetLabelsTest5()
-        'pass empty List to SetAreas() function as arg
-        Report.SetAreas(New List(Of Integer))
-        Assert.Equal(Of Dictionary(Of Integer, String))(New Dictionary(Of Integer, String), Report.GetLabels())
+    Public Sub ExcludeLabelBeforeSetDateRangeTest()
+        Dim Report1 As Report = CreateReport()
+        Report1.SetAreas({58}.ToList())
+        Report1.SetLabels({553, 554}.ToList()) 'end user interacts with and unselects 1 label from pm/checklist using label modal
+        Report1.SetDateRange("08/01/2025", "08/01/2025") 'end user interacts with date range pickers
+        Dim ExpectedDS As Data.DataSet = Report1.GetDS()
+
+        Dim Report2 As Report = New Report(New Dictionary(Of String, String) From {
+            {"GroupKey", 0},
+            {"AreaKey", 0}
+        })
+        Report2.SetGroup(1) 'end user interacts with group ddl
+        Report2.SetAreas({58}.ToList()) 'end user interacts with and unselects 1 pm/checklist using area modal
+        Report2.SetLabels({553, 554}.ToList()) 'end user interacts with and unselects 1 label from pm/checklist using label modal
+        Report2.SetDateRange("08/01/2025", "08/01/2025") 'end user interacts with date range pickers
+        Dim ActualDS As Data.DataSet = Report2.GetDS()
+
+        Assert.NotEqual(0, NumOfRecords(Report2))
+        Assert.True(AreDataSetsEqual(ActualDS, ExpectedDS))
     End Sub
-
-    <Fact>
-    Public Sub GetLabelsReturnEmptyUntil1AreaIsLeft()
-        Report.SetAreas(New List(Of Integer) From {58, 59})
-        Report.SetAreas(New List(Of Integer) From {58})
-        Assert.Equal(Of Dictionary(Of Integer, String))(NitrogenDailyLabelsHash, Report.GetLabels())
-    End Sub
-
-    <Fact>
-    Public Sub OrderByDateTest1()
-        'ensure, after calling Report.OrderByDate(), the DS is not equal to the dataset returned by Report.GetDS()
-        Report.SetDateRange("04/01/2025", "04/03/2025")
-
-        Dim RecordSet1 As New RecordSet(Report.GetDS())
-        Dim RecordSet2 As New RecordSet(Report.OrderDSByDate())
-        Assert.False(RecordSet1.DataSetsMatch(RecordSet2))
-    End Sub
-
-    <Fact>
-    Public Sub OrderByDateTest2()
-        'ensure that if a date range does NOT exists, and after calling Report.OrderByDate(), the DS has no records
-        Report.SetDateRange(Nothing, Nothing)
-        Assert.Equal(Of Integer)(0, Report.OrderDSByDate().Tables(0).Rows.Count)
-    End Sub
-
-    <Fact>
-    Public Sub OrderByDateTest3()
-        'call OrderDSByDate(), test against a live dataset to ensure each label is display for a date, then the next date
-        Dim DR As Data.DataRow
-
-        Report.SetLabels(NitrogenDailyLabelsHash.Keys.ToList()) 'no labels are excluded
-        Report.SetDateRange("04/01/2025", "04/03/2025")
-        DS = Report.OrderDSByDate()
-
-        For I As Integer = 0 To 2 'ensure first 3 rows have the same date
-            DR = DS.Tables(0).Rows(I)
-
-            Assert.Equal(Of String)(DR("Date"), "04/01/2025")
-        Next
-
-        'since there are 3 labels for Nitrogen Daily, the date for the next DataRow should contains "04/02/2025"
-        DR = DS.Tables(0).Rows(3)
-        Assert.Equal(Of String)(DR("Date"), "04/02/2025")
-    End Sub
-
-    <Fact>
-    Public Sub OrderByDateTest4()
-        'if Report.OrderDSByDate() is called first, DS returned from GetDS() matches DS returned by Report.OrderDSByDate()
-        Dim RecordSet1 As RecordSet
-
-        Report.SetDateRange("04/01/2025", "04/03/2025")
-        DS = Report.OrderDSByDate()
-
-        RecordSet1 = New RecordSet(DS)
-
-        Assert.True(RecordSet1.DataSetsMatch(New RecordSet(Report.GetDS())))
-    End Sub
-
-    <Fact>
-    Public Sub UndoOrderByDateTest1()
-        'Report.UndoOrderDSByDate() reverses result from Report.OrderDSByDate()
-        Dim RecordSet As RecordSet
-
-        Report.SetDateRange("04/01/2025", "04/03/2025")
-
-        RecordSet = New RecordSet(Report.GetDS())
-
-        Report.OrderDSByDate()
-
-        Assert.True(RecordSet.DataSetsMatch(New RecordSet(Report.UndoOrderDSByDate())))
-    End Sub
-
-    <Fact>
-    Public Sub DateTest1()
-        'ensure InputDate includes date and time
-        Dim DS As Data.DataSet = Report.GetDS()
-        Dim AccurateData As Boolean = True
-
-        For Each DR As Data.DataRow In DS.Tables(0).Rows
-            If (IsDateOnly(DR("InputDate"))) Then 'b/c the dataset is on AreaKey 58 for 04/01/2025, which has date stamps for each input, this condition should NOT be true
-                AccurateData = False
-            End If
-        Next
-
-        Assert.True(AccurateData)
-    End Sub
-
-    <Fact>
-    Public Sub DateTest3()
-        'ensure Accurate StartDate and InputDate values.
-        'Test against edgecase T_LogData Key 334, where the InputDate has a date different than StartDate field
-        'This means operator filled in data AFTER the due date
-
-        'setup environment for T_LogData Key 334
-        Report.SetDateRange("2025-03-23", "2025-03-23")
-        Report.SetArea(57)
-
-        Dim DS As Data.DataSet = Report.GetDS()
-        Dim ExpectedMismatches As Boolean = True
-
-        For Each DR As Data.DataRow In DS.Tables(0).Rows
-            If Date.Parse(DR("StartDate")).Day = Date.Parse(DR("InputDate")).Day Then
-                ExpectedMismatches = False
-                Exit For
-            End If
-        Next
-
-        Assert.True(ExpectedMismatches)
-
-        OgEnvironment()
-    End Sub
-
-    <Fact>
-    Public Sub InputDateNeverNull1()
-        'StartDate should ALWAYS have a value!!!!
-
-        'Group=3&Area=75&StartDate=4/4/2025&EndDate=4/4/2025
-        'the querystring above is an instance where StartDate field values display as empty
-        'Group is 0 for current environment (All), so am NOT calling Report.SetGroup()
-
-        Dim DS As Data.DataSet
-        Dim NullInputDate As Boolean = False
-
-        Report.SetArea(75)
-        Report.SetDateRange("4/4/2025", "4/4/2025")
-        DS = Report.GetDS()
-
-        For Each DR As Data.DataRow In DS.Tables(0).Rows
-            If String.IsNullOrEmpty(DR("StartDate")) Then
-                NullInputDate = True
-                Exit For
-            End If
-        Next
-
-        Assert.False(NullInputDate)
-    End Sub
-
-    <Fact>
-    Public Sub AccurateStartDate()
-        'when InputValue is null, StartDate should have a value that matches T_LogData Date field value rather than today's date
-        '?Group=1&Area=48&StartDate=4/14/2025&EndDate=4/20/2025
-
-        Dim DS As Data.DataSet
-
-        Report.SetArea(48)
-        Report.SetDateRange("4/19/2025", "4/20/2025") 'null operator values for this date range
-        Report.OrderDSByDate()
-        DS = Report.GetDS()
-
-        For Each DR As Data.DataRow In DS.Tables(0).Rows
-            If String.IsNullOrEmpty(DR("Value")) Then
-                Assert.NotEqual(Format.DateField(Today.Date), DR("StartDate"))
-            End If
-        Next
-    End Sub
-
-    Private Sub OgEnvironment()
-        'return environment to og setup from constructor
-        Report.SetArea(58) 'SC-1 Fume Scrubber Monitoring Daily
-        Report.SetDateRange("04/01/2025", "04/01/2025")
-    End Sub
-
-
-
-    Private Function IsDateOnly(DateValue As String) As Boolean
-        Dim parsedDate As DateTime
-        Return DateTime.TryParseExact(DateValue, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, parsedDate)
-    End Function
 End Class
 
 Public Class GetOperatorsTest
-    Inherits Security
-    Public Report As New Report(New Dictionary(Of String, String) From {
-        {"GroupKey", 0},
-        {"AreaKey", 0}
-    })
-    Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
+    Inherits ReportTestsLibrary
+
+    Private _OperatorDs As Data.DataSet
+
     Sub New()
+        _OperatorDs = BuildOperatorsDs()
+    End Sub
+
+    Private Function BuildOperatorsDs() As Data.DataSet
+        Dim Report As Report = CreateReport()
+        Report.SetAreas({58}.ToList())
+        Report.SetDateRange("08/01/2025", "10/01/2025")
+        Return Report.GetOperators()
+    End Function
+
+    <Fact>
+    Public Sub NoDuplicateInputOperatorValues()
+        Dim DS As Data.DataSet = _OperatorDs.Copy()
+        Assert.NotEqual(0, NumOfRecords(DS))
+
+        Dim OperatorHashset As New HashSet(Of String)
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            Dim InputOperator As Object = DR("Operator")
+            Assert.False(OperatorHashset.Contains(InputOperator))
+            OperatorHashset.Add(InputOperator)
+        Next
     End Sub
 
     <Fact>
-    Public Sub DoNotReturnNullOrBasicUser()
-        Dim DS As New Data.DataSet
-        Dim OperatorList As New List(Of String)
+    Public Sub NoDuplicateInputOperatorValues2()
+        'some operators have duplicate entries in operator ds with different casing (Ex: Mark Kiser and mark kiser, Andrew Williams and andrew williams)
+        'account for this edge case
+        Dim DS As Data.DataSet = _OperatorDs.Copy()
+        Assert.NotEqual(0, NumOfRecords(DS))
 
-        Report.SetArea(48)
-
-        DS = Report.GetOperators()
-
+        Dim OperatorHashset As New HashSet(Of String)
         For Each DR As Data.DataRow In DS.Tables(0).Rows
-            OperatorList.Add(If(IsDBNull(DR("Operator")), Nothing, DR("Operator")))
+            Dim InputOperator As Object = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DR("Operator").ToLower())
+            Assert.False(OperatorHashset.Contains(InputOperator))
+            OperatorHashset.Add(InputOperator)
         Next
-
-        '(hopefully) scale proof way of testing
-        Assert.True(OperatorList.Contains("Chase Dostie"))
-        Assert.False(OperatorList.Contains(Nothing))
-        Assert.False(OperatorList.Contains("Brett Teets"))
     End Sub
 
     <Fact>
-    Public Sub DoNotReturnSzymonOrBrett()
-        Dim DS As New Data.DataSet
-        Dim OperatorList As New List(Of String)
+    Public Sub NoEmptyStringOperatorValues()
+        Dim DS As Data.DataSet = _OperatorDs.Copy()
+        Assert.NotEqual(0, NumOfRecords(DS))
 
-        Report.SetArea(0)
-
-        DS = Report.GetOperators()
-
+        Dim OperatorHashset As New HashSet(Of String)
         For Each DR As Data.DataRow In DS.Tables(0).Rows
-            OperatorList.Add(If(IsDBNull(DR("Operator")), Nothing, DR("Operator")))
+            Dim InputOperator As Object = DR("Operator")
+            Assert.NotEqual("", InputOperator)
         Next
-
-        '(hopefully) scale proof way of testing
-        Assert.True(OperatorList.Contains("Chase Dostie"))
-        Assert.True(OperatorList.Contains("mark kiser"))
-        Assert.False(OperatorList.Contains("Brett Teets"))
-        Assert.False(OperatorList.Contains("Szymon Tyburek"))
     End Sub
 End Class
 
 Public Class AdminOverrideTests
-    Inherits Security
+    Inherits ReportTestsLibrary
 
-    Private Report As New Report(New Dictionary(Of String, String) From {
-        {"GroupKey", 0},
-        {"AreaKey", 0}
-    })
-    Private NitrogenDailyLabels As New List(Of String) From {"Recirculation Water | >75 GPM", "DP Across Media | 1-3 inH20", "Recirculation Water | 3-10 pH"}
-    Private OgDS As Data.DataSet
+    Private _Security As New Security()
+    Private _Report As Report
     Private LabelKey As Integer = 553
-    Private RecordSet As New RecordSet(OgDS)
 
     Public Sub New()
-        Report.SetArea(58) 'SC-1 Fume Scrubber Monitoring Daily
-        Report.SetDateRange("04/14/2025", "04/14/2025")
-        OgDS = Report.GetDS()
+        _Report = CreateReport()
+        _Report.SetAreas({58}.ToList()) 'SC-1 Fume Scrubber Monitoring Daily
+        _Report.SetDateRange("04/14/2025", "04/14/2025")
     End Sub
 
     <Fact>
@@ -965,7 +623,7 @@ Public Class AdminOverrideTests
         '- Value: 153	
         '- InputDate: 04/14/2025 09:50:20 AM
         '- Operator: Chase Dostie
-        Dim InputsJson As String = GetSingleDbField("SELECT Inputs FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=514", New Dictionary(Of String, Dictionary(Of String, String)), "Inputs")
+        Dim InputsJson As String = _Security.GetSingleDbField("SELECT Inputs FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=514", New Dictionary(Of String, Dictionary(Of String, String)), "Inputs")
         Dim Inputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(InputsJson)
 
         Assert.Equal(Inputs(LabelKey)("Value"), 153)
@@ -985,14 +643,14 @@ Public Class AdminOverrideTests
             {"LabelKey", LabelKey},
             {"Date", "04/14/2025"}
         }
-        Dim OverrideInputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(Report.Override(Config, Mods))
+        Dim OverrideInputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(_Report.Override(Config, Mods))
 
         Assert.Equal(OverrideInputs(LabelKey)("Value"), NewValue)
         Assert.Equal(OverrideInputs(LabelKey)("Date"), NewDate)
     End Sub
 End Class
 
-Public Class DummyDS
+Public Class DummyDS 
     Private Shared Random As New Random()
 
     Function InstantiationWithData(Optional RC As Integer = 1) As RecordSet
@@ -1048,85 +706,66 @@ Public Class DummyDS
 End Class
 
 Public Class ReturnZeroRecordsEdgecases
-    Inherits Security
+    Inherits ReportTestsLibrary
 
-    Private Format As New Format()
-    Private Report As New Report(New Dictionary(Of String, String) From {
+    Private _Config As New Dictionary(Of String, String) From {
         {"GroupKey", 0},
-        {"AreaKey", 58}
-    })
-    Private DateLowestBound As String = GetSingleDbField("SELECT FORMAT(MIN(Date), 'MM/dd/yyyy') As DateLowestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", New Dictionary(Of String, Dictionary(Of String, String)), "DateLowestBound")
-    Private DateHighestBound As String = GetSingleDbField("SELECT FORMAT(MAX(Date), 'MM/dd/yyyy') As DateHighestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", New Dictionary(Of String, Dictionary(Of String, String)), "DateHighestBound")
+        {"AreaKey", 0}
+    }
 
-    Public Sub New()
-        SetValidDateRange()
-    End Sub
-
-    Private Sub SetValidDateRange()
-        Report.SetDateRange("04/14/2025", "04/14/2025")
-    End Sub
-
-    Private Function NumOfRecords()
-        Return Report.GetDS().Tables(0).Rows.Count
-    End Function
-
-    Private Function DateTypeToMMDDYYYYStringFormat(Input As Date)
-        Return Format.DateField(Input.ToString).Split(" ")(0)
-    End Function
+    'if connected to dev db and tests are failing, make sure records exist from 1 month ago
+    Private UpperBoundAt As String = Today.AddMonths(-1).ToString("MM/dd/yyyy")
+    Private LowerBoundAt As String = Date.Parse(UpperBoundAt).AddDays(-7).ToString("MM/dd/yyyy")
 
     <Fact>
-    Private Sub Baseline()
-        Assert.NotEqual(0, NumOfRecords())
+    Public Sub SetGroupTest()
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+
+        Dim ReportDs As Data.DataSet = Report.GetDS()
+        Assert.Equal(0, ReportDs.Tables(0).Rows.Count)
     End Sub
 
     <Fact>
-    Public Sub StartDateAtLowerBound()
-        Report.SetDateRange(DateLowestBound, "04/14/2025")
-        Assert.NotEqual(0, NumOfRecords())
-    End Sub
+    Public Sub SetGroupAndAreasTest()
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetAreas({58}.ToList())
 
-    <Fact>
-    Public Sub StartDateAtUpperBound()
-        Report.SetDateRange(DateLowestBound, DateTypeToMMDDYYYYStringFormat(Today))
-        Assert.NotEqual(0, NumOfRecords())
-    End Sub
-
-    <Fact>
-    Public Sub DateBeforeLowerBound()
-        Dim LowerBound As Date = Date.Parse(DateLowestBound).AddDays(-1)
-
-        Report.SetDateRange(DateTypeToMMDDYYYYStringFormat(LowerBound), "04/14/2025")
-        Assert.NotEqual(0, NumOfRecords())
-    End Sub
-
-    <Fact>
-    Public Sub DateAfterUpperBound()
-        Report.SetDateRange(DateLowestBound, DateTypeToMMDDYYYYStringFormat(Today.AddDays(1)))
-        Assert.NotEqual(0, NumOfRecords())
+        Dim ReportDs As Data.DataSet = Report.GetDS()
+        Assert.Equal(0, ReportDs.Tables(0).Rows.Count)
     End Sub
 
     <Fact>
     Public Sub EndDatePrecedesStartDate()
-        Report.SetDateRange(DateHighestBound, DateLowestBound)
-        Assert.Equal(0, NumOfRecords())
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetDateRange(UpperBoundAt, LowerBoundAt)
+        Assert.Equal(0, NumOfRecords(Report))
     End Sub
 
     <Fact>
     Public Sub StartDateSucceedsEndDate()
-        Report.SetDateRange(DateTypeToMMDDYYYYStringFormat(Date.Parse(DateLowestBound).AddDays(1)), DateLowestBound)
-        Assert.Equal(0, NumOfRecords())
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetDateRange(Date.Parse(LowerBoundAt).AddDays(1), LowerBoundAt)
+        Assert.Equal(0, NumOfRecords(Report))
     End Sub
 
     <Fact>
     Public Sub EmptyStartDate()
-        Report.SetDateRange(String.Empty, DateHighestBound)
-        Assert.Equal(0, NumOfRecords())
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetDateRange(String.Empty, UpperBoundAt)
+        Assert.Equal(0, NumOfRecords(Report))
     End Sub
 
     <Fact>
     Public Sub EmptyEndDate()
-        Report.SetDateRange(DateLowestBound, String.Empty)
-        Assert.Equal(0, NumOfRecords())
+        Dim Report As New Report(_Config)
+        Report.SetGroup(1)
+        Report.SetDateRange(LowerBoundAt, String.Empty)
+        Assert.Equal(0, NumOfRecords(Report))
     End Sub
 End Class
 Public Class RecordSetTests
@@ -1201,102 +840,54 @@ Public Class RecordSetTests
     End Sub
 End Class
 
-Public Class ColsWithIdenticalValueTests
-    Inherits DummyDS
-
-    Private RecordSet As RecordSet = InstantiationWithData(20)
-    Private DS1 As Data.DataSet = RecordSet.GetDS()
-    Private Report As New Report(New Dictionary(Of String, String) From { 'since ColsWithIdenticalValues() will grab DS within instantiation when argument is NOT passed, instantiate with a small dataset
-        {"GroupKey", 1},
-        {"AreaKey", 48}
-    })
-    Private MatchingColsList As New List(Of String) From {"Null"} 'DummyDS.InstantiationWithData() return a RecordSet with DBNull.Value for all cells in the 'Null' column
-
-    Private Sub MatchCols(Cols As String())
-        Dim RC As Integer = DS1.Tables(0).Rows.Count
-
-        MatchingColsList = New List(Of String) From {"Null"} 'reset
-
-        For I As Integer = 0 To RC - 1
-            Dim DR As Data.DataRow = DS1.Tables(0).Rows(I)
-
-            For Each Col In Cols 'match field to value in row 1
-                DR(Col) = DS1.Tables(0).Rows(0)(Col)
-
-                If MatchingColsList.Contains(Col) = False Then
-                    MatchingColsList.Add(Col)
-                End If
-            Next
-        Next
-    End Sub
-
-    <Fact>
-    Public Sub EdgeCase()
-        'pass empty DS to function
-        Assert.Equal(New List(Of String), Report.ColsWithIdenticalValues(New Data.DataSet))
-    End Sub
-
-    <Fact>
-    Public Sub NullDbValue()
-        'ensure error does not occur when dealing with null db values
-        Assert.Equal(MatchingColsList, Report.ColsWithIdenticalValues(DS1))
-    End Sub
-
-    <Fact>
-    Public Sub ColBooleanMatching()
-        Dim Res As List(Of String)
-
-        'reset
-        DS1 = RecordSet.GetDS()
-
-        MatchCols({"Integer"})
-
-        Res = Report.ColsWithIdenticalValues(DS1)
-
-        MatchingColsList.Sort()
-        Res.Sort()
-        Assert.Equal(MatchingColsList, Res)
-    End Sub
-
-    <Fact>
-    Public Sub ColsDateDecimalStringMatching()
-        Dim Res As List(Of String)
-
-        'reset
-        DS1 = RecordSet.GetDS()
-
-        MatchCols({"Date", "Decimal", "String"})
-
-        Res = Report.ColsWithIdenticalValues(DS1)
-
-        MatchingColsList.Sort()
-        Res.Sort()
-        Assert.Equal(MatchingColsList, Res)
-    End Sub
-End Class
-
 Public Class OrderedByDateTests
-    Private Report As New Report(New Dictionary(Of String, String) From {
-        {"GroupKey", 1},
-        {"AreaKey", 0}
-    })
-    Private OrderByLabelDS As Data.DataSet = Report.GetDS()
-    Private OrderByDateDS As Data.DataSet = Report.OrderDSByDate()
+    Inherits ReportTestsLibrary
 
-    Sub New()
+    Private Function CreateCustomReport() As Report
+        Dim Report As Report = CreateReport()
+        Report.SetDateRange("08/11/2025", "08/12/2025")
+        Return Report
+    End Function
 
-    End Sub
+    Private Function IsDsOrderedByDate(Ds As Data.DataSet) As Boolean
+        Dim StartDateAt As String = "08/11/2025"
+        For I As Integer = 0 To Ds.Tables(0).Rows.Count
+            Dim Dr As Data.DataRow = Ds.Tables(0).Rows(I)
+            Dim DateAt As String = Dr("StartDate")
+            If I = 1 Then
+                'the 2nd row dictates whether the dataset is ordered by date or input
+                If DateAt = StartDateAt Then
+                    'if the date of the 2nd row is the same as the 1st row, the dataset is ordered by input
+                    'otherwise, the dataset is ordered by date
+                    Return True
+                End If
+                Return False
+            End If
+        Next
+
+        Return False 'placeholder
+    End Function
 
     <Fact>
-    Public Sub OrderedByDateTrue()
+    Public Sub OrderDsByDateTest()
+        Dim Report As Report = CreateCustomReport()
         Report.OrderDSByDate()
-        Assert.True(Report.OrderedByDate)
+        Dim ActualDs As Data.DataSet = Report.GetDS()
+
+        Assert.True(IsDsOrderedByDate(ActualDs))
     End Sub
 
     <Fact>
-    Public Sub OrderedByDateFalse()
+    Public Sub OrderDsByDateThenByInputTest()
+        Dim Report As Report = CreateCustomReport()
+        Dim ExpectedDs As Data.DataSet = Report.GetDS().Copy()
+
+        Report.OrderDSByDate()
         Report.UndoOrderDSByDate()
-        Assert.False(Report.OrderedByDate)
+        Dim ActualDs As Data.DataSet = Report.GetDS()
+
+        Assert.False(IsDsOrderedByDate(ActualDs))
+        Assert.True(AreDataSetsEqual(ExpectedDs, ActualDs))
     End Sub
 End Class
 
@@ -1419,7 +1010,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1430,7 +1021,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1453,8 +1044,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1504,7 +1095,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1515,7 +1106,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1542,8 +1133,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1593,7 +1184,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1604,7 +1195,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1629,8 +1220,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1665,8 +1256,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
         ExpectedRes("Some Inputs Phased Loooooooo...") = New List(Of String()) From {
             New String() {"Some Inputs Phased Loooooooooooong Name", "", "", "", "", "A1"},
@@ -1677,8 +1268,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
         ExpectedRes("All Inputs Phased") = New List(Of String()) From {
             New String() {"All Inputs Phased", "", "", "", "", "A1"},
@@ -1691,8 +1282,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1737,7 +1328,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "1"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1748,7 +1339,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1764,8 +1355,8 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘", "08/11/2025", "", "", "default"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"},
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1813,7 +1404,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "1/0"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1824,7 +1415,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "1/1"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1839,7 +1430,7 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✘", "08/11/2025", "", "", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✘", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✘", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
             New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
@@ -1847,7 +1438,7 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✔", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✔", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "✔/✔", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1892,7 +1483,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1903,7 +1494,7 @@ Public Class GetExcelDataTests
             {"Phase", DBNull.Value},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -1918,7 +1509,7 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "✘/✘", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
             New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
@@ -1926,7 +1517,7 @@ Public Class GetExcelDataTests
             New String() {"", "", "", "", "", "default"},
             New String() {"Item", "Value", "Start Date", "Input Date", "Operator", "bold"},
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(
@@ -1971,7 +1562,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -1982,7 +1573,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -2001,7 +1592,7 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
             New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
@@ -2013,7 +1604,7 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
 
@@ -2059,7 +1650,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02: 44:29 PM"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
         CreateFakeDr(DT, New Dictionary(Of String, Object) From
@@ -2070,7 +1661,7 @@ Public Class GetExcelDataTests
             {"Phase", "phase 2"},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06: 33:19 AM"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
             {"InputOperator", "andrew williams"}
         })
 
@@ -2087,7 +1678,7 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "8.19", "08/11/2025", "08/11/2025 02:44:22 PM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02: 44:29 PM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "6.99", "08/11/2025", "08/11/2025 02:44:29 PM", "andrew williams", "default"}
         }
         ExpectedRes("Pm Or Checklist... (08/12/2025)") = New List(Of String()) From {
             New String() {"Pm Or Checklist Name", "", "", "", "", "A1"},
@@ -2097,7 +1688,7 @@ Public Class GetExcelDataTests
             New String() {"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "6.30", "08/12/2025", "08/12/2025 06:33:11 AM", "andrew williams", "default"},
             New String() {"", "", "", "", "", "default"},
             New String() {"phase 2", "", "", "", "", "bold"},
-            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06: 33:19 AM", "andrew williams", "default"}
+            New String() {"Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "7.18", "08/12/2025", "08/12/2025 06:33:19 AM", "andrew williams", "default"}
         }
 
         Assert.Equal(

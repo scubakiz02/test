@@ -1,22 +1,11 @@
 ﻿Imports System.Text.Json
+Imports System.Globalization
 
 Public Class Report
     Inherits Security
 
     Private GroupDS As Data.DataSet
     Private EmptyGroupDS As New Data.DataSet()
-    Private ConstructorQuery As String = "SELECT A.[Key] As AreaKey, A.Area, A.[Key] As AreaKey, " &
-        "D.[Key] As DataKey, D.Operator, " &
-        "L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
-        "P.Phase, " &
-        "FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As StartDate, '' As InputDate, '' As InputOperator " &
-        "FROM [ALTS].[dbo].[T_LogLabel] L " &
-        "INNER JOIN [ALTS].[dbo].[T_LogArea] A On L.AreaKey=A.[Key] " &
-        "RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey " &
-        "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
-        "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] " &
-        "WHERE (A.[Key]=@AreaKey0 Or @AreaKey0=0) And (A.GroupKey=@GroupKey Or (@GroupKey=0 And A.GroupKey Is Not NULL)) " &
-        "ORDER BY A.Area, P.PhaseOrder, L.LabelOrder, D.Date"
     Private MaxFieldVals As New Dictionary(Of String, String)
     Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Dim LogAspx As New LogAspxLibrary
@@ -25,11 +14,33 @@ Public Class Report
     Public ReadOnly OutOfRangeDateMessage As String = "Error: Out of range"
     Private LabelsToExclude As New List(Of Integer)
     Private AreasToExclude As New List(Of Integer)
-    Private LabelsHash As New Dictionary(Of Integer, String)
-    Private AreasHash As New Dictionary(Of Integer, String)
     Private LabelKeysList As New List(Of Integer)
     Private AreaKeysList As New List(Of Integer)
     Private DS_OrderedByDate As Boolean = False
+
+    'Private ConstructorQuery As String = "SELECT A.[Key] As AreaKey, A.Area, A.[Key] As AreaKey, " &
+    '    "D.[Key] As DataKey, D.Operator, " &
+    '    "L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
+    '    "P.Phase, " &
+    '    "FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As StartDate, '' As InputDate, '' As InputOperator " &
+    '    "FROM [ALTS].[dbo].[T_LogLabel] L " &
+    '    "INNER JOIN [ALTS].[dbo].[T_LogArea] A On L.AreaKey=A.[Key] " &
+    '    "RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey " &
+    '    "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
+    '    "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] " &
+    '    "WHERE (A.[Key]=@AreaKey0 Or @AreaKey0=0) And (A.GroupKey=@GroupKey Or (@GroupKey=0 And A.GroupKey Is Not NULL)) " &
+    '    "ORDER BY A.Area, P.PhaseOrder, L.LabelOrder, D.Date"
+    Private _ConstructorQuery As String
+    Private __ConstructorQueryShell As String = "SELECT A.[Key] As AreaKey, A.Area, " &
+        "D.[Key] As DataKey, D.Operator, " &
+        "L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
+        "P.Phase, " &
+        "FORMAT(D.Date, 'MM/dd/yyyy') As StartDate, FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As InputDate, '' As InputOperator " &
+        "FROM [ALTS].[dbo].[T_LogLabel] L " &
+        "INNER JOIN [ALTS].[dbo].[T_LogArea] A On L.AreaKey=A.[Key] " &
+        "RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey " &
+        "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
+        "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] "
 
     Public Sub New()
 
@@ -50,7 +61,7 @@ Public Class Report
         SetVar("GroupKey", Config("GroupKey"), "int")
         SetVar("AreaKey0", Config("AreaKey"), "int")
 
-        If Config.ContainsKey("StartDate") AndAlso Config.ContainsKey("EndDate") Then
+        If Config.ContainsKey("GroupKey") AndAlso Config.ContainsKey("StartDate") AndAlso Config.ContainsKey("EndDate") Then
             SetDateRange(Config("StartDate"), Config("EndDate"))
         End If
     End Sub
@@ -83,39 +94,43 @@ Public Class Report
     End Function
 
     Public Function GetOperators() As Data.DataSet
-        Dim ConstructorQueryDelimited As String() = ConstructorQuery.Split({"FROM", "ORDER BY"}, StringSplitOptions.None) 'strip queried fields & ORDER BY clause from ConstructorQuery
-        Dim OperatorDS As Data.DataSet = GetMyDataSetParamQuery("SELECT Operator FROM" & ConstructorQueryDelimited(1) & "GROUP BY Operator", QueryConfig)
+        Dim DT As New Data.DataTable
+        DT.Columns.Add("Operator", GetType(String))
+        Dim Ds As New Data.DataSet
+        Ds.Tables.Add(DT)
 
-        For Each OperatorDR As Data.DataRow In OperatorDS.Tables(0).Rows
-            If {Nothing, "Basic User", "Szymon Tyburek", "Brett Teets"}.Contains(If(IsDBNull(OperatorDR("Operator")), Nothing, OperatorDR("Operator"))) Then 'Nothing represents a DBNull value
-                OperatorDR.Delete() 'mark row for deletion
+        Dim OperatorsHashset As New HashSet(Of String) 'using hashset b/c they do not store duplicate values
+        For Each Dr As Data.DataRow In GroupDS.Tables(0).Rows
+            'iterate through each row in report dataset and look for unique operators
+            Dim InputOperator As Object = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Dr("InputOperator").ToLower())
+            If OperatorsHashset.Contains(InputOperator) = False Then
+                'encountered a new operator
+                If InputOperator = String.Empty Then Continue For 'skip blank operators
+
+                Dim NewDr As Data.DataRow = DT.NewRow()
+                NewDr("Operator") = InputOperator
+                DT.Rows.Add(NewDr)
             End If
-        Next
-        OperatorDS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
 
-        Return OperatorDS
+            OperatorsHashset.Add(InputOperator)
+        Next
+
+        Return Ds
     End Function
 
     Public Function SetDateRange(StartDate As String, EndDate As String) As Data.DataSet
-        Dim DateLowestBound As String
-        Dim DateHighestBound As String
         Dim DateBoundsQueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-
         DateBoundsQueryConfig("@AreaKey") = New Dictionary(Of String, String) From {
             {"value", GetVar("AreaKey0")},
             {"typeOf", "int"}
         }
 
-        DateLowestBound = GetSingleDbField("SELECT FORMAT(MIN(Date), 'MM/dd/yyyy') As DateLowestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", DateBoundsQueryConfig, "DateLowestBound")
-        DateHighestBound = GetSingleDbField("SELECT FORMAT(MAX(Date), 'MM/dd/yyyy') As DateHighestBound FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=58", DateBoundsQueryConfig, "DateHighestBound")
-
         SetVar("StartDate", StartDate, "string")
         SetVar("EndDate", EndDate, "string")
 
         Try
+            If GetVar("GroupKey") = 0 Then Throw New Exception("")
             If String.IsNullOrEmpty(StartDate) OrElse String.IsNullOrEmpty(EndDate) Then Throw New Exception("")
-
-            ConstructorQuery = ConstructorQuery.Replace("WHERE", "WHERE D.Date >= @StartDate AND D.Date <= @EndDate AND ")
             PullAndStripDS()
         Catch ex As Exception
             GroupDS = EmptyGroupDS
@@ -145,20 +160,27 @@ Public Class Report
         Return Message
     End Function
 
-    Public Function SetArea(AreaKey As Integer) As Data.DataSet
-        SetVar("AreaKey0", AreaKey, "int")
+    Private Function GetLabelKeys(AreaKey As Integer) As List(Of Integer)
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@AreaKey", GetParamVarHash(AreaKey, "int")}
+        }
+        Dim Ds As Data.DataSet = GetMyDataSetParamQuery("SELECT [Key] FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey", SqlConfig)
 
-        Return SetAreas(New List(Of Integer) From {AreaKey})
+        Dim LabelKeys As New List(Of Integer)
+        For Each DR As Data.DataRow In Ds.Tables(0).Rows
+            LabelKeys.Add(DR("Key"))
+        Next
+        Return LabelKeys
     End Function
 
     Public Function SetAreas(AreasList As List(Of Integer)) As Data.DataSet
-        LabelsHash.Clear()
-        AreasHash.Clear()
-
         If AreasList Is Nothing OrElse AreasList.Count = 0 Then
             GroupDS = EmptyGroupDS
         Else
-            If AreasList.Count > 1 Then
+            If AreasList.Count = 1 Then
+                Dim AreaKey As Integer = AreasList(0)
+                LabelKeysList = GetLabelKeys(AreaKey)
+            Else
                 SetVar("AreaKey0", 0, "int")
                 LabelsToExclude.Clear()
             End If
@@ -176,13 +198,25 @@ Public Class Report
         Return GroupDS
     End Function
 
+    Private Function GetAreaKeys(GroupKey As Integer) As List(Of Integer)
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
+            {"@GroupKey", GetParamVarHash(GroupKey, "int")}
+        }
+        Dim Ds As Data.DataSet = GetMyDataSetParamQuery("SELECT [Key] FROM [ALTS].[dbo].[T_LogArea] WHERE GroupKey=@GroupKey", SqlConfig)
+
+        Dim AreaKeys As New List(Of Integer)
+        For Each DR As Data.DataRow In Ds.Tables(0).Rows
+            AreaKeys.Add(DR("Key"))
+        Next
+        Return AreaKeys
+    End Function
+
     Public Function SetGroup(GroupKey As String) As Data.DataSet
-        SetVar("AreaKey0", 0, "int") 'reset AreaKey back to 0, which means All checklists pertaining to the new Group
+        SetVar("AreaKey0", 0, "int") 'reset AreaKey back to 0, which means All pm/checklists associated with the new GroupKey are available
         SetVar("GroupKey", GroupKey, "int")
 
-        LabelsHash.Clear()
-        AreasHash.Clear()
         AreasToExclude.Clear()
+        AreaKeysList = GetAreaKeys(CInt(GroupKey))
 
         PullAndStripDS()
 
@@ -201,62 +235,109 @@ Public Class Report
         End If
     End Sub
 
-    Private Sub PullAndStripDS()
-        Dim GroupRC As Integer
+    Public Function BuildWhereClause(Config As Dictionary(Of String, Object), ByRef SqlConfig As Dictionary(Of String, Dictionary(Of String, String))) As String
+        Dim SqlWhereClause As String = ""
 
+        'this function should never be called if Config does not have values for 'GroupKey', 'StartDate', and 'EndDate' kvp
+        Dim GroupKey As Integer = If(Config.ContainsKey("GroupKey"), Config("GroupKey"), 0)
+        Dim StartDate As Object = If(Config.ContainsKey("StartDate"), Config("StartDate"), DBNull.Value)
+        Dim EndDate As Object = If(Config.ContainsKey("EndDate"), Config("EndDate"), DBNull.Value)
+
+        'GroupKey
+        SqlConfig("@GroupKey") = GetParamVarHash(GroupKey, "int")
+        SqlWhereClause += "WHERE A.GroupKey=@GroupKey "
+
+        'StartDate and EndDate
+        SqlConfig("@StartDate") = GetParamVarHash(StartDate, "string")
+        SqlConfig("@EndDate") = GetParamVarHash(EndDate, "string")
+        SqlWhereClause += "And D.Date >= @StartDate And D.Date <= @EndDate "
+
+        'AreaKey(s)
+        Dim AreasToExclude2 As List(Of Integer) = If(Config.ContainsKey("AreasToExclude"), Config("AreasToExclude"), New List(Of Integer))
+        SqlWhereClause += BuildNotInClause(AreasToExclude2, "And A.[Key] Not In (", "@AreaKey", SqlConfig)
+
+        'LabelKey(s)
+        Dim LabelsToExclude2 As List(Of Integer) = If(Config.ContainsKey("LabelsToExclude"), Config("LabelsToExclude"), New List(Of Integer))
+        SqlWhereClause += BuildNotInClause(LabelsToExclude2, "And L.[Key] Not In (", "@LabelKey", SqlConfig)
+
+        Return SqlWhereClause
+    End Function
+
+    Private Function BuildNotInClause(KeysToExclude As List(Of Integer), SqlPrefix As String, ParamKeyPrefix As String, ByRef SqlConfig As Dictionary(Of String, Dictionary(Of String, String))) As String
+        Dim SqlNotInClause As String = ""
+
+        If KeysToExclude.Count > 0 Then
+            SqlNotInClause += SqlPrefix
+            For I As Integer = 0 To KeysToExclude.Count - 1
+                Dim Key As Integer = KeysToExclude(I)
+                Dim ParamKey As String = ParamKeyPrefix & Key.ToString()
+
+                'update sql config passed by reference to function
+                SqlConfig(ParamKey) = GetParamVarHash(Key, "int")
+
+                'add to sql not in clause that will be returned by this function
+                SqlNotInClause += ParamKey
+                If I = KeysToExclude.Count - 1 Then
+                    SqlNotInClause += ") "
+                Else
+                    SqlNotInClause += ", "
+                End If
+            Next
+        End If
+
+        Return SqlNotInClause
+    End Function
+
+    Private Function BuildOrderByClause(IsDatasetOrderedByDate As Boolean) As String
+        If IsDatasetOrderedByDate Then Return "ORDER BY A.Area, P.PhaseOrder, D.Date, L.LabelOrder"
+        Return "ORDER BY A.Area, P.PhaseOrder, L.LabelOrder, D.Date"
+    End Function
+
+    Private Sub PullAndStripDS()
         If GetVar("StartDate") Is Nothing OrElse GetVar("EndDate") Is Nothing Then Exit Sub
 
-        GroupDS = GetMyDataSetParamQuery(ConstructorQuery, QueryConfig)
-        GroupRC = GroupDS.Tables(0).Rows.Count - 1
-
+        Dim WhereClauseConfig As Dictionary(Of String, Object) = New Dictionary(Of String, Object) From {
+            {"GroupKey", CInt(GetVar("GroupKey"))},
+            {"StartDate", GetVar("StartDate")},
+            {"EndDate", GetVar("EndDate")},
+            {"AreasToExclude", AreasToExclude},
+            {"LabelsToExclude", LabelsToExclude}
+        }
+        _ConstructorQuery = __ConstructorQueryShell & BuildWhereClause(WhereClauseConfig, QueryConfig) & BuildOrderByClause(DS_OrderedByDate)
+        GroupDS = GetMyDataSetParamQuery(_ConstructorQuery, QueryConfig)
         MaxFieldVals = New Dictionary(Of String, String) From { 'to ensure values in MaxFieldVals pertain to current configured dataset
-           {"InputDate", String.Empty},
-           {"StartDate", String.Empty},
-           {"Value", String.Empty},
+           {"InputDate", "mm/dd/yyyy 00:00:00 PM"},
+           {"StartDate", "mm/dd/yyyy"},
+           {"Value", "Value"},
            {"InputOperator", String.Empty},
            {"Area", String.Empty},
-           {"LabelKey", String.Empty},
            {"Label", String.Empty}
         }
-
+        Dim GroupRC As Integer = GroupDS.Tables(0).Rows.Count - 1
         For I As Integer = 0 To GroupRC
             Dim GroupDR As Data.DataRow = GroupDS.Tables(0).Rows(I)
-            Dim LabelKey As Integer = GroupDR("LabelKey")
             Dim AreaKey As Integer = GroupDR("AreaKey")
-            Dim Inputs As Dictionary(Of Integer, Dictionary(Of String, String)) = LogAspx.GetInputs(GroupDR) 'in case DB Inputs field value is in the old JSON format, run it through LogAspxLibrary Class GetInputs function
-            Dim ObjOfInterest As Dictionary(Of String, String)
+            Dim StartDate As String = GroupDR("StartDate")
+            Dim Area As String = GroupDR("Area")
+            Dim Label As String = GroupDR("Label")
             Dim InputDate As String
-            Dim StartDate As String
             Dim Value As String
             Dim InputOperator As String
-            Dim Area As String
-            Dim Label As String
-
-            StartDate = DbFormatting.DateField(GroupDR("Date")).Split(" ")(0) 'date only
-
-            'initializing these 2 variables here, rather than the try catch block below
-            'this is to ensure rows with labels or areas marked for deletion will be deleted
-            Label = GroupDR("Label")
-            Area = GroupDR("Area")
-
-            If AreasToExclude.Contains(AreaKey) OrElse LabelsToExclude.Contains(LabelKey) Then
-                GroupDR.Delete() 'mark row for deletion
-                Continue For
-            Else 'the logic below should NOT be ran on deleted rows
-                If CInt(GetVar("GroupKey")) <> 0 Then 'If GroupKey has a value and is not 'All' (0), then consider adding to AreasList
-                    If AreasHash.ContainsKey(AreaKey) = False Then AreasHash(AreaKey) = Area
-                    If AreaKeysList.Contains(AreaKey) = False Then AreaKeysList.Add(AreaKey)
-
-                    If LabelsHash.ContainsKey(LabelKey) = False Then LabelsHash(LabelKey) = Label
-                    If LabelKeysList.Contains(LabelKey) = False Then LabelKeysList.Add(LabelKey)
-                End If
-            End If
-
-            Try 'in case there is no instance of a log for a certain date (grouped reports are not guarenteed the same start and end dates)
-                ObjOfInterest = Inputs(LabelKey)
-                InputDate = DbFormatting.DateField(ObjOfInterest("Date"))
-                Value = ObjOfInterest("Value")
-                InputOperator = ObjOfInterest("Operator")
+            Try
+                'in case there is no instance of a log for a certain date (grouped reports are not guarenteed the same start and end dates)
+                Try
+                    'records before 04/2025 follow a different structure than Dictionary(Of Integer, Dictionary(Of String, String))
+                    'records before 04/2025 are simply test records, so this try catch loop ensures they are not processed in the report dataset
+                    Dim InputsStringified As String = GroupDR("Inputs")
+                    Dim Inputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(InputsStringified)
+                    Dim LabelKey As Integer = GroupDR("LabelKey")
+                    Dim ObjOfInterest As Dictionary(Of String, String) = Inputs(LabelKey)
+                    InputDate = DbFormatting.DateField(ObjOfInterest("Date"))
+                    Value = ObjOfInterest("Value")
+                    InputOperator = ObjOfInterest("Operator")
+                Catch ex As Exception
+                    Continue For
+                End Try
             Catch ex As Exception
                 InputDate = String.Empty
                 Value = String.Empty
@@ -264,16 +345,11 @@ Public Class Report
                 Area = String.Empty
                 Label = String.Empty
             End Try
-
             GroupDR("InputDate") = InputDate
-            GroupDR("StartDate") = StartDate
             GroupDR("Value") = Value
             GroupDR("InputOperator") = InputOperator
 
-            SetMaxFieldVals("LabelKey", GroupDR("LabelKey"))
             SetMaxFieldVals("Label", Label)
-            SetMaxFieldVals("InputDate", InputDate)
-            SetMaxFieldVals("StartDate", StartDate)
             SetMaxFieldVals("Value", Value)
             SetMaxFieldVals("InputOperator", InputOperator)
             SetMaxFieldVals("Area", Area)
@@ -334,7 +410,6 @@ Public Class Report
         DS_OrderedByDate = True
 
         If GetVar("StartDate") IsNot Nothing AndAlso GetVar("EndDate") IsNot Nothing Then
-            ConstructorQuery = ConstructorQuery.Replace("L.LabelOrder, D.Date", "D.Date, L.LabelOrder") 'prioritize Date over LabelOrder
             PullAndStripDS()
             Return GroupDS
         Else
@@ -346,7 +421,6 @@ Public Class Report
         DS_OrderedByDate = False
 
         If GetVar("StartDate") IsNot Nothing AndAlso GetVar("EndDate") IsNot Nothing Then
-            ConstructorQuery = ConstructorQuery.Replace("D.Date, L.LabelOrder", "L.LabelOrder, D.Date") 'prioritize LabelOrder over Date, just as og value of ConstructorQuery
             PullAndStripDS()
             Return GroupDS
         Else
@@ -374,59 +448,6 @@ Public Class Report
         End If
 
         Return GroupDS
-    End Function
-
-    Public Function GetLabels() As Dictionary(Of Integer, String)
-        Return LabelsHash
-    End Function
-
-    Public Function GetAreas() As Dictionary(Of Integer, String)
-        Return AreasHash
-    End Function
-
-    Public Function GetReportedAreas() As Dictionary(Of Integer, String)
-        Dim AreasReportingHash As New Dictionary(Of Integer, String)(AreasHash)
-
-        For Each AreaKey As Integer In AreasToExclude
-            AreasReportingHash.Remove(AreaKey)
-        Next
-
-        Return AreasReportingHash
-    End Function
-
-
-    Public Function ColsWithIdenticalValues(Optional DS As Data.DataSet = Nothing) As List(Of String) 'Optional argument for testing purposes
-        Dim IdenticalColsList As New List(Of String)
-        Dim RC As Integer
-        Dim DR As Data.DataRow
-        Dim FirstRowValues As New Dictionary(Of String, String)
-
-        If DS Is Nothing Then DS = GroupDS
-
-        Try 'in case function receives empty DataSet
-            RC = DS.Tables(0).Rows.Count
-        Catch ex As Exception
-            Return IdenticalColsList
-        End Try
-
-        For I As Integer = 0 To RC - 1
-            DR = DS.Tables(0).Rows(I)
-
-            For Each Field In DR.Table.Columns
-                Dim FieldStr As String = Field.ToString()
-                Dim FieldValue As String = If(IsDBNull(DR(FieldStr)), Nothing, DR(FieldStr))
-
-                If I = 0 Then
-                    FirstRowValues(FieldStr) = FieldValue
-                    IdenticalColsList.Add(FieldStr)
-                ElseIf FieldValue <> FirstRowValues(FieldStr) Then
-                    IdenticalColsList.Remove(FieldStr)
-                End If
-            Next
-
-        Next
-
-        Return IdenticalColsList
     End Function
 
     Private Sub AddRowBreak(ListOfArrays As List(Of String()))
@@ -481,11 +502,11 @@ Public Class Report
     End Function
 
     Public Function GetExcelData(ReportInst As Report) As Dictionary(Of String, List(Of String()))
-        Dim DS_Final As Data.DataSet = ReportInst.GetDS()
-        Dim DsRc As Integer = DS_Final.Tables(0).Rows.Count
         Dim IsDatasetOrderedByDate As Boolean = ReportInst.OrderedByDate()
         Dim ExcelCollection As New Dictionary(Of String, List(Of String()))
 
+        Dim DS_Final As Data.DataSet = ReportInst.GetDS()
+        Dim DsRc As Integer = DS_Final.Tables(0).Rows.Count
         For I As Integer = 0 To DsRc - 1
             Dim DR_Final As Data.DataRow = DS_Final.Tables(0).Rows(I)
             Dim Area As String = DR_Final("Area")

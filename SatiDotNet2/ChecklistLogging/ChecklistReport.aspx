@@ -351,40 +351,45 @@
         #export-button-icon {
             width: 21px;
         }
+
+        /*============== pm-report-body ===============*/
+        #pm-report-body {
+            display: flex;
+            gap: var(--UWhitespace);
+            flex-direction: column;
+        }
+
+        #pm-report-body-header {
+            display: flex;
+            align-items: center;
+            gap: var(--UWhitespace);
+        }
+
+        .pm-report-body-header-reset-button {
+            width: 25px;
+            cursor: pointer;
+        }
+
+        #pm-report-body-header-title {
+            margin: 0;
+        }
     </style>
 
     <sati-spinner id="WebpageSpinner"></sati-spinner>
+    <div id="overlay"></div>
 
-    <h3 style="margin: var(--UWhitespace) 0;">Checklist & PM Reporting</h3>
-
-    <div style="display: flex; gap: var(--UWhitespace); flex-direction: column;">
-        <div style="display: flex; gap: var(--UWhitespace);">
-            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #FFA07A; text-wrap: nowrap;">
-                <div style="display: flex; align-items: center;">
-                    <asp:Label Text="Start Date:" runat="server" />
-                    <asp:TextBox ID="StartDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
-                </div>
-
-                <div style="display: flex; align-items: center;">
-                    <asp:Label Text="End Date:" runat="server" />
-                    <asp:TextBox ID="EndDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
-                </div>
-
-                <div>
-                    <asp:Button ID="ResetGridButton" OnClientClick="WebpageSpinner.displaySpin();" Text="Reset Grid" runat="server" Style="float: right;" />
-                </div>
-
-                <asp:CheckBox Text="View Filters" ID="ViewFilters_CheckBox" AutoPostBack="True" onchange="WebpageSpinner.displaySpin();" OnCheckedChanged="ViewFilters_OnCheckedChanged" Style="display: flex; align-items: center;" TextAlign="Right" runat="server" />
-            </div>
+    <section id="pm-report-body">
+        <div id="pm-report-body-header">
+            <asp:ImageButton ID="ResetGridButton" CssClass="pm-report-body-header-reset-button" OnClientClick="WebpageSpinner.displaySpin();" ImageUrl="~/Color/icons/refresh.svg" runat="server" />
+            <h3 id="pm-report-body-header-title">Checklist & PM Reporting</h3>
         </div>
 
+        <div style="display: flex; gap: var(--UWhitespace);">
+            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #FFA07A; text-wrap: nowrap;">
 
-        <asp:Panel runat="server" Visible="False" ID="ViewFilters_Panel" Style="display: flex; gap: var(--UWhitespace);">
-            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #90EE90;">
                 <div style="display: flex; align-items: center;">
                     <asp:Label Text="Select Group:" runat="server" />
                     <asp:DropDownList ID="GroupDropDownList" runat="server" AppendDataBoundItems="True" AutoPostBack="True"
-                        Enabled="False"
                         DataSourceID="GroupDropDownList_SqlDataSource" DataTextField="Group"
                         DataValueField="Key"
                         OnSelectedIndexChanged="GroupDropDownList_SelectedIndexChanged"
@@ -396,62 +401,83 @@
                     <asp:SqlDataSource ID="GroupDropDownList_SqlDataSource" runat="server" ConnectionString="<%$ ConnectionStrings:ALTSConnectionString %>"
                         SelectCommand="SELECT G.[Group], G.[Key] FROM [ALTS].[dbo].[T_LogGroup] G ORDER BY G.[Group]"></asp:SqlDataSource>
                 </div>
+            </div>
+        </div>
+
+
+        <asp:Panel runat="server" Enabled="False" ID="FilterAndDateRangePanel" Style="display: flex; gap: var(--UWhitespace);">
+            <div style="display: flex; gap: var(--UWhitespace); padding: var(--UWhitespace); background-color: #90EE90; text-wrap: nowrap;">
 
                 <asp:Button Enabled="False" ID="FilterChecklists_Button" Text="Filter PMs/Checklists" data-modal-target="#checklistModal" runat="server" OnClientClick="return false;" />
                 <asp:Button Enabled="False" ID="FilterLabels_Button" Text="Filter Inputs" data-modal-target="#label-modal" runat="server" OnClientClick="return false;" />
+
+                <section id="modal-container">
+                    <%--these modals are not visible by default--%>
+                    <%--they become visible after clicking the button with a data-modal-target attribute value matching the modal id attribute value--%>
+                    <div class="modal" id="checklistModal">
+                        <div class="modal-header">
+                            <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
+                                <span>Checklists To <span style="font-weight: bold;">Include</span>:</span>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <asp:CheckBoxList ID="AreaCheckBoxList" runat="server" RepeatColumns="2" TextAlign="Right">
+                            </asp:CheckBoxList>
+                        </div>
+
+                        <div id="checklist-modal-footer" class="modal-footer">
+                            <div>
+                                <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                                <asp:CheckBox ID="CheckAllChecklists_CheckBox" Text="Check All" runat="server" />
+                            </div>
+
+                            <div id="checklist-footer-buttons-container">
+                                <button data-close-button class="HeaderPanelButtons">Cancel</button>
+                                <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateChecklistsButton" OnClick="UpdateChecklistsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal" id="label-modal">
+                        <div class="modal-header">
+                            <span>Inputs To <span style="font-weight: bold;">Include</span>:</span>
+                        </div>
+                        <div class="modal-body">
+                            <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right">
+                            </asp:CheckBoxList>
+
+                            <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
+                                <button data-close-button class="HeaderPanelButtons">Cancel</button>
+                                <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
+                            </div>
+                        </div>
+                        <div id="label-modal-footer" class="modal-footer">
+                            <div>
+                                <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
+                                <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
+                            </div>
+                            <div id="label-modal-order-by-functionality">
+                                <asp:Label Text="Order By: " runat="server" />
+                                <asp:RadioButton ID="OrderByInputRB" GroupName="OrderByGroup" Text="Input" runat="server" />
+                                <asp:RadioButton ID="OrderByDateRB" GroupName="OrderByGroup" Text="Date" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <div style="display: flex; align-items: center;">
+                    <asp:Label Text="Start Date:" runat="server" />
+                    <asp:TextBox ID="StartDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <asp:Label Text="End Date:" runat="server" />
+                    <asp:TextBox ID="EndDate_TextBox" OnTextChanged="DatepickTextBox_OnTextChanged" AutoPostBack="True" TextMode="Date" runat="server" Style="width: calc(100% - var(--UWhitespace))" />
+                </div>
+
             </div>
-
-            <div class="modal" id="label-modal">
-                <div class="modal-header">
-                    <span>Inputs To <span style="font-weight: bold;">Include</span>:</span>
-                </div>
-                <div class="modal-body">
-                    <asp:CheckBoxList ID="LabelCbxList" runat="server" RepeatColumns="2" TextAlign="Right">
-                    </asp:CheckBoxList>
-
-                    <div style="padding: var(--UWhitespace) 0; display: flex; gap: var(--UWhitespace); justify-content: right;">
-                        <button data-close-button class="HeaderPanelButtons">Cancel</button>
-                        <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateLabelsButton" OnClick="UpdateLabelsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
-                    </div>
-                </div>
-                <div id="label-modal-footer" class="modal-footer">
-                    <div>
-                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
-                        <asp:CheckBox ID="CheckAll_CheckBox" Text="Check All" runat="server" />
-                    </div>
-                    <div id="label-modal-order-by-functionality">
-                        <asp:Label Text="Order By: " runat="server" />
-                        <asp:RadioButton ID="OrderByInputRB" GroupName="OrderByGroup" Text="Input" runat="server" />
-                        <asp:RadioButton ID="OrderByDateRB" GroupName="OrderByGroup" Text="Date" runat="server" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal" id="checklistModal">
-                <div class="modal-header">
-                    <div style="display: flex; align-items: center; gap: var(--UWhitespace);">
-                        <span>Checklists To <span style="font-weight: bold;">Include</span>:</span>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <asp:CheckBoxList ID="AreaCheckBoxList" runat="server" RepeatColumns="2" TextAlign="Right">
-                    </asp:CheckBoxList>
-                </div>
-
-                <div id="checklist-modal-footer" class="modal-footer">
-                    <div>
-                        <%--placing asp Checkbox control in a div to avoid gap between html input & span--%>
-                        <asp:CheckBox ID="CheckAllChecklists_CheckBox" Text="Check All" runat="server" />
-                    </div>
-
-                    <div id="checklist-footer-buttons-container">
-                        <button data-close-button class="HeaderPanelButtons">Cancel</button>
-                        <asp:Button OnClientClick="WebpageSpinner.displaySpin();" ID="UpdateChecklistsButton" OnClick="UpdateChecklistsButton_OnClick" Text="Update" runat="server" CssClass="HeaderPanelButtons" BackColor="#80BEFD" />
-                    </div>
-                </div>
-            </div>
-
-            <div id="overlay"></div>
 
             <div id="export-button-container">
                 <asp:Button ID="ExportButton" CssClass="export-button" Enabled="False" OnClientClick="spinOnExport();" Text="Export" runat="server" />
@@ -533,6 +559,7 @@
                                     display: flex;
                                     flex-direction: column;
                                 }
+
                                 .input-date-admin-mode-label {
                                     padding: 0 !important;
                                 }
@@ -587,7 +614,7 @@
                 <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
             </asp:GridView>
         </div>
-    </div>
+    </section>
 
 </asp:Content>
 

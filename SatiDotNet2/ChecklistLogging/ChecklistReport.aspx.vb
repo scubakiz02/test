@@ -4,7 +4,6 @@ Imports System.Security.Cryptography
 Imports FlexCel.Core
 Imports System.Text
 
-
 Partial Class MR_OpenTicketStatusBoard
     Inherits System.Web.UI.Page
     Dim CurrUser As New SatiUser(User.Identity.Name.ToString())
@@ -19,13 +18,12 @@ Partial Class MR_OpenTicketStatusBoard
     Dim EndDateFromQueryString As String
     Dim PageIdxFromQueryString As String
     Dim AdminFromQueryString As String
-    Private ViewFiltersFromQs As String
     Private Shared Security As New Security()
     Private Shared Format As New Format()
     Private SatiCode As New Class1()
     Private MaintPM As New MaintPM()
     Private PhaseController As New PhaseController()
-    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin", "ViewFilters"}
+    Private QsKeys As New List(Of String) From {"Group", "AreasToInclude", "LabelsToInclude", "StartDate", "EndDate", "PageIdx", "Admin"}
 
     Private _Report As New Report()
     Private _PmInput As New PmInput()
@@ -51,11 +49,6 @@ Partial Class MR_OpenTicketStatusBoard
         PageIdxFromQueryString = Request.QueryString("PageIdx")
         StartDateFromQueryString = Request.QueryString("StartDate")
         EndDateFromQueryString = Request.QueryString("EndDate")
-        ViewFiltersFromQs = Request.QueryString("ViewFilters")
-
-        If StartDateFromQueryString IsNot Nothing AndAlso EndDateFromQueryString IsNot Nothing Then
-            GroupDropDownList.Enabled = True
-        End If
 
         Try
             AdminFromQueryString = Request.QueryString("Admin")
@@ -74,14 +67,6 @@ Partial Class MR_OpenTicketStatusBoard
                 ExportButton.Enabled = True
             End If
         End If
-
-        'set Visible property for ViewFilters_Panel and Checked property for ViewFilters_CheckBox
-        'if "ViewFilters" does NOT exist, set properties mentioned above to true, meaning checkbox is checked by p
-        'if the above does not occur, a double click on ViewFilters_CheckBox will be required on initial load of webpage for proper functionality
-        Dim ViewFilters As Boolean = True
-        If ViewFiltersFromQs IsNot Nothing Then ViewFilters = ViewFiltersFromQs
-        ViewFilters_Panel.Visible = ViewFilters
-        ViewFilters_CheckBox.Checked = ViewFilters
     End Sub
 
     Private Function TextBoxDateFormat(DateStr As String) As String
@@ -122,86 +107,68 @@ Partial Class MR_OpenTicketStatusBoard
 
         ClientScript.RegisterStartupScript(Me.GetType(), "GridViewCols", "ColWidths(" & JsonSerializer.Serialize(Of Dictionary(Of String, String))(Session("Report").GetMaxFieldVals()) & ");", True)
 
-        'build AreaCheckBoxList children dynamically using DS variable
-        If GroupFromQueryString IsNot Nothing AndAlso GroupFromQueryString <> 0 Then 'if AreaFromQueryString is nothing or 0, then it area ddl is at 'All'
-            Dim AreasDS As New Data.DataSet
-            Dim AreasList As New List(Of Integer)
-            Dim Cbx As ListItem
-
+        If GroupFromQueryString IsNot Nothing AndAlso GroupFromQueryString <> 0 Then
+            Dim AreasList As List(Of Integer) = ConfigureModal("AreasToInclude", AreaCheckBoxList, CheckAllChecklists_CheckBox)
+            FilterAndDateRangePanel.Enabled = True
             FilterChecklists_Button.Enabled = True
 
-            QueryConfig("@GroupKey") = New Dictionary(Of String, String) From {
-                {"value", GroupFromQueryString},
-                {"typeOf", "int"}
-            }
-            AreasDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] As AreaKey, A.Area FROM [ALTS].[dbo].[T_LogArea] A WHERE GroupKey=@GroupKey AND A.Status='live' ORDER BY A.Area", QueryConfig)
+            If AreasList.Count = 1 Then
+                ConfigureModal("LabelsToInclude", LabelCbxList, CheckAll_CheckBox)
+                FilterLabels_Button.Enabled = True
 
-            Try 'in case AreaFromQueryString is null
-                AreasList = JsonSerializer.Deserialize(Of List(Of Integer))(AreaFromQueryString)
-            Catch ex As Exception
-                AreasList = Nothing
-            End Try
-
-            AreaCheckBoxList.Items.Clear()
-            For Each AreaDR As Data.DataRow In AreasDS.Tables(0).Rows
-                Dim AreaKey As String = AreaDR("AreaKey")
-                Dim Area As String = AreaDR("Area")
-
-                Cbx = New ListItem(Area, AreaKey)
-                AreaCheckBoxList.Items.Add(Cbx)
-
-                'if AreasList is nothing, that means user has NOT interacted with AreaCheckBoxList
-                'that means all Areas are included in the DataSet for the GroupKey
-                If AreasList Is Nothing OrElse AreasList.Contains(AreaKey) Then
-                    Cbx.Selected = True
-                End If
-            Next
-            If AreasList Is Nothing OrElse AreasList.Count = AreasDS.Tables(0).Rows.Count Then CheckAllChecklists_CheckBox.Checked = True
-
-            'build LabelCbxList children dynamically using DS variable
-            Try 'in case AreaFromQueryString is nothing
-                Dim LabelsHash As Dictionary(Of Integer, String) = Session("Report").GetLabels()
-                Dim LabelsToInclude As List(Of Integer)
-
-                If LabelsFromQs Is Nothing Then
-                    LabelsToInclude = LabelsHash.Keys.ToList()
+                Dim DataIsOrderedByDate As Boolean = Session("Report").OrderedByDate()
+                If DataIsOrderedByDate Then
+                    OrderByDateRB.Checked = True
                 Else
-                    LabelsToInclude = JsonSerializer.Deserialize(Of List(Of Integer))(LabelsFromQs)
+                    OrderByInputRB.Checked = True
                 End If
+            End If
+        End If
+    End Sub
 
-                'condition below ensures 1 checklist is being selected for reporting
-                If AreasList.Count = 1 Then
-                    Dim DataIsOrderedByDate As Boolean = Session("Report").OrderedByDate()
+    Private Function ConfigureModal(QsParamKey As String, CbxListCtrl As CheckBoxList, CheckAllCbxCtrl As CheckBox) As List(Of Integer)
+        Dim OptionsList As New List(Of Integer)
+        Try
+            'in case list from qs param is null
+            Dim QsParamValue As String = If(QsParamKey = "AreasToInclude", AreaFromQueryString, LabelsFromQs)
+            OptionsList = JsonSerializer.Deserialize(Of List(Of Integer))(QsParamValue)
+        Catch ex As Exception
+            OptionsList = Nothing
+        End Try
+        Dim IsModalUntouched As Boolean = If(OptionsList Is Nothing, True, False)
 
-                    FilterLabels_Button.Enabled = True
-                    If DataIsOrderedByDate Then
-                        OrderByDateRB.Checked = True
-                    Else
-                        OrderByInputRB.Checked = True
-                    End If
+        Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String))
+        Dim SqlQuery As String
+        If QsParamKey = "AreasToInclude" Then
+            SqlConfig("@GroupKey") = Security.GetParamVarHash(GroupFromQueryString, "int")
+            SqlQuery = "SELECT [Key], Area As Value FROM [ALTS].[dbo].[T_LogArea] WHERE GroupKey=@GroupKey AND Status='live' ORDER BY Area"
+        Else
+            Dim AreasList As List(Of Integer) = JsonSerializer.Deserialize(Of List(Of Integer))(AreaFromQueryString)
+            SqlConfig("@AreaKey") = Security.GetParamVarHash(AreasList(0), "int")
+            SqlQuery = "SELECT [Key], Label As Value FROM [ALTS].[dbo].[T_LogLabel] WHERE AreaKey=@AreaKey ORDER BY LabelOrder"
+        End If
+        Dim DS As Data.DataSet = Security.GetMyDataSetParamQuery(SqlQuery, SqlConfig)
+        Dim AllOptionsList As New List(Of Integer)
+        CbxListCtrl.Items.Clear()
+        For Each DR As Data.DataRow In DS.Tables(0).Rows
+            Dim Key As Integer = DR("Key")
+            Dim Value As String = DR("Value")
 
-                    LabelCbxList.Items.Clear()
-                    For Each kvp As KeyValuePair(Of Integer, String) In LabelsHash
-                        Dim LabelKey As Integer = kvp.Key
-                        Dim Label As String = kvp.Value
-                        Dim Cbx1 As New ListItem(Label, LabelKey)
+            Dim Cbx As ListItem = New ListItem(Value, Key)
+            CbxListCtrl.Items.Add(Cbx)
 
-                        LabelCbxList.Items.Add(Cbx1)
-
-                        If LabelsToInclude.Contains(LabelKey) Then
-                            Cbx1.Selected = True
-                        End If
-                    Next
-
-                    If LabelsToInclude.Count = LabelsHash.Count Then CheckAll_CheckBox.Checked = True
-                End If
-            Catch ex As Exception
-
-            End Try
+            If IsModalUntouched OrElse OptionsList.Contains(Key) Then
+                Cbx.Selected = True
+            End If
+            AllOptionsList.Add(Key)
+        Next
+        If IsModalUntouched OrElse OptionsList.Count = DS.Tables(0).Rows.Count Then
+            'if all options are selected, select the appropriate 'Check All' cbx
+            CheckAllCbxCtrl.Checked = True
         End If
 
-
-    End Sub
+        Return If(IsModalUntouched, AllOptionsList, OptionsList)
+    End Function
 
     Private Sub Page_PreRenderComplete(sender As Object, e As EventArgs) Handles Me.PreRenderComplete
         GroupDropDownList.SelectedValue = GroupFromQueryString
@@ -666,11 +633,6 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Sub ReportGridView_PreRender(sender As Object, e As EventArgs) Handles ReportGridView.PreRender
 
-    End Sub
-
-    Protected Sub ViewFilters_OnCheckedChanged(sender As Object, e As EventArgs)
-        Session("AspWebpage").SetUrl("ViewFilters", Not sender.Checked) 'applying opposite of sender.Checked, b/c of when this line is executed relative to asp.net page lifecycle
-        RefreshPreview()
     End Sub
 
     Protected Sub ResetGrid_OnClick(sender As Object, e As EventArgs) Handles ResetGridButton.Click
