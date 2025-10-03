@@ -33,7 +33,8 @@ Public Class Report
     Private _ConstructorQuery As String
     Private __ConstructorQueryShell As String = "SELECT A.[Key] As AreaKey, A.Area, " &
         "D.[Key] As DataKey, D.Operator, " &
-        "L.[Key] As LabelKey, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
+        "L.[Key] As LabelKey, L.Range, L.FieldType, Case WHEN L.Range Is Not NULL THEN L.Label + ' | ' + L.Range + Case WHEN L.UnitKey Is Not NULL THEN ' ' + U.Unit Else '' End Else L.Label End As Label, " &
+        "U.Unit, " &
         "P.Phase, " &
         "FORMAT(D.Date, 'MM/dd/yyyy') As StartDate, FORMAT(D.Date, 'MM/dd/yyyy') As Date, D.Inputs, '' As Value, '' As InputDate, '' As InputOperator " &
         "FROM [ALTS].[dbo].[T_LogLabel] L " &
@@ -606,6 +607,85 @@ Public Class Report
         End If
 
         Return AdjustedSheetName
+    End Function
+
+    Private Sub ConfigBounds(DbRange As Object, ByRef Config As Dictionary(Of String, Object))
+        Dim LowerBound As String = Nothing
+        Dim UpperBound As String = Nothing
+        Try
+            'in case range is db null or not formatted correctly
+            If DbRange.Contains("-") Then
+                Dim Ranges As String() = DbRange.Split("-")
+                LowerBound = Ranges(0)
+                UpperBound = Ranges(1)
+            ElseIf DbRange.Contains("<") Then
+                LowerBound = Nothing
+                UpperBound = DbRange.Substring(1) 'remove the first char ('<')
+            ElseIf DbRange.Contains(">") Then
+                LowerBound = DbRange.Substring(1) 'remove the first char ('>')
+                UpperBound = Nothing
+            End If
+        Catch ex As Exception
+            LowerBound = Nothing
+            UpperBound = Nothing
+        End Try
+        Config("lowerBound") = LowerBound
+        Config("upperBound") = UpperBound
+    End Sub
+
+
+    Private Sub ConfigChartTitles(DbUnit As Object, ByRef Config As Dictionary(Of String, Object))
+        Dim xAxisTitle As String = Nothing
+        Dim yAxisTitle As String = Nothing
+        Try
+            'in case unit is db null or not formatted correctly
+            xAxisTitle = "Input Date"
+            yAxisTitle = DbUnit
+        Catch ex As Exception
+            xAxisTitle = Nothing
+            yAxisTitle = Nothing
+        End Try
+        Config("xAxisTitle") = xAxisTitle
+        Config("yAxisTitle") = yAxisTitle
+    End Sub
+
+    Public Function GetLineChartConfig(LabelKey As Integer, Optional FakeDs As Data.DataSet = Nothing) As Dictionary(Of String, Object)
+        Dim LineChartConfig As New Dictionary(Of String, Object)
+        Dim Ds As Data.DataSet
+
+        If FakeDs Is Nothing Then
+            Ds = GetDS()
+        Else
+            Ds = FakeDs
+        End If
+
+        Dim xAxisLabelsList As New List(Of String)
+        Dim DataPointsList As New List(Of String)
+        For I As Integer = 0 To Ds.Tables(0).Rows.Count - 1
+            Dim Dr As Data.DataRow = Ds.Tables(0).Rows(I)
+
+            If Dr("LabelKey") = LabelKey Then
+                'set config values
+                Dim DateNoTimeAt As String = Dr("StartDate")
+                xAxisLabelsList.Add(DateNoTimeAt)
+
+                Dim InputValue As Object = Dr("Value")
+                If InputValue = "" Then InputValue = Nothing
+                DataPointsList.Add(InputValue)
+
+                If LineChartConfig.ContainsKey("graphTitle") = False Then
+                    'these config kvp only need to be set once
+                    LineChartConfig("graphTitle") = Dr("Label")
+                    ConfigChartTitles(Dr("Unit"), LineChartConfig)
+                    ConfigBounds(Dr("Range"), LineChartConfig)
+                End If
+            End If
+        Next
+        LineChartConfig("xAxisLabels") = xAxisLabelsList.ToArray()
+        LineChartConfig("data") = DataPointsList.ToArray()
+        LineChartConfig("graphTitle") += " (" & xAxisLabelsList(0) & " - " & xAxisLabelsList(xAxisLabelsList.Count - 1) & ")" 'this assumes xAxisLabels is sorted from earliest to latest date no time value
+
+        Return LineChartConfig
     End Function
 
     'use these functions below for testing purposes only!!!!!!!!!

@@ -3,10 +3,12 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <script src="../scripts/WebComponents/Spinner.js"></script>
     <script src="../scripts/common.js"></script>
+    <script src="../scripts/chart.umd.js"></script>
     <script defer type="text/javascript">
         let StartDate_Textbox;
         let EndDate_Textbox;
         let WebpageSpinner;
+        let _inputLineChartCanvas;
 
         window.addEventListener("visibilitychange", function () {
             // user has returned to the tab after viewing hyperlink in 'View File' column of ReportGridView
@@ -74,8 +76,241 @@
             const exportButtonContainer = document.getElementById("export-button-container");
             const exportButton = document.getElementById('<%= ExportButton.ClientID %>');
             redirectClickTo(exportButtonContainer, exportButton);
+
+            _inputLineChartCanvas = document.getElementById('input-line-chart');
+            configureChartCopy(_inputLineChartCanvas);
+            configureChartDownload(_inputLineChartCanvas);
         })
 
+        function configureHyperlinkChart(config) {
+            buildLineChart(config).then(function (chartInstance) {
+                WebpageSpinner.displaySpin();
+                configureChartClose(_inputLineChartCanvas, chartInstance);
+
+                setTimeout(function () {
+                    //fit width and height to line chart, hide spinner, and open modal
+                    const lineChartModal = document.getElementById("line-chart-modal");
+                    lineChartModal.classList.add("active");
+
+                    //display line chart
+                    WebpageSpinner.hideSpin();
+                    openModal(lineChartModal);
+                }, 1000);
+
+                return false;
+            })
+        }
+
+        const _transparentGreen = 'rgba(144,238,144,0.35)';
+
+        function buildLineChartControlLimit(xAxisLabels, controlLimit, isLowerControlLimit) {
+            let fill;
+            if (isLowerControlLimit) {
+                //range is >?
+                fill = {
+                    target: 'end', //go to min value on y-axis
+                    below: _transparentGreen, //why below rather than above? I don't know :'(
+                };
+            }
+            else {
+                //range is <?
+                fill = {
+                    target: 'start', //go to max value on y-axis
+                    above: _transparentGreen, //why above rather than below? I don't know :'(
+                };
+            }
+
+            return {
+                label: '',
+                data: Array(xAxisLabels.length).fill(controlLimit), //Ex: [30, 30, 30, 30, 30]
+                borderColor: 'red',
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: fill
+            };
+        }
+
+        function buildLineChartDatasets(config) {
+            const { xAxisLabels, data, lowerBound, upperBound, graphTitle } = config;
+            let datasets = [];
+
+            if (upperBound && lowerBound) {
+                //range is ? - ?
+                //not calling buildLineChartControlLimit() here
+                //these control limit datasets use an index or boolean for fill rather than 'start' or 'end'
+
+                datasets.push({
+                    label: '',
+                    data: Array(xAxisLabels.length).fill(upperBound), //Ex: [5, 5, 5, 5, 5, 5, 5]
+                    borderColor: 'red',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: {
+                        target: 1, //lower bound dataset
+                        above: _transparentGreen, //only add fill for upperBound. otherwise, the transparent blue will be darker
+                    },
+                });
+
+                datasets.push({
+                    label: '',
+                    data: Array(xAxisLabels.length).fill(lowerBound), //Ex: [30, 30, 30, 30, 30]
+                    borderColor: 'red',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+            else if (!upperBound && lowerBound) {
+                //range is >?
+                const lclDataset = buildLineChartControlLimit(xAxisLabels, lowerBound, isLowerControlLimit = true);
+                datasets.push(lclDataset);
+            }
+            else if (upperBound && !lowerBound) {
+                //range is <?
+                const uclDataset = buildLineChartControlLimit(xAxisLabels, upperBound, isLowerControlLimit = false);
+                datasets.push(uclDataset);
+            }
+            else if (!upperBound && !lowerBound) {
+                //db range is null, so fill chart above and below single dataset
+                datasets.push({
+                    label: '',
+                    data: data,
+                    borderColor: 'blue',
+                    pointRadius: 0,
+                    spanGaps: true,
+                    fill: {
+                        target: 'start', //go to max value on y-axis
+                        above: _transparentGreen, //why above rather than below? I don't know :'(
+                    }
+                });
+
+                datasets.push({
+                    label: '',
+                    data: data,
+                    borderColor: 'blue',
+                    pointRadius: 0,
+                    spanGaps: true,
+                    fill: {
+                        target: 'end', //go to min value on y-axis
+                        below: _transparentGreen, //why below rather than above? I don't know :'(
+                    }
+                });
+            }
+
+            datasets.push({
+                label: graphTitle,
+                data: data,
+                borderColor: 'blue',
+                fill: false
+            });
+
+            return datasets;
+        }
+
+        function buildLineChartTitles(config) {
+            const { xAxisTitle, yAxisTitle } = config;
+
+            if (xAxisTitle && yAxisTitle) {
+                return {
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: xAxisTitle
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: yAxisTitle
+                            }
+                        }
+                    }
+                }
+            };
+
+            return {};
+        }
+
+        async function buildLineChart(config) {
+            const { xAxisLabels } = config;
+            const ctx = _inputLineChartCanvas.getContext('2d');
+
+            let chartConfig = {
+                type: 'line',
+                data: {
+                    labels: xAxisLabels,
+                    datasets: buildLineChartDatasets(config)
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            align: 'start', //left-align line chart title
+                            labels: {
+                                // filter out upper and lower bounds (datasets with empty label)
+                                filter: function (item, chart) {
+                                    return item.text !== '';
+                                },
+                                //dataset title border color display
+                                boxHeight: 2,
+                                boxWidth: 7.5,
+                                padding: 10,
+                                textAlign: 'center'
+                            }
+                        }
+                    },
+                }
+            };
+            chartConfig.options = { ...chartConfig.options, ...buildLineChartTitles(config) }
+
+            return new Chart(ctx, chartConfig);
+        }
+
+        function configureChartClose(canvas, chartInstance) {
+            const buildLineChartCloseButton = document.getElementById("line-chart-chart-close-button");
+            buildLineChartCloseButton.addEventListener("click", function () {
+                const lineChartModal = document.getElementById("line-chart-modal");
+                closeModal(lineChartModal);
+                chartInstance.destroy();
+                canvas.classList.remove("active");
+                return false;
+            })
+        }
+
+        function configureChartCopy(canvas) {
+            const copyButton = document.getElementById("line-chart-modal-copy-button");
+            copyButton.addEventListener("click", async function () {
+                try {
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ "image/png": blob })
+                    ]);
+
+                    this.classList.remove("failure");
+                    this.classList.add("success");
+                } catch (err) {
+                    this.classList.remove("success");
+                    this.classList.add("failure");
+                }
+
+                setTimeout(() => {
+                    // Reset icon after 1.5s
+                    this.classList.remove("success", "failure");
+                }, 1500);
+            })
+        }
+
+        function configureChartDownload(canvas) {
+            const downloadButton = document.getElementById("line-chart-modal-download-button");
+            downloadButton.addEventListener("click", function () {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'chart.png';
+                link.click();
+            })
+        }
 
         function CheckAllFunctionality(CheckBoxList) {
             const targetCtrl = CheckBoxList;
@@ -196,6 +431,7 @@
             --Width: 300px;
         }
 
+        /*=================== misc ================*/
         .Width {
             width: var(--Width);
         }
@@ -229,6 +465,7 @@
             animation: spin 1s linear infinite;
         }
 
+        /*============ ReportGridView ============*/
         .ReportGridView td, .GridViewColumn {
             text-wrap: nowrap;
         }
@@ -323,6 +560,62 @@
                 transform: rotate(360deg);
             }
         }
+
+        /*============== line-chart-modal ==========*/
+        #line-chart-modal {
+            display: flex;
+            flex-direction: column;
+            width: 75vw;
+            height: 50vh;
+        }
+
+            #line-chart-modal.active {
+                width: fit-content;
+                height: fit-content;
+            }
+
+            #line-chart-modal.modal {
+                border-radius: 0px;
+            }
+
+        #input-line-chart {
+            box-shadow: 0 4px 16px -2px rgba(0,0,0,0.55); /* subtle shadow below canvas */
+            display: block; /* removes inline gap if needed */
+            margin-bottom: 0; /* ensure no extra margin */
+        }
+
+        #line-chart-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #line-chart-modal-header-copy-and-download-buttons-container {
+            display: flex;
+            align-items: center;
+            gap: var(--UWhitespace);
+        }
+
+        #line-chart-chart-close-button, #line-chart-modal-copy-button, #line-chart-modal-download-button {
+            cursor: pointer;
+        }
+
+        #line-chart-modal-copy-button {
+            width: 32px;
+            height: 32px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-image: url('../Color/icons/copy-simple-bold.svg');
+        }
+
+            #line-chart-modal-copy-button.success {
+                background-image: url('../Color/icons/check-bold.svg');
+            }
+
+            #line-chart-modal-copy-button.failure {
+                background-image: url('../Color/icons/warning-bold.svg');
+            }
 
         /*============== label-modal =============*/
         #label-modal-order-by-functionality {
@@ -605,6 +898,12 @@
                         </ItemTemplate>
                     </asp:TemplateField>
 
+                    <asp:TemplateField HeaderText="View Graph">
+                        <ItemTemplate>
+                            <%--cell content is added in code-behind ReportGridView_RowDataBound event--%>
+                        </ItemTemplate>
+                    </asp:TemplateField>
+
                     <asp:CommandField Visible="False" ShowEditButton="True" ShowCancelButton="True" />
                 </Columns>
                 <FooterStyle BackColor="#CCCCCC" />
@@ -613,6 +912,20 @@
                 <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
                 <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
             </asp:GridView>
+
+            <div class="modal" id="line-chart-modal">
+                <div id="line-chart-modal-header" class="modal-header">
+                    <div id="line-chart-modal-header-copy-and-download-buttons-container">
+                        <div id="line-chart-modal-copy-button"></div>
+                        <img id="line-chart-modal-download-button" src="../Color/icons/download-bold.svg" alt="download" />
+                    </div>
+                    <img id="line-chart-chart-close-button" src="../Color/icons/x-bold.svg" alt="close" />
+                </div>
+                <div class="modal-body">
+                    <canvas id="input-line-chart"></canvas>
+                </div>
+            </div>
+
         </div>
     </section>
 

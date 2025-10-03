@@ -650,7 +650,7 @@ Public Class AdminOverrideTests
     End Sub
 End Class
 
-Public Class DummyDS 
+Public Class DummyDS
     Private Shared Random As New Random()
 
     Function InstantiationWithData(Optional RC As Integer = 1) As RecordSet
@@ -935,16 +935,279 @@ Public Class GenerateActiveSheetNameTests
     End Sub
 End Class
 
-Public Class GetExcelDataTests
+Public Class GetLineChartConfigTests
     Inherits Report
 
-    Private Function CreateFakeDsSchema() As Data.DataSet
+    Private _ReportMockDs As New ReportMockDs()
+
+    Public Shared ReadOnly Property AwnStage1Results As IEnumerable(Of Object())
+        Get
+            Dim ReportMockDs As New ReportMockDs()
+            Dim AwnDs As Data.DataSet = ReportMockDs.GetOneLogNoPhasesDataset()
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025"}},
+                {"data", {"8.19", "6.30"}},
+                {"lowerBound", "5.5"},
+                {"upperBound", "9"},
+                {"graphTitle", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH (08/11/2025 - 08/12/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+            Dim DsLabelKey As Integer = 560
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property AwnStage2Results As IEnumerable(Of Object())
+        Get
+            Dim ReportMockDs As New ReportMockDs()
+            Dim AwnDs As Data.DataSet = ReportMockDs.GetOneLogNoPhasesDataset()
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025"}},
+                {"data", {"6.99", "7.18"}},
+                {"lowerBound", "5.5"},
+                {"upperBound", "9"},
+                {"graphTitle", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH (08/11/2025 - 08/12/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+            Dim DsLabelKey As Integer = 561
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property AwnIncompleteStage1Results As IEnumerable(Of Object())
+        Get
+            Dim ReportMockDs As New ReportMockDs()
+            Dim Ds As Data.DataSet = ReportMockDs.GetOneLogNoPhasesIncompleteDataset()
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025", "08/13/2025"}},
+                {"data", {"8.19", Nothing, "6.30"}},
+                {"lowerBound", "5.5"},
+                {"upperBound", "9"},
+                {"graphTitle", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH (08/11/2025 - 08/13/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+            Dim DsLabelKey As Integer = 560
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, Ds, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+
+
+
+
+    Private Shared Function CreateCustomDs(Config As Dictionary(Of String, Object)) As Data.DataSet
+        Dim ReportMockDs As New ReportMockDs()
+        Dim Ds As Data.DataSet = ReportMockDs.GetOneLogNoPhasesDataset()
+
+        Dim LabelKey = Config("LabelKey")
+        For Each Dr As Data.DataRow In Ds.Tables(0).Rows
+            If Dr("LabelKey") = LabelKey Then
+                Dr("Range") = Config("Range")
+                Dr("Unit") = Config("Unit")
+                Dr("Label") = Config("Label")
+            End If
+        Next
+
+        Return Ds
+    End Function
+
+    Public Shared ReadOnly Property NoBoundsExpectedResults As IEnumerable(Of Object())
+        Get
+            Dim DsLabelKey As Integer = 561
+
+            Dim CustomDsConfig As New Dictionary(Of String, Object) From {
+                {"LabelKey", DsLabelKey},
+                {"Range", DBNull.Value},
+                {"Unit", "pH"},
+                {"Label", "Stage 2 / AIT AWN-2 Reading"}
+            }
+            Dim AwnDs As Data.DataSet = CreateCustomDs(CustomDsConfig)
+
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025"}},
+                {"data", {"6.99", "7.18"}},
+                {"lowerBound", Nothing},
+                {"upperBound", Nothing},
+                {"graphTitle", "Stage 2 / AIT AWN-2 Reading (08/11/2025 - 08/12/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property UpperBoundOnlyExpectedResults As IEnumerable(Of Object())
+        Get
+            Dim DsLabelKey As Integer = 561
+            Dim Label As String = "Stage 2 / AIT AWN-2 Reading | <9 pH"
+
+            Dim CustomDsConfig As New Dictionary(Of String, Object) From {
+                {"LabelKey", DsLabelKey},
+                {"Range", "<9"},
+                {"Unit", "pH"},
+                {"Label", Label}
+            }
+            Dim AwnDs As Data.DataSet = CreateCustomDs(CustomDsConfig)
+
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025"}},
+                {"data", {"6.99", "7.18"}},
+                {"lowerBound", Nothing},
+                {"upperBound", "9"},
+                {"graphTitle", Label & " (08/11/2025 - 08/12/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property LowerBoundOnlyExpectedResults As IEnumerable(Of Object())
+        Get
+            Dim DsLabelKey As Integer = 561
+            Dim Label As String = "Stage 2 / AIT AWN-2 Reading | >5.5 pH"
+
+            Dim CustomDsConfig As New Dictionary(Of String, Object) From {
+                {"LabelKey", DsLabelKey},
+                {"Range", ">5.5"},
+                {"Unit", "pH"},
+                {"Label", Label}
+            }
+            Dim AwnDs As Data.DataSet = CreateCustomDs(CustomDsConfig)
+
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"xAxisLabels", {"08/11/2025", "08/12/2025"}},
+                {"data", {"6.99", "7.18"}},
+                {"lowerBound", "5.5"},
+                {"upperBound", Nothing},
+                {"graphTitle", Label & " (08/11/2025 - 08/12/2025)"},
+                {"xAxisTitle", "Input Date"},
+                {"yAxisTitle", "pH"}
+            }
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property AwnNull_yAxisTitlExpectedResults As IEnumerable(Of Object())
+        Get
+            Dim DsLabelKey As Integer = 561
+
+            Dim CustomDsConfig As New Dictionary(Of String, Object) From {
+                {"LabelKey", DsLabelKey},
+                {"Range", DBNull.Value},
+                {"Unit", DBNull.Value},
+                {"Label", ""}
+            }
+            Dim AwnDs As Data.DataSet = CreateCustomDs(CustomDsConfig)
+
+            Dim ExpectedConfig As New Dictionary(Of String, Object) From {
+                {"yAxisTitle", Nothing}
+            }
+
+            Return New List(Of Object()) From {
+                New Object() {DsLabelKey, AwnDs, ExpectedConfig}
+            }
+        End Get
+    End Property
+
+    <Theory>
+    <MemberData(NameOf(AwnStage1Results))>
+    <MemberData(NameOf(AwnStage2Results))>
+    <MemberData(NameOf(AwnIncompleteStage1Results))>
+    Public Sub xAxisLabelsTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(Of String())(ExpectedConfig("xAxisLabels"), ActualConfig("xAxisLabels"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(NoBoundsExpectedResults))>
+    <MemberData(NameOf(UpperBoundOnlyExpectedResults))>
+    <MemberData(NameOf(LowerBoundOnlyExpectedResults))>
+    Public Sub LowerBoundTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(ExpectedConfig("lowerBound"), ActualConfig("lowerBound"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(NoBoundsExpectedResults))>
+    <MemberData(NameOf(UpperBoundOnlyExpectedResults))>
+    <MemberData(NameOf(LowerBoundOnlyExpectedResults))>
+    Public Sub UpperBoundTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(ExpectedConfig("upperBound"), ActualConfig("upperBound"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(AwnStage1Results))>
+    <MemberData(NameOf(AwnStage2Results))>
+    <MemberData(NameOf(AwnIncompleteStage1Results))>
+    Public Sub graphTitleTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(ExpectedConfig("graphTitle"), ActualConfig("graphTitle"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(AwnStage1Results))>
+    <MemberData(NameOf(AwnStage2Results))>
+    <MemberData(NameOf(AwnIncompleteStage1Results))>
+    Public Sub xAxisTitleTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(ExpectedConfig("xAxisTitle"), ActualConfig("xAxisTitle"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(AwnStage1Results))>
+    <MemberData(NameOf(AwnStage2Results))>
+    <MemberData(NameOf(AwnIncompleteStage1Results))>
+    <MemberData(NameOf(AwnNull_yAxisTitlExpectedResults))>
+    Public Sub yAxisTitleTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(ExpectedConfig("yAxisTitle"), ActualConfig("yAxisTitle"))
+    End Sub
+
+    <Theory>
+    <MemberData(NameOf(AwnStage1Results))>
+    <MemberData(NameOf(AwnStage2Results))>
+    <MemberData(NameOf(AwnIncompleteStage1Results))>
+    Public Sub DataTest(LabelKey As Integer, FakeDs As Data.DataSet, ExpectedConfig As Dictionary(Of String, Object))
+        Dim ActualConfig As Dictionary(Of String, Object) = GetLineChartConfig(LabelKey, FakeDs)
+        Assert.Equal(Of String())(ExpectedConfig("data"), ActualConfig("data"))
+    End Sub
+End Class
+
+
+Public Class ReportMockDs
+    Public Function CreateFakeDsSchema() As Data.DataSet
         Dim DS As New Data.DataSet
         Dim DT As New Data.DataTable
 
         DT.Columns.Add("Area", GetType(String))
         DT.Columns.Add("FieldType", GetType(String))
+        DT.Columns.Add("LabelKey", GetType(Integer))
         DT.Columns.Add("Label", GetType(String))
+        DT.Columns.Add("Range", GetType(String))
+        DT.Columns.Add("Unit", GetType(String))
         DT.Columns.Add("Phase", GetType(String))
         DT.Columns.Add("Value", GetType(String))
         DT.Columns.Add("StartDate", GetType(String))
@@ -956,7 +1219,7 @@ Public Class GetExcelDataTests
         Return DS
     End Function
 
-    Private Sub CreateFakeDr(DT As Data.DataTable, Data As Dictionary(Of String, Object))
+    Public Sub CreateFakeDr(DT As Data.DataTable, Data As Dictionary(Of String, Object))
         Dim DR As Data.DataRow = DT.NewRow()
 
         For Each kvp As KeyValuePair(Of String, Object) In Data
@@ -969,14 +1232,7 @@ Public Class GetExcelDataTests
         DT.Rows.Add(DR)
     End Sub
 
-    Private Function StringifyMatrixHash(MatrixHash As Dictionary(Of String, List(Of String())))
-        Return JsonSerializer.Serialize(
-            MatrixHash.ToDictionary(Function(kv) kv.Key, Function(kv) kv.Value),
-            New JsonSerializerOptions With {.WriteIndented = True}
-        )
-    End Function
-
-    Private Function GetOneLogNoPhasesDataset() As Data.DataSet
+    Public Function GetOneLogNoPhasesDataset() As Data.DataSet
         Dim DS As Data.DataSet = CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
@@ -984,7 +1240,10 @@ Public Class GetExcelDataTests
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
             {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
             {"Phase", DBNull.Value},
             {"Value", "8.19"},
             {"StartDate", "08/11/2025"},
@@ -995,7 +1254,10 @@ Public Class GetExcelDataTests
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
             {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
             {"Phase", DBNull.Value},
             {"Value", "6.30"},
             {"StartDate", "08/12/2025"},
@@ -1006,7 +1268,10 @@ Public Class GetExcelDataTests
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
             {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
             {"Phase", DBNull.Value},
             {"Value", "6.99"},
             {"StartDate", "08/11/2025"},
@@ -1017,7 +1282,10 @@ Public Class GetExcelDataTests
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
             {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
             {"Phase", DBNull.Value},
             {"Value", "7.18"},
             {"StartDate", "08/12/2025"},
@@ -1028,10 +1296,249 @@ Public Class GetExcelDataTests
         Return DS
     End Function
 
+    Public Function GetOneLogNoPhasesIncompleteDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", ""},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", ""},
+            {"InputOperator", ""}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/13/2025"},
+            {"InputDate", "08/13/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", ""},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", ""},
+            {"InputOperator", ""}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "No Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "7.18"},
+            {"StartDate", "08/13/2025"},
+            {"InputDate", "08/13/2025 06:33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+        Return DS
+    End Function
+
+    Public Function GetOneLogAllInputsPhasedDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 1"},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 1"},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "All Inputs Phased"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+
+        Return DS
+    End Function
+
+
+    Public Function GetOneLogSomeInputsPhasedDataset() As Data.DataSet
+        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DT As Data.DataTable = DS.Tables(0)
+
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "8.19"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:22 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 560},
+            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", DBNull.Value},
+            {"Value", "6.30"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:11 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 2"},
+            {"Value", "6.99"},
+            {"StartDate", "08/11/2025"},
+            {"InputDate", "08/11/2025 02:44:29 PM"},
+            {"InputOperator", "andrew williams"}
+        })
+        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        {
+            {"Area", "Some Inputs Phased Loooooooooooong Name"},
+            {"FieldType", DBNull.Value},
+            {"LabelKey", 561},
+            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
+            {"Range", "5.5-9"},
+            {"Unit", "pH"},
+            {"Phase", "phase 2"},
+            {"Value", "7.18"},
+            {"StartDate", "08/12/2025"},
+            {"InputDate", "08/12/2025 06:33:19 AM"},
+            {"InputOperator", "andrew williams"}
+        })
+
+
+        Return DS
+    End Function
+End Class
+
+Public Class GetExcelDataTests
+    Inherits Report
+
+    Private _ReportMockDs As New ReportMockDs()
+
+    Private Function StringifyMatrixHash(MatrixHash As Dictionary(Of String, List(Of String())))
+        Return JsonSerializer.Serialize(
+            MatrixHash.ToDictionary(Function(kv) kv.Key, Function(kv) kv.Value),
+            New JsonSerializerOptions With {.WriteIndented = True}
+        )
+    End Function
+
     <Fact>
     Public Sub OneLogNoPhasesDatasetOrderedByInputTest()
         '1 log with no phases or groups (ordered by input)
-        Dim DS As Data.DataSet = GetOneLogNoPhasesDataset()
+        Dim DS As Data.DataSet = _ReportMockDs.GetOneLogNoPhasesDataset()
         Dim ReportInst As New Report()
         ReportInst.RebindGroupDS(DS)
 
@@ -1060,64 +1567,10 @@ Public Class GetExcelDataTests
 
 
 
-
-    Private Function GetOneLogAllInputsPhasedDataset() As Data.DataSet
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
-        Dim DT As Data.DataTable = DS.Tables(0)
-
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "All Inputs Phased"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
-            {"Phase", "phase 1"},
-            {"Value", "8.19"},
-            {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02:44:22 PM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "All Inputs Phased"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
-            {"Phase", "phase 1"},
-            {"Value", "6.30"},
-            {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06:33:11 AM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "All Inputs Phased"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
-            {"Phase", "phase 2"},
-            {"Value", "6.99"},
-            {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02:44:29 PM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "All Inputs Phased"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
-            {"Phase", "phase 2"},
-            {"Value", "7.18"},
-            {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06:33:19 AM"},
-            {"InputOperator", "andrew williams"}
-        })
-
-
-        Return DS
-    End Function
-
     <Fact>
     Public Sub OneLogAllInputsPhasedOrderedByInputTest()
         '1 log with all inputs in phases or groups  (ordered by input)
-        Dim DS As Data.DataSet = GetOneLogAllInputsPhasedDataset()
+        Dim DS As Data.DataSet = _ReportMockDs.GetOneLogAllInputsPhasedDataset()
         Dim ReportInst As New Report()
         ReportInst.RebindGroupDS(DS)
 
@@ -1150,63 +1603,10 @@ Public Class GetExcelDataTests
 
 
 
-    Private Function GetOneLogSomeInputsPhasedDataset() As Data.DataSet
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
-        Dim DT As Data.DataTable = DS.Tables(0)
-
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "Some Inputs Phased Loooooooooooong Name"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
-            {"Phase", DBNull.Value},
-            {"Value", "8.19"},
-            {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02:44:22 PM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "Some Inputs Phased Loooooooooooong Name"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH"},
-            {"Phase", DBNull.Value},
-            {"Value", "6.30"},
-            {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06:33:11 AM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "Some Inputs Phased Loooooooooooong Name"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
-            {"Phase", "phase 2"},
-            {"Value", "6.99"},
-            {"StartDate", "08/11/2025"},
-            {"InputDate", "08/11/2025 02:44:29 PM"},
-            {"InputOperator", "andrew williams"}
-        })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
-        {
-            {"Area", "Some Inputs Phased Loooooooooooong Name"},
-            {"FieldType", DBNull.Value},
-            {"Label", "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH"},
-            {"Phase", "phase 2"},
-            {"Value", "7.18"},
-            {"StartDate", "08/12/2025"},
-            {"InputDate", "08/12/2025 06:33:19 AM"},
-            {"InputOperator", "andrew williams"}
-        })
-
-
-        Return DS
-    End Function
-
     <Fact>
     Public Sub OneLogSomeInputsPhasedOrderedByInputTest()
         '1 log with some inputs in phases or groups (ordered by input)
-        Dim DS As Data.DataSet = GetOneLogSomeInputsPhasedDataset()
+        Dim DS As Data.DataSet = _ReportMockDs.GetOneLogSomeInputsPhasedDataset()
         Dim ReportInst As New Report()
         ReportInst.RebindGroupDS(DS)
 
@@ -1237,7 +1637,7 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub SeveralLogsOrderedByInput()
         'several logs with various types (some/none/all inputs in phases or groups). All logs are ordered by input
-        Dim Datasets As New List(Of DataSet) From {GetOneLogNoPhasesDataset(), GetOneLogSomeInputsPhasedDataset(), GetOneLogAllInputsPhasedDataset()}
+        Dim Datasets As New List(Of DataSet) From {_ReportMockDs.GetOneLogNoPhasesDataset(), _ReportMockDs.GetOneLogSomeInputsPhasedDataset(), _ReportMockDs.GetOneLogAllInputsPhasedDataset()}
         Dim MasterDS As New Data.DataSet
         For Each DS As DataSet In Datasets
             MasterDS.Merge(DS, preserveChanges:=True, missingSchemaAction:=MissingSchemaAction.Add)
@@ -1295,10 +1695,10 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub CheckboxFieldtypeDatasetOrderedByInput()
         '1 log with no phases or groups (ordered by input) 
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DS As Data.DataSet = _ReportMockDs.CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", "Checkbox"},
@@ -1309,7 +1709,7 @@ Public Class GetExcelDataTests
             {"InputDate", DBNull.Value},
             {"InputOperator", ""}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", "Checkbox"},
@@ -1320,7 +1720,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", "Checkbox"},
@@ -1331,7 +1731,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "No Inputs Phased"},
             {"FieldType", DBNull.Value},
@@ -1371,10 +1771,10 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub CheckboxFieldtypeDatasetOrderedByDate()
         '1 log with no phases or groups (ordered by date) 
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DS As Data.DataSet = _ReportMockDs.CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", "DP"},
@@ -1385,7 +1785,7 @@ Public Class GetExcelDataTests
             {"InputDate", DBNull.Value},
             {"InputOperator", ""}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", "DP"},
@@ -1396,7 +1796,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", "DP"},
@@ -1407,7 +1807,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", "DP"},
@@ -1450,10 +1850,10 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub OneLogNoPhasesDatasetOrderedByDateTest()
         '1 log with no phases or groups (ordered by date) 
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DS As Data.DataSet = _ReportMockDs.CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", "DP"},
@@ -1464,7 +1864,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:22 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1475,7 +1875,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1486,7 +1886,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1529,10 +1929,10 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub OneLogAllInputsPhasedOrderedByDate()
         '1 log with all inputs in phases or groups  (ordered by date)
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DS As Data.DataSet = _ReportMockDs.CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1543,7 +1943,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:22 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1554,7 +1954,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1565,7 +1965,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1617,10 +2017,10 @@ Public Class GetExcelDataTests
     <Fact>
     Public Sub OneLogSomeInputsPhasedOrderedByDate()
         '1 log with some inputs in phases or groups (ordered by date)
-        Dim DS As Data.DataSet = CreateFakeDsSchema()
+        Dim DS As Data.DataSet = _ReportMockDs.CreateFakeDsSchema()
         Dim DT As Data.DataTable = DS.Tables(0)
 
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1631,7 +2031,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:22 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1642,7 +2042,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/12/2025 06:33:11 AM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
@@ -1653,7 +2053,7 @@ Public Class GetExcelDataTests
             {"InputDate", "08/11/2025 02:44:29 PM"},
             {"InputOperator", "andrew williams"}
         })
-        CreateFakeDr(DT, New Dictionary(Of String, Object) From
+        _ReportMockDs.CreateFakeDr(DT, New Dictionary(Of String, Object) From
         {
             {"Area", "Pm Or Checklist Name"},
             {"FieldType", DBNull.Value},
