@@ -53,7 +53,7 @@
             redirectClickTo(exportButtonContainer, exportButton);
 
             _inputLineChartCanvas = document.getElementById('input-line-chart');
-            configureChartCopy(_inputLineChartCanvas);
+            //configureChartCopy(_inputLineChartCanvas);
             configureChartDownload(_inputLineChartCanvas);
         })
 
@@ -917,7 +917,7 @@
             <div class="modal" id="line-chart-modal">
                 <div id="line-chart-modal-header" class="modal-header">
                     <div id="line-chart-modal-header-copy-and-download-buttons-container">
-                        <div id="line-chart-modal-copy-button"></div>
+                        <%--<div id="line-chart-modal-copy-button"></div>--%>
                         <img id="line-chart-modal-download-button" src="../Color/icons/download-bold.svg" alt="download" />
                     </div>
                     <img id="line-chart-chart-close-button" src="../Color/icons/x-bold.svg" alt="close" />
