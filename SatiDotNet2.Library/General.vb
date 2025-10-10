@@ -348,6 +348,17 @@ Public Class Format
         End Try
     End Function
 
+    Public Function DateNoTime(InputDate As String) As String
+        Dim ParsedDate As DateTime
+
+        Try
+            ParsedDate = DateTime.Parse(InputDate)
+            Return ParsedDate.ToString("MM/dd/yyyy")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
     Public Function ValidLogDate(InputDate As String) As Boolean
         If String.IsNullOrEmpty(Trim(InputDate)) Then Return False 'null or empty string edgecases
 

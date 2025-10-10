@@ -55,7 +55,6 @@ Partial Class MR_OpenTicketStatusBoard
 
             If AdminFromQueryString Then
                 MenuAuthenication.CheckGroupsAuthenication({"admin", "FMManagerApproval"}, Server)
-                ReportGridView.Columns(ReportGridView.Columns.Count - 1).Visible = True 'make CommandField visible
             End If
         Catch ex As Exception
             AdminFromQueryString = Nothing
@@ -80,32 +79,12 @@ Partial Class MR_OpenTicketStatusBoard
     Private Sub Page_PreRender(sender As Object, e As EventArgs) Handles Me.PreRender
         StartDate_TextBox.Text = TextBoxDateFormat(StartDateFromQueryString)
         EndDate_TextBox.Text = TextBoxDateFormat(EndDateFromQueryString)
-        ReportGridView.PageIndex = PageIdxFromQueryString
 
         If GroupFromQueryString IsNot Nothing Then
-            SetGridViewSrc()
-
             If GroupDropDownList.Items(0).Text = "Select Group..." Then
                 GroupDropDownList.Items.RemoveAt(0)
             End If
         End If
-
-        'set CheckBox overlay where FieldType is 'CheckBox'
-        For Each Row As GridViewRow In ReportGridView.Rows
-            If Row.RowType = DataControlRowType.DataRow Then
-                Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
-                Dim LabelKey As Integer = ReportLabelKey_Label.Text
-                Dim FieldType As String = _PmInput.GetFieldType(LabelKey)
-
-                Dim ReportValue_Label As Label = CType(Row.FindControl("ReportValue_Label"), Label)
-                If ReportValue_Label IsNot Nothing Then
-                    'filter value through fieldtype
-                    ReportValue_Label.Text = _Report.GetFieldTypeValue(ReportValue_Label.Text, FieldType)
-                End If
-            End If
-        Next
-
-        ClientScript.RegisterStartupScript(Me.GetType(), "GridViewCols", "ColWidths(" & JsonSerializer.Serialize(Of Dictionary(Of String, String))(Session("Report").GetMaxFieldVals()) & ");", True)
 
         If GroupFromQueryString IsNot Nothing AndAlso GroupFromQueryString <> 0 Then
             Dim AreasList As List(Of Integer) = ConfigureModal("AreasToInclude", AreaCheckBoxList, CheckAllChecklists_CheckBox)
@@ -155,6 +134,8 @@ Partial Class MR_OpenTicketStatusBoard
             Dim Value As String = DR("Value")
 
             Dim Cbx As ListItem = New ListItem(Value, Key)
+            Cbx.Attributes("class") = "filter-cbx"
+            Cbx.Attributes("key") = Key
             CbxListCtrl.Items.Add(Cbx)
 
             If IsModalUntouched OrElse OptionsList.Contains(Key) Then
@@ -269,20 +250,6 @@ Partial Class MR_OpenTicketStatusBoard
         Session("Report").SetAreas(Session("AreasToInclude"))
     End Sub
 
-    Protected Sub SetGridViewSrc()
-        Dim DS As Data.DataSet = Session("Report").GetDS()
-
-        ReportGridView.DataSource = DS.Tables(0)
-        ReportGridView.DataBind()
-    End Sub
-
-    Protected Sub ReportGridView_PageIndexChanging(ByVal sender As Object, ByVal e As GridViewPageEventArgs) Handles ReportGridView.PageIndexChanging
-        'PageIdxFromQueryString = e.NewPageIndex
-        Session("AspWebpage").SetUrl("PageIdx", e.NewPageIndex)
-        'SetGridViewSrc()
-        RefreshPreview()
-    End Sub
-
     Protected Sub GroupDropDownList_SelectedIndexChanged(sender As Object, e As EventArgs)
         Dim SelectedValue As String = GroupDropDownList.SelectedValue
 
@@ -308,168 +275,6 @@ Partial Class MR_OpenTicketStatusBoard
             Return False
         End If
     End Function
-
-    Protected Sub ReportGridView_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-
-    End Sub
-
-    Private Sub ReportGridView_RowDataBound(sender As Object, e As GridViewRowEventArgs) Handles ReportGridView.RowDataBound
-        If e.Row.RowType = DataControlRowType.DataRow Then
-            'add "View Graph" column cells content
-            Dim ViewGraphColIdx As Integer = 9
-            Dim LabelKeyCtrl As Label = CType(e.Row.FindControl("ReportLabelKey_Label"), Label)
-            Dim LabelKey As Integer = Convert.ToInt32(LabelKeyCtrl.Text)
-            If _PmInput.GetFieldType(LabelKey) = "Number" Then
-                Dim Cell As TableCell = e.Row.Cells(ViewGraphColIdx)
-                Dim LineChartConfigJson As Dictionary(Of String, Object) = Session("Report").GetLineChartConfig(LabelKey)
-                Cell.Text = "<a class='gridview-hyperlink' title='Click to view graph' onclick='configureHyperlinkChart(" & JsonSerializer.Serialize(LineChartConfigJson) & ");' style='color: blue; text-decoration: underline; cursor: pointer;'>View Graph</a>"
-            End If
-
-            If e.Row.RowState.HasFlag(DataControlRowState.Edit) Then
-                'add functionality to Admin mode Edit functionality
-                Dim Row As GridViewRow = e.Row
-                Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
-                Dim ReportValue_TextBox As TextBox = CType(Row.FindControl("ReportValue_TextBox"), TextBox)
-                Dim ReportDate_TextBox As TextBox = CType(Row.FindControl("ReportDate_TextBox"), TextBox)
-                Dim ReportOperator_DropDownList As DropDownList = CType(e.Row.FindControl("ReportOperator_DropDownList"), DropDownList)
-
-                'dynamically assign dataset to ReportOperator_DropDownList
-                ReportOperator_DropDownList.DataSource = Session("Report").GetOperators().Tables(0)
-                ReportOperator_DropDownList.DataTextField = "Operator"
-                ReportOperator_DropDownList.DataValueField = "Operator"
-                ReportOperator_DropDownList.DataBind()
-                ReportOperator_DropDownList.SelectedValue = CType(Row.FindControl("ReportOperatorHidden_Label"), Label).Text
-                ReportOperator_DropDownList.Items.Insert(0, New ListItem("Select Operator...", String.Empty))
-
-                If Session("EditModeValues") IsNot Nothing Then
-                    Dim EditModeValues As Dictionary(Of String, String) = Session("EditModeValues")
-
-                    'doing this b/c EditTemplate controls returns to DB field value after postback
-                    ReportDate_TextBox.Text = EditModeValues("Date")
-                    ReportValue_TextBox.Text = EditModeValues("Value")
-                    ReportOperator_DropDownList.SelectedValue = EditModeValues("Operator")
-
-                    Row.FindControl("InvalidReportDate_Label").Visible = True
-                End If
-
-                'incorporate Checkbox asp overlay if needed
-                FieldTypeOverlay(Row, Sub(FieldType As Object, Ctrl As Control)
-                                          Select Case FieldType
-                                              Case "Checkbox"
-                                                  Dim CheckBox As CheckBox = DirectCast(Ctrl, CheckBox)
-
-                                                  CheckBox.Checked = If(ReportValue_TextBox.Text = "1", True, False)
-
-                                                  ReportValue_TextBox.Visible = False
-
-                                                  CType(Row.FindControl("CheckBox_Panel"), Panel).Visible = True
-                                              Case "DP"
-                                                  Dim DpPanel As Panel = DirectCast(Ctrl, Panel)
-                                                  DpPanel.Visible = True
-                                                  ReportValue_TextBox.Visible = False
-
-                                                  Dim DpCbx1 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx1")
-                                                  Dim DpCbx2 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx2")
-
-                                                  Dim DpValues As String() = ReportValue_TextBox.Text.Split("/")
-                                                  Try
-                                                      'try catch block in case db field value is a blank string
-                                                      DpCbx1.Checked = If(DpValues(0) = "1", True, False)
-                                                      DpCbx2.Checked = If(DpValues(1) = "1", True, False)
-                                                  Catch ex As Exception
-                                                      DpCbx1.Checked = False
-                                                      DpCbx2.Checked = False
-                                                  End Try
-                                          End Select
-                                      End Sub)
-            End If
-        End If
-    End Sub
-
-    Private Sub ReportGridView_RowUpdating(sender As Object, e As GridViewUpdateEventArgs) Handles ReportGridView.RowUpdating
-        Dim Row As GridViewRow = ReportGridView.Rows(Convert.ToInt32(ReportGridView.EditIndex))
-        Dim ReportValue_TextBox As TextBox = CType(Row.FindControl("ReportValue_TextBox"), TextBox)
-        Dim DbValue As String = ReportValue_TextBox.Text
-        FieldTypeOverlay(Row, Sub(FieldType As String, Ctrl As Control)
-                                  'here to grab db values from fieldtype control overlays used to increase ui/ux for end user
-                                  Select Case FieldType
-                                      Case "Checkbox"
-                                          Dim CheckBox As CheckBox = DirectCast(Ctrl, CheckBox)
-                                          DbValue = If(CheckBox.Checked, 1, 0)
-                                      Case "DP"
-                                          Dim DpPanel As Panel = DirectCast(Ctrl, Panel)
-                                          Dim DpCbx1 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx1")
-                                          Dim DpCbx2 As CheckBox = DpPanel.FindControl("ReportValue_DpCbx2")
-
-                                          Dim DpDbValue As String = Convert.ToInt32(DpCbx1.Checked) & "/" & Convert.ToInt32(DpCbx2.Checked)
-                                          DbValue = DpDbValue
-                                  End Select
-                              End Sub)
-
-        Dim ReportDate_TextBox As TextBox = CType(Row.FindControl("ReportDate_TextBox"), TextBox)
-        Dim ReportOperator_DropDownList As DropDownList = CType(Row.FindControl("ReportOperator_DropDownList"), DropDownList)
-        Dim DbDate As String = ReportDate_TextBox.Text
-        Dim Mods As New Dictionary(Of String, String) From {
-            {"Value", DbValue},
-            {"Date", DbDate},
-            {"Operator", ReportOperator_DropDownList.SelectedValue}
-        }
-
-        If Format.ValidLogDate(DbDate) Then
-            Dim StartDate_Label As Label = CType(Row.FindControl("StartDate_Label"), Label)
-            Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
-            Dim Config As New Dictionary(Of String, String) From {
-                {"LabelKey", ReportLabelKey_Label.Text},
-                {"Date", StartDate_Label.Text}
-            }
-
-            Session.Remove("EditModeValues")
-            Session("Report").Override(Config, Mods, True)
-
-            ReportGridView.EditIndex = -1
-            SetGridViewSrc()
-        Else
-            Session("EditModeValues") = Mods
-        End If
-    End Sub
-
-    Private Sub FieldTypeOverlay(Row As GridViewRow, Callback As Action(Of String, Control))
-        Dim ReportLabelKey_Label As Label = CType(Row.FindControl("ReportLabelKey_Label"), Label)
-        Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
-        Dim LabelKey As Integer = ReportLabelKey_Label.Text
-        Dim FieldType As String = _PmInput.GetFieldType(LabelKey)
-
-        If FieldType <> "Number" Then
-            Dim DbValueCtrl As Label = CType(Row.FindControl("ReportValue_Label"), Label)
-            Dim DbValue As String
-
-            Try
-                'in case GridView is in edit mode (Label control will NOT be visible)
-                DbValue = DbValueCtrl.Text
-            Catch ex As Exception
-                DbValue = CType(Row.FindControl("ReportValue_TextBox"), TextBox).Text
-            End Try
-
-            Select Case FieldType
-                Case "Checkbox"
-                    Callback("Checkbox", Row.FindControl("ReportValue_CheckBox"))
-                Case "DP"
-                    Callback("DP", Row.FindControl("DP_Panel"))
-                Case Else
-            End Select
-        End If
-    End Sub
-
-    Private Sub ReportGridView_RowEditing(sender As Object, e As GridViewEditEventArgs) Handles ReportGridView.RowEditing
-        ReportGridView.EditIndex = e.NewEditIndex
-        SetGridViewSrc()
-    End Sub
-
-    Private Sub ReportGridView_RowCancelingEdit(sender As Object, e As GridViewCancelEditEventArgs) Handles ReportGridView.RowCancelingEdit
-        Session.Remove("EditModeValues")
-        ReportGridView.EditIndex = -1
-        SetGridViewSrc()
-    End Sub
 
     Private Sub GenerateActiveSheet(FlexObj As FlexCel.XlsAdapter.XlsFile, SheetName As String)
         Dim NewSheetCount As Integer = FlexObj.SheetCount + 1
@@ -644,11 +449,6 @@ Partial Class MR_OpenTicketStatusBoard
         Res = (StripIllegalFileSystemChars(Route) & "--" & HashedCombinedString).Replace(" ", String.Empty) & ".xls"
         Return Res
     End Function
-
-    Private Sub ReportGridView_PreRender(sender As Object, e As EventArgs) Handles ReportGridView.PreRender
-
-    End Sub
-
     Protected Sub ResetGrid_OnClick(sender As Object, e As EventArgs) Handles ResetGridButton.Click
         Session("Report") = Nothing
 

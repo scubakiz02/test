@@ -1,6 +1,8 @@
 ﻿<%@ Page Title="" Language="VB" MaintainScrollPositionOnPostback="true" MasterPageFile="~/MasterPage1.master" AutoEventWireup="false" CodeFile="ChecklistReport.aspx.vb" Inherits="MR_OpenTicketStatusBoard" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <link href="../scripts/tabulator.min.css" rel="stylesheet">
+    <script src="../scripts/tabulator.min.js"></script>
     <script src="../scripts/WebComponents/Spinner.js"></script>
     <script src="../scripts/common.js"></script>
     <script src="../scripts/chart.umd.js"></script>
@@ -9,17 +11,9 @@
         let EndDate_Textbox;
         let WebpageSpinner;
         let _inputLineChartCanvas;
-
-        window.addEventListener("visibilitychange", function () {
-            // user has returned to the tab after viewing hyperlink in 'View File' column of ReportGridView
-            // induce a postback using javascript
-            if (!document.hidden) {
-                __doPostBack('<%= ReportGridView.ClientID %>', '');
-            }
-        });
+        let _tabulatorGrid;
 
         window.addEventListener("load", function () {
-            const ReportGridView = document.getElementById('<%= ReportGridView.ClientID %>');
             const CheckAllCbx = document.getElementById('<%= CheckAll_CheckBox.ClientID %>');
             const LabelCbxList = document.getElementById('<%= LabelCbxList.ClientID %>');
             const CheckAllChecklists_CheckBox = document.getElementById('<%= CheckAllChecklists_CheckBox.ClientID %>');
@@ -27,21 +21,6 @@
             const openModalButtons = document.querySelectorAll('[data-modal-target]')
             const closeModalButtons = document.querySelectorAll('[data-close-button]')
             const gridPager = document.querySelector(".grid-pager");
-
-            if (gridPager) gridPager.style.width = ReportGridView.offsetWidth + "px";
-
-            //set height of ReportGridView programmatically
-            if (ReportGridView) {
-                let LargestReportGridViewHeight = sessionStorage.getItem("ReportGridView_Height") ? parseFloat(sessionStorage.getItem("ReportGridView_Height")) : 0;
-
-                if (ReportGridView.offsetHeight > LargestReportGridViewHeight) {
-                    LargestReportGridViewHeight = ReportGridView.offsetHeight;
-                    sessionStorage.setItem("ReportGridView_Height", LargestReportGridViewHeight);
-                }
-
-                document.querySelector(".grid-container").style.height = LargestReportGridViewHeight + (ReportGridView.querySelector("tr").offsetHeight * 2) + "px"; //add height of 1 of the rows of ReportGridView to total, to ensure pager does not lay over bottom most row 
-                ReportGridView.style.visibility = "visible";
-            }
 
             WebpageSpinner = document.getElementById("WebpageSpinner");
             document.body.appendChild(WebpageSpinner);
@@ -69,10 +48,6 @@
             DateTbxChange.call(StartDate_Textbox);
             DateTbxChange.call(EndDate_Textbox);
 
-            if (ReportGridView) {
-                SetSpinAnimation.call(ReportGridView);
-            }
-
             const exportButtonContainer = document.getElementById("export-button-container");
             const exportButton = document.getElementById('<%= ExportButton.ClientID %>');
             redirectClickTo(exportButtonContainer, exportButton);
@@ -81,6 +56,194 @@
             configureChartCopy(_inputLineChartCanvas);
             configureChartDownload(_inputLineChartCanvas);
         })
+
+        window.addEventListener("DOMContentLoaded", function () {
+
+            // =============== tabulator =================
+
+            //add event listeners to tabs
+            //document.getElementById("tab1-btn").addEventListener("click", function () {
+            //    table.setData(dataA);
+            //    document.querySelector('.tab-button.active').classList.remove('active');
+            //    this.classList.add('active');
+            //});
+
+            //document.getElementById("tab2-btn").addEventListener("click", function () {
+            //    table.setData(dataB);
+            //    document.querySelector('.tab-button.active').classList.remove('active');
+            //    this.classList.add('active');
+            //});
+
+            //create Tabulator on DOM element with id "tabulator-grid"
+            _tabulatorGrid = new Tabulator("#tabulator-grid", {
+                //data: getTabulatorDataFake(), //for troubleshooting/debugging
+                ajaxURL: "/api/pm-report/tabulator-data.ashx",
+                ajaxParams: function () {
+                    const groupDdl = document.getElementById('<%= GroupDropDownList.ClientID %>');
+                    const groupkey = groupDdl.value === "Nothing" ? null : groupDdl.value;
+
+                    const pmModal = document.getElementById("checklistModal");
+                    const pmCbxList = document.getElementById('<%= AreaCheckBoxList.ClientID %>');
+                    const pmKeys = getDbKeys(pmCbxList, pmModal);
+
+                    const inputModal = document.getElementById("label-modal");
+                    const inputCbxList = document.getElementById('<%= LabelCbxList.ClientID %>');
+                    const inputKeys = getDbKeys(inputCbxList, inputModal);
+
+                    const startDateTbx = document.getElementById('<%= StartDate_TextBox.ClientID %>');
+                    const startDateAt = getDate(startDateTbx);
+
+                    const endDateTbx = document.getElementById('<%= EndDate_TextBox.ClientID %>');
+                    const endDateAt = getDate(endDateTbx);
+
+                    return {
+                        groupkey: groupkey,
+                        pmKeys: pmKeys,
+                        inputKeys: inputKeys,
+                        startDateAt: startDateAt,
+                        endDateAt: endDateAt
+                    };
+                },
+                layout: "fitColumns",
+                height: "100%",
+                columns: [
+                    { title: "Pm/Checklist", field: "checklist", headerSort: false },
+                    { title: "Input", field: "input", headerSort: false },
+                    { title: "Value", field: "value", headerSort: false },
+                    {
+                        title: "Start Date", field: "startDateAt",
+                        headerSort: false
+                        //    headerSort: true,
+                        //    headerClick: async function (e, column) {
+                        //        const table = column.getTable();
+                        //        const sorters = table.getSorters();
+
+                        //        let isSortAsc = true;
+                        //        if (sorters[0].dir === "desc") {
+                        //            isSortAsc = false;
+                        //            table.clearSort();  // clear sort rather than sorting by desc order
+                        //        }
+
+                        //        //make http request to sort dataset in report class
+                        //        WebpageSpinner.displaySpin();
+
+                        //        setTimeout(function () {
+                        //            // code to run after 3 second (simulates http request delay)
+                        //            WebpageSpinner.hideSpin();
+                        //        }, 3000);
+
+                        //    }
+                    },
+                    { title: "Input Date", field: "inputDateAt", headerSort: false },
+                    { title: "Operator", field: "operator", headerSort: false },
+                    {
+                        title: "View File", field: "", formatter: function (cell, formatterParams, onRendered) {
+                            const data = cell.getData();
+                            const querystring = "?Key=" + data.datakey;
+                            return '<a href="Log.aspx' + querystring + '" target="_blank" rel="noopener">Log.aspx</a>';
+                        }, headerSort: false
+                    },
+                    {
+                        title: "View Graph", field: "", formatter: function (cell, formatterParams, onRendered) {
+                            const data = cell.getData();
+                            if (data.fieldtype === "Number") {
+                                // Create anchor element
+                                const a = document.createElement('a');
+                                a.setAttribute("labelkey", data.labelkey);
+                                a.className = 'tabulator-view-graph-cell';
+                                a.title = 'Click to view graph';
+                                a.textContent = 'View Graph';
+                                a.style.cursor = 'pointer';
+                                a.onclick = async function () {
+                                    //const config = { "graphTitle": "Inlet Prefilter Pressure | >45 psi (09/01/2025 - 09/02/2025)", "xAxisTitle": "Input Date", "yAxisTitle": "psi", "lowerBound": "45", "upperBound": null, "xAxisLabels": ["09/01/2025", "09/02/2025"], "data": ["52", "51"] }; //for troubleshooting/debugging
+                                    const config = await httpGet("/api/pm-report/tabulator-line-chart-config.ashx", { labelkey: this.getAttribute("labelkey") });
+                                    configureHyperlinkChart(config);
+                                };
+                                return a; // Return the DOM element
+                            }
+                            return "";
+                        }, headerSort: false
+                    },
+                ],
+            });
+        })
+
+        function getDate(dateTbx) {
+            let dateAt = null;
+            if (dateTbx.value !== "") dateAt = dateTbx.value;
+            return dateAt;
+        }
+
+        function getDbKeys(cbxList, modal) {
+            let pmKeys = [];
+
+            if (cbxList) {
+                //modal needs to be opened for child elements to be visible
+                openModal(modal);
+                const cbxParents = cbxList.querySelectorAll(".filter-cbx");
+                closeModal(modal);
+
+                for (const cbxParent of cbxParents) {
+                    const cbx = cbxParent.querySelector("input");
+                    if (cbx.checked) {
+                        const key = cbxParent.getAttribute("key");
+                        pmKeys.push(parseInt(key));
+                    }
+                }
+            }
+
+            return pmKeys.length === 0 ? null : JSON.stringify(pmKeys);
+        }
+
+        async function getTabulatorData() {
+            return await httpGet("/api/pm-report/tabulator-data.ashx")
+        }
+
+        async function getTabulatorDataFake() {
+            // Sample datasets
+            const lineChartConfig = '{"graphTitle":"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH (09/01/2025 - 09/03/2025)","xAxisTitle":"Input Date","yAxisTitle":"pH","lowerBound":"5.5","upperBound":"9","xAxisLabels":["09/01/2025","09/02/2025","09/03/2025"],"data":["7.63","7.77","6.66"]}';
+
+            var dataA = [
+                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 446, "fieldtype": "Number", "value": 8.33, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:42:57 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 446, "fieldtype": "Number", "value": 7.0, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:39 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 446, "fieldtype": "Number", "value": 7.9, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:05 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 447, "fieldtype": "Number", "value": 6.34, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:02 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 447, "fieldtype": "Number", "value": 6.7, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:44 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 447, "fieldtype": "Number", "value": 7.6, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:23 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 448, "fieldtype": "Number", "value": 6.80, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:07 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 448, "fieldtype": "Number", "value": 7.2, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:49 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 448, "fieldtype": "Number", "value": 7.8, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:32 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2051, "labelkey": 449, "fieldtype": "Number", "value": 7.51, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:11 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2106, "labelkey": 449, "fieldtype": "Number", "value": 7.7, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:53 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2114, "labelkey": 449, "fieldtype": "Number", "value": 8.4, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:53 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2051, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:12 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2106, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:56 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2114, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:40:43 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2051, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:13 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2106, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:58 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2114, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:40:59 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2051, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:16 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2106, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:03 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2114, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:41:31 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2051, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:13 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2106, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:06 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2114, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:42:03 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2051, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:17 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2106, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:08 PM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2114, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:42:24 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2051, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:18 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2106, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:32 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2114, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:33 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2051, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:19 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2106, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:34 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2114, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:34 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2051, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:19 AM", "operator": "Andrew Williams" },
+                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2106, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:33 AM", "operator": "Mark kiser" },
+                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2114, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:34 AM", "operator": "Mark kiser" }
+            ];
+
+            return dataA;
+        }
 
         function configureHyperlinkChart(config) {
             buildLineChart(config).then(function (chartInstance) {
@@ -339,49 +502,6 @@
             });
         }
 
-        function ColWidths(json) {
-            const ReportGridView = document.getElementById('<%= ReportGridView.ClientID %>');
-            let colgroup = document.createElement("colgroup"); //to group and style column(s)
-            let ColumnOrder = ["Area", "Label", "Value", "InputDate", "InputOperator"];;
-            let TableColWidths = [];
-            let row;
-            let cell;
-            let cellText;
-
-            if (!ReportGridView) return;
-            else ReportGridView.appendChild(colgroup);
-
-            row = ReportGridView.rows[1];
-            cell = row.children[0];
-            cellText = cell.innerHTML;
-
-            //get the most narrow cell
-            for (const child of row.children) {
-                if (child.offsetWidth < cell.offsetWidth) {
-                    cell = child
-                    cellText = cell.innerHTML;
-                }
-            }
-
-            //get largest width for each column based off of values in 'json' arg
-            for (const Col of ColumnOrder) {
-                cell.innerHTML = json[Col];
-                TableColWidths.push(cell.offsetWidth);
-            }
-
-            cell.innerHTML = cellText; //return cell to its original text
-
-            //create rules for columns using html colgroup/col elements & TableColWidths data structure
-            for (let i = 0; i < TableColWidths.length - 1; i++) {
-                const width = TableColWidths[i];
-                let col;
-
-                col = document.createElement("col");
-                colgroup.appendChild(col);
-                col.style.width = width + 5 + "px"; //add extra 5px for cushion to prevent text-wrapping
-            }
-        }
-
         function SetSpinAnimation() {
             let buttons = this.querySelectorAll("tbody a");
             buttons.forEach(button => {
@@ -424,6 +544,7 @@
             }, 3000);
         }
     </script>
+
     <style>
         :root {
             --UWhitespace: 0.5em;
@@ -465,28 +586,35 @@
             animation: spin 1s linear infinite;
         }
 
-        /*============ ReportGridView ============*/
-        .ReportGridView td, .GridViewColumn {
-            text-wrap: nowrap;
-        }
+        /*============ tabulator-grid ===============*/
 
-            .ReportGridView td span, .ReportGridView a { /*pagination elements are html span elements*/
-                padding: var(--UWhitespace);
-            }
-
-        .grid-container {
+        #tabulator-grid-section {
             position: relative;
             display: flex;
             flex-direction: column;
+            height: 400px;
         }
 
-        .grid-pager {
-            position: absolute;
-            bottom: 0;
-            display: flex;
-            justify-content: center;
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background-color: #f1f1f1;
         }
 
+            .tab-button.active {
+                background-color: #fff;
+                border-bottom: 1px solid #fff;
+            }
+
+        .tabulator-view-graph-cell {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /*=========== modal classes =============*/
         .modal {
             position: fixed;
             top: 50%;
@@ -778,141 +906,14 @@
             </div>
         </asp:Panel>
 
-        <div class="grid-container">
-            <asp:GridView ID="ReportGridView" CssClass="ReportGridView" runat="server" AllowPaging="true" PageSize="15"
-                AllowSorting="True" AutoGenerateColumns="False"
-                BackColor="White" BorderColor="#999999" BorderStyle="Solid" BorderWidth="1px" CellPadding="3" ForeColor="Black" GridLines="Vertical"
-                OnRowCommand="ReportGridView_RowCommand"
-                PagerStyle-CssClass="grid-pager"
-                Style="table-layout: fixed; visibility: hidden;">
-                <AlternatingRowStyle BackColor="#CCCCCC" />
-                <Columns>
-                    <asp:TemplateField HeaderText="Checklist">
-                        <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("Area") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="LabelKey" Visible="False">
-                        <ItemTemplate>
-                            <asp:Label ID="ReportLabelKey_Label" runat="server" Text='<%# Eval("LabelKey") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Input">
-                        <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("Label") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
+        <section id="tabulator-grid-section">
+            <div>
+                <%--                <button id="tab1-btn" class="tab-button active" onclick="return false;">Everything</button>
+                <button id="tab2-btn" class="tab-button" onclick="return false;">Nothing (for now)</button>--%>
+            </div>
+            <div id="tabulator-grid"></div>
 
-                    <asp:TemplateField HeaderText="Value">
-                        <ItemTemplate>
-                            <asp:Label ID="ReportValue_Label" runat="server" Text='<%# Eval("Value") %>'></asp:Label>
-                            <asp:CheckBox Visible="False" ID="ReportValue_CheckBox" runat="server" Style="pointer-events: none;"></asp:CheckBox>
-                        </ItemTemplate>
-
-                        <EditItemTemplate>
-                            <asp:TextBox ID="ReportValue_TextBox" runat="server" Text='<%# Bind("Value") %>' />
-
-                            <asp:Panel ID="Checkbox_Panel" Visible="False" runat="server">
-                                <asp:CheckBox ID="ReportValue_CheckBox" runat="server"></asp:CheckBox>
-                            </asp:Panel>
-
-                            <asp:Panel ID="DP_Panel" Visible="False" runat="server">
-                                <asp:CheckBox ID="ReportValue_DpCbx1" runat="server"></asp:CheckBox>
-                                <span>/</span>
-                                <asp:CheckBox ID="ReportValue_DpCbx2" runat="server"></asp:CheckBox>
-                            </asp:Panel>
-
-                            <asp:Panel ID="HOA_Panel" Visible="False" HOA="False" runat="server">
-                                <asp:DropDownList ID="ReportValue_DropDownList" runat="server">
-                                    <asp:ListItem Selected="True" Text="Switch Select..." />
-                                    <asp:ListItem Text="Hand" Value="Hand" />
-                                    <asp:ListItem Text="Off" Value="Off" />
-                                    <asp:ListItem Text="Auto" Value="Auto" />
-                                </asp:DropDownList>
-                            </asp:Panel>
-
-                        </EditItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="Start Date">
-                        <ItemTemplate>
-                            <asp:Label ID="StartDate_Label" runat="server" Text='<%# Eval("StartDate") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="Input Date">
-                        <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("InputDate") %>'></asp:Label>
-                        </ItemTemplate>
-
-                        <EditItemTemplate>
-                            <%--placed css styles for admin mode related css classes here to reduce chances of it being found accidently--%>
-                            <style>
-                                .input-date-admin-mode-container {
-                                    display: flex;
-                                    flex-direction: column;
-                                }
-
-                                .input-date-admin-mode-label {
-                                    padding: 0 !important;
-                                }
-                            </style>
-                            <div class="input-date-admin-mode-container">
-                                <asp:Label Text="mm/dd/yyyy hh:mm:ss tt" CssClass="input-date-admin-mode-label" runat="server" />
-                                <asp:TextBox ID="ReportDate_TextBox" Text='<%# Eval("InputDate") %>' runat="server" />
-                                <asp:Label ID="InvalidReportDate_Label" CssClass="input-date-admin-mode-label" Visible="False" ForeColor="Red" Text="error: invalid date" runat="server" />
-                            </div>
-                        </EditItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="Operator">
-                        <ItemTemplate>
-                            <asp:Label runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
-                        </ItemTemplate>
-
-                        <EditItemTemplate>
-                            <%--<asp:TextBox ID="ReportOperator_TextBox" runat="server" Text='<%# Bind("InputOperator") %>' />--%>
-                            <asp:DropDownList
-                                DataTextField="Operator"
-                                DataValueField="Operator"
-                                ID="ReportOperator_DropDownList"
-                                runat="server">
-                            </asp:DropDownList>
-                        </EditItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="OperatorHidden" Visible="False">
-                        <ItemTemplate>
-                            <asp:Label ID="ReportOperatorHidden_Label" runat="server" Text='<%# Eval("InputOperator") %>'></asp:Label>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="View File">
-                        <ItemTemplate>
-                            <asp:HyperLink runat="server"
-                                Text="Log.aspx"
-                                NavigateUrl='<%# "Log.aspx?Key=" + Eval("DataKey").ToString() %>'
-                                Target="_blank"
-                                ToolTip="Opens a new tab">
-                            </asp:HyperLink>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="View Graph">
-                        <ItemTemplate>
-                            <%--cell content is added in code-behind ReportGridView_RowDataBound event--%>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-
-                    <asp:CommandField Visible="False" ShowEditButton="True" ShowCancelButton="True" />
-                </Columns>
-                <FooterStyle BackColor="#CCCCCC" />
-                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
-                <HeaderStyle BackColor="Black" Font-Bold="True" ForeColor="White" />
-                <PagerStyle BackColor="#999999" ForeColor="Black" HorizontalAlign="Center" />
-                <SelectedRowStyle BackColor="#000099" Font-Bold="True" ForeColor="White" />
-            </asp:GridView>
-
+            <%--1 modal is used for spc line charts--%>
             <div class="modal" id="line-chart-modal">
                 <div id="line-chart-modal-header" class="modal-header">
                     <div id="line-chart-modal-header-copy-and-download-buttons-container">
@@ -925,8 +926,7 @@
                     <canvas id="input-line-chart"></canvas>
                 </div>
             </div>
-
-        </div>
+        </section>
     </section>
 
 </asp:Content>

@@ -149,4 +149,3 @@ function redirectClickTo(clickedElem, targetElem) {
         targetElem.click();
     })
 }
-

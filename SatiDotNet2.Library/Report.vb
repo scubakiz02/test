@@ -1,12 +1,12 @@
-﻿Imports System.Text.Json
-Imports System.Globalization
+﻿Imports System.Globalization
+Imports System.Text.Json
+Imports System.Windows
 
 Public Class Report
     Inherits Security
 
     Private GroupDS As Data.DataSet
     Private EmptyGroupDS As New Data.DataSet()
-    Private MaxFieldVals As New Dictionary(Of String, String)
     Private QueryConfig As New Dictionary(Of String, Dictionary(Of String, String))
     Dim LogAspx As New LogAspxLibrary
     Private DbFormatting As New Format()
@@ -42,6 +42,9 @@ Public Class Report
         "RIGHT JOIN [ALTS].[dbo].[T_LogData] D On D.AreaKey=L.AreaKey " &
         "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
         "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] "
+
+    Private _TabulatorConfig As List(Of Dictionary(Of String, Object))
+    Private _PmInput As New PmInput()
 
     Public Sub New()
 
@@ -224,18 +227,6 @@ Public Class Report
         Return GroupDS
     End Function
 
-    Public Function GetMaxFieldVals() As Dictionary(Of String, String)
-        Return MaxFieldVals
-    End Function
-
-    Private Sub SetMaxFieldVals(KeyToTest As String, TestVal As String)
-        If TestVal Is Nothing Then TestVal = String.Empty
-
-        If TestVal.Length > MaxFieldVals(KeyToTest).Length Then
-            MaxFieldVals(KeyToTest) = TestVal
-        End If
-    End Sub
-
     Public Function BuildWhereClause(Config As Dictionary(Of String, Object), ByRef SqlConfig As Dictionary(Of String, Dictionary(Of String, String))) As String
         Dim SqlWhereClause As String = ""
 
@@ -294,6 +285,10 @@ Public Class Report
         Return "ORDER BY A.Area, P.PhaseOrder, L.LabelOrder, D.Date"
     End Function
 
+    Public Sub RefreshDS()
+        PullAndStripDS()
+    End Sub
+
     Private Sub PullAndStripDS()
         If GetVar("StartDate") Is Nothing OrElse GetVar("EndDate") Is Nothing Then Exit Sub
 
@@ -306,15 +301,9 @@ Public Class Report
         }
         _ConstructorQuery = __ConstructorQueryShell & BuildWhereClause(WhereClauseConfig, QueryConfig) & BuildOrderByClause(DS_OrderedByDate)
         GroupDS = GetMyDataSetParamQuery(_ConstructorQuery, QueryConfig)
-        MaxFieldVals = New Dictionary(Of String, String) From { 'to ensure values in MaxFieldVals pertain to current configured dataset
-           {"InputDate", "mm/dd/yyyy 00:00:00 PM"},
-           {"StartDate", "mm/dd/yyyy"},
-           {"Value", "Value"},
-           {"InputOperator", String.Empty},
-           {"Area", String.Empty},
-           {"Label", String.Empty}
-        }
+
         Dim GroupRC As Integer = GroupDS.Tables(0).Rows.Count - 1
+        _TabulatorConfig = New List(Of Dictionary(Of String, Object))
         For I As Integer = 0 To GroupRC
             Dim GroupDR As Data.DataRow = GroupDS.Tables(0).Rows(I)
             Dim AreaKey As Integer = GroupDR("AreaKey")
@@ -350,14 +339,23 @@ Public Class Report
             GroupDR("Value") = Value
             GroupDR("InputOperator") = InputOperator
 
-            SetMaxFieldVals("Label", Label)
-            SetMaxFieldVals("Value", Value)
-            SetMaxFieldVals("InputOperator", InputOperator)
-            SetMaxFieldVals("Area", Area)
+            Dim TabulatorRowConfig As New Dictionary(Of String, Object)
+            TabulatorRowConfig("checklist") = Area
+            TabulatorRowConfig("input") = Label
+            TabulatorRowConfig("datakey") = GroupDR("DataKey")
+            TabulatorRowConfig("labelkey") = GroupDR("LabelKey")
+            TabulatorRowConfig("fieldtype") = _PmInput.GetFieldType(GroupDR("LabelKey"))
+            TabulatorRowConfig("value") = Value
+            TabulatorRowConfig("startDateAt") = StartDate
+            TabulatorRowConfig("inputDateAt") = InputDate
+            TabulatorRowConfig("operator") = InputOperator
+            _TabulatorConfig.Add(TabulatorRowConfig)
         Next
-
-        GroupDS.Tables(0).AcceptChanges() 'remove DataRow(s) marked for deletion permanently
     End Sub
+
+    Public Function GetTabulatorConfig() As List(Of Dictionary(Of String, Object))
+        Return _TabulatorConfig
+    End Function
 
     Public Function Override(Config As Dictionary(Of String, String), Mods As Dictionary(Of String, String), Optional UpdateDB As Boolean = False) As String
         Dim UnpackedInputs As New Dictionary(Of Integer, Dictionary(Of String, String))

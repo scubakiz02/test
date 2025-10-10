@@ -290,52 +290,6 @@ Public Class ReportTests
 
         Assert.NotEqual(0, Ds.Tables(0).Rows.Count)
     End Sub
-
-    <Fact>
-    Public Sub GetMaxFieldValsTest1()
-        'calling GetMaxFieldVals function. test return field values against entire dataset for GroupKey 1 AreaKey 48
-        Dim Report As Report = CreateReport()
-        Report.SetAreas({48}.ToList()) 'Nitrogen Daily
-        Dim MaxFieldVals As Dictionary(Of String, String) = Report.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
-        Dim AccurateResults As Boolean = True
-
-        If MaxFieldVals("Label").Length < ("Check for leaks - blow-off").Length Then 'in case a new label with longer length is added
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("Value")) Then 'changes too often. not wise to test against a static value
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("InputDate")) Then 'all values are the same length
-            AccurateResults = False
-        ElseIf LCase(MaxFieldVals("Area")) <> "nitrogen daily" Then
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("InputOperator")) Then
-            AccurateResults = False
-        End If
-
-        Assert.True(AccurateResults)
-    End Sub
-
-    <Fact>
-    Public Sub GetMaxFieldValsTest2()
-        'calling GetMaxFieldVals function. test return field values against entire dataset for GroupKey 1 AreaKey 56
-        Dim Report As Report = CreateReport()
-        Report.SetAreas({56}.ToList()) 'R.O. Daily
-        Dim MaxFieldVals As Dictionary(Of String, String) = Report.GetMaxFieldVals() 'idx slots for MaxFieldVals: Area, Label, Value, Date, InputOperator
-        Dim AccurateResults As Boolean = True
-
-        If MaxFieldVals("Label").Contains("1st Pass System Pressure, Final Concentrate") = False Then
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("Value")) Then 'changes too often. not wise to test against a static value
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("InputDate")) Then 'all values are the same length
-            AccurateResults = False
-        ElseIf LCase(MaxFieldVals("Area")) <> "r.o. daily" Then
-            AccurateResults = False
-        ElseIf String.IsNullOrEmpty(MaxFieldVals("InputOperator")) Then
-            AccurateResults = False
-        End If
-
-        Assert.True(AccurateResults)
-    End Sub
 End Class
 
 Public Class SetAreasTests
