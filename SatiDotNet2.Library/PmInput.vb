@@ -11,9 +11,13 @@ Public Class PmInput
         Dim QueryConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
             {"@LabelKey", GetParamVarHash(LabelKey, "int")}
         }
-        Dim FieldType As Object = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
+        Dim FieldType As String = GetSingleDbField("SELECT FieldType FROM [ALTS].[dbo].[T_LogLabel] WHERE [Key]=@LabelKey", QueryConfig, "FieldType")
 
-        If FieldType Is Nothing Then Return "Number"
+        If FieldType Is Nothing Then
+            'number fieldtype is represented by DBNull in the database
+            'that is why the function returns 'number' when result is DBNull
+            Return "Number"
+        End If
         Return FieldType
     End Function
 

@@ -2055,10 +2055,12 @@ End Class
 Public Class GetFieldTypeValueTests
     Inherits Report
 
-    <Fact>
-    Public Sub NumberFieldTypeTests()
-        Dim FieldType As Object = DBNull.Value
-        Dim Value As Integer = 34
+    <Theory>
+    <InlineData(Nothing, "34")>
+    <InlineData("Number", "145")>
+    Public Sub NumberFieldTypeTests(FieldType As Object, Value As String)
+        'number fieldtype is represented by DBNull in the database
+        'that is why this test has two cases, null (Nothing) and "Number"
         Assert.Equal(Value, GetFieldTypeValue(Value, FieldType))
     End Sub
 

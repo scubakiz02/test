@@ -310,6 +310,7 @@ Public Class Report
             Dim StartDate As String = GroupDR("StartDate")
             Dim Area As String = GroupDR("Area")
             Dim Label As String = GroupDR("Label")
+            Dim LabelKey As Integer = GroupDR("LabelKey")
             Dim InputDate As String
             Dim Value As String
             Dim InputOperator As String
@@ -320,7 +321,6 @@ Public Class Report
                     'records before 04/2025 are simply test records, so this try catch loop ensures they are not processed in the report dataset
                     Dim InputsStringified As String = GroupDR("Inputs")
                     Dim Inputs As Dictionary(Of Integer, Dictionary(Of String, String)) = JsonSerializer.Deserialize(Of Dictionary(Of Integer, Dictionary(Of String, String)))(InputsStringified)
-                    Dim LabelKey As Integer = GroupDR("LabelKey")
                     Dim ObjOfInterest As Dictionary(Of String, String) = Inputs(LabelKey)
                     InputDate = DbFormatting.DateField(ObjOfInterest("Date"))
                     Value = ObjOfInterest("Value")
@@ -348,12 +348,15 @@ Public Class Report
             TabulatorRowConfig("checklist") = Area
             TabulatorRowConfig("input") = Label
             TabulatorRowConfig("datakey") = GroupDR("DataKey")
-            TabulatorRowConfig("labelkey") = GroupDR("LabelKey")
-            TabulatorRowConfig("fieldtype") = _PmInput.GetFieldType(GroupDR("LabelKey"))
-            TabulatorRowConfig("value") = Value
+            TabulatorRowConfig("labelkey") = LabelKey
             TabulatorRowConfig("startDateAt") = StartDate
             TabulatorRowConfig("inputDateAt") = InputDate
             TabulatorRowConfig("operator") = InputOperator
+
+            Dim FieldType As String = _PmInput.GetFieldType(LabelKey)
+            TabulatorRowConfig("fieldtype") = FieldType
+            TabulatorRowConfig("value") = GetFieldTypeValue(Value, FieldType)
+
             _TabulatorConfig(Area).Add(TabulatorRowConfig)
         Next
     End Sub
@@ -473,7 +476,8 @@ Public Class Report
     End Sub
 
     Public Function GetFieldTypeValue(Value As Object, FieldType As Object) As String
-        If IsDBNull(FieldType) = False Then
+        Try
+            'try catch block in case fieldtype is db null
             If FieldType = "Checkbox" Then
                 Return BitToSymbol(Value)
             ElseIf FieldType = "DP" Then
@@ -495,7 +499,9 @@ Public Class Report
 
                 Return Dp1 & "/" & Dp2
             End If
-        End If
+        Catch ex As Exception
+            Return Value
+        End Try
 
         Return Value
     End Function
