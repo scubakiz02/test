@@ -1,6 +1,6 @@
 ﻿Imports System.Globalization
 Imports System.Text.Json
-Imports System.Windows
+Imports System.Collections.Specialized
 
 Public Class Report
     Inherits Security
@@ -43,7 +43,7 @@ Public Class Report
         "LEFT JOIN [ALTS].[dbo].[T_LogUnit] U On L.UnitKey=U.[Key] " &
         "LEFT JOIN [ALTS].[dbo].[T_LogPhase] P On L.PhaseKey=P.[Key] "
 
-    Private _TabulatorConfig As List(Of Dictionary(Of String, Object))
+    Private _TabulatorConfig As OrderedDictionary 'using OrderedDictionary to preserve order of insertion
     Private _PmInput As New PmInput()
 
     Public Sub New()
@@ -303,7 +303,7 @@ Public Class Report
         GroupDS = GetMyDataSetParamQuery(_ConstructorQuery, QueryConfig)
 
         Dim GroupRC As Integer = GroupDS.Tables(0).Rows.Count - 1
-        _TabulatorConfig = New List(Of Dictionary(Of String, Object))
+        _TabulatorConfig = New OrderedDictionary()
         For I As Integer = 0 To GroupRC
             Dim GroupDR As Data.DataRow = GroupDS.Tables(0).Rows(I)
             Dim AreaKey As Integer = GroupDR("AreaKey")
@@ -339,6 +339,11 @@ Public Class Report
             GroupDR("Value") = Value
             GroupDR("InputOperator") = InputOperator
 
+            '========= tabulator config =========
+            If _TabulatorConfig.Contains(Area) = False Then
+                _TabulatorConfig.Add(Area, New List(Of Dictionary(Of String, Object))())
+            End If
+
             Dim TabulatorRowConfig As New Dictionary(Of String, Object)
             TabulatorRowConfig("checklist") = Area
             TabulatorRowConfig("input") = Label
@@ -349,11 +354,11 @@ Public Class Report
             TabulatorRowConfig("startDateAt") = StartDate
             TabulatorRowConfig("inputDateAt") = InputDate
             TabulatorRowConfig("operator") = InputOperator
-            _TabulatorConfig.Add(TabulatorRowConfig)
+            _TabulatorConfig(Area).Add(TabulatorRowConfig)
         Next
     End Sub
 
-    Public Function GetTabulatorConfig() As List(Of Dictionary(Of String, Object))
+    Public Function GetTabulatorConfig() As OrderedDictionary
         Return _TabulatorConfig
     End Function
 

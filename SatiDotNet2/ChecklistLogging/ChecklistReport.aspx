@@ -61,22 +61,8 @@
 
             // =============== tabulator =================
 
-            //add event listeners to tabs
-            //document.getElementById("tab1-btn").addEventListener("click", function () {
-            //    table.setData(dataA);
-            //    document.querySelector('.tab-button.active').classList.remove('active');
-            //    this.classList.add('active');
-            //});
-
-            //document.getElementById("tab2-btn").addEventListener("click", function () {
-            //    table.setData(dataB);
-            //    document.querySelector('.tab-button.active').classList.remove('active');
-            //    this.classList.add('active');
-            //});
-
             //create Tabulator on DOM element with id "tabulator-grid"
             _tabulatorGrid = new Tabulator("#tabulator-grid", {
-                //data: getTabulatorDataFake(), //for troubleshooting/debugging
                 ajaxURL: "/api/pm-report/tabulator-data.ashx",
                 ajaxParams: function () {
                     const groupDdl = document.getElementById('<%= GroupDropDownList.ClientID %>');
@@ -101,8 +87,40 @@
                         pmKeys: pmKeys,
                         inputKeys: inputKeys,
                         startDateAt: startDateAt,
-                        endDateAt: endDateAt
+                        endDateAt: endDateAt,
                     };
+                },
+                ajaxResponse: function (url, params, response) {
+                    //after http response is received but before tabulator records are created
+                    //create tabulator tabs and add click functionality
+                    const tabContainer = document.getElementById("tabulator-tab-container");
+
+                    if (response) {
+                        const pmOrChecklistNames = Object.keys(response);
+                        for (let i = 0; i < pmOrChecklistNames.length; i++) {
+                            const pmOrChecklistName = pmOrChecklistNames[i];
+
+                            const tab = document.createElement("div");
+                            tab.classList.add("tabulator-tab");
+                            tab.innerText = pmOrChecklistName;
+                            tab.setAttribute("title", pmOrChecklistName);
+                            tab.addEventListener("click", function () {
+                                const activeTab = tabContainer.querySelector(".active");
+                                activeTab.classList.remove("active");
+                                this.classList.add("active");
+
+                                _tabulatorGrid.setData(response[pmOrChecklistName]);
+                            })
+                            tabContainer.appendChild(tab);
+
+                            if (i === 0) tab.classList.add("active");
+                        }
+
+                        return response[pmOrChecklistNames[0]]; // return first dataset to Tabulator
+                    }
+                    else {
+                        return response;
+                    }
                 },
                 layout: "fitColumns",
                 height: "100%",
@@ -193,56 +211,6 @@
             }
 
             return pmKeys.length === 0 ? null : JSON.stringify(pmKeys);
-        }
-
-        async function getTabulatorData() {
-            return await httpGet("/api/pm-report/tabulator-data.ashx")
-        }
-
-        async function getTabulatorDataFake() {
-            // Sample datasets
-            const lineChartConfig = '{"graphTitle":"Stage 1 / AIT AWN-1 Reading | 5.5-9 pH (09/01/2025 - 09/03/2025)","xAxisTitle":"Input Date","yAxisTitle":"pH","lowerBound":"5.5","upperBound":"9","xAxisLabels":["09/01/2025","09/02/2025","09/03/2025"],"data":["7.63","7.77","6.66"]}';
-
-            var dataA = [
-                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 446, "fieldtype": "Number", "value": 8.33, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:42:57 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 446, "fieldtype": "Number", "value": 7.0, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:39 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 1 / AIT AWN-1 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 446, "fieldtype": "Number", "value": 7.9, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:05 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 447, "fieldtype": "Number", "value": 6.34, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:02 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 447, "fieldtype": "Number", "value": 6.7, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:44 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 2 / AIT AWN-2 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 447, "fieldtype": "Number", "value": 7.6, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:23 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2051, "labelkey": 448, "fieldtype": "Number", "value": 6.80, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:07 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2106, "labelkey": 448, "fieldtype": "Number", "value": 7.2, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:49 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 3 / AIT AWN-3 Reading | 5.5-9 pH", "datakey": 2114, "labelkey": 448, "fieldtype": "Number", "value": 7.8, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:32 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2051, "labelkey": 449, "fieldtype": "Number", "value": 7.51, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:11 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2106, "labelkey": 449, "fieldtype": "Number", "value": 7.7, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:53 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Stage 4 / AIT AWN-4 Reading | 5.5-9", "datakey": 2114, "labelkey": 449, "fieldtype": "Number", "value": 8.4, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:39:53 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2051, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:12 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2106, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:56 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Acid Level", "datakey": 2114, "labelkey": 450, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:40:43 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2051, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:13 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2106, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:37:58 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Caustic Level", "datakey": 2114, "labelkey": 451, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:40:59 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2051, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:16 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2106, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:03 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Alarms (if Yes, describe. Otherwise, type 'No')", "datakey": 2114, "labelkey": 452, "fieldtype": "Text", "value": "No", "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:41:31 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2051, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:13 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2106, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:06 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Acid Pumps in Auto", "datakey": 2114, "labelkey": 453, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:42:03 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2051, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:17 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2106, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 12:38:08 PM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "Caustic Pumps in Auto", "datakey": 2114, "labelkey": 454, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:42:24 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2051, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:18 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2106, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:32 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M1 Mixers Running", "datakey": 2114, "labelkey": 455, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:33 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2051, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:19 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2106, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:34 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M2 Mixers Running", "datakey": 2114, "labelkey": 456, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:34 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2051, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/01/2025", "inputDateAt": "10/01/2025 06:43:19 AM", "operator": "Andrew Williams" },
-                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2106, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/02/2025", "inputDateAt": "10/02/2025 06:32:33 AM", "operator": "Mark kiser" },
-                { "checklist": "Static Data", "input": "M3 Mixers Running", "datakey": 2114, "labelkey": 457, "fieldtype": "Checkbox", "value": 1, "startDateAt": "10/03/2025", "inputDateAt": "10/03/2025 07:43:34 AM", "operator": "Mark kiser" }
-            ];
-
-            return dataA;
         }
 
         function configureHyperlinkChart(config) {
@@ -595,17 +563,29 @@
             height: 400px;
         }
 
-        .tab-button {
-            padding: 10px 20px;
+        #tabulator-tab-container {
+            display: flex;
+            gap: 2.5px;
+            text-wrap: nowrap;
+            overflow: auto;
+        }
+
+        .tabulator-tab {
+            padding: var(--UWhitespace);
+            border-radius: 5px 5px 0 0;
             cursor: pointer;
             border: 1px solid #ccc;
             border-bottom: none;
             background-color: #f1f1f1;
+            flex: 1 1 0;
+            min-width: 1%;
+            max-width: 25%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-            .tab-button.active {
-                background-color: #fff;
-                border-bottom: 1px solid #fff;
+            .tabulator-tab.active {
+                background-color: #80BEFD;
             }
 
         .tabulator-view-graph-cell {
@@ -907,9 +887,7 @@
         </asp:Panel>
 
         <section id="tabulator-grid-section">
-            <div>
-                <%--                <button id="tab1-btn" class="tab-button active" onclick="return false;">Everything</button>
-                <button id="tab2-btn" class="tab-button" onclick="return false;">Nothing (for now)</button>--%>
+            <div id="tabulator-tab-container">
             </div>
             <div id="tabulator-grid"></div>
 
