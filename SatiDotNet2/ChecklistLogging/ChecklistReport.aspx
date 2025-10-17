@@ -217,6 +217,7 @@
             buildLineChart(config).then(function (chartInstance) {
                 WebpageSpinner.displaySpin();
                 configureChartClose(_inputLineChartCanvas, chartInstance);
+                configureChartZoom(chartInstance);
 
                 setTimeout(function () {
                     //fit width and height to line chart, hide spinner, and open modal
@@ -396,7 +397,9 @@
             };
             chartConfig.options = { ...chartConfig.options, ...buildLineChartTitles(config) }
 
-            return new Chart(ctx, chartConfig);
+            const chartInstance = new Chart(ctx, chartConfig);
+            prepChartYAxis(chartInstance);
+            return chartInstance;
         }
 
         function configureChartClose(canvas, chartInstance) {
@@ -440,6 +443,61 @@
                 link.href = canvas.toDataURL('image/png');
                 link.download = 'chart.png';
                 link.click();
+            })
+        }
+
+        function prepChartYAxis(chart) {
+            // Get all data points
+            const allValues = chart.data.datasets.flatMap(ds => ds.data.filter(v => v !== null && v !== undefined));
+            const minValue = Math.min(...allValues);
+            const maxValue = Math.max(...allValues);
+
+            // Add padding to make it look nicer
+            const padding = (maxValue - minValue) * 0.1;
+            const yAxisMin = minValue - padding;
+            const yAxisMax = maxValue + padding;
+            _ogYAxisMin = yAxisMin;
+            _ogYAxisMax = yAxisMax;
+            chart.options.scales.y.min = yAxisMin;
+            chart.options.scales.y.max = yAxisMax;
+
+            // Re-render chart
+            chart.update();
+        }
+
+        function zoomChart(chart, zoomFactor) {
+            const yScale = chart.options.scales.y;
+            const currentMin = yScale.min;
+            const currentMax = yScale.max;
+            const range = currentMax - currentMin;
+            const center = (currentMax + currentMin) / 2;
+
+            const newRange = range * zoomFactor;
+            yScale.min = center - newRange / 2;
+            yScale.max = center + newRange / 2;
+
+            chart.update();
+        }
+
+        let _ogYAxisMin;
+        let _ogYAxisMax;
+        function configureChartZoom(chartInstance) {
+            const zoomInButton = document.getElementById("line-chart-modal-zoom-in-button");
+            const zoomOutButton = document.getElementById("line-chart-modal-zoom-out-button");
+            const resetZoomButton = document.getElementById("line-chart-modal-reset-zoom-button");
+
+            zoomInButton.addEventListener("click", function () {
+                zoomChart(chartInstance, 0.8);
+            });
+
+            zoomOutButton.addEventListener("click", function () {
+                zoomChart(chartInstance, 1.2);
+            });
+
+            resetZoomButton.addEventListener("click", function () {
+                chartInstance.options.scales.y.min = _ogYAxisMin;
+                chartInstance.options.scales.y.max = _ogYAxisMax;
+                chartInstance.update();
             })
         }
 
@@ -686,6 +744,12 @@
                 border-radius: 0px;
             }
 
+            #line-chart-modal .modal-footer {
+                align-items: center;
+                justify-content: normal;
+                gap: var(--UWhitespace);
+            }
+
         #input-line-chart {
             box-shadow: 0 4px 16px -2px rgba(0,0,0,0.55); /* subtle shadow below canvas */
             display: block; /* removes inline gap if needed */
@@ -704,8 +768,21 @@
             gap: var(--UWhitespace);
         }
 
-        #line-chart-chart-close-button, #line-chart-modal-copy-button, #line-chart-modal-download-button {
+        #line-chart-chart-close-button, #line-chart-modal-copy-button, #line-chart-modal-download-button, #line-chart-modal-zoom-in-button, #line-chart-modal-zoom-out-button, #line-chart-modal-reset-zoom-button {
             cursor: pointer;
+        }
+
+        #line-chart-modal-zoom-in-button, #line-chart-modal-zoom-out-button {
+            width: 24px;
+            height: 24px;
+        }
+
+        #line-chart-modal-reset-zoom-button {
+            display: flex;
+            align-items: center;
+            width: fit-content;
+            padding: var(--UWhitespace);
+            border: 1px solid black;
         }
 
         #line-chart-modal-copy-button {
@@ -902,6 +979,11 @@
                 </div>
                 <div class="modal-body">
                     <canvas id="input-line-chart"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <img id="line-chart-modal-zoom-out-button" src="../Color/icons/magnifying-glass-minus.svg" alt="zoom out" />
+                    <img id="line-chart-modal-zoom-in-button" src="../Color/icons/magnifying-glass-plus.svg" alt="zoom in" />
+                    <div id="line-chart-modal-reset-zoom-button">Reset Zoom</div>
                 </div>
             </div>
         </section>
