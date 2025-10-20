@@ -7,6 +7,9 @@
             <script src="../scripts/WebComponents/Spinner.js"></script>
             <script src="../scripts/WebComponents/sati-full-screen.js"></script>
             <script src="../scripts/common.js"></script>
+            <script src="../scripts/jquery-3.6.0.min.js"></script>
+            <script src="../scripts/jquery.signalR-2.4.3.min.js"></script>
+            <script src="/signalr/hubs"></script>
             <script type="text/javascript">
                 let _overdueCache = new OverdueLogsCache();
 
@@ -66,115 +69,196 @@
 
                         });
                     }
-
-                    setInterval(async function () {
-                        await getLogStateChanges();
-                    }, 10000);
                 })
 
-                async function getLogStateChanges() {
-                    //configure server side events after data for all overdue logs has been received
-
-                    //const response = fakeApiCacheData(); //for debugging/troubleshooting
-                    const response = await httpGet("/api/pm-log-state-change.ashx");
-                    if (response.refreshPage) window.location.reload(true); //hard reload (no cache storage)
-
-                    const datakeys = Object.keys(response);
-                    for (const datakey of datakeys) {
-                        const data = response[datakey];
-                        const logState = data.logState;
-                        let log;
-
+                async function keepAspCookiesAlive() {
+                    //send http request once every 10 minutes to ensure the cookies stay alive
+                    const now = new Date();
+                    const min = now.getMinutes();
+                    const seconds = now.getSeconds();
+                    if (min % 10 === 0 && seconds < 30) {
                         try {
-                            log = document.getElementById("log-" + datakey);
-                            if (!log) throw error;
-                        }
-                        catch (err) {
-                            //logs built in asp code-behind
-                            const logId = "log-" + datakey
-                            log = getAspControl(logId);
-                        }
+                            const response = await fetch('/api/pm-status-board/http-session-refresh.ashx', {
+                                method: 'GET',
+                                credentials: 'same-origin',  // credentials: 'same-origin' ensures the ASP.NET_SessionId cookie is sent
+                                cache: 'no-store'
+                            });
 
-                        const newParentCtrl = getAspControl(data.logParentId);
-                        const oldParentCtrl = log ? log.parentElement : null;
-                        if (log && (oldParentCtrl !== newParentCtrl || logState === "delete")) {
-                            //log needs to be moved, so delete the current one
-                            oldParentCtrl.removeChild(log);
-                            assessIntervalSectionState(oldParentCtrl);
-
-                            if (logState === "delete") {
-                                //log is deleted, so move onto the next log
-                                continue;
+                            if (!response.ok) {
+                                console.warn('session refresh failed:', response.status);
                             }
-                            else {
-                                //initialze log var with null value so the log is created in the appropriate interval section
-                                log = null;
-                            }
+                        } catch (err) {
+                            console.warn('session refresh error:', err);
                         }
-                        if (!log) {
-                            log = buildLog({
-                                datakey: datakey,
-                                pmName: data.pmName,
-                                iconsConfig: [], //the case statement below creates the icons
-                                logState: data.logState
-                            }, newParentCtrl)
-
-                            const hasLogsClass = "has-logs";
-                            if (!newParentCtrl.classList.contains(hasLogsClass)) {
-                                newParentCtrl.classList.add(hasLogsClass);
-                            }
-                        }
-
-                        switch (logState) {
-                            case "virgin":
-                            case "incomplete":
-                                removeStampCtrlsFrom(log);
-
-                                break;
-                            case "submitted":
-                                // remove stamps
-                                for (const stampRole of data.removeStamps) {
-                                    const stampCtrlClass = getStampCssClass(stampRole);
-                                    const stampCtrl = log.querySelector("." + stampCtrlClass);
-
-                                    if (stampCtrl) {
-                                        stampCtrl.parentElement.removeChild(stampCtrl);
-                                    }
-                                }
-
-                                //add stamps
-                                for (const stampRole of data.addStamps) {
-                                    const stampCtrlClass = getStampCssClass(stampRole);
-                                    const stampCtrl = log.querySelector("." + stampCtrlClass);
-
-                                    if (!stampCtrl) {
-                                        const iconPanel = log.querySelector(".icon-panel");
-                                        createStamp(stampCtrlClass, datakey, iconPanel)
-                                    }
-                                }
-
-                                break;
-                            case "completed":
-                                //log is complete. It has been submitted, received all its stamps, and is staying up on the status board
-                                removeStampCtrlsFrom(log);
-
-                                break;
-                            case "error":
-                                //error has occured. Display the message from http response on log
-                                const logButton = log.querySelector(".ChecklistButton");
-
-                                removeStampCtrlsFrom(log);
-                                applyBackcolorClass(log, "error");
-
-                                break;
-                        }
-
-                        //no matter the log state, apply the log state backcolor css classes
-                        applyBackcolorClass(log, logState);
-                        iterateChildren(function () {
-                            applyBackcolorClass(this, logState);
-                        }, log);
                     }
+                }
+
+                function ssePingReaction(signal, data) {
+                    switch (signal) {
+                        case "change":
+                            const response = JSON.parse(data);
+                            //const response = fakeApiCacheData(); //for debugging/troubleshooting
+                            const datakeys = Object.keys(response);
+                            for (const datakey of datakeys) {
+                                const config = response[datakey];
+                                changeLogState(datakey, config);
+                            }
+                            break;
+
+                        case "refresh":
+                            // reload status board with today's date as where qs param value
+                            const url = new URL(window.location.href);
+                            const today = new Date();
+                            const mm = String(today.getMonth() + 1).padStart(2, '0');
+                            const dd = String(today.getDate()).padStart(2, '0');
+                            const yyyy = today.getFullYear();
+                            const mmddyyyy = `${mm}/${dd}/${yyyy}`;
+                            url.searchParams.set('WHERE', mmddyyyy);
+                            window.location.href = url.toString();
+                            break;
+
+                        case "ping":
+                            console.log('last ping: ' + data);
+                            break;
+
+                        default:
+                            console.error("status board server side event failure");
+                    }
+                }
+
+                $(function () {
+                    const connection = $.connection.sseStatusBoardHub;
+                    connection.client.statusBoardPing = async function (signal, data) {
+                        ssePingReaction(signal, data);
+                        await keepAspCookiesAlive();
+                    };
+
+
+                    //disconnect server side event connection after 5 seconds (for troubleshooting/debugging callbacks below)
+                    //setTimeout(function () {
+                    //    $.connection.hub.stop();
+                    //}, 5000);
+
+                    $.connection.hub.connectionSlow(function () {
+                        console.warn("SignalR: Connection is slow.");
+                    });
+
+                    $.connection.hub.reconnecting(function () {
+                        console.warn("SignalR: Attempting to reconnect...");
+                    });
+
+                    $.connection.hub.reconnected(function () {
+                        console.info("SignalR: Reconnected.");
+                    });
+
+                    $.connection.hub.disconnected(function () {
+                        console.error("SignalR: Disconnected. Attempting to reconnect in 5 seconds...");
+                        setTimeout(startSignalR(), 5000);
+                    });
+
+                    function startSignalR() {
+                        $.connection.hub.start({ transport: 'serverSentEvents' }).done(function () {
+                            console.info("SignalR: Connected.");
+                        }).fail(function () {
+                            console.error("SignalR: Connection failed. Retrying in 5 seconds...");
+                            setTimeout(startSignalR, 5000);
+                        });
+                    }
+
+                    startSignalR();
+                });
+
+                function changeLogState(datakey, config) {
+                    const logState = config.logState;
+                    let log;
+
+                    try {
+                        log = document.getElementById("log-" + datakey);
+                        if (!log) throw error;
+                    }
+                    catch (err) {
+                        //logs built in asp code-behind
+                        const logId = "log-" + datakey
+                        log = getAspControl(logId);
+                    }
+
+                    const newParentCtrl = getAspControl(config.logParentId);
+                    const oldParentCtrl = log ? log.parentElement : null;
+                    if (log && (oldParentCtrl !== newParentCtrl || logState === "delete")) {
+                        //log needs to be moved, so delete the current one
+                        oldParentCtrl.removeChild(log);
+                        assessIntervalSectionState(oldParentCtrl);
+
+                        if (logState === "delete") {
+                            //log is deleted, so move onto the next log
+                            return;
+                        }
+                        else {
+                            //initialze log var with null value so the log is created in the appropriate interval section
+                            log = null;
+                        }
+                    }
+                    if (!log) {
+                        log = buildLog({
+                            datakey: datakey,
+                            pmName: config.pmName,
+                            iconsConfig: [], //the case statement below creates the icons
+                            logState: config.logState
+                        }, newParentCtrl)
+
+                        const hasLogsClass = "has-logs";
+                        if (!newParentCtrl.classList.contains(hasLogsClass)) {
+                            newParentCtrl.classList.add(hasLogsClass);
+                        }
+                    }
+
+                    switch (logState) {
+                        case "virgin":
+                        case "incomplete":
+                            removeStampCtrlsFrom(log);
+                            break;
+                        case "submitted":
+                            // remove stamps
+                            for (const stampRole of config.removeStamps) {
+                                const stampCtrlClass = getStampCssClass(stampRole);
+                                const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                if (stampCtrl) {
+                                    stampCtrl.parentElement.removeChild(stampCtrl);
+                                }
+                            }
+
+                            //add stamps
+                            for (const stampRole of config.addStamps) {
+                                const stampCtrlClass = getStampCssClass(stampRole);
+                                const stampCtrl = log.querySelector("." + stampCtrlClass);
+
+                                if (!stampCtrl) {
+                                    const iconPanel = log.querySelector(".icon-panel");
+                                    createStamp(stampCtrlClass, datakey, iconPanel)
+                                }
+                            }
+
+                            break;
+                        case "completed":
+                            //log is complete. It has been submitted, received all its stamps, and is staying up on the status board
+                            removeStampCtrlsFrom(log);
+                            break;
+                        case "error":
+                            //error has occured. Display the message from http response on log
+                            const logButton = log.querySelector(".ChecklistButton");
+
+                            removeStampCtrlsFrom(log);
+                            applyBackcolorClass(log, "error");
+                            break;
+                    }
+
+                    //no matter the log state, apply the log state backcolor css classes
+                    applyBackcolorClass(log, logState);
+                    iterateChildren(function () {
+                        applyBackcolorClass(this, logState);
+                    }, log);
+
                 }
 
                 function assessIntervalSectionState(intervalSection) {
@@ -258,8 +342,10 @@
                 function applyBackcolorClass(elem, cssClass) {
                     const logStates = ["error", "virgin", "incomplete", "submitted", "completed"];
 
-                    //remove currently applied log states
+                    if (!elem) return;
+
                     for (const css_class of elem.classList) {
+                        //remove currently applied log states
                         if (logStates.includes(css_class)) {
                             elem.classList.remove(css_class);
                         }
@@ -271,6 +357,7 @@
                     if (cssClass === "error") {
                         try {
                             pushErrorToDom(elem);
+                            elem.setAttribute("title", elem.value);
                         }
                         catch (err) {
                             return;
@@ -936,11 +1023,20 @@
                     --ChecklistButtonHeight: 50px;
                 }
 
-                /* status board log classes */
+                /* ============= status board log classes =============== */
+
+                .button-and-stamps-container {
+                    display: inline-block;
+                    border: 2px solid black;
+                }
+
+                .ChecklistButton {
+                    height: var(--ChecklistButtonHeight);
+                    text-overflow: ellipsis;
+                }
+
                 .error {
                     background: red;
-                    pointer-events: none;
-                    opacity: .75;
                 }
 
                 .virgin {
@@ -1039,16 +1135,6 @@
                 .MasterMainBackground {
                     background: none;
                     margin: 0;
-                }
-
-                .button-and-stamps-container {
-                    display: inline-block;
-                    border: 2px solid black;
-                }
-
-                .ChecklistButton {
-                    height: var(--ChecklistButtonHeight);
-                    text-overflow: ellipsis;
                 }
 
                 .ColorCodingMessages {

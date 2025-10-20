@@ -51,7 +51,6 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Format As New Format()
     Private PmInput As New PmInput()
-    Private _ActivePmCache As New ActivePmCache()
     Private _StampIndicator As New StampIndicator()
 
     Private PhaseController As PhaseController
@@ -626,7 +625,7 @@ Partial Class MR_OpenTicketStatusBoard
         sender.Text = User.Identity.Name.ToString
         sender.Enabled = False
 
-        _ActivePmCache.CacheAdd(KeyFromQueryString)
+        SseStatusBoardHub.StatusBoardChange(KeyFromQueryString)
         SetScrollPos()
     End Sub
 
@@ -1032,7 +1031,7 @@ Partial Class MR_OpenTicketStatusBoard
         UploadToDataTable(User.Identity.Name.ToString)
         MarkAsDone()
 
-        _ActivePmCache.CacheAdd(KeyFromQueryString)
+        SseStatusBoardHub.StatusBoardChange(KeyFromQueryString)
     End Sub
 
     Protected Sub UndoDoneButton_Click(sender As Object, e As EventArgs)
@@ -1042,7 +1041,7 @@ Partial Class MR_OpenTicketStatusBoard
             {"typeOf", "int"}
         }
         Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStamp] SET Active=0 WHERE DataRecordKey=@T_LogDataKey And Active=1; UPDATE [ALTS].[dbo].[T_LogData] SET CompleteLog=0, Ranges=NULL WHERE [Key]=@T_LogDataKey;", QueryConfig)
-        _ActivePmCache.CacheAdd(KeyFromQueryString)
+        SseStatusBoardHub.StatusBoardChange(KeyFromQueryString)
         SetScrollPos()
     End Sub
 
@@ -1283,7 +1282,7 @@ Partial Class MR_OpenTicketStatusBoard
         }
         Security.ExecuteSqlParamQuery("DELETE FROM [ALTS].[dbo].[T_LogOperatorComments] WHERE CommentKey=@T_LogDataKey; DELETE FROM [ALTS].[dbo].[T_LogDataPhotos] WHERE DataKey=@T_LogDataKey", QueryConfig)
 
-        _ActivePmCache.CacheAdd(KeyFromQueryString)
+        SseStatusBoardHub.StatusBoardChange(KeyFromQueryString)
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "ResetLog_OnClick", "window.close(); ", True)
     End Sub
 End Class

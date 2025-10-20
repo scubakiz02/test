@@ -183,7 +183,7 @@ Public Class ActivePm
             'Now get the data needed to determine parent panel id
             Ds = GetMyDataSetParamQuery("SELECT 
                 D.Date As LogStartDateAt, AI.Interval, A.Assignee As AssignedTo,
-                    CASE WHEN D.[Key]=(SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] SubD WHERE SubD.AreaKey=D.AreaKey AND SubD.Date <= @StatusBoardDateAt ORDER BY Date DESC) Then 1
+                    CASE WHEN D.[Key]=(SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] SubD WHERE SubD.AreaKey=D.AreaKey AND SubD.Date <= @StatusBoardDateAt ORDER BY Date DESC, [Key] DESC) Then 1
 	                Else 0 End As 
                 IsLogNewest
                 FROM [ALTS].[dbo].[T_LogData] D

@@ -12,8 +12,6 @@ Partial Class MR_OpenTicketStatusBoard
     Dim RC As Integer
     Dim QueryObject As New Dictionary(Of String, Dictionary(Of String, String))
 
-    Private _ActivePmCache As New ActivePmCache()
-
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
         'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
         'MenuAuthenication.CheckGroupAuthenication("Office", Server)
@@ -45,6 +43,7 @@ Partial Class MR_OpenTicketStatusBoard
 
     Protected Sub ExitIframeButton_onClick(sender As Object, e As EventArgs)
         If sender.Text = "Update" Then
+            'set active status of all stamps relevant to pm/checklist according to cbx selected values in cbx list interface
             For Each ListItem As ListItem In StampCheckBoxList.Items
                 QueryObject("@Active") = New Dictionary(Of String, String) From {
                     {"value", If(ListItem.Selected, True, False)},
@@ -58,16 +57,20 @@ Partial Class MR_OpenTicketStatusBoard
                 Security.ExecuteSqlParamQuery("UPDATE [ALTS].[dbo].[T_LogStampList] SET Active=@Active WHERE TitleKey=@TitleKey AND AreaKey=@AreaKey", QueryObject)
             Next
 
-            'sql query to get all submitted logs that do not have all of there stamps
+            'send signal to connected clients for an update on status board current log
             Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
                 {"@AreaKey", Security.GetParamVarHash(AreaFromQueryString, "int")},
+                {"@StatusBoardDateAt", Security.GetParamVarHash(Session("WhereFromQueryString"), "string")},
                 {"@StartDateCutoffAt", Security.GetParamVarHash(Session("StartDateCutoffAt"), "string")}
             }
-            Dim RelevantLogsDs As Data.DataSet = Security.GetMyDataSetParamQuery("SELECT [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D WHERE CompleteLog=1 AND AreaKey=@AreaKey AND D.Date > @StartDateCutoffAt", SqlConfig)
+            Dim CurrentLogDataKey As Integer = Security.GetSingleDbField("SELECT TOP(1) [Key] As DataKey FROM [ALTS].[dbo].[T_LogData] D " &
+            "WHERE " &
+            "AreaKey=@AreaKey " &
+            "AND D.Date <= @StatusBoardDateAt " &
+            "And D.Date > @StartDateCutoffAt " &
+            "ORDER BY Date DESC", SqlConfig, "Datakey")
 
-            For Each RelevantLogsDr As Data.DataRow In RelevantLogsDs.Tables(0).Rows
-                _ActivePmCache.CacheAdd(RelevantLogsDr("DataKey"))
-            Next
+            SseStatusBoardHub.StatusBoardChange(CurrentLogDataKey)
         End If
 
         ScriptManager.RegisterStartupScript(Me, Me.GetType(), "disableIframe", "disableIframe();", True)

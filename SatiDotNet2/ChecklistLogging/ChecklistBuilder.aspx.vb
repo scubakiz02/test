@@ -40,7 +40,6 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private PhaseController As New PhaseController()
     Private PmInput As New PmInput()
-    Private _ActivePmCache As New ActivePmCache()
     Private _ActivePm As New ActivePm()
 
     <WebMethod()>
@@ -1150,7 +1149,7 @@ Partial Class MR_OpenTicketStatusBoard
         Try
             'if there are no logs for a pm/checklist and this function is called, GetLogConfig() function throws an error
             'that is why this try catch block exists
-            _ActivePmCache.CacheAdd(CurrentLogDataKey)
+            SseStatusBoardHub.StatusBoardChange(CurrentLogDataKey)
         Catch ex As Exception
             Exit Sub
         End Try
@@ -1178,8 +1177,8 @@ Partial Class MR_OpenTicketStatusBoard
         ChecklistBuilder.ArchivePM(AreaFromQueryString)
 
         'both functions below are needed to cache the disabled logs properly
-        'this is b/c CacheUnfinishedLogs() function calls ActivePmCache Class CacheAdd function
-        'CacheAdd function call ActivePm Class GetLogConfig() function, which looks at ALTS Database T_LogArea Table Active field value
+        'this is b/c CacheUnfinishedLogs() function calls status board server side event SseStatusBoardHub.StatusBoardChange() function
+        'SseStatusBoardHub.StatusBoardChange() function call ActivePm Class GetLogConfig() function, which looks at ALTS Database T_LogArea Table Active field value
         'hence why, before calling CacheUnfinishedLogs() function, SetPmActiveStatus() function is called (to set Active field value mentioned to false)
         SetPmActiveStatus(False, AreaFromQueryString)
         CacheUnfinishedCurrentLog(AreaFromQueryString, Session("StartDateCutoffAt"), Session("WhereFromQueryString"))

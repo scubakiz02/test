@@ -13,7 +13,6 @@ Public Class StreamData
     Private Format As New Format()
     Private LogAspx As New LogAspxLibrary()
     Private ActivePm As New ActivePm()
-    Private _ActivePmCache As New ActivePmCache()
     Private PmInput As New PmInput()
     Private PhaseController As New PhaseController()
     Private _DataKey As String
@@ -41,7 +40,7 @@ Public Class StreamData
                 Dim IsPost As Boolean = True
                 Res = BuildHttpResponse(ParamJson, IsPost)
 
-                _ActivePmCache.CacheAdd(_DataKey)
+                SseStatusBoardHub.StatusBoardChange(_DataKey)
             End If
         Catch KeyNotFoundException As KeyNotFoundException
             Res = New Dictionary(Of String, Object)

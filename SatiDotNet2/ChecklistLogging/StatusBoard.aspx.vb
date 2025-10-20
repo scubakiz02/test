@@ -1,10 +1,11 @@
 ﻿
+Imports System.Configuration
 Imports System.Text.Encodings.Web
 Imports System.Text.Json
 Imports System.Threading.Tasks
 Imports System.Web.Services
+Imports Microsoft.PowerBI.Api.V2.Models
 Imports SatiDotNet2.Library
-Imports System.Configuration
 
 
 Partial Class MR_OpenTicketStatusBoard
@@ -22,7 +23,6 @@ Partial Class MR_OpenTicketStatusBoard
 
     Private Shared StampIndicator As New StampIndicator()
     Private _ActivePm As New ActivePm()
-    Private _ActivePmCache As New ActivePmCache()
 
     Private Sub PageInit(sender As Object, e As EventArgs) Handles Me.Init
         Dim DS As New Data.DataSet
@@ -35,7 +35,12 @@ Partial Class MR_OpenTicketStatusBoard
 
         'check if intitial entry of webpage does NOT contain querystring. if so, redirect to ChecklistLoggingMainMaint.aspx
         If Request.QueryString.Count = 0 AndAlso (Session("WhereFromQueryString") Is Nothing OrElse Session("DepartmentFromQueryString") Is Nothing OrElse Session("ViewFromQueryString") Is Nothing) Then
-            Response.Redirect("/MaintenanceDepartment/MD_Main.aspx", False)
+            'reinitialize the session state variables then refresh the page
+            'this process is critical in ensuring 24/7 uptime of status board
+            Session("WhereFromQueryString") = TodaysDate.Date
+            Session("DepartmentFromQueryString") = "Maintenance"
+            Session("ViewFromQueryString") = "Focus"
+            Response.Redirect(Request.Url.ToString(), False)
             Exit Sub
         ElseIf Request.QueryString.Count > 0 Then
             Dim QsDepartment As String = Request.QueryString("Department")
@@ -71,25 +76,26 @@ Partial Class MR_OpenTicketStatusBoard
                 {"value", Session("DepartmentFromQueryString")},
                 {"typeOf", "string"}
             }
-            AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Status='live' AND A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY I.DisplayOrder, A.Area", QueryConfig)
+            AreaDS = Security.GetMyDataSetParamQuery("SELECT A.[Key] FROM [ALTS].[dbo].[T_LogArea] A INNER JOIN [ALTS].[dbo].[T_LogDepartment] D ON A.DepartmentKey=D.[Key] INNER JOIN [ALTS].[dbo].[T_LogAreaInterval] I ON A.IntervalKey=I.[Key] WHERE A.Status='live' AND A.Active=1 AND" & If(Session("DepartmentFromQueryString") <> "All", " D.Department=@Department AND", String.Empty) & " (SELECT COUNT([Key]) FROM [ALTS].[dbo].[T_LogLabel] L WHERE L.AreaKey=A.[Key]) > 0 AND A.Assignee IS NOT NULL ORDER BY [Key], I.DisplayOrder, A.Area", QueryConfig)
             AreaRC = AreaDS.Tables(0).Rows.Count
 
             For I = 0 To AreaRC - 1
                 QueryConfig.Clear()
                 AreaKey = AreaDS.Tables(0).Rows(I)("Key")
 
-                If _ActivePm.IsTimeForNewLog(AreaKey, Session("WhereFromQueryString")) Then
-                    CreateRecord(AreaKey)
-                End If
-
+                'There's a constraint on ALTS Database T_LogData Table AreaKey and Date columns
+                'This constraint ensures every record has a unique AreaKey + Date
+                'That is why CreateRecord() function can be called every time and no duplicated logs will be created
+                CreateRecord(AreaKey)
                 BuildCurrentLogs(AreaKey)
             Next
         End If
     End Sub
 
     Private Sub MR_OpenTicketStatusBoard_Load(sender As Object, e As EventArgs) Handles Me.Load
-        'MenuAuthenication.CheckPageAuthenication(Page, User, Server)
-        'MenuAuthenication.CheckGroupAuthenication("Office", Server)
+        'the method below is static. It only needs to be called once to start the timer that will keep all clients connected to this hub alive
+        'can be called anywhere, so I chose status board Page_Load event
+        SseStatusBoardHub.StartPing()
     End Sub
 
     Sub MaybeCreateRecord(AreaKey As Integer, CalendarDate As Date)
@@ -221,11 +227,11 @@ Partial Class MR_OpenTicketStatusBoard
 
         RC = DS.Tables(0).Rows.Count
         For I = 0 To RC - 1
+            If I > 0 Then Exit For 'in case duplicates exist
+
             Dim Panel As Panel
             Dim CurrentLogsButton As Button
             Dim BuildLogExport As Tuple(Of Panel, Button)
-
-            If I > 0 Then Exit For 'in case duplicates exist
 
             DR = DS.Tables(0).Rows(I)
             Assignee = If(IsDBNull(DR("Assignee")), Nothing, DR("Assignee").ToString())
