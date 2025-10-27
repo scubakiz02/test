@@ -40,7 +40,8 @@ Public Class ActivePm
 
         If FakeStampDs Is Nothing OrElse FakeLogDs Is Nothing Then
             Dim SqlConfig As New Dictionary(Of String, Dictionary(Of String, String)) From {
-                {"@DataKey", GetParamVarHash(DataKey, "int")}
+                {"@DataKey", GetParamVarHash(DataKey, "int")},
+                {"@StatusBoardDateAt", GetParamVarHash(StatusBoardDateAt, "string")}
             }
 
             StampDs = GetMyDataSetParamQuery("Select ST.Title As StampTitle, " &
@@ -54,7 +55,7 @@ Public Class ActivePm
             "WHERE SL.AreaKey = (SELECT AreaKey FROM [ALTS].[dbo].[T_LogData] WHERE [Key]=@DataKey) ORDER BY S.Date DESC", SqlConfig)
 
             LogDataDr = GetMyDataSetParamQuery("SELECT " &
-                "CASE WHEN [Key]=(SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] SubD WHERE SubD.AreaKey=D.AreaKey ORDER BY Date DESC) Then 1 " &
+                "CASE WHEN [Key]=(SELECT TOP(1) [Key] FROM [ALTS].[dbo].[T_LogData] SubD WHERE SubD.AreaKey=D.AreaKey AND Date <= @StatusBoardDateAt ORDER BY Date DESC) Then 1 " &
                 "Else 0 " &
                 "End As IsLogNewest, CompleteLog As IsLogComplete, " &
                     "CASE WHEN (SELECT COUNT(*) FROM [ALTS].[dbo].[T_LogData] WHERE AreaKey=D.AreaKey AND Date=D.Date) > 1 Then 1 " &

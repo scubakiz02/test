@@ -27,7 +27,7 @@ Public Class SseStatusBoardHub
         Dim Now As DateTime = DateTime.Now
 
         'If Now.Minute Mod 2 = 0 Then 'for troubleshooting, debugging
-        If Now.Minute = 0 Then
+        If Now.Minute = 0 AndAlso Now.Second < 30 Then
             Context.Clients.All.statusBoardPing("refresh", Nothing)
         Else
             Context.Clients.All.statusBoardPing("ping", Now.ToString("MM/dd/yyyy HH:mm:ss tt"))

@@ -325,6 +325,30 @@ Public Class ActivePmGetLogConfigTests
         Assert.Equal(Of Object)(ExpectedRes, LogStateConfig)
     End Sub
 
+    <Theory>
+    <InlineData(1245, "07/15/2025")>
+    <InlineData(1151, "07/07/2025")>
+    Public Sub LogCompletedStatusBoardDateAtInPastTest(DataKey As Integer, StatusBoardDateAt As String)
+        'there's a bug that occurs when the status board date is in the past
+        'any log that has a completed state will return a logState of 'delete'
+        'it should be 'completed'
+        'going to pull data from the DB to replicate this bug
+        'These test cases are logs that have received all their stamps with their date field value from the DB
+        Dim ExpectedRes As New Dictionary(Of String, Object) From {
+            {"logState", "completed"},
+            {"logParentId", "DailyMFShiftPanel"},
+            {"pmName", "DI WATER DAILY"}
+        }
+        Dim FakeStampDs As New Data.DataSet
+        Dim FakeLogDs As New Data.DataSet
+
+        GetLogCompletedOnTimeDatasets(FakeStampDs, FakeLogDs)
+
+        Dim LogStateConfig As Object = GetLogConfig(DataKey, StatusBoardDateAt)
+
+        Assert.Equal(Of Object)(ExpectedRes, LogStateConfig)
+    End Sub
+
     <Fact>
     Public Sub PmOrChecklistDisabled_CompletedOnTimeLogState_Test()
         Dim ExpectedRes As New Dictionary(Of String, Object) From {

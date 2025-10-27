@@ -101,7 +101,8 @@
                             const datakeys = Object.keys(response);
                             for (const datakey of datakeys) {
                                 const config = response[datakey];
-                                changeLogState(datakey, config);
+                                const log = findLog(datakey, config);
+                                changeLogState(log, datakey, config);
                             }
                             break;
 
@@ -128,6 +129,8 @@
 
                 $(function () {
                     const connection = $.connection.sseStatusBoardHub;
+                    const satiSpinner = document.getElementById("status-board-spinner");
+
                     connection.client.statusBoardPing = async function (signal, data) {
                         ssePingReaction(signal, data);
                         await keepAspCookiesAlive();
@@ -156,9 +159,37 @@
                         setTimeout(startSignalR(), 5000);
                     });
 
+                    async function findCurrentLogs() {
+                        //if logs exist, modify them if needed
+                        //if logs do not exist, create them
+                        const response = await httpGet("/api/pm-status-board/current-logs.ashx", {
+                            statusBoardDateAt: '<%= Session("WhereFromQueryString") %>',
+                            department: '<%= Session("DepartmentFromQueryString") %>'
+                        });
+
+                        for (const kvp of response) {
+                            const datakey = kvp.Key;
+                            const config = kvp.Value;
+                            try {
+                                const log = findLog(datakey, config);
+
+                                //calling this in case log state has changed before server side event connection is established
+                                //this edgecase can occur during publishes or hourly programmatic changes
+                                changeLogState(log, datakey, config);
+                            }
+                            catch (err) {
+                                continue;
+                            }
+                        }
+                    }
+
                     function startSignalR() {
-                        $.connection.hub.start({ transport: 'serverSentEvents' }).done(function () {
+                        $.connection.hub.start({ transport: 'serverSentEvents' }).done(async function () {
                             console.info("SignalR: Connected.");
+
+                            satiSpinner.displaySpin();
+                            await findCurrentLogs();
+                            satiSpinner.hideSpin();
                         }).fail(function () {
                             console.error("SignalR: Connection failed. Retrying in 5 seconds...");
                             setTimeout(startSignalR, 5000);
@@ -168,36 +199,37 @@
                     startSignalR();
                 });
 
-                function changeLogState(datakey, config) {
-                    const logState = config.logState;
-                    let log;
 
-                    try {
-                        log = document.getElementById("log-" + datakey);
-                        if (!log) throw error;
-                    }
-                    catch (err) {
-                        //logs built in asp code-behind
-                        const logId = "log-" + datakey
-                        log = getAspControl(logId);
-                    }
-
-                    const newParentCtrl = getAspControl(config.logParentId);
+                function checkForShiftChange(datakey, config) {
+                    //a shift would be a subsection within an interval (Ex: Weekly Logs D1 Shift, Weekly Logs D2 Shift, etc.)
+                    let log = document.getElementById("log-" + datakey);
+                    const { logParentId, logState } = config;
+                    const newParentCtrl = getAspControl(logParentId);
                     const oldParentCtrl = log ? log.parentElement : null;
                     if (log && (oldParentCtrl !== newParentCtrl || logState === "delete")) {
-                        //log needs to be moved, so delete the current one
+                        //log needs to be moved or deleted
+                        //in either case, delete the current log
                         oldParentCtrl.removeChild(log);
-                        assessIntervalSectionState(oldParentCtrl);
+                    }
 
-                        if (logState === "delete") {
-                            //log is deleted, so move onto the next log
-                            return;
-                        }
-                        else {
-                            //initialze log var with null value so the log is created in the appropriate interval section
-                            log = null;
+                    const hasLogsClass = "has-logs";
+                    if (oldParentCtrl) {
+                        if (oldParentCtrl.children.length === 1) {
+                            //the only element within oldParentCtrl is the no logs message
+                            oldParentCtrl.classList.remove(hasLogsClass)
                         }
                     }
+                    if (newParentCtrl) newParentCtrl.classList.add(hasLogsClass);
+
+                    return newParentCtrl;
+                }
+
+                function findLog(datakey, config) {
+                    //if log does not exist, create the log
+                    //if log exists, return the log
+                    const newParentCtrl = checkForShiftChange(datakey, config);
+
+                    let log = document.getElementById("log-" + datakey);
                     if (!log) {
                         log = buildLog({
                             datakey: datakey,
@@ -205,12 +237,13 @@
                             iconsConfig: [], //the case statement below creates the icons
                             logState: config.logState
                         }, newParentCtrl)
-
-                        const hasLogsClass = "has-logs";
-                        if (!newParentCtrl.classList.contains(hasLogsClass)) {
-                            newParentCtrl.classList.add(hasLogsClass);
-                        }
                     }
+
+                    return log;
+                }
+
+                function changeLogState(log, datakey, config) {
+                    const { logState, removeStamps, addStamps } = config;
 
                     switch (logState) {
                         case "virgin":
@@ -219,7 +252,7 @@
                             break;
                         case "submitted":
                             // remove stamps
-                            for (const stampRole of config.removeStamps) {
+                            for (const stampRole of removeStamps) {
                                 const stampCtrlClass = getStampCssClass(stampRole);
                                 const stampCtrl = log.querySelector("." + stampCtrlClass);
 
@@ -229,7 +262,7 @@
                             }
 
                             //add stamps
-                            for (const stampRole of config.addStamps) {
+                            for (const stampRole of addStamps) {
                                 const stampCtrlClass = getStampCssClass(stampRole);
                                 const stampCtrl = log.querySelector("." + stampCtrlClass);
 
@@ -259,13 +292,6 @@
                         applyBackcolorClass(this, logState);
                     }, log);
 
-                }
-
-                function assessIntervalSectionState(intervalSection) {
-                    if (intervalSection.children.length === 1) {
-                        //the only element within interval shift section is the no logs message
-                        intervalSection.classList.remove("has-logs")
-                    }
                 }
 
                 function removeStampCtrlsFrom(ctrl) {
@@ -1318,6 +1344,7 @@
             </style>
 
             <sati-full-screen></sati-full-screen>
+            <sati-spinner id="status-board-spinner"></sati-spinner>
 
             <%--style="display: flex; justify-content: space-between;"--%>
             <div style="display: flex; flex-direction: column-reverse;">
