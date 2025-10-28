@@ -27,7 +27,7 @@
             const style = document.createElement("style");
             style.textContent += `
             .overlay {
-                position: absolute;
+                position: fixed; 
                 width: 100vw;
                 height: 100vh;
                 background-color: black;
@@ -65,7 +65,6 @@
     }
 
     displaySpin() {
-        self.Overlay.style.top = parseFloat(self.Overlay.style.top) + window.scrollY + "px"; // web component width and height coverage is relative to parent viewport, regardless of vertical scrolling
         self.Overlay.style.display = "flex";
         self.parentElement.style.overflow = "hidden"; //lock scrolling for window within standard DOM
     }

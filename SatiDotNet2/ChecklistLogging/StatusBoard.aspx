@@ -137,20 +137,22 @@
                     };
 
 
-                    //disconnect server side event connection after 5 seconds (for troubleshooting/debugging callbacks below)
-                    //setTimeout(function () {
+                    //disconnect server side event connection every 10 seconds (for troubleshooting/debugging callbacks below)
+                    //setInterval(function () {
                     //    $.connection.hub.stop();
-                    //}, 5000);
+                    //}, 10000);
 
                     $.connection.hub.connectionSlow(function () {
                         console.warn("SignalR: Connection is slow.");
                     });
 
                     $.connection.hub.reconnecting(function () {
+                        satiSpinner.displaySpin();
                         console.warn("SignalR: Attempting to reconnect...");
                     });
 
                     $.connection.hub.reconnected(function () {
+                        satiSpinner.hideSpin();
                         console.info("SignalR: Reconnected.");
                     });
 
