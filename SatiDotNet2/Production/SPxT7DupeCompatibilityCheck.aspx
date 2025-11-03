@@ -19,8 +19,8 @@
                                     <asp:ListItem Value="SP1">SP1 (T2)</asp:ListItem>
                                     <asp:ListItem Value="SP1-3">SP1-3 (T9)</asp:ListItem>
                                     <asp:ListItem Value="SP2-S0132">SP2 (T6)</asp:ListItem>
-                                    <asp:ListItem Value="SP3-2110224">SP3 (T8)</asp:ListItem>
-
+                                    <asp:ListItem Value="SP3-2110224">SP3-1 (T8)</asp:ListItem>
+                                    <asp:ListItem Value="SP3-2110164">SP3-2</asp:ListItem>
                                 </asp:ListBox></asp:Panel>
                         </td>
                         <td colspan="2">

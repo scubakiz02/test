@@ -369,10 +369,7 @@ Partial Class Reports_SurfScan
                 End If
             End If
 
-            '**************SP22 Add ************
-            '***********************************
-            'SP2-2080166R
-            If Me.SP3CheckBox.Checked = True Then
+            If Me.SP3_1CheckBox.Checked = True Then
                 If Multi = True Then
                     BuildSQL = BuildSQL & "' OR Machine = N'SP3-2110224"
                 Else
@@ -380,8 +377,15 @@ Partial Class Reports_SurfScan
                     Multi = True
                 End If
             End If
-            '***********************************
-            '***********************************
+
+            If Me.SP3_2CheckBox.Checked = True Then
+                If Multi = True Then
+                    BuildSQL = BuildSQL & "' OR Machine = N'SP3-2110164"
+                Else
+                    BuildSQL = BuildSQL & "SP3-2110164"
+                    Multi = True
+                End If
+            End If
 
 
             BuildSQL = BuildSQL & "') AND (NOT (ID# = N'move')) AND (NOT (RUN# = N'99999')) AND (NOT (Wafer_log = N'99999'))"
@@ -600,7 +604,7 @@ Partial Class Reports_SurfScan
                     Wafers = Wafers + CType(Me.GridView2.Rows(i).Cells(6).Text, Integer)
                     Passed = Passed + CType(Me.GridView2.Rows(i).Cells(7).Text, Integer)
                     Rejects = Rejects + CType(Me.GridView2.Rows(i).Cells(8).Text, Integer)
-                    
+
                 Next
                 Me.GridView2.FooterRow.Cells(6).Text = Wafers
                 Me.GridView2.FooterRow.Cells(7).Text = Passed
@@ -634,7 +638,8 @@ Partial Class Reports_SurfScan
             Me.SP12CheckBox.Visible = True
             Me.SP13CheckBox.Visible = True '
             Me.SP2CheckBox.Visible = True
-            Me.SP3CheckBox.Visible = True
+            Me.SP3_1CheckBox.Visible = True
+            Me.SP3_2CheckBox.Visible = True
             Me.GridView1.Visible = True '
 
             Me.TencorCheckBox.Visible = False
@@ -648,7 +653,8 @@ Partial Class Reports_SurfScan
             Me.SP12CheckBox.Visible = False
             Me.SP13CheckBox.Visible = False '
             Me.SP2CheckBox.Visible = False
-            Me.SP3CheckBox.Visible = False
+            Me.SP3_1CheckBox.Visible = False
+            Me.SP3_2CheckBox.Visible = False
             Me.GridView1.Visible = False
 
             Me.TencorCheckBox.Visible = True
@@ -923,7 +929,7 @@ Partial Class Reports_SurfScan
             'Dim row As String = e.CommandArgument.ToString
             Me.MapRowLabel.Text = e.CommandArgument.ToString
             LookMap(Me.MapRowLabel.Text, "C")
-            
+
             Me.MapModalPopupExtender.Show()
         End If
     End Sub
@@ -977,7 +983,7 @@ Partial Class Reports_SurfScan
 
 
         'Me.CSlotLabel.Text = "Looking @ Slot: " & Me.GridView3.Rows(Row).Cells(0).Text 'me.MapRowLabel.Text + 1
-       
+
         Me.MapImage.ImageUrl = MapFile
         Me.MapImage.DataBind()
 
@@ -1145,7 +1151,7 @@ Partial Class Reports_SurfScan
         UpdateData()
     End Sub
 
-    Protected Sub SP3CheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles SP3CheckBox.CheckedChanged
+    Protected Sub SP3CheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateData()
     End Sub
     Protected Sub ButtonNextMap_Click(sender As Object, e As EventArgs) Handles ButtonNextMap.Click
