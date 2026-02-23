@@ -21,6 +21,7 @@
                 <asp:CheckBox ID="SP2CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="SP2CheckBox_CheckedChanged" Text="SP2" />
                 <asp:CheckBox ID="SP3_1CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="SP3CheckBox_CheckedChanged" Text="SP3-1" />
                 <asp:CheckBox ID="SP3_2CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="SP3CheckBox_CheckedChanged" Text="SP3-2" />
+                <asp:CheckBox ID="SP5_1CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="SP5CheckBox_CheckedChanged" Text="SP5-1" />
                 <asp:CheckBox ID="TencorCheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="TencorCheckBox_CheckedChanged" Text="Tencor," Visible="False" />&nbsp;
                 <asp:CheckBox ID="Tencor3CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="Tencor3CheckBox_CheckedChanged" Text="Tencor 3," Visible="False" />&nbsp;
                 <asp:CheckBox ID="Tencor4CheckBox" runat="server" AutoPostBack="True" OnCheckedChanged="Tencor4CheckBox_CheckedChanged" Text="Tencor 4"  Visible="False" />

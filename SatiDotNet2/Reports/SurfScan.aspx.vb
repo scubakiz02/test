@@ -39,10 +39,9 @@ Partial Class Reports_SurfScan
             Surfscan = "Tencor"
         End If
 
-
         If Me.CheckBoxDaily.Checked = True Then
             '(SPSessionName LIKE N'%Daily%')
-            BuildSQL = "SELECT TOP (100) PERCENT SessionDate, Machine, Comment1, Comment2, SPSessionName, ID# + N'-' + RUN# + N'-' + Wafer_log AS Lot, COUNT(DestinationStationID) AS [Wafers In], SUM(CASE WHEN DestinationStationID = 2 THEN 1 ELSE 0 END) AS Passed, SUM(CASE WHEN DispositionName = 'Rejected' THEN 1 WHEN DispositionName = 'Overload' THEN 1 ELSE 0 END) AS Rejects, SUM(CASE WHEN DispositionName = 'Overload' THEN 1 ELSE 0 END) AS OverLoads, SUM(CASE WHEN DestinationStationID = 2 THEN 1 ELSE 0 END) AS Bin2, SUM(CASE WHEN DestinationStationID = 3 THEN 1 ELSE 0 END) AS Bin3 FROM " & DBtable & "GROUP BY Machine, SPSessionName, SessionDate, ID# + N'-' + RUN# + N'-' + Wafer_log, Comment1, Comment2 HAVING (Machine = N'SP1' OR Machine = N'SP2' OR Machine = N'SP1-3' OR Machine = N'SP2-S0132' OR Machine = N'SP3-2110224') AND (SessionDate > CONVERT(DATETIME, '" & DateAdd("d", -90, DateTime.Now.ToShortDateString) & " 00:00:00', 102)) AND (SessionDate < CONVERT(DATETIME, '" & DateTime.Now.ToShortDateString & " 23:59:59', 102)) AND (SPSessionName LIKE N'%Daily%') ORDER BY SessionDate DESC"
+            BuildSQL = "SELECT TOP (100) PERCENT SessionDate, Machine, Comment1, Comment2, SPSessionName, ID# + N'-' + RUN# + N'-' + Wafer_log AS Lot, COUNT(DestinationStationID) AS [Wafers In], SUM(CASE WHEN DestinationStationID = 2 THEN 1 ELSE 0 END) AS Passed, SUM(CASE WHEN DispositionName = 'Rejected' THEN 1 WHEN DispositionName = 'Overload' THEN 1 ELSE 0 END) AS Rejects, SUM(CASE WHEN DispositionName = 'Overload' THEN 1 ELSE 0 END) AS OverLoads, SUM(CASE WHEN DestinationStationID = 2 THEN 1 ELSE 0 END) AS Bin2, SUM(CASE WHEN DestinationStationID = 3 THEN 1 ELSE 0 END) AS Bin3 FROM " & DBtable & "GROUP BY Machine, SPSessionName, SessionDate, ID# + N'-' + RUN# + N'-' + Wafer_log, Comment1, Comment2 HAVING (Machine = N'SP1' OR Machine = N'SP2' OR Machine = N'SP1-3' OR Machine = N'SP2-S0132' OR Machine = N'SP3-2110224' OR Machine = N'SP3-2110164' OR Machine = N'SP5-2130406') AND (SessionDate > CONVERT(DATETIME, '" & DateAdd("d", -90, DateTime.Now.ToShortDateString) & " 00:00:00', 102)) AND (SessionDate < CONVERT(DATETIME, '" & DateTime.Now.ToShortDateString & " 23:59:59', 102)) AND (SPSessionName LIKE N'%Daily%') ORDER BY SessionDate DESC"
             Me.Sp1SqlDataSource.SelectCommand = BuildSQL
             Me.GridView1.DataBind()
             FooterSum()
@@ -387,6 +386,14 @@ Partial Class Reports_SurfScan
                 End If
             End If
 
+            If Me.SP5_1CheckBox.Checked = True Then
+                If Multi = True Then
+                    BuildSQL = BuildSQL & "' OR Machine = N'SP5-2130406"
+                Else
+                    BuildSQL = BuildSQL & "SP5-2130406"
+                    Multi = True
+                End If
+            End If
 
             BuildSQL = BuildSQL & "') AND (NOT (ID# = N'move')) AND (NOT (RUN# = N'99999')) AND (NOT (Wafer_log = N'99999'))"
 
@@ -1154,6 +1161,11 @@ Partial Class Reports_SurfScan
     Protected Sub SP3CheckBox_CheckedChanged(sender As Object, e As EventArgs)
         UpdateData()
     End Sub
+
+    Protected Sub SP5CheckBox_CheckedChanged(sender As Object, e As EventArgs)
+        UpdateData()
+    End Sub
+
     Protected Sub ButtonNextMap_Click(sender As Object, e As EventArgs) Handles ButtonNextMap.Click
         'LookMap(Me.MapRowLabel.Text, "N")
         Dim MapFile As String = ""
