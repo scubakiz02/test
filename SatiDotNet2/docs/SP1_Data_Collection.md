@@ -2,7 +2,16 @@
 
 ## Overview
 
-The `SP1_Data` table in the AutoData database acts as a central cache of wafer inspection data from physical surf scan tools. Data is not inserted directly by the .NET application. Instead, SQL Server linked servers connect to the tool databases, and stored procedures sync data on-demand.
+The `SP1_Data` table in the AutoData database acts as a central cache of wafer inspection data from physical surf scan tools. Data is not inserted directly by the .NET application.
+
+**Two data collection methods exist:**
+
+| Method | Tools | How It Works |
+|--------|-------|--------------|
+| Linked Servers + Stored Procedures | SP1, SP1-3 | SQL Server linked servers connect to tool databases; stored procedures sync data on-demand |
+| SP2DC Software | SP2, SP3, SP5 | External data collection software uploads data directly to SP1_Data |
+
+This document focuses on the linked server approach used for SP1 and SP1-3.
 
 ## Linked Servers
 
