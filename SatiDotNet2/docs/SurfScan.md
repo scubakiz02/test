@@ -75,11 +75,52 @@ Individual checkboxes for slots 1-25 to include/exclude specific source slots fr
 
 | Table | Purpose |
 |-------|---------|
-| `dbo.SP1_Data` | Live SPx tool inspection data |
+| `dbo.SP1_Data` | Live SPx tool inspection data (cache of tool data) |
 | `dbo.Archive_SP1_Data` | Archived SPx data (older than 90 days) |
 | `dbo.Tencor_Data` | Tencor tool inspection data |
 | `dbo.T_Spec_Scan_Log` | Spec scan timestamps |
 | `dbo.CofA_Info` | Certificate of Analysis bin configuration |
+
+## Data Refresh Mechanism
+
+The `SP1_Data` table acts as a **cache** of data from the physical surf scan tool systems. Data is not inserted directly by the .NET application. Instead, stored procedures sync data from the tools on-demand.
+
+### Stored Procedures
+
+| Procedure | Tool |
+|-----------|------|
+| `exsil_user.[SP1DataCollector_SP11Only]` | SP1 |
+| `exsil_user.[SP1DataCollector_SP12Only]` | SP2 |
+| `exsil_user.[SP1DataCollector_SP13Only]` | SP1-3 |
+
+**Note:** SP2-S0132 uses real-time data collection and does not require manual refresh.
+
+### How Refresh Works
+
+1. User triggers a refresh (e.g., clicks "Update SP1" button)
+2. Application calls the appropriate stored procedure via `UpdateSPxTool()` in `App_Code/Class1.vb`
+3. Stored procedure pulls latest data from the tool system into `SP1_Data`
+4. Application queries the now-updated `SP1_Data` table
+
+### Refresh Triggers in This Page
+
+The Advanced Filter panel contains "Update SP1", "Update SP12", and "Update SP13" buttons that call:
+- `SP1UpdateButton_Click` → `Saticode.UpdateSPxTool("SP1")` (line 776)
+- `SP12UpdateButton_Click` → `Saticode.UpdateSPxTool("SP2")` (line 781)
+- `SP13UpdateButton_Click` → `Saticode.UpdateSPxTool("SP13")` (line 1194)
+
+### Other Pages That Refresh SP1_Data
+
+| Page | Method | User Action |
+|------|--------|-------------|
+| `Production/MakeSurfScanWaferBoxLabel.aspx` | `Button_Pull_Data_Click` | Pull data for label printing |
+| `Production/SurfScanLabelMaker.aspx` | `GoSPxSQL()` | Generate surf scan labels |
+| `SPC/SPC_Compile.aspx` | `UpdateToolData()` | Compile SPC statistics |
+| `Production/SPxT7DupeCompatibilityCheck.aspx` | `FindOut()` | Check T7 compatibility |
+
+### Why Refresh Is Needed
+
+Without calling refresh, users query potentially stale data that doesn't reflect wafers scanned since the last sync. Users trigger refresh when they need the most current data from the physical tool systems.
 
 ## UI Components
 
