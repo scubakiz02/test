@@ -1,0 +1,39 @@
+FileVersion 1 2;
+FileTimestamp 01-30-26 18:21:52;
+InspectionStationID "KLA-Tencor" "SFSSP1" "0901-0728-TBI";
+SampleType WAFER;
+ResultTimestamp 01-30-26 18:07:46;
+LotID "2850";
+SampleSize 1 200;
+DeviceID "None";
+SetupID "T2-2850A" 01-30-26 18:07:46;
+StepID "6855";
+SampleOrientationMarkType NOTCH;
+OrientationMarkLocation DOWN;
+DiePitch 200000 200000;
+DieOrigin 0 0;
+WaferID "24";
+Slot 24;
+SampleCenterLocation 100000 100000;
+ClassLookup 1
+  0 "0"  ;
+OrientationInstructions "Front";
+CoordinatesMirrored No;
+InspectionTest 1;
+SampleTestPlan 1
+  0 0 ;
+AreaPerTest 2.85032e+010;
+DefectRecordSpec 15 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE ;
+DefectList
+ 1 64412.000 108643.000 0 0 0.000 0.000 0.000 0.198 0 1 0 0 0 0
+ 2 57709.000 102052.000 0 0 0.000 0.000 0.000 0.121 0 1 0 0 0 0
+ 3 77820.000 31787.000 0 0 0.000 0.000 0.000 0.286 0 1 0 0 0 0
+ 4 45256.000 170418.000 0 0 0.000 0.000 0.000 0.121 0 1 0 0 0 0
+ 5 119775.000 189795.000 0 0 0.000 0.000 0.000 0.134 0 1 0 0 0 0;
+ProcessEquipmentIDList 1
+  "6620" ;
+SummarySpec 5
+  TESTNO    NDEFECT    DEFDENSITY    NDIE    NDEFDIE  ;
+SummaryList 
+  1    5    0.01754    1    1  ;
+EndOfFile;
