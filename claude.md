@@ -2,6 +2,12 @@
 
 ## Workflow Process
 
+### 0. Reference Documentation First
+- Check relevant markdown files in `docs/` folder before relying on session context
+- Existing documentation may contain accurate, up-to-date information about the codebase
+- Use documented knowledge as the foundation; supplement with session exploration as needed
+- If documentation is missing or outdated, note it for later update
+
 ### 1. Make Plans from Prompts
 - Before implementing any changes, analyze the user's request thoroughly
 - Break down complex tasks into clear, actionable steps
