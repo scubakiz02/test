@@ -521,9 +521,8 @@
                                     /* landscape images get a width of 1002px */
                                     /* portrait images get a height of 80% */
                                     max-width: 1002px;
-                                    height: 80%;
+                                    max-height: 80%;
                                 }
-
                             </style>
                             <asp:Image ID="MapImage" runat="server" />
                         </td>
