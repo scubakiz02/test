@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(Select-Object -ExpandProperty LotID)",
+      "Bash(Sort-Object -Unique)",
+      "Bash(Measure-Object)",
+      "Bash(Select-Object -ExpandProperty StepID)",
+      "Bash(Select-Object -ExpandProperty ProcessEquip)",
+      "Bash(Select-Object -ExpandProperty Slot)",
+      "Bash(powershell -ExecutionPolicy Bypass -File analyze_klarf.ps1)",
+      "Bash(powershell -ExecutionPolicy Bypass -File analyze_klarf_v2.ps1:*)"
+    ]
+  }
+}

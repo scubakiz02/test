@@ -515,7 +515,16 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <asp:Image ID="MapImage" runat="server" Width="1002px" />
+                            <style>
+                                #ctl00_ContentPlaceHolder1_MapImage {
+                                    /* ASP.NET places 'ctl00_ContentPlaceHolder1_' prefix to html elements */
+                                    /* landscape images get a width of 1002px */
+                                    /* portrait images get a height of 80% */
+                                    max-width: 1002px;
+                                    max-height: 80%;
+                                }
+                            </style>
+                            <asp:Image ID="MapImage" runat="server" />
                         </td>
                     </tr>
                     <tr>
