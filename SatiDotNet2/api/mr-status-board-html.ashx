@@ -62,12 +62,20 @@ Public Class StreamData
                     If I = RC - 1 Then
                         Exit Do
                     End If
-                    DR_Look = DS.Tables(0).Rows(I + CountNotes)
-                    If DR("MR_Key").ToString = DR_Look("MR_Key").ToString Then
-                        CountNotes += 1
-                    Else
+                    Try
+                        'this try catch block addresses a bug that causes mr status board to not display anything. Here's what happens:
+                        '1) notes exist for a ticket (If statement evaluation below), and CountNotes var is incremented
+                        '2) CountNotes can be incremented too much, cause DR_Look evaluation to error because code is looking for a row that doesn't exist
+                        '3) when this error occurs, mr status board ends up not displaying anything
+                        DR_Look = DS.Tables(0).Rows(I + CountNotes)
+                        If DR("MR_Key").ToString = DR_Look("MR_Key").ToString Then
+                            CountNotes += 1
+                        Else
+                            Exit Do
+                        End If
+                    Catch ex As Exception
                         Exit Do
-                    End If
+                    End Try
                 End If
             Loop
 

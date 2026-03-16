@@ -12,7 +12,10 @@
       "Bash(Select-Object -ExpandProperty ProcessEquip)",
       "Bash(Select-Object -ExpandProperty Slot)",
       "Bash(powershell -ExecutionPolicy Bypass -File analyze_klarf.ps1)",
-      "Bash(powershell -ExecutionPolicy Bypass -File analyze_klarf_v2.ps1:*)"
+      "Bash(powershell -ExecutionPolicy Bypass -File analyze_klarf_v2.ps1:*)",
+      "Bash(echo:*)",
+      "Bash(clip)",
+      "Bash(powershell -Command:*)"
     ]
   }
 }
