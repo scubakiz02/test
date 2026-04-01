@@ -21,7 +21,11 @@
 - Clarify any ambiguities before proceeding
 - Confirm the scope of changes to avoid unnecessary work
 
-### 3. Update Documentation After Implementation
+### 3. Git Commit After Implementation
+- After completing the implementation, create a git commit with the changes
+- Use a clear, concise commit message that describes what was changed and why
+
+### 4. Update Documentation After Implementation
 - After completing the implementation, update relevant documentation
 - Document new features, APIs, or configuration options
 - Update README files if the changes affect setup or usage

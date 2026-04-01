@@ -53,6 +53,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release2|AnyCPU'">
+    <OutputPath>bin\Release2\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\SatiDotNet2\packages\Microsoft.Bcl.AsyncInterfaces.9.0.3\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -81,6 +84,7 @@
       <HintPath>..\SatiDotNet2\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Pipelines, Version=9.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\SatiDotNet2\packages\System.IO.Pipelines.9.0.3\lib\net462\System.IO.Pipelines.dll</HintPath>
@@ -146,6 +150,7 @@
     <Compile Include="MaintPMTests.vb" />
     <Compile Include="ChecklistLogging\LogAspxTests.vb" />
     <Compile Include="ActivePmTests.vb" />
+    <Compile Include="CofA300mmTests.vb" />
     <Compile Include="ReportTests.vb" />
     <Compile Include="GeneralTests.vb" />
     <Compile Include="PhaseControllerTests.vb" />

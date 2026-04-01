@@ -15,3 +15,5 @@ SatiDotNet2Tests/obj/
 SatiDotNet2Tests/packages/
 SatiDotNet2/PrecompiledWeb/
 claude.exe
+worktrees/
+.claude/settings.local.json

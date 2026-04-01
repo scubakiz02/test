@@ -9,6 +9,7 @@ Imports SatiDotNet2.Library
 Public Class Class1
     Inherits System.Web.UI.Page
     Dim Security As New Security
+    Private _cofA300mm As New SatiDotNet2.Library.CofA300mm()
 
     Sub OpenNewPage(ByVal MyUpdatePanel As UpdatePanel, ByVal TheWebPage As String)
 
@@ -1312,58 +1313,17 @@ Public Class Class1
     End Function
 
     Function GetCarton300mmMetals(ByVal InstanceNumber As String) As Data.DataSet 'normal 300mm make CofA pulls here
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
-        Connection.Open()
-        Dim LotNumber As String = ""
-        'Find LotNumber for the Instance Number
-        'Look to see if that Instance numbers lot number is in the metals database.
-        'if the lot number is in the data base then return the data
-        Dim DS_LotNumber As New Data.DataSet
-        DS_LotNumber = GetMyDataSet("SELECT dbo.T_FGI_Boxes.InstanceKey, dbo.LabelsMade.Lot FROM dbo.LabelsMade INNER JOIN dbo.T_FGI_Boxes ON dbo.LabelsMade.LabelRecordNumber = dbo.T_FGI_Boxes.LabelsMadeKey WHERE (dbo.T_FGI_Boxes.InstanceKey = " & InstanceNumber & ")")
-        If DS_LotNumber.Tables(0).Rows.Count > 0 Then
-            Dim DR_lotNumber As Data.DataRow
-
-            DR_lotNumber = DS_LotNumber.Tables(0).Rows(0)
-            LotNumber = DR_lotNumber("Lot")
-            Dim DS_MetalsTable As New Data.DataSet
-            DS_MetalsTable = GetMyDataSet("SELECT [Date/Time], Source, [Test Type], Location, Idenyification, Notes, NotesExtra, Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, V, Au, Ag FROM dbo.[GFAAS Data] WHERE (Source = N'300mm' OR Source = N'SATI') AND (Idenyification = N'" & LotNumber & "') AND (Notes IS NULL)")
-            If DS_MetalsTable.Tables(0).Rows.Count > 1 Then
-                'return data
-                GetCarton300mmMetals = DS_MetalsTable
-                Connection.Close()
-                Exit Function
-            End If
-        End If
-
-
-        'else, get some data then save as the lot number in the data dase for later 
-        'Get some data and save it
-        Dim DS_Get300mmMetalsData As New Data.DataSet
-        DS_Get300mmMetalsData = Get300Metals(InstanceNumber)
-
-        GetCarton300mmMetals = WriteMetals(DS_Get300mmMetalsData, LotNumber)
-
-        Connection.Close()
+        Return _cofA300mm.GetCarton300mmMetals(InstanceNumber)
     End Function
 
     Function Get300Metals(ByVal InstanceNumber As String) As Data.DataSet
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
-        Connection.Open()
-        Dim DA_Metals As New Data.SqlClient.SqlDataAdapter
-        Dim DS_Metals As New Data.DataSet
-        Dim MetalsSelectCmd As New System.Data.SqlClient.SqlCommand
-        With MetalsSelectCmd
-            .CommandText = "SELECT Ca, Ma, Ni, Zn, Al, Fe, Cr, Cu, Na, K, Co, Mn, Mo, W, Ti, V, Au, Ag FROM dbo.fctn_SatiCofA300MetalsSample('" & InstanceNumber & "') AS fctn_SatiCofA300MetalsSample_1"
-            .Connection = Connection
-        End With
-        DA_Metals.SelectCommand = MetalsSelectCmd
-        DA_Metals.Fill(DS_Metals)
-        Get300Metals = DS_Metals
+        Return _cofA300mm.Get300Metals(InstanceNumber)
     End Function
 
 
+    ' NOTE: This function exists in 2 places: here (App_Code/Class1.vb) and in
+    ' SatiDotNet2.Library/CofA300mm.vb. The goal is to eventually remove this copy
+    ' and have only the Library version exist, once the 200mm CofA path is also migrated.
     Function WriteMetals(DS_Metals As Data.DataSet, LotNumber As String) As Data.DataSet
 
         Dim Connection As New Data.SqlClient.SqlConnection
@@ -2532,65 +2492,7 @@ Public Class Class1
 
 
     Function GetCofAData(ByVal CartonString As String, ByVal T7s As Boolean, ByVal Customer As String) As Data.DataSet
-
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
-        Connection.Open()
-        Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
-        Dim DS_CofAData As New Data.DataSet
-        Dim CofADataSelectCmd As New System.Data.SqlClient.SqlCommand
-        Dim CartonStringBK As String = CartonString
-        If T7s = True Then ' Build T7 CofA Info
-
-            Dim SQLString As String
-            Dim MoreCartons As Boolean
-            Dim SQLStringCount As Int16
-            Dim SnipCarton As String
-            Dim Carton_Int As Integer
-            Dim CartonSelectCmd As New System.Data.SqlClient.SqlCommand
-            'SELECT TOP 100 PERCENT dbo.LabelsMade.Lot, dbo.LabelsMade.LotBoxNumber, dbo.T7_InstanceInfo.InstanceID AS BoxID, dbo.T7_InstanceInfo.Slot, LEFT(dbo.T7_WaferActionTracking.T7, 10) AS T7, T7_GeoData_2.CenterThick AS PreCenterThick, T7_GeoData_1.CenterThick AS PostCenterThk, T7_GeoData_1.TTV, T7_GeoData_1.TotWarp AS Warp, T7_GeoData_2.CenterThick - T7_GeoData_1.CenterThick AS Removal, T7_GeoData_1.CenterRes, T7_GeoData_1.Type, T7_GeoData_1.Bow, T7_GeoData_1.TIR, dbo.T7_ParticalData.SumAllDefects, dbo.T7_ParticalData.SP1BinCnt1, dbo.T7_ParticalData.SP1BinCnt2, dbo.T7_ParticalData.SP1BinCnt3, dbo.T7_ParticalData.SP1BinCnt4, dbo.T7_ParticalData.SP1BinCnt5, dbo.T7_ParticalData.SP1BinCnt6, dbo.T7_ParticalData.SP1BinCnt7, dbo.T7_ParticalData.SP1BinCnt8, dbo.T7_ParticalData.SP1BinCnt18, dbo.T7_ParticalData.StdDeviation, dbo.T7_ParticalData.AreaCnt, dbo.T7_ParticalData.TotalArea, dbo.T7_ParticalData.ScratchCnt, dbo.T7_ParticalData.ScratchTotalLength, dbo.T7_ParticalData.SP1LPDNBinCntInSize1, dbo.T7_ParticalData.SP1LPDNBinCntInSize2, dbo.T7_ParticalData.SP1LPDNBinCntInSize3, dbo.T7_ParticalData.SP1LPDNBinCntInSize4, dbo.T7_ParticalData.SP1LPDNBinCntInSize5, dbo.T7_ParticalData.SP1LPDNBinCntInSize6, dbo.T7_ParticalData.SP1LPDNBinCntInSize7, dbo.T7_ParticalData.SP1LPDNBinCntInSize8, dbo.T7_ParticalData.SP1LPDNBinCntInSize18, dbo.T7_ParticalData.SP1SOD1, dbo.T7_ParticalData.SP1SOD2, dbo.T7_ParticalData.SP1SOD3, dbo.T7_ParticalData.SP1SOD4, dbo.T7_ParticalData.SP1SOD5, dbo.T7_ParticalData.SP1SOD6, dbo.T7_ParticalData.SP1SOD7, dbo.T7_ParticalData.SP1SOD8, dbo.T7_ParticalData.SP1SOD18, dbo.T7_ParticalData.Average, dbo.T7_ParticalData.Peak, dbo.T7_ParticalData.Median, dbo.T7_ParticalData.EdgeExclusion, dbo.T7_ParticalData.RFID, dbo.T_FGI_Boxes.BoxInvNumber as WB, dbo.T7_WaferActionTracking.PreGeo_Key, dbo.T_FGI_Boxes.CartonNumber, dbo.T7_ParticalData.RecordDate AS LaserScanDate, dbo.T7_ParticalData.ClusterAreaCnt FROM dbo.T7_WaferActionTracking INNER JOIN dbo.T7_InstanceInfo ON dbo.T7_WaferActionTracking.WAT_Key = dbo.T7_InstanceInfo.WAT_Key INNER JOIN dbo.T_FGI_Boxes ON dbo.T7_InstanceInfo.InstanceID = dbo.T_FGI_Boxes.InstanceKey INNER JOIN dbo.LabelsMade ON dbo.T_FGI_Boxes.LabelsMadeKey = dbo.LabelsMade.LabelRecordNumber LEFT OUTER JOIN dbo.T7_ParticalData ON dbo.T7_WaferActionTracking.Partical_Key = dbo.T7_ParticalData.Partical_Key LEFT OUTER JOIN dbo.T7_GeoData T7_GeoData_1 ON dbo.T7_WaferActionTracking.PostGeo_Key = T7_GeoData_1.Geo_Key LEFT OUTER JOIN dbo.T7_GeoData T7_GeoData_2 ON dbo.T7_WaferActionTracking.PreGeo_Key = T7_GeoData_2.Geo_Key WHERE (dbo.T_FGI_Boxes.CartonNumber = 
-            SQLString = "SELECT TOP 100 PERCENT dbo.LabelsMade.Lot, dbo.LabelsMade.LotBoxNumber, dbo.T7_InstanceInfo.InstanceID AS BoxID, dbo.T7_InstanceInfo.Slot, LEFT(dbo.T7_WaferActionTracking.T7, 10) AS T7, T7_GeoData_2.CenterThick AS PreCenterThick, T7_GeoData_1.CenterThick AS PostCenterThk, T7_GeoData_1.TTV, T7_GeoData_1.TotWarp AS Warp, T7_GeoData_2.CenterThick - T7_GeoData_1.CenterThick AS Removal, T7_GeoData_1.CenterRes, T7_GeoData_1.Type, T7_GeoData_1.Bow, T7_GeoData_1.TIR, dbo.T7_ParticalData.SumAllDefects, dbo.T7_ParticalData.SP1BinCnt1, dbo.T7_ParticalData.SP1BinCnt2, dbo.T7_ParticalData.SP1BinCnt3, dbo.T7_ParticalData.SP1BinCnt4, dbo.T7_ParticalData.SP1BinCnt5, dbo.T7_ParticalData.SP1BinCnt6, dbo.T7_ParticalData.SP1BinCnt7, dbo.T7_ParticalData.SP1BinCnt8, dbo.T7_ParticalData.SP1BinCnt18, dbo.T7_ParticalData.StdDeviation, dbo.T7_ParticalData.AreaCnt, dbo.T7_ParticalData.TotalArea, dbo.T7_ParticalData.ScratchCnt, dbo.T7_ParticalData.ScratchTotalLength, dbo.T7_ParticalData.SP1LPDNBinCntInSize1, dbo.T7_ParticalData.SP1LPDNBinCntInSize2, dbo.T7_ParticalData.SP1LPDNBinCntInSize3, dbo.T7_ParticalData.SP1LPDNBinCntInSize4, dbo.T7_ParticalData.SP1LPDNBinCntInSize5, dbo.T7_ParticalData.SP1LPDNBinCntInSize6, dbo.T7_ParticalData.SP1LPDNBinCntInSize7, dbo.T7_ParticalData.SP1LPDNBinCntInSize8, dbo.T7_ParticalData.SP1LPDNBinCntInSize18, dbo.T7_ParticalData.SP1SOD1, dbo.T7_ParticalData.SP1SOD2, dbo.T7_ParticalData.SP1SOD3, dbo.T7_ParticalData.SP1SOD4, dbo.T7_ParticalData.SP1SOD5, dbo.T7_ParticalData.SP1SOD6, dbo.T7_ParticalData.SP1SOD7, dbo.T7_ParticalData.SP1SOD8, dbo.T7_ParticalData.SP1SOD18, dbo.T7_ParticalData.Average, dbo.T7_ParticalData.Peak, dbo.T7_ParticalData.Median, dbo.T7_ParticalData.EdgeExclusion, dbo.T7_ParticalData.RFID, dbo.T7_ParticalData.RFID_1, dbo.T_FGI_Boxes.BoxInvNumber as WB, dbo.T7_WaferActionTracking.PreGeo_Key, dbo.T_FGI_Boxes.CartonNumber, dbo.T7_ParticalData.RecordDate AS LaserScanDate, dbo.T7_ParticalData.ClusterAreaCnt, ISNULL(dbo.Q_Diameter_T7_Active.Diameter, 300.00) AS Diameter FROM dbo.T7_WaferActionTracking INNER JOIN dbo.T7_InstanceInfo ON dbo.T7_WaferActionTracking.WAT_Key = dbo.T7_InstanceInfo.WAT_Key INNER JOIN dbo.T_FGI_Boxes ON dbo.T7_InstanceInfo.InstanceID = dbo.T_FGI_Boxes.InstanceKey INNER JOIN dbo.LabelsMade ON dbo.T_FGI_Boxes.LabelsMadeKey = dbo.LabelsMade.LabelRecordNumber LEFT OUTER JOIN dbo.Q_Diameter_T7_Active ON dbo.T7_WaferActionTracking.WAT_Key = dbo.Q_Diameter_T7_Active.WAT_Key LEFT OUTER JOIN dbo.T7_ParticalData ON dbo.T7_WaferActionTracking.Partical_Key = dbo.T7_ParticalData.Partical_Key LEFT OUTER JOIN dbo.T7_GeoData AS T7_GeoData_1 ON dbo.T7_WaferActionTracking.PostGeo_Key = T7_GeoData_1.Geo_Key LEFT OUTER JOIN dbo.T7_GeoData AS T7_GeoData_2 ON dbo.T7_WaferActionTracking.PreGeo_Key = T7_GeoData_2.Geo_Key WHERE (dbo.T_FGI_Boxes.CartonNumber = "
-
-            MoreCartons = True
-            Do Until MoreCartons = False 'Build Where
-                SQLStringCount = SQLStringCount + 1
-                SnipCarton = Left(CartonString, CartonString.IndexOf(Chr(13)))
-
-                SnipCarton = Mid(SnipCarton, 3)
-                Carton_Int = SnipCarton
-
-                If SQLStringCount = 1 Then
-                    SQLString = SQLString & Carton_Int
-                Else
-                    SQLString = SQLString & ") OR (dbo.T_FGI_Boxes.CartonNumber = " & Carton_Int
-                End If
-
-                CartonString = Mid(CartonString, CartonString.IndexOf(Chr(13)) + 2)
-
-                If Not CartonString.Contains(Chr(13)) Then
-                    SQLString = SQLString & ") ORDER BY dbo.T7_InstanceInfo.InstanceID, dbo.T7_InstanceInfo.Slot"
-
-                    With CofADataSelectCmd
-                        .CommandText = SQLString
-                        .Connection = Connection
-                    End With
-                    MoreCartons = False
-                    Exit Do
-                End If
-            Loop
-
-        Else 'Build Batch CofA info
-            'Build Batch CofA info
-            'Build Batch CofA info
-        End If
-
-        DA_CofAData.SelectCommand = CofADataSelectCmd
-        DA_CofAData.Fill(DS_CofAData)
-
-        GetCofAData = DS_CofAData
-
-        Connection.Close()
-
+        Return _cofA300mm.GetCofAData(CartonString, T7s, Customer)
     End Function
 
     Function GetCofAData_BK_2018_06_13(ByVal CartonString As String, ByVal T7s As Boolean, ByVal Customer As String) As Data.DataSet
@@ -2857,77 +2759,7 @@ Public Class Class1
     End Function
 
     Function GetCofADataSumary(ByVal CartonString As String, ByVal T7s As Boolean) As Data.DataRow
-
-        Dim Connection As New Data.SqlClient.SqlConnection
-        Connection.ConnectionString = ConfigurationManager.ConnectionStrings("ALTSConnectionString").ConnectionString
-        Connection.Open()
-        Dim DA_CofAData As New Data.SqlClient.SqlDataAdapter
-        Dim DS_CofAData As New Data.DataSet
-        Dim CofADataSelectCmd As New System.Data.SqlClient.SqlCommand
-
-
-        If T7s = True Then ' Build T7 CofA Info
-            Dim SQLString As String
-            Dim MoreCartons As Boolean
-            Dim SQLStringCount As Int16
-            Dim SnipCarton As String
-            Dim Carton_Int As Integer
-            Dim DA_Carton As New Data.SqlClient.SqlDataAdapter
-            Dim DS_Carton As New Data.DataSet
-            Dim DR_Carton As Data.DataRow
-            Dim CartonSelectCmd As New System.Data.SqlClient.SqlCommand
-            Dim Ikey As String
-            SQLString = "SELECT TOP 100 PERCENT AVG(dbo.T7_GeoData.CenterThick) AS ThickAVG, MIN(dbo.T7_GeoData.CenterThick) AS ThickMin, MAX(dbo.T7_GeoData.CenterThick) AS ThickMax, STDEV(dbo.T7_GeoData.CenterThick) AS ThickStdev, AVG(dbo.T7_GeoData.TTV) AS TTVAvg, MIN(dbo.T7_GeoData.TTV) AS TTVMin, MAX(dbo.T7_GeoData.TTV) AS TTVMax, STDEV(dbo.T7_GeoData.TTV) AS TTVStdev, AVG(dbo.T7_GeoData.TIR) AS TIRAvg, MIN(dbo.T7_GeoData.TIR) AS TIRMin, MAX(dbo.T7_GeoData.TIR) AS TIRMax, STDEV(dbo.T7_GeoData.TIR) AS TIRStdev, AVG(dbo.T7_GeoData.CenterRes) AS ResAvg, MIN(dbo.T7_GeoData.CenterRes) AS ResMin, AVG(dbo.T7_GeoData.CenterRes) AS ResMax, STDEV(dbo.T7_GeoData.CenterRes) AS ResStdev, AVG(dbo.T7_GeoData.Bow) AS BowAvg, MIN(dbo.T7_GeoData.Bow) AS BowMin, MAX(dbo.T7_GeoData.Bow) AS BowMax, STDEV(dbo.T7_GeoData.Bow) AS BowStdev, AVG(dbo.T7_GeoData.TotWarp) AS WarpAvg, MIN(dbo.T7_GeoData.TotWarp) AS WarpMin, MAX(dbo.T7_GeoData.TotWarp) AS WarpMax, STDEV(dbo.T7_GeoData.TotWarp) AS WarpStdev, AVG(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Avg, MIN(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Min, MAX(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Max, STDEV(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Avg, MIN(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Min, MAX(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Max, STDEV(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Avg, MIN(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Min, MAX(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Max, STDEV(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Avg, MIN(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Min, MAX(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Max, STDEV(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Avg, MIN(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Min, MAX(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Max, STDEV(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Avg, MIN(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Min, MAX(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Max, STDEV(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Avg, MIN(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Min, MAX(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Max, STDEV(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Avg, MIN(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Min, MAX(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Max, MIN(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Stdev FROM dbo.T7_WaferActionTracking INNER JOIN dbo.T7_InstanceInfo ON dbo.T7_WaferActionTracking.WAT_Key = dbo.T7_InstanceInfo.WAT_Key INNER JOIN dbo.T7_ParticalData ON dbo.T7_WaferActionTracking.Partical_Key = dbo.T7_ParticalData.Partical_Key LEFT OUTER JOIN dbo.T7_GeoData ON dbo.T7_WaferActionTracking.PostGeo_Key = dbo.T7_GeoData.Geo_Key WHERE (dbo.T7_InstanceInfo.InstanceID = "
-            '"SELECT TOP 100 PERCENT AVG(dbo.T7_GeoData.CenterThick) AS ThickAVG, MIN(dbo.T7_GeoData.CenterThick) AS ThickMin, MAX(dbo.T7_GeoData.CenterThick) AS ThickMax, STDEV(dbo.T7_GeoData.CenterThick) AS ThichStdev, AVG(dbo.T7_GeoData.TTV) AS TTVAvg, MIN(dbo.T7_GeoData.TTV) AS TTVMin, MAX(dbo.T7_GeoData.TTV) AS TTVMax, STDEV(dbo.T7_GeoData.TTV) AS TTVStdev, AVG(dbo.T7_GeoData.TIR) AS TIRAvg, MIN(dbo.T7_GeoData.TIR) AS TIRMin, MAX(dbo.T7_GeoData.TIR) AS TIRMax, STDEV(dbo.T7_GeoData.TIR) AS TIDStdev, AVG(dbo.T7_GeoData.CenterRes) AS ResAvg, MIN(dbo.T7_GeoData.CenterRes) AS ResMin, AVG(dbo.T7_GeoData.CenterRes) AS ResMax, STDEV(dbo.T7_GeoData.CenterRes) AS ResStdev, AVG(dbo.T7_GeoData.Bow) AS BowAvg, MIN(dbo.T7_GeoData.Bow) AS BowMin, MAX(dbo.T7_GeoData.Bow) AS BowMax, STDEV(dbo.T7_GeoData.Bow) AS BowStdev, AVG(dbo.T7_GeoData.TotWarp) AS WarpAvg, MIN(dbo.T7_GeoData.TotWarp) AS WarpMin, MAX(dbo.T7_GeoData.TotWarp) AS WarpMax, STDEV(dbo.T7_GeoData.TotWarp), AVG(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Avg, MIN(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Min, MAX(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Max, STDEV(dbo.T7_ParticalData.SP1BinCnt1) AS LPDBin1Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Avg, MIN(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Min, MAX(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Max, STDEV(dbo.T7_ParticalData.SP1BinCnt2) AS LPDBin2Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Avg, MIN(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Min, MAX(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Max, STDEV(dbo.T7_ParticalData.SP1BinCnt3) AS LPDBin3Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Avg, MIN(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Min, MAX(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Max, STDEV(dbo.T7_ParticalData.SP1BinCnt4) AS LPDBin4Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Avg, MIN(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Min, MAX(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Max, STDEV(dbo.T7_ParticalData.SP1BinCnt5) AS LPDBin5Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Avg, MIN(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Min, MAX(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Max, STDEV(dbo.T7_ParticalData.SP1BinCnt6) AS LPDBin6Stdev, AVG(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Avg, MIN(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Min, MAX(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBin7Max, STDEV(dbo.T7_ParticalData.SP1BinCnt7) AS LPDBinStdev, AVG(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Avg, MIN(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Min, MAX(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Max, MIN(dbo.T7_ParticalData.SP1BinCnt8) AS LPDBin8Stdev FROM dbo.T7_WaferActionTracking INNER JOIN dbo.T7_InstanceInfo ON dbo.T7_WaferActionTracking.WAT_Key = dbo.T7_InstanceInfo.WAT_Key INNER JOIN dbo.T7_ParticalData ON dbo.T7_WaferActionTracking.Partical_Key = dbo.T7_ParticalData.Partical_Key LEFT OUTER JOIN dbo.T7_GeoData ON dbo.T7_WaferActionTracking.PostGeo_Key = dbo.T7_GeoData.Geo_Key WHERE (dbo.T7_InstanceInfo.InstanceID = " & Carton_Int & ")"
-            MoreCartons = True
-            Do Until MoreCartons = False 'Build Where
-                SQLStringCount = SQLStringCount + 1
-                SnipCarton = Left(CartonString, CartonString.IndexOf(Chr(13)))
-
-                SnipCarton = Mid(SnipCarton, 3)
-                Carton_Int = SnipCarton
-
-                With CartonSelectCmd
-                    .CommandText = "SELECT dbo.T_FGI_Boxes.InstanceKey AS BoxID FROM dbo.T_FGI_Boxes WHERE (dbo.T_FGI_Boxes.CartonNumber = " & Carton_Int & ")"
-                    .Connection = Connection
-                End With
-                DA_Carton.SelectCommand = CartonSelectCmd
-                DS_Carton.Clear()
-                DA_Carton.Fill(DS_Carton)
-                DR_Carton = DS_Carton.Tables(0).Rows(0)
-                Ikey = DR_Carton("BoxID")
-                If SQLStringCount = 1 Then
-                    SQLString = SQLString & Ikey
-                Else
-                    SQLString = SQLString & ") OR (dbo.T7_InstanceInfo.InstanceID = " & Ikey
-                End If
-
-                CartonString = Mid(CartonString, CartonString.IndexOf(Chr(13)) + 2)
-
-                If Not CartonString.Contains(Chr(13)) Then
-                    SQLString = SQLString & ")"
-
-                    With CofADataSelectCmd
-                        .CommandText = SQLString
-                        .Connection = Connection
-                    End With
-                    MoreCartons = False
-                    Exit Do
-                End If
-            Loop
-
-        Else 'Build Batch CofA info
-            'Build Batch CofA info
-            'Build Batch CofA info
-        End If
-
-        DA_CofAData.SelectCommand = CofADataSelectCmd
-        DA_CofAData.Fill(DS_CofAData)
-
-        GetCofADataSumary = DS_CofAData.Tables(0).Rows(0)
-        Connection.Close()
-
-
+        Return _cofA300mm.GetCofADataSumary(CartonString, T7s)
     End Function
 
     Function TestWaferBoxs_ForCarton(ByVal WaferBoxString As String) As Boolean
@@ -8595,11 +8427,9 @@ Public Class Class1
 
 
 
-
         CofAInfoRowCount = DS_CofAInfo.Tables(0).Rows.Count
 
-        Path = "\\PWI-40\software$\LabelTemplates\SatiCofA.xls"
-        'Path = "\\PWI-40\software$\LabelTemplates\SatiCofAwith New PackingSlip.xls" 'SatiCofAwith New PackingSlip.xls
+        Path = ConfigurationManager.AppSettings("CofA:TemplatePath")
 
 
         'FileName = "TestCofA.xls"
@@ -20936,7 +20766,7 @@ Public Class Class1
 
 
 
-        flex.Save("\\PWI-40\LabelArchive$\CofA Files\" & FileName & ".xls")
+        flex.Save(ConfigurationManager.AppSettings("CofA:ArchivePath") & FileName & ".xls")
         '***********************************************************
         '******** The Delete Try ***********************************
         '***********************************************************
@@ -21110,7 +20940,11 @@ Public Class Class1
 
         flex.ActiveSheetByName = CofASheetName
 
-        flex.Save("\\PWI-40\Customerdata$\" & mainid & "\" & FileName & ".xls")
+        Dim customerDir As String = ConfigurationManager.AppSettings("CofA:CustomerDataPath") & mainid
+        If Not IO.Directory.Exists(customerDir) Then
+            IO.Directory.CreateDirectory(customerDir)
+        End If
+        flex.Save(customerDir & "\" & FileName & ".xls")
 
         '************************************************************************
         '************************************************************************
