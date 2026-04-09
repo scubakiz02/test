@@ -1,0 +1,92 @@
+# Continuous deployment: GitHub-hosted build + self-hosted IIS deploy.
+# Guide: docs/github-actions-cd-self-hosted-guide.md
+
+name: CD (self-hosted IIS)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Restore NuGet packages
+        run: nuget restore SatiDotNet2/SatiDotNet2.sln
+
+      - name: Build solution (Release)
+        run: msbuild SatiDotNet2/SatiDotNet2.sln /p:Configuration=Release
+
+      - name: Run tests
+        run: vstest.console.exe "SatiDotNet2Tests\bin\Release\SatiDotNet2Tests.dll"
+
+      - name: Stage website for artifact
+        shell: pwsh
+        run: |
+          $dest = Join-Path $env:RUNNER_TEMP 'sati-site'
+          if (Test-Path $dest) { Remove-Item $dest -Recurse -Force }
+          New-Item -ItemType Directory -Path $dest -Force | Out-Null
+          robocopy SatiDotNet2 $dest /E /XD obj .vs /NFL /NDL /NJH /NJS /nc /ns /np
+          if ($LASTEXITCODE -gt 7) { exit $LASTEXITCODE }
+
+      - name: Upload website artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sati-website
+          path: ${{ runner.temp }}/sati-site
+
+  deploy-to-iis:
+    name: Deploy to IIS (self-hosted)
+    needs: build-and-test
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download website artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sati-website
+          path: site
+
+      - name: Deploy to IIS path
+        shell: pwsh
+        env:
+          DEPLOY_IIS_PATH: ${{ vars.DEPLOY_IIS_PATH }}
+          DEPLOY_SITE_NAME: ${{ vars.DEPLOY_SITE_NAME }}
+        run: |
+          $target = if ($env:DEPLOY_IIS_PATH) { $env:DEPLOY_IIS_PATH.Trim() } else { '' }
+          $siteName = if ($env:DEPLOY_SITE_NAME) { $env:DEPLOY_SITE_NAME.Trim() } else { '' }
+          if ([string]::IsNullOrWhiteSpace($target) -or [string]::IsNullOrWhiteSpace($siteName)) {
+            Write-Error "Set repository Variables DEPLOY_IIS_PATH and DEPLOY_SITE_NAME (Settings → Secrets and variables → Actions → Variables). See docs/github-actions-cd-self-hosted-guide.md"
+            exit 1
+          }
+
+          Import-Module WebAdministration -ErrorAction Stop
+
+          Write-Host "Stopping IIS site: $siteName"
+          Stop-WebSite -Name $siteName -ErrorAction SilentlyContinue
+
+          if (-not (Test-Path $target)) {
+            Write-Error "Deploy path does not exist: $target"
+            exit 1
+          }
+
+          # Mirror artifact into IIS physical path. Add /XF web.config if production config must stay on-server.
+          robocopy (Join-Path $PWD 'site') $target /MIR /NFL /NDL /NJH /NJS /nc /ns /np
+          if ($LASTEXITCODE -gt 7) { exit $LASTEXITCODE }
+
+          Write-Host "Starting IIS site: $siteName"
+          Start-WebSite -Name $siteName

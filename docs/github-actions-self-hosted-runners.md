@@ -2,6 +2,8 @@
 
 This guide explains how to set up self-hosted runners for deploying SatiDotNet2 to on-premises IIS servers.
 
+**Continuous deployment (build on GitHub, deploy on your VM):** see [github-actions-cd-self-hosted-guide.md](./github-actions-cd-self-hosted-guide.md) and [`.github/workflows/cd.yml`](../.github/workflows/cd.yml).
+
 ## Overview
 
 A **self-hosted runner** is a machine you control that executes GitHub Actions workflows. Instead of using GitHub's cloud-hosted runners (`runs-on: windows-latest`), your workflows run on your own server.
