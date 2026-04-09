@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/CustomerMaintenance/TestLabel.aspx" hash="fffffffadb1f33c3" filehash="9bd7e2ddfe44ce4b" flags="110000" assembly="App_Web_mq50r1a2" type="ASP.customermaintenance_testlabel_aspx">
+    <filedeps>
+        <filedep name="/CustomerMaintenance/TestLabel.aspx" />
+        <filedep name="/CustomerMaintenance/TestLabel.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

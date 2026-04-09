@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/Partial Inv.aspx" hash="fffffffadb1f33c3" filehash="6af7d97187380333" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_partial_inv_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/Partial Inv.aspx" />
+        <filedep name="/PC/Partial Inv.aspx.vb" />
+    </filedeps>
+</preserve>

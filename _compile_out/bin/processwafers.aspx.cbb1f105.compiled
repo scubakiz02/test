@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/ProcessWafers.aspx" hash="fffffffadb1f33c3" filehash="6d24d99b71475b62" flags="110000" assembly="App_Web_kgb1sqwa" type="ASP.production_processwafers_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/ProcessWafers.aspx" />
+        <filedep name="/Production/ProcessWafers.aspx.vb" />
+    </filedeps>
+</preserve>

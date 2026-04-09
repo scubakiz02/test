@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/MR/Tools.aspx" hash="fffffffadb1f33c3" filehash="78a4e07a776bff5f" flags="110000" assembly="App_Web_4kx2ky30" type="ASP.mr_tools_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/MR/Tools.aspx" />
+        <filedep name="/MR/Tools.aspx.vb" />
+    </filedeps>
+</preserve>

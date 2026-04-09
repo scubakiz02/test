@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/SAR/SAR_View.aspx" hash="fffffffadb1f33c3" filehash="9418c942b23c41dd" flags="110000" assembly="App_Web_u5eirnpu" type="ASP.reports_sar_sar_view_aspx">
+    <filedeps>
+        <filedep name="/Reports/SAR/SAR_View.aspx" />
+        <filedep name="/Reports/SAR/SAR_View.aspx.vb" />
+    </filedeps>
+</preserve>

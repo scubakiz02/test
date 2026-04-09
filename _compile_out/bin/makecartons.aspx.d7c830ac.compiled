@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/MakeCartons.aspx" hash="fffffffadb1f33c3" filehash="a7d436b1fbdb9d65" flags="110000" assembly="App_Web_hulyfwxb" type="ASP.pc_makecartons_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/MakeCartons.aspx" />
+        <filedep name="/PC/MakeCartons.aspx.vb" />
+    </filedeps>
+</preserve>

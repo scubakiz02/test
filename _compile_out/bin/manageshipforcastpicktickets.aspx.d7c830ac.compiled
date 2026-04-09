@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/ManageShipForcastPickTickets.aspx" hash="fffffffadb1f33c3" filehash="6f56b3b305a8b070" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_manageshipforcastpicktickets_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/ManageShipForcastPickTickets.aspx" />
+        <filedep name="/PC/ManageShipForcastPickTickets.aspx.vb" />
+    </filedeps>
+</preserve>

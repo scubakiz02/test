@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/Spec-Surf-CMP.aspx" hash="fffffffadb1f33c3" filehash="d1e8aee8e383c130" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_spec_surf_cmp_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/Spec-Surf-CMP.aspx" />
+        <filedep name="/Reports/Spec-Surf-CMP.aspx.vb" />
+    </filedeps>
+</preserve>

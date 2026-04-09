@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/MR/Old/MaintenanceRequest.aspx" hash="fffffffadb1f33c3" filehash="7d9e52857aa31a20" flags="110000" assembly="App_Web_yu22tx0h" type="ASP.mr_old_maintenancerequest_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/MR/Old/MaintenanceRequest.aspx" />
+        <filedep name="/MR/Old/MaintenanceRequest.aspx.vb" />
+    </filedeps>
+</preserve>

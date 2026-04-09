@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/ShipmentReleaseView.aspx" hash="fffffffadb1f33c3" filehash="98bef9176fded8e2" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_shipmentreleaseview_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/ShipmentReleaseView.aspx" />
+        <filedep name="/Reports/ShipmentReleaseView.aspx.vb" />
+    </filedeps>
+</preserve>

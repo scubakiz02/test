@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurfScan (Bin Fall) Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #27ae60; }
+        h4 { color: #8e44ad; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+        }
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        li { margin: 5px 0; }
+        .note {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        a { color: #3498db; }
+        .overview-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .overview-list li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>SurfScan (Bin Fall) Report</h1>
+
+    <h2>Overview</h2>
+    <ul class="overview-list">
+        <li><strong>Purpose:</strong> Wafer surface scan inspection report for viewing pass/reject data from surface particle detection equipment</li>
+        <li><strong>Page Title:</strong> Bin Fall</li>
+        <li><strong>Location:</strong> <code>Reports/SurfScan.aspx</code></li>
+        <li><strong>Code-behind:</strong> <code>Reports/SurfScan.aspx.vb</code></li>
+    </ul>
+
+    <h2>Supported Equipment</h2>
+
+    <h3>SPx Tools (Primary)</h3>
+    <table>
+        <tr>
+            <th>Checkbox Label</th>
+            <th>Machine ID</th>
+        </tr>
+        <tr><td>SP1</td><td>SP1</td></tr>
+        <tr><td>SP1-2</td><td>SP2</td></tr>
+        <tr><td>SP1-3</td><td>SP1-3</td></tr>
+        <tr><td>SP2</td><td>SP2-S0132</td></tr>
+        <tr><td>SP3-1</td><td>SP3-2110224</td></tr>
+        <tr><td>SP3-2</td><td>SP3-2110164</td></tr>
+        <tr><td>SP5-1</td><td>SP5-2130406</td></tr>
+    </table>
+
+    <h3>Tencor Tools (Hidden by default)</h3>
+    <ul>
+        <li>Tencor</li>
+        <li>Tencor 3</li>
+        <li>Tencor 4</li>
+    </ul>
+
+    <h2>Features</h2>
+
+    <h3>Session Quantity Selection</h3>
+    <ul>
+        <li><strong>10, 25, 50, 75:</strong> Returns top N records</li>
+        <li><strong>Select Date:</strong> Custom date range with start/end date pickers</li>
+    </ul>
+
+    <h3>Wafer Diameter Filter</h3>
+    <ul>
+        <li>All</li>
+        <li>200mm (WaferDia = 200000)</li>
+        <li>300mm (WaferDia = 300000)</li>
+    </ul>
+
+    <h3>Daily Tests</h3>
+    <p>"Find all 'Daily' tests on all tools" checkbox searches for sessions with "Daily" in the name</p>
+
+    <h3>Advanced Filtering</h3>
+    <p>Enable via "Advanced Filter" checkbox to access:</p>
+    <table>
+        <tr>
+            <th>Filter</th>
+            <th>Description</th>
+        </tr>
+        <tr><td>ID</td><td>Wafer ID filtering (find only or exclude)</td></tr>
+        <tr><td>Run</td><td>Run number filtering</td></tr>
+        <tr><td>WL</td><td>Wafer log filtering</td></tr>
+        <tr><td>Session Name</td><td>Session name filtering</td></tr>
+        <tr><td>Comment 1</td><td>CMP type indicator</td></tr>
+        <tr><td>Comment 2</td><td>Instance numbers</td></tr>
+        <tr><td>CMP Type</td><td>Dropdown for CMP 1-5, 4L, 4R</td></tr>
+        <tr><td>Remove Daily Tests</td><td>Excludes sessions with "Daily" in name</td></tr>
+        <tr><td>Archives</td><td>Query archived data instead of live (last 90 days)</td></tr>
+    </table>
+
+    <h3>Pass Bin Configuration</h3>
+    <ul>
+        <li><strong>Bin 2:</strong> Count wafers sent to destination station 2 as passed</li>
+        <li><strong>Bin 3:</strong> Count wafers sent to destination station 3 as passed</li>
+        <li><strong>Bins 2 &amp; 3:</strong> Count both as passed</li>
+    </ul>
+
+    <h3>Slot Filtering</h3>
+    <p>Individual checkboxes for slots 1-25 to include/exclude specific source slots from the query.</p>
+
+    <h3>Footer Summation</h3>
+    <p>"Show Footer As Sum" checkbox toggles between column labels and calculated totals in the grid footer.</p>
+
+    <h3>Data Export</h3>
+    <ul>
+        <li>Enter email prefix (appends @purewafer.com)</li>
+        <li>Exports GridView data to CSV</li>
+        <li>Sends via email using <code>Saticode.SendMailWithFile()</code></li>
+        <li>File saved to: <code>\\PWI-40\TempImageWebFiles$\</code></li>
+    </ul>
+
+    <h2>Data Sources</h2>
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Purpose</th>
+        </tr>
+        <tr><td><code>dbo.SP1_Data</code></td><td>Live SPx tool inspection data (cache of tool data)</td></tr>
+        <tr><td><code>dbo.Archive_SP1_Data</code></td><td>Archived SPx data (older than 90 days)</td></tr>
+        <tr><td><code>dbo.Tencor_Data</code></td><td>Tencor tool inspection data</td></tr>
+        <tr><td><code>dbo.T_Spec_Scan_Log</code></td><td>Spec scan timestamps</td></tr>
+        <tr><td><code>dbo.CofA_Info</code></td><td>Certificate of Analysis bin configuration</td></tr>
+    </table>
+
+    <h2>Data Refresh Mechanism</h2>
+    <p>The <code>SP1_Data</code> table acts as a <strong>cache</strong> of data from the physical surf scan tool systems. Data is not inserted directly by the .NET application. Instead, stored procedures sync data from the tools on-demand.</p>
+
+    <h3>Stored Procedures</h3>
+    <table>
+        <tr>
+            <th>Procedure</th>
+            <th>Tool</th>
+        </tr>
+        <tr><td><code>exsil_user.[SP1DataCollector_SP11Only]</code></td><td>SP1</td></tr>
+        <tr><td><code>exsil_user.[SP1DataCollector_SP12Only]</code></td><td>SP2</td></tr>
+        <tr><td><code>exsil_user.[SP1DataCollector_SP13Only]</code></td><td>SP1-3</td></tr>
+    </table>
+    <div class="note">
+        <strong>Note:</strong> SP2-S0132 uses real-time data collection and does not require manual refresh.
+    </div>
+
+    <h3>How Refresh Works</h3>
+    <ol>
+        <li>User triggers a refresh (e.g., clicks "Update SP1" button)</li>
+        <li>Application calls the appropriate stored procedure via <code>UpdateSPxTool()</code> in <code>App_Code/Class1.vb</code></li>
+        <li>Stored procedure pulls latest data from the tool system into <code>SP1_Data</code></li>
+        <li>Application queries the now-updated <code>SP1_Data</code> table</li>
+    </ol>
+
+    <h3>Refresh Triggers in This Page</h3>
+    <p>The Advanced Filter panel contains "Update SP1", "Update SP12", and "Update SP13" buttons that call:</p>
+    <ul>
+        <li><code>SP1UpdateButton_Click</code> → <code>Saticode.UpdateSPxTool("SP1")</code> (line 776)</li>
+        <li><code>SP12UpdateButton_Click</code> → <code>Saticode.UpdateSPxTool("SP2")</code> (line 781)</li>
+        <li><code>SP13UpdateButton_Click</code> → <code>Saticode.UpdateSPxTool("SP13")</code> (line 1194)</li>
+    </ul>
+
+    <h3>Other Pages That Refresh SP1_Data</h3>
+    <table>
+        <tr>
+            <th>Page</th>
+            <th>Method</th>
+            <th>User Action</th>
+        </tr>
+        <tr><td><code>Production/MakeSurfScanWaferBoxLabel.aspx</code></td><td><code>Button_Pull_Data_Click</code></td><td>Pull data for label printing</td></tr>
+        <tr><td><code>Production/SurfScanLabelMaker.aspx</code></td><td><code>GoSPxSQL()</code></td><td>Generate surf scan labels</td></tr>
+        <tr><td><code>SPC/SPC_Compile.aspx</code></td><td><code>UpdateToolData()</code></td><td>Compile SPC statistics</td></tr>
+        <tr><td><code>Production/SPxT7DupeCompatibilityCheck.aspx</code></td><td><code>FindOut()</code></td><td>Check T7 compatibility</td></tr>
+    </table>
+
+    <h3>Why Refresh Is Needed</h3>
+    <p>Without calling refresh, users query potentially stale data that doesn't reflect wafers scanned since the last sync. Users trigger refresh when they need the most current data from the physical tool systems.</p>
+
+    <h2>UI Components</h2>
+
+    <h3>Main Panel</h3>
+    <ul>
+        <li>Tool selection radio buttons and checkboxes</li>
+        <li>Session quantity options</li>
+        <li>Diameter dropdown</li>
+        <li>Advanced filter toggle</li>
+    </ul>
+
+    <h3>GridView1 (SPx Data)</h3>
+    <p>Displays aggregated session data:</p>
+    <ul>
+        <li>SessionDate, Comment2 (Instance), SPSessionName, Lot</li>
+        <li>Wafers In, Passed, %Pass, Rejects, OverLoads, Bin2, Bin3, Comment1 (CMP)</li>
+    </ul>
+
+    <h3>GridView2 (Tencor Data)</h3>
+    <p>Displays Tencor session data:</p>
+    <ul>
+        <li>Run Time, Tencor, Recipe, Operator, Lot</li>
+        <li>Wafers, Passed, Reject, %Pass</li>
+    </ul>
+
+    <h3>Modal Popups</h3>
+
+    <h4>SPx Detail Panel</h4>
+    <p>Shows individual wafer data for a session:</p>
+    <ul>
+        <li>Source slot, destination, disposition class</li>
+        <li>SOD1-SOD8 values, Scratch Count, Cluster Area Count</li>
+        <li>Map button for wafer map image</li>
+    </ul>
+
+    <h4>Tencor Detail Panel</h4>
+    <p>Shows individual wafer data:</p>
+    <ul>
+        <li>Event time, slot, sort result, LPD counts by size bin</li>
+        <li>Scratch count, area count</li>
+    </ul>
+
+    <h4>Map Panel</h4>
+    <p>Displays wafer map images with navigation:</p>
+    <ul>
+        <li>Back/Next map buttons</li>
+        <li>Back/Next session buttons</li>
+        <li>Map images loaded from <code>SatiMapsDir</code> or <code>SP2Files</code> session paths</li>
+    </ul>
+
+    <h2>Key Methods</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Purpose</th>
+        </tr>
+        <tr><td><code>UpdateData()</code></td><td>Builds and executes SQL query based on filter selections</td></tr>
+        <tr><td><code>FooterSum()</code></td><td>Calculates and displays footer totals</td></tr>
+        <tr><td><code>ChangeToolSet()</code></td><td>Toggles visibility between SPx and Tencor controls</td></tr>
+        <tr><td><code>getbucket()</code></td><td>Loads session detail data for popup display</td></tr>
+        <tr><td><code>LookMap()</code></td><td>Loads wafer map image for display</td></tr>
+        <tr><td><code>ExportData()</code></td><td>Exports grid data to CSV and sends email</td></tr>
+    </table>
+
+    <h2>Authentication</h2>
+    <p>Page uses <code>MenuAuthenication.AuthenicationByPass(Page)</code> on load.</p>
+
+    <p><a href="SP1_Data_Collection.html">See also: SP1_Data Collection Architecture</a></p>
+
+</body>
+</html>

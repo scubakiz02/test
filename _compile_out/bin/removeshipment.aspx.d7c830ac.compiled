@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/RemoveShipment.aspx" hash="fffffffadb1f33c3" filehash="6251481083f8eb40" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_removeshipment_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/RemoveShipment.aspx" />
+        <filedep name="/PC/RemoveShipment.aspx.vb" />
+    </filedeps>
+</preserve>

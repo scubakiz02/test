@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/InvFilterExport.aspx" hash="fffffffadb1f33c3" filehash="d64379e259ee4084" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_invfilterexport_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/InvFilterExport.aspx" />
+        <filedep name="/Reports/InvFilterExport.aspx.vb" />
+    </filedeps>
+</preserve>

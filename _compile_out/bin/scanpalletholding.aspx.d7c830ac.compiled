@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/ScanPalletHolding.aspx" hash="fffffffadb1f33c3" filehash="927a9b3b57c949ff" flags="110000" assembly="App_Web_hulyfwxb" type="ASP.pc_scanpalletholding_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/ScanPalletHolding.aspx" />
+        <filedep name="/PC/ScanPalletHolding.aspx.vb" />
+    </filedeps>
+</preserve>

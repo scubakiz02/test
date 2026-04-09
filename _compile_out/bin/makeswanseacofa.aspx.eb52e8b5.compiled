@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/TestArea/MakeSwanseaCofA.aspx" hash="fffffffadb1f33c3" filehash="4267c4ebc834f0a9" flags="110000" assembly="App_Web_sy5gllzq" type="ASP.testarea_makeswanseacofa_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/TestArea/MakeSwanseaCofA.aspx" />
+        <filedep name="/TestArea/MakeSwanseaCofA.aspx.vb" />
+    </filedeps>
+</preserve>

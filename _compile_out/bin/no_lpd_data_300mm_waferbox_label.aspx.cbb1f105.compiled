@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/No_LPD_Data_300mm_WaferBox_Label.aspx" hash="fffffffadb1f33c3" filehash="6b489ed655015b43" flags="110000" assembly="App_Web_2rnibltr" type="ASP.production_no_lpd_data_300mm_waferbox_label_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/No_LPD_Data_300mm_WaferBox_Label.aspx" />
+        <filedep name="/Production/No_LPD_Data_300mm_WaferBox_Label.aspx.vb" />
+    </filedeps>
+</preserve>

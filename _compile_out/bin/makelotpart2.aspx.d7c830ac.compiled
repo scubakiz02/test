@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/MakeLotPart2.aspx" hash="fffffffadb1f33c3" filehash="25400ffcf1a4fe74" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_makelotpart2_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/MakeLotPart2.aspx" />
+        <filedep name="/PC/MakeLotPart2.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/DBMaintenance/SATI_SDS.aspx" hash="fffffffadb1f33c3" filehash="a3c53cd17ae927d6" flags="110000" assembly="App_Web_skpq1jtf" type="ASP.dbmaintenance_sati_sds_aspx">
+    <filedeps>
+        <filedep name="/DBMaintenance/SATI_SDS.aspx" />
+        <filedep name="/DBMaintenance/SATI_SDS.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

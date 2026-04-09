@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SatiDataManagment/SatiDataManagment.aspx" hash="fffffffadb1f33c3" filehash="15a8eba0270a7663" flags="110000" assembly="App_Web_wnlmnsz5" type="ASP.satidatamanagment_satidatamanagment_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SatiDataManagment/SatiDataManagment.aspx" />
+        <filedep name="/SatiDataManagment/SatiDataManagment.aspx.vb" />
+    </filedeps>
+</preserve>

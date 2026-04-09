@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SMR/Reports/MachineUptimeReport.aspx" hash="fffffffadb1f33c3" filehash="1dde65128de37b62" flags="110000" assembly="App_Web_k5ubgwm1" type="ASP.smr_reports_machineuptimereport_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SMR/Reports/MachineUptimeReport.aspx" />
+        <filedep name="/SMR/Reports/MachineUptimeReport.aspx.vb" />
+    </filedeps>
+</preserve>

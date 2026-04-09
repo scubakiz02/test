@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/LabelRemakeWithCurrent.aspx" hash="fffffffadb1f33c3" filehash="4ccbaf4a256911cb" flags="110000" assembly="App_Web_2rnibltr" type="ASP.production_labelremakewithcurrent_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/LabelRemakeWithCurrent.aspx" />
+        <filedep name="/Production/LabelRemakeWithCurrent.aspx.vb" />
+    </filedeps>
+</preserve>

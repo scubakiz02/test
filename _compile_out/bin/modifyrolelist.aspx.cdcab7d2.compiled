@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/ModifyRoleList.aspx" hash="fffffffadb1f33c3" filehash="7bead56a0107de0a" flags="110000" assembly="App_Web_1j2he5bh" type="ASP.modifyrolelist_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/ModifyRoleList.aspx" />
+        <filedep name="/ModifyRoleList.aspx.vb" />
+    </filedeps>
+</preserve>

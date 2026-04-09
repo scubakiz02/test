@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/TestArea/metal.aspx" hash="fffffffadb1f33c3" filehash="a4608806cbb04585" flags="110000" assembly="App_Web_sy5gllzq" type="ASP.testarea_metal_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/TestArea/metal.aspx" />
+        <filedep name="/TestArea/metal.aspx.vb" />
+    </filedeps>
+</preserve>

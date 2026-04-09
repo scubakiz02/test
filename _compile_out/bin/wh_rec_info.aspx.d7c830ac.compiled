@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/WH_Rec_Info.aspx" hash="fffffffadb1f33c3" filehash="8a5f77ad849b782b" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_wh_rec_info_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/WH_Rec_Info.aspx" />
+        <filedep name="/PC/WH_Rec_Info.aspx.vb" />
+    </filedeps>
+</preserve>

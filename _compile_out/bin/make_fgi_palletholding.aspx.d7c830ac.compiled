@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/Make_FGI_PalletHolding.aspx" hash="fffffffadb1f33c3" filehash="976ff270f3a80227" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_make_fgi_palletholding_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/Make_FGI_PalletHolding.aspx" />
+        <filedep name="/PC/Make_FGI_PalletHolding.aspx.vb" />
+    </filedeps>
+</preserve>

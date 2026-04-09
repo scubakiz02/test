@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/WHInventory.aspx" hash="fffffffadb1f33c3" filehash="f874696f49a601d7" flags="110000" assembly="App_Web_hulyfwxb" type="ASP.pc_whinventory_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/WHInventory.aspx" />
+        <filedep name="/PC/WHInventory.aspx.vb" />
+    </filedeps>
+</preserve>

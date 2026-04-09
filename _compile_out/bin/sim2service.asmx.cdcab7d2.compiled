@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/SIm2Service.asmx" hash="ffffffffd8b12621" filehash="fffffc9b5fba7baf" flags="130000" assembly="App_Code" type="SIm2Service">
+    <filedeps>
+        <filedep name="/SIm2Service.asmx" />
+    </filedeps>
+</preserve>

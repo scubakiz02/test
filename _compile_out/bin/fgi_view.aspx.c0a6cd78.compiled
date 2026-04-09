@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/DBMaintenance/FGI_View.aspx" hash="fffffffadb1f33c3" filehash="35b02ab1e33c96ef" flags="110000" assembly="App_Web_jtuoqcf5" type="ASP.dbmaintenance_fgi_view_aspx">
+    <filedeps>
+        <filedep name="/DBMaintenance/FGI_View.aspx" />
+        <filedep name="/DBMaintenance/FGI_View.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

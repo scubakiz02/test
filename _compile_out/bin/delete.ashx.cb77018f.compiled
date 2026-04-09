@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/api/pm-phase/delete.ashx" hash="ffffffffd8b12621" filehash="ffffecb3e6f01ead" flags="110000" assembly="App_Web_jrdykk0c" type="StreamData">
+    <filedeps>
+        <filedep name="/api/pm-phase/delete.ashx" />
+    </filedeps>
+</preserve>

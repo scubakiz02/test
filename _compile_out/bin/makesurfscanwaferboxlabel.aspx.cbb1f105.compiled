@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/MakeSurfScanWaferBoxLabel.aspx" hash="fffffffadb1f33c3" filehash="83c4f2ca7f63bd3b" flags="110000" assembly="App_Web_kgb1sqwa" type="ASP.production_makesurfscanwaferboxlabel_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/MakeSurfScanWaferBoxLabel.aspx" />
+        <filedep name="/Production/MakeSurfScanWaferBoxLabel.aspx.vb" />
+    </filedeps>
+</preserve>

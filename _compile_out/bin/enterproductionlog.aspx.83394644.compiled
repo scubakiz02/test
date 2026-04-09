@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/BK/EnterProductionLog.aspx" hash="fffffffadb1f33c3" filehash="6db7f089dcbb15c2" flags="110000" assembly="App_Web_wdeguthv" type="ASP.production_bk_enterproductionlog_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/BK/EnterProductionLog.aspx" />
+        <filedep name="/Production/BK/EnterProductionLog.aspx.vb" />
+    </filedeps>
+</preserve>

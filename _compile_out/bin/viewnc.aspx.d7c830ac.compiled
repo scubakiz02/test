@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/ViewNC.aspx" hash="fffffffadb1f33c3" filehash="fbf17d7f2452e262" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_viewnc_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/ViewNC.aspx" />
+        <filedep name="/PC/ViewNC.aspx.vb" />
+    </filedeps>
+</preserve>

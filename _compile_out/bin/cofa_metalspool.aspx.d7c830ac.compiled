@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/CofA_MetalsPool.aspx" hash="fffffffadb1f33c3" filehash="a0071ee77986c719" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_cofa_metalspool_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/CofA_MetalsPool.aspx" />
+        <filedep name="/PC/CofA_MetalsPool.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SMR/OpenTicketStatusBoard.aspx" hash="fffffffadb1f33c3" filehash="4234f5121b00b662" flags="110000" assembly="App_Web_vt0sbmbw" type="ASP.smr_openticketstatusboard_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SMR/OpenTicketStatusBoard.aspx" />
+        <filedep name="/SMR/OpenTicketStatusBoard.aspx.vb" />
+    </filedeps>
+</preserve>

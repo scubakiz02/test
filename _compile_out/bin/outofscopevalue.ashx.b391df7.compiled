@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/ChecklistLogging/OutOfScopeValue.ashx" hash="ffffffffd8b12621" filehash="fffff44c3c7a6d44" flags="110000" assembly="App_Web_ythpzlui" type="StreamData">
+    <filedeps>
+        <filedep name="/ChecklistLogging/OutOfScopeValue.ashx" />
+    </filedeps>
+</preserve>

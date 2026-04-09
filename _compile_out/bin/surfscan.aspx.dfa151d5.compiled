@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/SurfScan.aspx" hash="fffffffadb1f33c3" filehash="a4d4111967f11629" flags="110000" assembly="App_Web_22go1hop" type="ASP.reports_surfscan_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/SurfScan.aspx" />
+        <filedep name="/Reports/SurfScan.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/ReprintLabel.aspx" hash="fffffffadb1f33c3" filehash="c47b6b80181f8bdd" flags="110000" assembly="App_Web_2rnibltr" type="ASP.production_reprintlabel_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/ReprintLabel.aspx" />
+        <filedep name="/Production/ReprintLabel.aspx.vb" />
+    </filedeps>
+</preserve>

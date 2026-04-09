@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/KPI.aspx" hash="fffffffadb1f33c3" filehash="8ab233df52106905" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_kpi_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/KPI.aspx" />
+        <filedep name="/Reports/KPI.aspx.vb" />
+    </filedeps>
+</preserve>

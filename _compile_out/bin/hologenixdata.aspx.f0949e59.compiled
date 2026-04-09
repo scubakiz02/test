@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/ToolData/HologenixData.aspx" hash="fffffffadb1f33c3" filehash="a6fde7d46dd56a24" flags="110000" assembly="App_Web_usxrgfly" type="ASP.tooldata_hologenixdata_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/ToolData/HologenixData.aspx" />
+        <filedep name="/ToolData/HologenixData.aspx.cs" />
+    </filedeps>
+</preserve>

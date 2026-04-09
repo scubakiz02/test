@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/api/pm-status-board/current-logs.ashx" hash="ffffffffd8b12621" filehash="fffff373436e66e5" flags="110000" assembly="App_Web_skh0ktb4" type="StreamData">
+    <filedeps>
+        <filedep name="/api/pm-status-board/current-logs.ashx" />
+    </filedeps>
+</preserve>

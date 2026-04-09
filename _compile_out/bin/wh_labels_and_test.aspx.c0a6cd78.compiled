@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/DBMaintenance/WH_Labels_and_Test.aspx" hash="fffffffadb1f33c3" filehash="2ec160e88f5ff92d" flags="110000" assembly="App_Web_jtuoqcf5" type="ASP.dbmaintenance_wh_labels_and_test_aspx">
+    <filedeps>
+        <filedep name="/DBMaintenance/WH_Labels_and_Test.aspx" />
+        <filedep name="/DBMaintenance/WH_Labels_and_Test.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

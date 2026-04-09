@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/SAR/CreateSAR.aspx" hash="fffffffadb1f33c3" filehash="e2917afb710beaa6" flags="110000" assembly="App_Web_fzebiort" type="ASP.reports_sar_createsar_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/SAR/CreateSAR.aspx" />
+        <filedep name="/Reports/SAR/CreateSAR.aspx.vb" />
+    </filedeps>
+</preserve>

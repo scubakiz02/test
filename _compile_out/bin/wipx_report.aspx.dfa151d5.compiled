@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/WipX_Report.aspx" hash="fffffffadb1f33c3" filehash="ee1b687d469d9a0b" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_wipx_report_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/WipX_Report.aspx" />
+        <filedep name="/Reports/WipX_Report.aspx.vb" />
+    </filedeps>
+</preserve>

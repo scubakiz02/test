@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/DayArchive.aspx" hash="fffffffadb1f33c3" filehash="be5fde01c6989591" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_dayarchive_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/DayArchive.aspx" />
+        <filedep name="/Reports/DayArchive.aspx.vb" />
+    </filedeps>
+</preserve>

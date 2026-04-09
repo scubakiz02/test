@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/SimpleService.asmx" hash="ffffffffd8b12621" filehash="30adc80bf684" flags="130000" assembly="App_Code" type="SimpleService">
+    <filedeps>
+        <filedep name="/SimpleService.asmx" />
+    </filedeps>
+</preserve>

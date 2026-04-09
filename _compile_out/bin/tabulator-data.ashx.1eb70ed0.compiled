@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/api/pm-report/tabulator-data.ashx" hash="ffffffffd8b12621" filehash="1fd5adc5e8dd" flags="110000" assembly="App_Web_hky22b35" type="StreamData">
+    <filedeps>
+        <filedep name="/api/pm-report/tabulator-data.ashx" />
+    </filedeps>
+</preserve>

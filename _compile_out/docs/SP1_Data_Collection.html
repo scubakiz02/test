@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SP1_Data Collection Architecture</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #27ae60; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .diagram {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        a { color: #3498db; }
+    </style>
+</head>
+<body>
+    <h1>SP1_Data Collection Architecture</h1>
+
+    <h2>Overview</h2>
+    <p>The <code>SP1_Data</code> table in the AutoData database acts as a central cache of wafer inspection data from physical surf scan tools. Data is not inserted directly by the .NET application.</p>
+
+    <p><strong>Two data collection methods exist:</strong></p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Tools</th>
+            <th>How It Works</th>
+        </tr>
+        <tr>
+            <td>Linked Servers + Stored Procedures</td>
+            <td>SP1, SP1-3</td>
+            <td>SQL Server linked servers connect to tool databases; stored procedures sync data on-demand</td>
+        </tr>
+        <tr>
+            <td>SP2DC Software</td>
+            <td>SP2, SP3, SP5</td>
+            <td>External data collection software uploads data directly to SP1_Data</td>
+        </tr>
+    </table>
+    <p>This document focuses on the linked server approach used for SP1 and SP1-3.</p>
+
+    <h2>Linked Servers</h2>
+    <p>Linked servers are configured in SQL Server under <code>Server Objects &gt; Linked Servers</code>. These provide direct database connectivity to the surf scan tool systems.</p>
+
+    <table>
+        <tr>
+            <th>Linked Server</th>
+            <th>Tool</th>
+            <th>Used By</th>
+        </tr>
+        <tr>
+            <td><code>SP11</code></td>
+            <td>SP1</td>
+            <td><code>[exsil_user].[SP1DataCollector_SP11Only]</code></td>
+        </tr>
+        <tr>
+            <td><code>SP1_3</code></td>
+            <td>SP1-3</td>
+            <td><code>[exsil_user].[SP1DataCollector_SP13Only]</code></td>
+        </tr>
+    </table>
+
+    <h2>Tool Database Schema</h2>
+    <p>Each surf scan tool has its own database (<code>SP1</code>) with the following tables that store inspection results:</p>
+
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><code>TBL_DataSumInfo</code></td>
+            <td>Session/wafer info: IDs, dates, recipe, disposition, slot positions</td>
+        </tr>
+        <tr>
+            <td><code>TBL_DataSumClassification</code></td>
+            <td>Classification data: area counts, scratch metrics, cluster counts</td>
+        </tr>
+        <tr>
+            <td><code>TBL_DataSumCommonChannel</code></td>
+            <td>Channel data: sum of all defects</td>
+        </tr>
+        <tr>
+            <td><code>TBL_DataSumHazeMap</code></td>
+            <td>Haze measurements: average, peak, median, std deviation</td>
+        </tr>
+        <tr>
+            <td><code>TBL_DataSumDefect</code></td>
+            <td>Defect counts: bin counts, LPD counts by size</td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <strong>Important:</strong> The AutoData database also contains tables with similar names (<code>TBL_DataSum*</code>). These are <strong>obsolete</strong> and are not the same as the tables on the physical tool databases. The stored procedures query the tool databases via linked servers, not the local AutoData copies.
+    </div>
+
+    <h2>Stored Procedures</h2>
+
+    <h3><code>[exsil_user].[SP1DataCollector_SP11Only]</code></h3>
+    <p>Syncs data from the SP1 tool into <code>SP1_Data</code>.</p>
+
+    <p><strong>Data Flow:</strong></p>
+    <pre><code>SP11 (Linked Server)
+    └── SP1.dbo.TBL_DataSumInfo
+    └── SP1.dbo.TBL_DataSumClassification
+    └── SP1.dbo.TBL_DataSumCommonChannel
+    └── SP1.dbo.TBL_DataSumHazeMap
+    └── SP1.dbo.TBL_DataSumDefect
+            │
+            ▼
+    JOIN all tables on CreationDate + ChannelID
+            │
+            ▼
+    LEFT JOIN with existing SP1_Data (Machine='SP1')
+            │
+            ▼
+    WHERE SP1_Data.CreationDate IS NULL (new records only)
+            │
+            ▼
+    INSERT into SP1_Data with Machine='SP1'</code></pre>
+
+    <h3><code>[exsil_user].[SP1DataCollector_SP13Only]</code></h3>
+    <p>Syncs data from the SP1-3 tool into <code>SP1_Data</code>. Identical logic to SP11Only but uses:</p>
+    <ul>
+        <li>Linked server: <code>SP1_3</code></li>
+        <li>Machine value: <code>'SP1-3'</code></li>
+    </ul>
+
+    <h2>Key Logic</h2>
+
+    <h3>New Records Only</h3>
+    <p>Both procedures use a LEFT OUTER JOIN pattern to avoid duplicates:</p>
+    <pre><code>LEFT OUTER JOIN dbo.SP1_Data SP1
+    ON Info.CreationDate = SP1.CreationDate
+    AND SP1.Machine = 'SP1'  -- or 'SP1-3'
+WHERE SP1.CreationDate IS NULL</code></pre>
+    <p>This ensures only records that don't already exist in <code>SP1_Data</code> are inserted.</p>
+
+    <h3>Composite Channel Filter</h3>
+    <p>Both procedures filter for composite channel data only:</p>
+    <pre><code>WHERE LEFT(Defect.ChannelID, 9) = 'Composite'</code></pre>
+
+    <h3>SOD Column Calculation</h3>
+    <p>Size-of-Defect (SOD) columns are calculated by combining bin counts:</p>
+    <pre><code>SOD1 = Defect.BinCnt1 + Defect.LPDNBinCntInSize1
+SOD2 = Defect.BinCnt2 + Defect.LPDNBinCntInSize2
+...
+SOD8 = Defect.BinCnt8 + Defect.LPDNBinCntInSize8
+SOD18 = Defect.BinCnt18 + Defect.LPDNBinCntInSize18</code></pre>
+
+    <h3>Column Mappings</h3>
+    <p>Key field mappings from tool database to SP1_Data:</p>
+
+    <table>
+        <tr>
+            <th>SP1_Data Column</th>
+            <th>Source Table</th>
+            <th>Source Column</th>
+        </tr>
+        <tr><td><code>ID#</code></td><td>Info</td><td><code>LotIdLabel</code> (trimmed)</td></tr>
+        <tr><td><code>RUN#</code></td><td>Info</td><td><code>StepID</code> (trimmed)</td></tr>
+        <tr><td><code>Wafer_log</code></td><td>Info</td><td><code>ProcessToolID</code> (trimmed)</td></tr>
+        <tr><td><code>Comment1</code></td><td>Info</td><td><code>ProcessGroup</code></td></tr>
+        <tr><td><code>Comment2</code></td><td>Info</td><td><code>ProcessArea</code></td></tr>
+        <tr><td><code>SessionDate</code></td><td>Info</td><td><code>SessionDate</code></td></tr>
+        <tr><td><code>SourceSlotID</code></td><td>Info</td><td><code>SourceSlotID</code></td></tr>
+        <tr><td><code>DestinationStationID</code></td><td>Info</td><td><code>DestinationStationID</code></td></tr>
+        <tr><td><code>DestinationSlotID</code></td><td>Info</td><td><code>DestinationSlotID</code></td></tr>
+        <tr><td><code>DispositionName</code></td><td>Info</td><td><code>DispositionName</code></td></tr>
+        <tr><td><code>ScratchCnt</code></td><td>Class</td><td><code>ScratchCnt</code></td></tr>
+        <tr><td><code>ClusterAreaCnt</code></td><td>Class</td><td><code>ClusterAreaCnt</code></td></tr>
+        <tr><td><code>SumAllDefects</code></td><td>Chnl</td><td><code>SumAllDefects</code></td></tr>
+        <tr><td><code>Average</code>, <code>Peak</code>, <code>Median</code></td><td>Haze</td><td>Haze measurements</td></tr>
+        <tr><td><code>BinCnt1-8</code>, <code>PosCnt</code>, <code>NegCnt</code></td><td>Defect</td><td>Defect counts</td></tr>
+    </table>
+
+    <h2>Triggering Data Collection</h2>
+    <p>The .NET application triggers these stored procedures via:</p>
+    <ol>
+        <li><strong>Shared utility method:</strong> <code>UpdateSPxTool()</code> in <code>App_Code/Class1.vb</code></li>
+        <li><strong>Direct calls:</strong> Some pages call the stored procedures directly</li>
+    </ol>
+    <p>See <a href="SurfScan.html">SurfScan.html</a> for the list of pages that trigger refresh.</p>
+
+    <h2>Architecture Diagram</h2>
+    <div class="diagram">┌─────────────────┐     ┌─────────────────┐
+│   SP1 Tool      │     │   SP1-3 Tool    │
+│   (Physical)    │     │   (Physical)    │
+└────────┬────────┘     └────────┬────────┘
+         │                       │
+         ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐
+│  SP11 Linked    │     │  SP1_3 Linked   │
+│     Server      │     │     Server      │
+└────────┬────────┘     └────────┬────────┘
+         │                       │
+         ▼                       ▼
+┌─────────────────────────────────────────┐
+│         SQL Server (AutoData)           │
+│  ┌───────────────────────────────────┐  │
+│  │ SP1DataCollector_SP11Only         │  │
+│  │ SP1DataCollector_SP13Only         │  │
+│  └───────────────┬───────────────────┘  │
+│                  ▼                      │
+│  ┌───────────────────────────────────┐  │
+│  │          SP1_Data Table           │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────┐
+│        SatiDotNet2 Web Application      │
+│  (Reports, Label Printing, SPC, etc.)   │
+└─────────────────────────────────────────┘</div>
+
+</body>
+</html>

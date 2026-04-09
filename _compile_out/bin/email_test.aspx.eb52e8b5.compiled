@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/TestArea/Email_Test.aspx" hash="fffffffadb1f33c3" filehash="70b387b6c07142d0" flags="110000" assembly="App_Web_sy5gllzq" type="ASP.testarea_email_test_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/TestArea/Email_Test.aspx" />
+        <filedep name="/TestArea/Email_Test.aspx.vb" />
+    </filedeps>
+</preserve>

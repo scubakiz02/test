@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/ViewLots2.aspx" hash="fffffffadb1f33c3" filehash="7ec2738f380d9cb7" flags="110000" assembly="App_Web_hulyfwxb" type="ASP.pc_viewlots2_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/ViewLots2.aspx" />
+        <filedep name="/PC/ViewLots2.aspx.vb" />
+    </filedeps>
+</preserve>

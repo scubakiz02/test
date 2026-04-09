@@ -1,0 +1,77 @@
+﻿.MasterPagePanel {
+    width: calc(100% - 5px);
+    height: calc(100% - 20px);
+    min-width: 1050px
+}
+
+.MasterPagePanelSub {
+    width: 100%;
+}
+
+.MasterPageContentPanel {
+    width: calc(100% - 20px);
+    padding:10px;
+}
+
+@media screen and (min-width: 1800px) {
+    .MainMenuNavBar {
+        font-size: 19px;
+    }
+
+    .MainMenuRows {
+        padding-left: 21%;
+        padding-right: 16%;
+    }
+}
+
+@media screen and (max-width: 1799px) {
+    .MainMenuNavBar {
+        font-size: 17px;
+    }
+
+    .MainMenuRows {
+        padding-left: 20%;
+        padding-right: 15%;
+    }
+}
+
+@media screen and (max-width: 1500px) {
+    .MainMenuNavBar {
+        font-size: 17px;
+    }
+
+    .MainMenuRows {
+        padding-left: 10%;
+        padding-right: 5%;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .MainMenuNavBar {
+        font-size: 14px;
+    }
+
+    .MainMenuRows {
+        padding-left: 8%;
+        padding-right: 3%;
+    }
+}
+
+.MasterMainBackground {
+    background: black;
+    background: black url("Color/DarkenWafers.jpg") no-repeat center center fixed;
+    background-size: cover;
+}
+
+.MasterTopBackground {
+    background-color: #80befd;
+}
+
+.MasterBottomBackground {
+    background-color: #0d2755;
+}
+
+.ContentAutoScaler {
+    width: 100%;
+    /*min-width: 1050px;*/
+}

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/SRN.aspx" hash="fffffffadb1f33c3" filehash="6b3ec89d1b275b1b" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_srn_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/SRN.aspx" />
+        <filedep name="/PC/SRN.aspx.vb" />
+    </filedeps>
+</preserve>

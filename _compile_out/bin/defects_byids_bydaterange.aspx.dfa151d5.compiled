@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/Defects_ByIDs_ByDateRange.aspx" hash="fffffffadb1f33c3" filehash="17621908f0400753" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_defects_byids_bydaterange_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/Defects_ByIDs_ByDateRange.aspx" />
+        <filedep name="/Reports/Defects_ByIDs_ByDateRange.aspx.vb" />
+    </filedeps>
+</preserve>

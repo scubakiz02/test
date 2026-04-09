@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/Ship.aspx" hash="fffffffadb1f33c3" filehash="d9d567155db960ee" flags="110000" assembly="App_Web_umrposus" type="ASP.pc_ship_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/Ship.aspx" />
+        <filedep name="/PC/Ship.aspx.vb" />
+    </filedeps>
+</preserve>

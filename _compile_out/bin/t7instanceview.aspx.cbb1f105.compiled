@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/T7InstanceView.aspx" hash="fffffffadb1f33c3" filehash="8d1dd7babaa0d5f2" flags="110000" assembly="App_Web_kkh4irov" type="ASP.production_t7instanceview_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/T7InstanceView.aspx" />
+        <filedep name="/Production/T7InstanceView.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/MR/MRT.aspx" hash="fffffffadb1f33c3" filehash="34c18b4b5e4d61e9" flags="110000" assembly="App_Web_4kx2ky30" type="ASP.mr_mrt_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/MR/MRT.aspx" />
+        <filedep name="/MR/MRT.aspx.vb" />
+    </filedeps>
+</preserve>

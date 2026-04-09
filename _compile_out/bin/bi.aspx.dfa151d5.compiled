@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/Bi.aspx" hash="fffffffadb1f33c3" filehash="c51a2eda9e61664d" flags="110000" assembly="App_Web_tkobninc" type="ASP.reports_bi_aspx">
+    <filedeps>
+        <filedep name="/Reports/Bi.aspx" />
+        <filedep name="/Reports/Bi.aspx.vb" />
+    </filedeps>
+</preserve>

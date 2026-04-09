@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Sales/MainSales.aspx" hash="fffffffadb1f33c3" filehash="7b755cda8875732f" flags="110000" assembly="App_Web_kibjyory" type="ASP.sales_mainsales_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Sales/MainSales.aspx" />
+        <filedep name="/Sales/MainSales.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/BK/DirectoryNavigator.aspx" hash="fffffffadb1f33c3" filehash="e7e5c66ab8d5a1c" flags="110000" assembly="App_Web_a3z5iggg" type="ASP.bk_directorynavigator_aspx">
+    <filedeps>
+        <filedep name="/BK/DirectoryNavigator.aspx" />
+        <filedep name="/BK/DirectoryNavigator.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

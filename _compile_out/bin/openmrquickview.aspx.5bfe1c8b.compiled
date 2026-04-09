@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/MR/OpenMRQuickView.aspx" hash="fffffffadb1f33c3" filehash="8fcd380ea6b1e598" flags="110000" assembly="App_Web_4kx2ky30" type="ASP.mr_openmrquickview_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/MR/OpenMRQuickView.aspx" />
+        <filedep name="/MR/OpenMRQuickView.aspx.vb" />
+    </filedeps>
+</preserve>

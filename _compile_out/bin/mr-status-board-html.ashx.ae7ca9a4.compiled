@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/api/mr-status-board-html.ashx" hash="ffffffffd8b12621" filehash="1bf729bec417" flags="110000" assembly="App_Web_otunvlme" type="StreamData">
+    <filedeps>
+        <filedep name="/api/mr-status-board-html.ashx" />
+    </filedeps>
+</preserve>

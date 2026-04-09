@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/WebSiteMap.aspx" hash="fffffffadb1f33c3" filehash="6151c7f7a29b15f0" flags="110000" assembly="App_Web_1j2he5bh" type="ASP.websitemap_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/WebSiteMap.aspx" />
+        <filedep name="/WebSiteMap.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SatiDotNet2 Developer Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #fafafa;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        h2 { color: #2980b9; margin-top: 30px; }
+        h3 { color: #27ae60; }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .card h3 {
+            margin-top: 0;
+        }
+        .card-link {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        .card-link:hover {
+            background-color: #2980b9;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background-color: #3498db; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .alert-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            color: #0c5460;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #856404;
+            color: #856404;
+        }
+        .architecture-diagram {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        .doc-list {
+            list-style: none;
+            padding: 0;
+        }
+        .doc-list li {
+            margin: 10px 0;
+        }
+        .doc-list a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .doc-list a:hover {
+            text-decoration: underline;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .badge-report { background-color: #9b59b6; color: white; }
+        .badge-architecture { background-color: #e67e22; color: white; }
+    </style>
+</head>
+<body>
+    <h1>SatiDotNet2 Developer Documentation</h1>
+
+    <div class="alert alert-info">
+        <strong>Welcome!</strong> This documentation is designed to help new developers understand the SatiDotNet2 codebase, particularly the surf scan reporting and data collection systems.
+    </div>
+
+    <h2>Quick Start</h2>
+    <p>SatiDotNet2 is a web application for managing wafer manufacturing data, including surface scan inspection reports, label printing, and SPC analysis.</p>
+
+    <h3>Documentation Index</h3>
+    <ul class="doc-list">
+        <li><a href="SurfScan.html">SurfScan (Bin Fall) Report</a> <span class="badge badge-report">Report</span></li>
+        <li><a href="SP1_Data_Collection.html">SP1_Data Collection Architecture</a> <span class="badge badge-architecture">Architecture</span></li>
+    </ul>
+
+    <h2>Surf Scan Tools Overview</h2>
+    <p>The application supports multiple surf scan tools that inspect wafer surfaces for defects and particles:</p>
+
+    <table>
+        <tr>
+            <th>Tool</th>
+            <th>Machine ID</th>
+            <th>Data Collection Method</th>
+        </tr>
+        <tr>
+            <td>SP1</td>
+            <td>SP1</td>
+            <td>Linked Server + Stored Procedure</td>
+        </tr>
+        <tr>
+            <td>SP1-3</td>
+            <td>SP1-3</td>
+            <td>Linked Server + Stored Procedure</td>
+        </tr>
+        <tr>
+            <td>SP2</td>
+            <td>SP2-S0132</td>
+            <td>SP2DC Software (Real-time)</td>
+        </tr>
+        <tr>
+            <td>SP3-1</td>
+            <td>SP3-2110224</td>
+            <td>SP2DC Software</td>
+        </tr>
+        <tr>
+            <td>SP3-2</td>
+            <td>SP3-2110164</td>
+            <td>SP2DC Software</td>
+        </tr>
+        <tr>
+            <td>SP5-1</td>
+            <td>SP5-2130406</td>
+            <td>SP2DC Software</td>
+        </tr>
+    </table>
+
+    <div class="alert alert-warning">
+        <strong>Important:</strong> SP1 and SP1-3 tools collect data differently than SP2, SP3, and SP5 tools.
+        SP1/SP1-3 use SQL Server linked servers and stored procedures to sync data on-demand, while the other tools
+        use the SP2DC data collection software which uploads data directly to the database.
+        <br><br>
+        <a href="SP1_Data_Collection.html">Learn more about SP1 data collection architecture →</a>
+    </div>
+
+    <h2>Data Flow Architecture</h2>
+    <div class="architecture-diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SURF SCAN TOOLS                                   │
+├─────────────────────────────────┬───────────────────────────────────────────┤
+│   SP1 & SP1-3 Tools             │   SP2, SP3 & SP5 Tools                    │
+│   (Linked Server Method)        │   (SP2DC Method)                          │
+└───────────────┬─────────────────┴─────────────────────┬─────────────────────┘
+                │                                       │
+                ▼                                       ▼
+┌───────────────────────────────┐       ┌───────────────────────────────┐
+│  SQL Server Linked Servers    │       │     SP2DC Data Collection     │
+│  - SP11 (for SP1)             │       │         Software              │
+│  - SP1_3 (for SP1-3)          │       │                               │
+└───────────────┬───────────────┘       └───────────────┬───────────────┘
+                │                                       │
+                ▼                                       ▼
+┌───────────────────────────────┐       ┌───────────────────────────────┐
+│  Stored Procedures            │       │     Direct Database Insert    │
+│  - SP1DataCollector_SP11Only  │       │                               │
+│  - SP1DataCollector_SP13Only  │       │                               │
+└───────────────┬───────────────┘       └───────────────┬───────────────┘
+                │                                       │
+                └───────────────────┬───────────────────┘
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │   AutoData Database           │
+                    │   ┌───────────────────────┐   │
+                    │   │     SP1_Data Table    │   │
+                    │   │  (Central Data Cache) │   │
+                    │   └───────────────────────┘   │
+                    └───────────────┬───────────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │   SatiDotNet2 Web Application │
+                    │   - Reports/SurfScan.aspx     │
+                    │   - Label Printing            │
+                    │   - SPC Analysis              │
+                    └───────────────────────────────┘</div>
+
+    <h2>Key Concepts</h2>
+
+    <div class="card">
+        <h3>SP1_Data Table</h3>
+        <p>The central cache table that stores all surf scan inspection data from all tools. The web application reads from this table for reporting and analysis.</p>
+        <p><strong>Location:</strong> <code>AutoData.dbo.SP1_Data</code></p>
+        <p><strong>Archive:</strong> <code>AutoData.dbo.Archive_SP1_Data</code> (data older than 90 days)</p>
+    </div>
+
+    <div class="card">
+        <h3>Data Refresh (SP1 & SP1-3 only)</h3>
+        <p>For SP1 and SP1-3 tools, users must trigger a data refresh to sync the latest data from the tool systems. This is done via "Update" buttons in the application or automatically before certain operations.</p>
+        <p>The refresh calls stored procedures like <code>[exsil_user].[SP1DataCollector_SP11Only]</code> which query the tool database via linked server and insert new records.</p>
+        <a href="SP1_Data_Collection.html" class="card-link">View Details</a>
+    </div>
+
+    <div class="card">
+        <h3>Bin Fall Report</h3>
+        <p>The primary report for viewing surf scan session results. Shows pass/reject counts, allows filtering by tool, date range, wafer diameter, and more. Includes drill-down to individual wafer data and map images.</p>
+        <p><strong>Location:</strong> <code>Reports/SurfScan.aspx</code></p>
+        <a href="SurfScan.html" class="card-link">View Documentation</a>
+    </div>
+
+    <h2>Key Files</h2>
+    <table>
+        <tr>
+            <th>File</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><code>Reports/SurfScan.aspx</code></td>
+            <td>Bin Fall report page</td>
+        </tr>
+        <tr>
+            <td><code>App_Code/Class1.vb</code></td>
+            <td>Shared utility class including <code>UpdateSPxTool()</code></td>
+        </tr>
+        <tr>
+            <td><code>Production/MakeSurfScanWaferBoxLabel.aspx</code></td>
+            <td>Wafer box label printing</td>
+        </tr>
+        <tr>
+            <td><code>Production/SurfScanLabelMaker.aspx</code></td>
+            <td>Surf scan label generation</td>
+        </tr>
+        <tr>
+            <td><code>SPC/SPC_Compile.aspx</code></td>
+            <td>Statistical Process Control compilation</td>
+        </tr>
+    </table>
+
+    <h2>Database Objects</h2>
+    <table>
+        <tr>
+            <th>Object</th>
+            <th>Type</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><code>dbo.SP1_Data</code></td>
+            <td>Table</td>
+            <td>Live surf scan data cache</td>
+        </tr>
+        <tr>
+            <td><code>dbo.Archive_SP1_Data</code></td>
+            <td>Table</td>
+            <td>Archived data (90+ days old)</td>
+        </tr>
+        <tr>
+            <td><code>dbo.CofA_Info</code></td>
+            <td>Table</td>
+            <td>Certificate of Analysis bin configuration</td>
+        </tr>
+        <tr>
+            <td><code>SP11</code></td>
+            <td>Linked Server</td>
+            <td>Connection to SP1 tool database</td>
+        </tr>
+        <tr>
+            <td><code>SP1_3</code></td>
+            <td>Linked Server</td>
+            <td>Connection to SP1-3 tool database</td>
+        </tr>
+        <tr>
+            <td><code>[exsil_user].[SP1DataCollector_SP11Only]</code></td>
+            <td>Stored Procedure</td>
+            <td>Syncs SP1 tool data</td>
+        </tr>
+        <tr>
+            <td><code>[exsil_user].[SP1DataCollector_SP13Only]</code></td>
+            <td>Stored Procedure</td>
+            <td>Syncs SP1-3 tool data</td>
+        </tr>
+    </table>
+
+    <hr style="margin-top: 40px;">
+    <p style="color: #666; font-size: 14px;">
+        <strong>SatiDotNet2 Documentation</strong> | Last updated: February 2025
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/GeoViewer.aspx" hash="fffffffadb1f33c3" filehash="b2697c5d2f5be77d" flags="110000" assembly="App_Web_22go1hop" type="ASP.reports_geoviewer_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/GeoViewer.aspx" />
+        <filedep name="/Reports/GeoViewer.aspx.vb" />
+    </filedeps>
+</preserve>

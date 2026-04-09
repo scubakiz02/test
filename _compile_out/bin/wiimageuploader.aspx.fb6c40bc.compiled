@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/WI_pages/WIImageUploader.aspx" hash="fffffffadb1f33c3" filehash="469ce9901936eea8" flags="110000" assembly="App_Web_puzf0mzt" type="ASP.wi_pages_wiimageuploader_aspx">
+    <filedeps>
+        <filedep name="/WI_pages/WIImageUploader.aspx" />
+        <filedep name="/WI_pages/WIImageUploader.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/api/pm-report/tabulator-line-chart-config.ashx" hash="ffffffffd8b12621" filehash="ffffec9ecd54d483" flags="110000" assembly="App_Web_jycip1li" type="StreamData">
+    <filedeps>
+        <filedep name="/api/pm-report/tabulator-line-chart-config.ashx" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/DBMaintenance/EditRoles.aspx" hash="fffffffadb1f33c3" filehash="e9f79ee0c9fb68df" flags="110000" assembly="App_Web_jtuoqcf5" type="ASP.dbmaintenance_editroles_aspx">
+    <filedeps>
+        <filedep name="/DBMaintenance/EditRoles.aspx" />
+        <filedep name="/DBMaintenance/EditRoles.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

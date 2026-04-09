@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/CustomerMaintenance/CustomerAddressEdit.aspx" hash="fffffffadb1f33c3" filehash="dd01d4262c49f22" flags="110000" assembly="App_Web_1upnka0m" type="ASP.customermaintenance_customeraddressedit_aspx">
+    <filedeps>
+        <filedep name="/CustomerMaintenance/CustomerAddressEdit.aspx" />
+        <filedep name="/CustomerMaintenance/CustomerAddressEdit.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

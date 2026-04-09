@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/CheckSum.aspx" hash="fffffffadb1f33c3" filehash="6ac35a0664c72f8f" flags="110000" assembly="App_Web_1j2he5bh" type="ASP.checksum_aspx">
+    <filedeps>
+        <filedep name="/CheckSum.aspx" />
+        <filedep name="/CheckSum.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

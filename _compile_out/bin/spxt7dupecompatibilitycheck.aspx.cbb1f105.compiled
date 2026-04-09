@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Production/SPxT7DupeCompatibilityCheck.aspx" hash="fffffffadb1f33c3" filehash="45b088c6a0d7631b" flags="110000" assembly="App_Web_kkh4irov" type="ASP.production_spxt7dupecompatibilitycheck_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Production/SPxT7DupeCompatibilityCheck.aspx" />
+        <filedep name="/Production/SPxT7DupeCompatibilityCheck.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/WHReceivingHistory.aspx" hash="fffffffadb1f33c3" filehash="36107277fe20138e" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_whreceivinghistory_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/WHReceivingHistory.aspx" />
+        <filedep name="/PC/WHReceivingHistory.aspx.vb" />
+    </filedeps>
+</preserve>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SPC/SPC_View.aspx" hash="fffffffadb1f33c3" filehash="dcbc32f5af1166d1" flags="110000" assembly="App_Web_ttlfrdid" type="ASP.spc_spc_view_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SPC/SPC_View.aspx" />
+        <filedep name="/SPC/SPC_View.aspx.vb" />
+    </filedeps>
+</preserve>

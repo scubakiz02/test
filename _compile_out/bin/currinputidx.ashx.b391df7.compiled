@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="2" virtualPath="/ChecklistLogging/CurrInputIdx.ashx" hash="ffffffffd8b12621" filehash="105e54e5a69b" flags="110000" assembly="App_Web_ub2zt02p" type="StreamData">
+    <filedeps>
+        <filedep name="/ChecklistLogging/CurrInputIdx.ashx" />
+    </filedeps>
+</preserve>

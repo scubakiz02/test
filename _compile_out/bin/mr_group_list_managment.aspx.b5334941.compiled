@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SMR/MR_Group_List_Managment.aspx" hash="fffffffadb1f33c3" filehash="93c8db3f993c17a6" flags="110000" assembly="App_Web_vt0sbmbw" type="ASP.smr_mr_group_list_managment_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SMR/MR_Group_List_Managment.aspx" />
+        <filedep name="/SMR/MR_Group_List_Managment.aspx.vb" />
+    </filedeps>
+</preserve>

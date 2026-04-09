@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/MakeShipmentsPending.aspx" hash="fffffffadb1f33c3" filehash="bea2c0e4260adac4" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_makeshipmentspending_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/MakeShipmentsPending.aspx" />
+        <filedep name="/PC/MakeShipmentsPending.aspx.vb" />
+    </filedeps>
+</preserve>

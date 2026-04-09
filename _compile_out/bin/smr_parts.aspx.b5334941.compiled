@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SMR/SMR_Parts.aspx" hash="fffffffadb1f33c3" filehash="4c55e9b8e2bfda8d" flags="110000" assembly="App_Web_qz4cnwzp" type="ASP.smr_smr_parts_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SMR/SMR_Parts.aspx" />
+        <filedep name="/SMR/SMR_Parts.aspx.vb" />
+    </filedeps>
+</preserve>

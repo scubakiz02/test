@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/NonConformingPacking.aspx" hash="fffffffadb1f33c3" filehash="c1d5b11fc76603a4" flags="110000" assembly="App_Web_iq4rhhuq" type="ASP.pc_nonconformingpacking_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/NonConformingPacking.aspx" />
+        <filedep name="/PC/NonConformingPacking.aspx.vb" />
+    </filedeps>
+</preserve>

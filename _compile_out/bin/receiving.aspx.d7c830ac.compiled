@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/Receiving.aspx" hash="fffffffadb1f33c3" filehash="25e08dcc3b208b3c" flags="110000" assembly="App_Web_gw2pr5zn" type="ASP.pc_receiving_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/Receiving.aspx" />
+        <filedep name="/PC/Receiving.aspx.vb" />
+    </filedeps>
+</preserve>

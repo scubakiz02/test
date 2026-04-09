@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/SPC/SPC_Record_Maintenance.aspx" hash="fffffffadb1f33c3" filehash="d3777cd760e8d37" flags="110000" assembly="App_Web_ttlfrdid" type="ASP.spc_spc_record_maintenance_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/SPC/SPC_Record_Maintenance.aspx" />
+        <filedep name="/SPC/SPC_Record_Maintenance.aspx.vb" />
+    </filedeps>
+</preserve>

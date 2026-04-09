@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/PC/CheckPoint.aspx" hash="fffffffadb1f33c3" filehash="e7149768c5c6f63d" flags="110000" assembly="App_Web_hulyfwxb" type="ASP.pc_checkpoint_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/PC/CheckPoint.aspx" />
+        <filedep name="/PC/CheckPoint.aspx.vb" />
+    </filedeps>
+</preserve>

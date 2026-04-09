@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/ToolData/ToolDataMain.aspx" hash="fffffffadb1f33c3" filehash="3f2f61d987b20e2b" flags="110000" assembly="App_Web_usxrgfly" type="ASP.tooldata_tooldatamain_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/ToolData/ToolDataMain.aspx" />
+        <filedep name="/ToolData/ToolDataMain.aspx.cs" />
+    </filedeps>
+</preserve>

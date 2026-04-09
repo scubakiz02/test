@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/ChecklistLogging/ChecklistReport.aspx" hash="fffffffadb1f33c3" filehash="f6235f00ec83447" flags="110000" assembly="App_Web_5ih3u12d" type="ASP.checklistlogging_checklistreport_aspx">
+    <filedeps>
+        <filedep name="/ChecklistLogging/ChecklistReport.aspx" />
+        <filedep name="/ChecklistLogging/ChecklistReport.aspx.vb" />
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+    </filedeps>
+</preserve>

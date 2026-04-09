@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<preserve resultType="3" virtualPath="/Reports/Reports.aspx" hash="fffffffadb1f33c3" filehash="58caa70b5cc8c149" flags="110000" assembly="App_Web_22go1hop" type="ASP.reports_reports_aspx">
+    <filedeps>
+        <filedep name="/MasterPage1.master" />
+        <filedep name="/MasterPage1.master.vb" />
+        <filedep name="/Reports/Reports.aspx" />
+        <filedep name="/Reports/Reports.aspx.vb" />
+    </filedeps>
+</preserve>
